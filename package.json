@@ -1,6 +1,6 @@
 {
   "name": "octocms",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A file-based CMS for Next.js — schema-driven, Git-backed, no database",
   "license": "MIT",
   "keywords": [
