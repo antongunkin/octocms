@@ -16,7 +16,7 @@ afterEach(() => {
 describe('dev command preconditions', () => {
   it('requires next.config.ts to exist', async () => {
     const { devCommand } = await import('./dev');
-    await devCommand(TMP_DIR, { port: 3001 });
+    await devCommand(TMP_DIR, { port: 3000 });
     expect(process.exitCode).toBe(1);
   });
 

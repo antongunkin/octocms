@@ -1,9 +1,4 @@
-export type EntryStatus =
-  | "draft"
-  | "published"
-  | "changed"
-  | "archived"
-  | "merged";
+export type EntryStatus = 'draft' | 'published' | 'changed' | 'archived' | 'merged';
 
 // ---------------------------------------------------------------------------
 // Schema / config types (previously in octocms/admin/types)
@@ -11,27 +6,27 @@ export type EntryStatus =
 // ---------------------------------------------------------------------------
 
 export type FieldFormat =
-  | "string"
-  | "text"
-  | "markdown"
-  | "boolean"
-  | "reference"
-  | "image"
-  | "number"
-  | "datetime"
-  | "json"
-  | "slug"
-  | "select"
-  | "url"
-  | "color"
-  | "conditional"
-  | "richtext";
+  | 'string'
+  | 'text'
+  | 'markdown'
+  | 'boolean'
+  | 'reference'
+  | 'image'
+  | 'number'
+  | 'datetime'
+  | 'json'
+  | 'slug'
+  | 'select'
+  | 'url'
+  | 'color'
+  | 'conditional'
+  | 'richtext';
 
 export type ReferenceFieldConfig = {
   /** Which collections this reference can point to. Defaults to all collections. */
   collections?: string[];
   /** 'one' = single reference, 'many' = array of references. Defaults to 'many'. */
-  cardinality?: "one" | "many";
+  cardinality?: 'one' | 'many';
   /** Minimum number of references (for 'many'). */
   min?: number;
   /** Maximum number of references (for 'many'). */
@@ -79,7 +74,7 @@ export type ConditionalFieldConfig = {
 export type RichTextComponentProp = {
   name: string;
   label: string;
-  type: "string" | "number" | "boolean" | "url" | "image" | "select";
+  type: 'string' | 'number' | 'boolean' | 'url' | 'image' | 'select';
   options?: readonly SelectOption[];
   required?: boolean;
   defaultValue?: string | number | boolean;
@@ -89,7 +84,7 @@ export type RichTextComponentProp = {
 export type RichTextComponentDef = {
   label: string;
   /** Inline = sits within a paragraph. Block = occupies its own line. */
-  kind: "inline" | "block";
+  kind: 'inline' | 'block';
   props: RichTextComponentProp[];
 };
 
@@ -124,7 +119,7 @@ export type RichTextFieldConfig = {
     references?: {
       collections?: string[];
       /** Whether references can appear inline, as blocks, or both. Default: 'both'. */
-      display?: "inline" | "block" | "both";
+      display?: 'inline' | 'block' | 'both';
     };
     /** Allow embedding conditional (A/B) content branches. */
     conditions?: boolean;
@@ -145,61 +140,61 @@ export type RichTextFieldConfig = {
  */
 export type CollectionField =
   | (CollectionFieldBase & {
-      format: "string";
+      format: 'string';
       /**
        * When `true`, the field stores a JSON array of strings (`string[]`) and the editor shows a tag-style list.
        */
       list?: true;
     })
   | (CollectionFieldBase & {
-      format: "text";
+      format: 'text';
       /** Textarea height; defaults to 4 in the editor. */
       rows?: number;
     })
-  | (CollectionFieldBase & { format: "markdown" })
+  | (CollectionFieldBase & { format: 'markdown' })
   | (CollectionFieldBase & {
-      format: "boolean";
+      format: 'boolean';
       /** When set, new entries get `"true"` or `"false"` in JSON. */
       defaultBoolean?: boolean;
       /** Radio labels in the editor (default Yes / No). */
       booleanLabels?: { true: string; false: string };
     })
   | (CollectionFieldBase & {
-      format: "reference";
+      format: 'reference';
       /** @deprecated Use `reference` config instead. Kept for backward compatibility. */
       collection?: string;
       reference?: ReferenceFieldConfig;
     })
-  | (CollectionFieldBase & { format: "image" })
+  | (CollectionFieldBase & { format: 'image' })
   | (CollectionFieldBase & {
-      format: "number";
+      format: 'number';
       min?: number;
       max?: number;
-      step?: number | "any";
-      valueType?: "int" | "float";
+      step?: number | 'any';
+      valueType?: 'int' | 'float';
     })
   | (CollectionFieldBase & {
-      format: "datetime";
+      format: 'datetime';
       dateOnly?: boolean;
       defaultNow?: boolean;
     })
-  | (CollectionFieldBase & { format: "json" })
+  | (CollectionFieldBase & { format: 'json' })
   | (CollectionFieldBase & {
-      format: "slug";
+      format: 'slug';
       /**
        * Field key to auto-generate from (must be a non-list `string` or `text` field).
        * If omitted, the field marked `entryTitle: true` is used.
        */
       slugSource?: string;
     })
-  | (CollectionFieldBase & { format: "url" })
+  | (CollectionFieldBase & { format: 'url' })
   | (CollectionFieldBase & {
-      format: "color";
+      format: 'color';
       /** When true, show a hex text field synced with the native color picker. */
       allowInput?: boolean;
     })
   | (CollectionFieldBase & {
-      format: "select";
+      format: 'select';
       options: readonly SelectOption[];
       multiple?: boolean;
       /** Default for new entries when `multiple` is not true; must match an option `value`. */
@@ -208,11 +203,11 @@ export type CollectionField =
       defaultOptions?: readonly string[];
     })
   | (CollectionFieldBase & {
-      format: "conditional";
+      format: 'conditional';
       conditional: ConditionalFieldConfig;
     })
   | (CollectionFieldBase & {
-      format: "richtext";
+      format: 'richtext';
       richtext?: RichTextFieldConfig;
     });
 
@@ -257,28 +252,13 @@ export type Config = {
 };
 
 /** Narrowed field types for parsers that only apply to one format. */
-export type NumberCollectionField = Extract<
-  CollectionField,
-  { format: "number" }
->;
-export type DatetimeCollectionField = Extract<
-  CollectionField,
-  { format: "datetime" }
->;
-export type JsonCollectionField = Extract<CollectionField, { format: "json" }>;
-export type SlugCollectionField = Extract<CollectionField, { format: "slug" }>;
-export type SelectCollectionField = Extract<
-  CollectionField,
-  { format: "select" }
->;
-export type ConditionalCollectionField = Extract<
-  CollectionField,
-  { format: "conditional" }
->;
-export type RichTextCollectionField = Extract<
-  CollectionField,
-  { format: "richtext" }
->;
+export type NumberCollectionField = Extract<CollectionField, { format: 'number' }>;
+export type DatetimeCollectionField = Extract<CollectionField, { format: 'datetime' }>;
+export type JsonCollectionField = Extract<CollectionField, { format: 'json' }>;
+export type SlugCollectionField = Extract<CollectionField, { format: 'slug' }>;
+export type SelectCollectionField = Extract<CollectionField, { format: 'select' }>;
+export type ConditionalCollectionField = Extract<CollectionField, { format: 'conditional' }>;
+export type RichTextCollectionField = Extract<CollectionField, { format: 'richtext' }>;
 
 export type SelectedFile = {
   type: string;
@@ -331,37 +311,37 @@ export type ResolvedImageField = {
 // ---------------------------------------------------------------------------
 
 export type RichTextNode =
-  | { type: "paragraph"; children: RichTextNode[] }
-  | { type: "blockquote"; children: RichTextNode[] }
-  | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; children: RichTextNode[] }
+  | { type: 'paragraph'; children: RichTextNode[] }
+  | { type: 'blockquote'; children: RichTextNode[] }
+  | { type: 'heading'; level: 1 | 2 | 3 | 4 | 5 | 6; children: RichTextNode[] }
   | {
-      type: "text";
+      type: 'text';
       value: string;
-      marks?: ("bold" | "italic" | "underline" | "code")[];
+      marks?: ('bold' | 'italic' | 'underline' | 'code')[];
     }
-  | { type: "link"; url: string; children: RichTextNode[] }
-  | { type: "image"; image: ResolvedImageField }
-  | { type: "reference"; entry: unknown; display: "inline" | "block" }
+  | { type: 'link'; url: string; children: RichTextNode[] }
+  | { type: 'image'; image: ResolvedImageField }
+  | { type: 'reference'; entry: unknown; display: 'inline' | 'block' }
   | {
-      type: "condition";
+      type: 'condition';
       field: string;
       branches: Record<string, RichTextDocument> | RichTextDocument;
     }
-  | { type: "variable"; name: string }
+  | { type: 'variable'; name: string }
   | {
-      type: "component";
+      type: 'component';
       name: string;
       props: Record<string, unknown>;
       children?: RichTextNode[];
     }
-  | { type: "list"; ordered: boolean; children: RichTextNode[] }
-  | { type: "listItem"; children: RichTextNode[] }
-  | { type: "thematicBreak" }
-  | { type: "code"; lang?: string; value: string }
-  | { type: "html"; value: string }
-  | { type: "break" };
+  | { type: 'list'; ordered: boolean; children: RichTextNode[] }
+  | { type: 'listItem'; children: RichTextNode[] }
+  | { type: 'thematicBreak' }
+  | { type: 'code'; lang?: string; value: string }
+  | { type: 'html'; value: string }
+  | { type: 'break' };
 
-export type RichTextDocument = { type: "doc"; content: RichTextNode[] };
+export type RichTextDocument = { type: 'doc'; content: RichTextNode[] };
 
 export type MediaFile = {
   id: string;

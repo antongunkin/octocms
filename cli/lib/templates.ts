@@ -12,11 +12,7 @@ export { AdminLayout as default, metadata } from 'octocms/admin/pages/AdminLayou
 export const adminPageTemplate = `export { AdminApp as default } from 'octocms/admin/AdminApp';
 `;
 
-export function octoConfigTemplate(opts: {
-  projectName: string;
-  baseBranch: string;
-  pointerBranch?: string;
-}): string {
+export function octoConfigTemplate(opts: { projectName: string; baseBranch: string; pointerBranch?: string }): string {
   const gitBlock = opts.pointerBranch
     ? `  git: {\n    baseBranch: '${opts.baseBranch}',\n    publishedPointerBranch: '${opts.pointerBranch}',\n  },`
     : `  git: { baseBranch: '${opts.baseBranch}' },`;
@@ -67,10 +63,10 @@ export function demoPostJson(id: string): string {
   const now = new Date().toISOString();
   return JSON.stringify(
     {
-      sys: { id, type: "post", status: "merged" },
+      sys: { id, type: 'post', status: 'merged' },
       fields: {
-        title: "Hello World",
-        slug: "hello-world",
+        title: 'Hello World',
+        slug: 'hello-world',
         publishedAt: now,
       },
     },
@@ -86,7 +82,7 @@ Welcome to your new OctoCMS site! This is a demo post.
 Edit this content in the CMS admin panel at \`/cms\`.
 `;
 
-const AGENT_DOCS_MARKER = "<!-- octocms:agent-docs -->";
+const AGENT_DOCS_MARKER = '<!-- octocms:agent-docs -->';
 
 export function agentsMdSection(): string {
   return `${AGENT_DOCS_MARKER}
@@ -109,9 +105,9 @@ ${agentsMdSection()}
 
 export function tsconfigPaths(): Record<string, string[]> {
   return {
-    "cms/__generated__": ["./cms/__generated__/index.ts"],
-    "cms/__generated__/*": ["./cms/__generated__/*"],
-    "octocms/*": ["./octocms/*"],
-    "@/*": ["./src/*"],
+    'cms/__generated__': ['./cms/__generated__/index.ts'],
+    'cms/__generated__/*': ['./cms/__generated__/*'],
+    'octocms/*': ['./octocms/*'],
+    '@/*': ['./src/*'],
   };
 }

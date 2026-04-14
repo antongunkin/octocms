@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 120,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "sortImports": {
+    "groups": ["builtin", "external", "internal", ["sibling", "index"], "parent", "style"],
+    "internalPattern": ["@cms/*", "@/*"],
+    "newlinesBetween": true,
+    "order": "asc",
+    "ignoreCase": true
+  },
+  "ignorePatterns": ["dist/**", "build/**", "node_modules/**", "coverage/**", "public/**", "out/**", "scripts/fixtures/**"]
+}

@@ -5,11 +5,7 @@
  * The script now imports these functions; the CLI `types:gen` command calls them directly.
  */
 
-import type {
-  CollectionField,
-  Config,
-  ConditionalBranchConfig,
-} from "../../types";
+import type { CollectionField, Config, ConditionalBranchConfig } from '../../types';
 
 export const CODEGEN_BANNER = `/*
  * AUTO-GENERATED — DO NOT EDIT.
@@ -28,110 +24,97 @@ export function pascalCase(s: string): string {
 export function fieldToTSType(
   field: CollectionField,
   collectionNames: readonly string[],
-  mode: "resolved" | "raw" = "resolved",
+  mode: 'resolved' | 'raw' = 'resolved',
 ): string {
   switch (field.format) {
-    case "string":
-      return field.list ? "string[]" : "string";
-    case "text":
-    case "markdown":
-    case "slug":
-    case "url":
-    case "color":
-      return "string";
-    case "richtext":
-      return "RichTextDocument";
-    case "boolean":
+    case 'string':
+      return field.list ? 'string[]' : 'string';
+    case 'text':
+    case 'markdown':
+    case 'slug':
+    case 'url':
+    case 'color':
+      return 'string';
+    case 'richtext':
+      return 'RichTextDocument';
+    case 'boolean':
       return "'true' | 'false'";
-    case "number":
-      return "number | null";
-    case "datetime":
-      return "string | null";
-    case "image":
-      return mode === "raw" ? "string" : "ResolvedImageField";
-    case "json":
-      return "unknown";
-    case "select": {
-      const union = field.options.map((o) => `'${o.value}'`).join(" | ");
+    case 'number':
+      return 'number | null';
+    case 'datetime':
+      return 'string | null';
+    case 'image':
+      return mode === 'raw' ? 'string' : 'ResolvedImageField';
+    case 'json':
+      return 'unknown';
+    case 'select': {
+      const union = field.options.map((o) => `'${o.value}'`).join(' | ');
       if (field.multiple) {
         return field.options.length > 1 ? `(${union})[]` : `${union}[]`;
       }
       return union;
     }
-    case "reference": {
-      if (mode === "raw") {
-        const cardinality = field.reference?.cardinality ?? "many";
-        return cardinality === "one" ? "string" : "string";
+    case 'reference': {
+      if (mode === 'raw') {
+        const cardinality = field.reference?.cardinality ?? 'many';
+        return cardinality === 'one' ? 'string' : 'string';
       }
       return referenceFieldType(field, collectionNames);
     }
-    case "conditional": {
-      if (mode === "raw") {
-        return "unknown";
+    case 'conditional': {
+      if (mode === 'raw') {
+        return 'unknown';
       }
       return conditionalFieldType(field, collectionNames);
     }
     default:
-      return "unknown";
+      return 'unknown';
   }
 }
 
 function referenceFieldType(
-  field: Extract<CollectionField, { format: "reference" }>,
+  field: Extract<CollectionField, { format: 'reference' }>,
   collectionNames: readonly string[],
 ): string {
-  const cols =
-    field.reference?.collections ??
-    (field.collection ? [field.collection] : [...collectionNames]);
+  const cols = field.reference?.collections ?? (field.collection ? [field.collection] : [...collectionNames]);
   const entryTypes = cols.map((c) => `${pascalCase(c)}Entry`);
-  const union = entryTypes.length > 1 ? entryTypes.join(" | ") : entryTypes[0];
-  const cardinality = field.reference?.cardinality ?? "many";
-  if (cardinality === "one") {
+  const union = entryTypes.length > 1 ? entryTypes.join(' | ') : entryTypes[0];
+  const cardinality = field.reference?.cardinality ?? 'many';
+  if (cardinality === 'one') {
     return entryTypes.length > 1 ? `(${union}) | null` : `${union} | null`;
   }
   return entryTypes.length > 1 ? `(${union})[]` : `${union}[]`;
 }
 
 function conditionalFieldType(
-  field: Extract<CollectionField, { format: "conditional" }>,
+  field: Extract<CollectionField, { format: 'conditional' }>,
   collectionNames: readonly string[],
 ): string {
-  const branchTypes = field.conditional.branches.map((branch) =>
-    branchValueType(branch, collectionNames),
-  );
-  return branchTypes.join(" | ");
+  const branchTypes = field.conditional.branches.map((branch) => branchValueType(branch, collectionNames));
+  return branchTypes.join(' | ');
 }
 
-function branchValueType(
-  branch: ConditionalBranchConfig,
-  collectionNames: readonly string[],
-): string {
-  if ("collection" in branch && typeof branch.collection === "string") {
+function branchValueType(branch: ConditionalBranchConfig, collectionNames: readonly string[]): string {
+  if ('collection' in branch && typeof branch.collection === 'string') {
     return `${pascalCase(branch.collection)}Entry`;
   }
   if (branch.fields) {
     const entries = Object.entries(branch.fields);
-    if (entries.length === 0) return "{}";
-    const props = entries.map(
-      ([name, f]) => `  ${name}: ${fieldToTSType(f, collectionNames)};`,
-    );
-    return `{\n${props.join("\n")}\n}`;
+    if (entries.length === 0) return '{}';
+    const props = entries.map(([name, f]) => `  ${name}: ${fieldToTSType(f, collectionNames)};`);
+    return `{\n${props.join('\n')}\n}`;
   }
-  return "unknown";
+  return 'unknown';
 }
 
 // ---------------------------------------------------------------------------
 // Generators
 // ---------------------------------------------------------------------------
 
-export function generateTypes(
-  cfg: Config,
-  collectionNames: readonly string[],
-): string {
+export function generateTypes(cfg: Config, collectionNames: readonly string[]): string {
   const lines: string[] = [
-    CODEGEN_BANNER +
-      "import type { EntryStatus, ResolvedImageField } from 'octocms/types';",
-    "",
+    CODEGEN_BANNER + "import type { EntryStatus, ResolvedImageField } from 'octocms/types';",
+    '',
   ];
 
   // Emit Fields interfaces
@@ -143,8 +126,8 @@ export function generateTypes(
       const tsType = fieldToTSType(field, collectionNames);
       lines.push(`  ${fieldName}: ${tsType};`);
     }
-    lines.push("}");
-    lines.push("");
+    lines.push('}');
+    lines.push('');
   }
 
   // Emit Entry interfaces
@@ -153,93 +136,78 @@ export function generateTypes(
     lines.push(`export interface ${pascal}Entry {`);
     lines.push(`  sys: { id: string; type: '${key}'; status: EntryStatus };`);
     lines.push(`  fields: ${pascal}Fields;`);
-    lines.push("}");
-    lines.push("");
+    lines.push('}');
+    lines.push('');
   }
 
   // AnyEntry union
   const entryNames = collectionNames.map((k) => `${pascalCase(k)}Entry`);
-  lines.push(`export type AnyEntry = ${entryNames.join(" | ")};`);
-  lines.push("");
+  lines.push(`export type AnyEntry = ${entryNames.join(' | ')};`);
+  lines.push('');
 
   // EntryMap
-  lines.push("export type EntryMap = {");
+  lines.push('export type EntryMap = {');
   for (const key of collectionNames) {
     lines.push(`  ${key}: ${pascalCase(key)}Entry;`);
   }
-  lines.push("};");
-  lines.push("");
+  lines.push('};');
+  lines.push('');
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
-export function generateEnums(
-  cfg: Config,
-  collectionNames: readonly string[],
-  fieldTypes: readonly string[],
-): string {
+export function generateEnums(cfg: Config, collectionNames: readonly string[], fieldTypes: readonly string[]): string {
   const lines: string[] = [];
 
   // CollectionName const object
-  lines.push("export const CollectionName = {");
+  lines.push('export const CollectionName = {');
   for (const key of collectionNames) {
     lines.push(`  ${pascalCase(key)}: '${key}',`);
   }
-  lines.push("} as const;");
-  lines.push(
-    "export type CollectionName = (typeof CollectionName)[keyof typeof CollectionName];",
-  );
-  lines.push("");
+  lines.push('} as const;');
+  lines.push('export type CollectionName = (typeof CollectionName)[keyof typeof CollectionName];');
+  lines.push('');
 
   // COLLECTION_NAMES array
-  lines.push(
-    `export const COLLECTION_NAMES = [${collectionNames.map((k) => `'${k}'`).join(", ")}] as const;`,
-  );
-  lines.push("");
+  lines.push(`export const COLLECTION_NAMES = [${collectionNames.map((k) => `'${k}'`).join(', ')}] as const;`);
+  lines.push('');
 
   // Select option enums per collection
   for (const key of collectionNames) {
     const col = cfg.collections[key as keyof typeof cfg.collections];
     for (const [fieldName, field] of Object.entries(col.fields)) {
-      if (field.format !== "select") continue;
+      if (field.format !== 'select') continue;
       const enumName = `${pascalCase(key)}${pascalCase(fieldName)}Option`;
       lines.push(`export const ${enumName} = {`);
       for (const opt of field.options) {
         lines.push(`  ${pascalCase(opt.value)}: '${opt.value}',`);
       }
-      lines.push("} as const;");
-      lines.push(
-        `export type ${enumName} = (typeof ${enumName})[keyof typeof ${enumName}];`,
-      );
-      lines.push("");
+      lines.push('} as const;');
+      lines.push(`export type ${enumName} = (typeof ${enumName})[keyof typeof ${enumName}];`);
+      lines.push('');
     }
   }
 
   // FieldFormat const object
-  lines.push("export const FieldFormat = {");
+  lines.push('export const FieldFormat = {');
   for (const ft of fieldTypes) {
     lines.push(`  ${pascalCase(ft)}: '${ft}',`);
   }
-  lines.push("} as const;");
-  lines.push(
-    "export type FieldFormat = (typeof FieldFormat)[keyof typeof FieldFormat];",
-  );
-  lines.push("");
+  lines.push('} as const;');
+  lines.push('export type FieldFormat = (typeof FieldFormat)[keyof typeof FieldFormat];');
+  lines.push('');
 
-  return CODEGEN_BANNER + lines.join("\n");
+  return CODEGEN_BANNER + lines.join('\n');
 }
 
-export function generateContentDecls(
-  cfg: Config,
-  collectionNames: readonly string[],
-): string {
+export function generateContentDecls(cfg: Config, collectionNames: readonly string[]): string {
   const lines: string[] = [
     CODEGEN_BANNER +
       "import type { EntryStatus } from 'octocms/types';\n\n" +
-      "// Raw on-disk types (before query() processing).\n" +
-      "// Image fields are UUID strings, reference fields are key strings,\n" +
-      "// markdown fields are omitted (stored in companion .md files),\n" +
-      "// richtext fields are omitted (stored in companion .mdx files).\n",
+      '// Raw on-disk types (before query() processing).\n' +
+      '// Image fields are UUID strings, reference fields are key strings,\n' +
+      '// markdown fields are omitted (stored in companion .md files),\n' +
+      '// richtext fields are omitted (stored in companion .mdx files).\n',
   ];
 
   for (const key of collectionNames) {
@@ -248,36 +216,33 @@ export function generateContentDecls(
 
     lines.push(`export interface Raw${pascal}Fields {`);
     for (const [fieldName, field] of Object.entries(col.fields)) {
-      if (field.format === "markdown" || field.format === "richtext") continue; // companion files, not in JSON
-      const tsType = fieldToTSType(field, collectionNames, "raw");
+      if (field.format === 'markdown' || field.format === 'richtext') continue; // companion files, not in JSON
+      const tsType = fieldToTSType(field, collectionNames, 'raw');
       lines.push(`  ${fieldName}: ${tsType};`);
     }
-    lines.push("}");
-    lines.push("");
+    lines.push('}');
+    lines.push('');
 
     lines.push(`export interface Raw${pascal}Entry {`);
     lines.push(`  sys: { id: string; type: '${key}'; status: EntryStatus };`);
     lines.push(`  fields: Raw${pascal}Fields;`);
-    lines.push("}");
-    lines.push("");
+    lines.push('}');
+    lines.push('');
   }
 
   // RawEntryMap
-  lines.push("export type RawEntryMap = {");
+  lines.push('export type RawEntryMap = {');
   for (const key of collectionNames) {
     lines.push(`  ${key}: Raw${pascalCase(key)}Entry;`);
   }
-  lines.push("};");
-  lines.push("");
+  lines.push('};');
+  lines.push('');
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 export function generateIndex(): string {
-  return (
-    CODEGEN_BANNER +
-    "export * from './types';\nexport * from './enums';\nexport * from './query';\n"
-  );
+  return CODEGEN_BANNER + "export * from './types';\nexport * from './enums';\nexport * from './query';\n";
 }
 
 /**

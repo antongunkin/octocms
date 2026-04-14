@@ -1,10 +1,10 @@
-import React, { Suspense } from "react";
+import React, { Suspense } from 'react';
 
-import { CollectionPage } from "./pages/CollectionPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { EntryPage } from "./pages/EntryPage";
-import { MediaPage } from "./pages/MediaPage";
-import { SearchPage } from "./pages/SearchPage";
+import { CollectionPage } from './pages/CollectionPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { EntryPage } from './pages/EntryPage';
+import { MediaPage } from './pages/MediaPage';
+import { SearchPage } from './pages/SearchPage';
 
 type AdminAppProps = {
   params: Promise<{ path?: string[] }>;
@@ -40,11 +40,11 @@ async function AdminAppRouter({ params }: AdminAppProps) {
     return <DashboardPage />;
   }
 
-  if (segments[0] === "search") {
+  if (segments[0] === 'search') {
     return <SearchPage />;
   }
 
-  if (segments[0] === "media") {
+  if (segments[0] === 'media') {
     const initialMediaId = segments.length >= 2 ? segments[1] : undefined;
     return <MediaPage initialMediaId={initialMediaId} />;
   }

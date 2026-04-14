@@ -28,4 +28,4 @@ export type {
   SelectCollectionField,
   ConditionalCollectionField,
   RichTextCollectionField,
-} from "../types";
+} from '../types';

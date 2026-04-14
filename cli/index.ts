@@ -65,7 +65,7 @@ const COMMAND_HELP: Record<string, string> = {
   ${fmt.bold('Usage:')} octocms dev [options]
 
   ${fmt.bold('Options:')}
-    --port <n>  Port number (default: 3001)
+    --port <n>  Port number (default: 3000)
     --help      Show this help message
 `,
   'types:gen': `

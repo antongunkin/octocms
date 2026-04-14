@@ -1,29 +1,20 @@
-import type { Config, ResolvedImageField } from "./types";
-import type { InferConditions, CollectionNames } from "./defineConfig";
+import type { Config, ResolvedImageField } from './types';
+import type { InferConditions, CollectionNames } from './defineConfig';
 import {
   companionMarkdownPath,
   companionRichTextPath,
   getMarkdownFieldNames,
   getRichTextFieldNames,
-} from "./lib/companionMarkdown";
-import {
-  getPublishedBranch,
-  isProductionMode,
-  listGitHubFiles,
-  readGitHubFilePublic,
-} from "./github-public";
-import { parseRichText } from "./lib/richtext/parseRichText";
+} from './lib/companionMarkdown';
+import { getPublishedBranch, isProductionMode, listGitHubFiles, readGitHubFilePublic } from './github-public';
+import { parseRichText } from './lib/richtext/parseRichText';
 
 // ---------------------------------------------------------------------------
 // Internal helpers — no dependency on user-app files
 // ---------------------------------------------------------------------------
 
-const readContentFile = async (
-  filePath: string,
-  branch?: string,
-): Promise<any | null> => {
-  const hasGitHubRepoConfig =
-    !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
+const readContentFile = async (filePath: string, branch?: string): Promise<any | null> => {
+  const hasGitHubRepoConfig = !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
 
   if (isProductionMode() && hasGitHubRepoConfig) {
     const content = await readGitHubFilePublic(filePath, branch);
@@ -32,41 +23,36 @@ const readContentFile = async (
 
   // Dev-only: guarded so Turbopack dead-code-eliminates this block (and the dynamic import)
   // in production builds, preventing NFT from tracing the local filesystem helpers.
-  if (process.env.NODE_ENV !== "production") {
-    const { readLocalContentFile } = await import("./lib/localReader");
+  if (process.env.NODE_ENV !== 'production') {
+    const { readLocalContentFile } = await import('./lib/localReader');
     return readLocalContentFile(filePath);
   }
   return null;
 };
 
 /** Read a raw text file (e.g. companion `.md`). Returns `""` when the file does not exist. */
-const readRawFile = async (
-  filePath: string,
-  branch?: string,
-): Promise<string> => {
-  const hasGitHubRepoConfig =
-    !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
+const readRawFile = async (filePath: string, branch?: string): Promise<string> => {
+  const hasGitHubRepoConfig = !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
 
   if (isProductionMode() && hasGitHubRepoConfig) {
     const content = await readGitHubFilePublic(filePath, branch);
-    return content ?? "";
+    return content ?? '';
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    const { readLocalRawFile } = await import("./lib/localReader");
+  if (process.env.NODE_ENV !== 'production') {
+    const { readLocalRawFile } = await import('./lib/localReader');
     return readLocalRawFile(filePath);
   }
-  return "";
+  return '';
 };
 
 function pathImageField(src: string): ResolvedImageField {
-  return { src, alt: "", width: null, height: null, blurDataURL: null };
+  return { src, alt: '', width: null, height: null, blurDataURL: null };
 }
 
 /** Resolve the published branch once for a query execution. Undefined in dev (uses local FS). */
 const resolvePublishedBranch = async (): Promise<string | undefined> => {
-  const hasGitHubRepoConfig =
-    !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
+  const hasGitHubRepoConfig = !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
   if (!isProductionMode() || !hasGitHubRepoConfig) return undefined;
   return getPublishedBranch();
 };
@@ -75,7 +61,7 @@ const REFERENCE_KEY_REGEX = /^([^-]+)-(.+?)(?:\.json)?$/;
 
 function toContentPathLocal(value: string, contentFolder: string): string {
   const match = value.match(REFERENCE_KEY_REGEX);
-  if (!match) return "";
+  if (!match) return '';
   const [, type, id] = match;
   return `${contentFolder}/${type}/${type}-${id}.json`;
 }
@@ -86,39 +72,28 @@ async function resolveImageFieldValue(
   branch?: string,
 ): Promise<ResolvedImageField | null> {
   if (!raw) return null;
-  if (raw.startsWith("/")) {
+  if (raw.startsWith('/')) {
     return pathImageField(raw);
   }
 
   const mediaDir = `${contentFolder}/media`;
-  let mediaEntry = await readContentFile(
-    `${mediaDir}/media-${raw}.json`,
-    branch,
-  );
+  let mediaEntry = await readContentFile(`${mediaDir}/media-${raw}.json`, branch);
   if (!mediaEntry) {
     // Legacy uploads may use `{uuid}.json` instead of `media-{uuid}.json`.
     mediaEntry = await readContentFile(`${mediaDir}/${raw}.json`, branch);
   }
   const ext = mediaEntry?.fields?.extension;
-  if (typeof ext !== "string" || !ext) {
+  if (typeof ext !== 'string' || !ext) {
     return null;
   }
 
-  const title =
-    typeof mediaEntry.fields.title === "string"
-      ? mediaEntry.fields.title.trim()
-      : "";
+  const title = typeof mediaEntry.fields.title === 'string' ? mediaEntry.fields.title.trim() : '';
   const width =
-    typeof mediaEntry.fields.width === "number" && mediaEntry.fields.width > 0
-      ? mediaEntry.fields.width
-      : null;
+    typeof mediaEntry.fields.width === 'number' && mediaEntry.fields.width > 0 ? mediaEntry.fields.width : null;
   const height =
-    typeof mediaEntry.fields.height === "number" && mediaEntry.fields.height > 0
-      ? mediaEntry.fields.height
-      : null;
+    typeof mediaEntry.fields.height === 'number' && mediaEntry.fields.height > 0 ? mediaEntry.fields.height : null;
   const blurRaw = mediaEntry.fields.blurDataURL;
-  const blurDataURL =
-    typeof blurRaw === "string" && blurRaw.length > 0 ? blurRaw : null;
+  const blurDataURL = typeof blurRaw === 'string' && blurRaw.length > 0 ? blurRaw : null;
 
   return {
     src: `/media/${raw}.${ext}`,
@@ -135,7 +110,7 @@ async function resolveImageFieldValue(
 async function resolveReferenceEmbedValue(
   refKey: string,
   contentFolder: string,
-  collections: Config["collections"],
+  collections: Config['collections'],
   branch?: string,
 ): Promise<unknown | null> {
   if (!refKey) return null;
@@ -153,13 +128,13 @@ async function resolveConditionalFieldValue(
   fieldConfig: any,
   storedValue: any,
   contentFolder: string,
-  collections: Config["collections"],
+  collections: Config['collections'],
   branch?: string,
   conditions?: Record<string, string>,
   fieldKey?: string,
   isTopLevel = false,
 ): Promise<any> {
-  if (!storedValue || typeof storedValue !== "object") return storedValue;
+  if (!storedValue || typeof storedValue !== 'object') return storedValue;
 
   const branches = fieldConfig.conditional?.branches;
   if (!branches || !Array.isArray(branches)) return storedValue;
@@ -167,39 +142,23 @@ async function resolveConditionalFieldValue(
   const selectedKey = fieldKey && conditions ? conditions[fieldKey] : undefined;
 
   if (isTopLevel && conditions && !selectedKey && fieldKey) {
-    const availableKeys = branches.map((b: any) => b.key).join(", ");
-    throw new Error(
-      `Missing condition for conditional field '${fieldKey}'. Available branch keys: ${availableKeys}`,
-    );
+    const availableKeys = branches.map((b: any) => b.key).join(', ');
+    throw new Error(`Missing condition for conditional field '${fieldKey}'. Available branch keys: ${availableKeys}`);
   }
 
   if (!selectedKey) {
     const result: Record<string, any> = {};
     for (const branchDef of branches) {
       const branchValue = storedValue[branchDef.key];
-      if (
-        branchDef.collection &&
-        typeof branchValue === "string" &&
-        branchValue.trim()
-      ) {
+      if (branchDef.collection && typeof branchValue === 'string' && branchValue.trim()) {
         const refPath = toContentPathLocal(branchValue, contentFolder);
         if (refPath) {
           const raw = await readContentFile(refPath, branch);
-          result[branchDef.key] = await processEntry(
-            raw,
-            contentFolder,
-            collections,
-            branch,
-            conditions,
-          );
+          result[branchDef.key] = await processEntry(raw, contentFolder, collections, branch, conditions);
         } else {
           result[branchDef.key] = null;
         }
-      } else if (
-        branchDef.fields &&
-        typeof branchValue === "object" &&
-        branchValue
-      ) {
+      } else if (branchDef.fields && typeof branchValue === 'object' && branchValue) {
         result[branchDef.key] = await resolveInlineBranchFields(
           branchDef.fields,
           branchValue,
@@ -220,11 +179,7 @@ async function resolveConditionalFieldValue(
 
   const branchValue = storedValue[selectedKey];
 
-  if (
-    branchDef.collection &&
-    typeof branchValue === "string" &&
-    branchValue.trim()
-  ) {
+  if (branchDef.collection && typeof branchValue === 'string' && branchValue.trim()) {
     const refPath = toContentPathLocal(branchValue, contentFolder);
     if (refPath) {
       const raw = await readContentFile(refPath, branch);
@@ -233,15 +188,8 @@ async function resolveConditionalFieldValue(
     return null;
   }
 
-  if (branchDef.fields && typeof branchValue === "object" && branchValue) {
-    return resolveInlineBranchFields(
-      branchDef.fields,
-      branchValue,
-      contentFolder,
-      collections,
-      branch,
-      conditions,
-    );
+  if (branchDef.fields && typeof branchValue === 'object' && branchValue) {
+    return resolveInlineBranchFields(branchDef.fields, branchValue, contentFolder, collections, branch, conditions);
   }
 
   return branchValue ?? null;
@@ -254,7 +202,7 @@ async function resolveInlineBranchFields(
   branchFieldDefs: Record<string, any>,
   branchValues: Record<string, any>,
   contentFolder: string,
-  collections: Config["collections"],
+  collections: Config['collections'],
   branch?: string,
   conditions?: Record<string, string>,
 ): Promise<Record<string, any>> {
@@ -263,19 +211,15 @@ async function resolveInlineBranchFields(
   for (const [subKey, subDef] of Object.entries(branchFieldDefs)) {
     let value = branchValues[subKey] ?? null;
 
-    if (subDef.format === "image") {
+    if (subDef.format === 'image') {
       if (value != null && String(value).trim()) {
-        const resolved = await resolveImageFieldValue(
-          String(value).trim(),
-          contentFolder,
-          branch,
-        );
+        const resolved = await resolveImageFieldValue(String(value).trim(), contentFolder, branch);
         value = resolved ?? null;
       } else {
         value = null;
       }
-    } else if (subDef.format === "reference") {
-      const isSingle = subDef.reference?.cardinality === "one";
+    } else if (subDef.format === 'reference') {
+      const isSingle = subDef.reference?.cardinality === 'one';
       let parsedPaths: string[] = [];
 
       if (isSingle) {
@@ -283,18 +227,9 @@ async function resolveInlineBranchFields(
         if (refPath) parsedPaths = [refPath];
       } else {
         try {
-          const parsed =
-            typeof value === "string"
-              ? JSON.parse(value)
-              : Array.isArray(value)
-                ? value
-                : [];
+          const parsed = typeof value === 'string' ? JSON.parse(value) : Array.isArray(value) ? value : [];
           parsedPaths = Array.isArray(parsed)
-            ? parsed
-                .map((item: string) =>
-                  toContentPathLocal(String(item), contentFolder),
-                )
-                .filter(Boolean)
+            ? parsed.map((item: string) => toContentPathLocal(String(item), contentFolder)).filter(Boolean)
             : [];
         } catch {
           /* skip */
@@ -304,26 +239,12 @@ async function resolveInlineBranchFields(
       const references: any[] = [];
       for (const refPath of parsedPaths) {
         const raw = await readContentFile(refPath, branch);
-        const resolved = await processEntry(
-          raw,
-          contentFolder,
-          collections,
-          branch,
-          conditions,
-        );
+        const resolved = await processEntry(raw, contentFolder, collections, branch, conditions);
         if (resolved) references.push(resolved);
       }
       value = isSingle ? references[0] || null : references;
-    } else if (subDef.format === "conditional") {
-      value = await resolveConditionalFieldValue(
-        subDef,
-        value,
-        contentFolder,
-        collections,
-        branch,
-        conditions,
-        subKey,
-      );
+    } else if (subDef.format === 'conditional') {
+      value = await resolveConditionalFieldValue(subDef, value, contentFolder, collections, branch, conditions, subKey);
     }
 
     result[subKey] = value;
@@ -339,7 +260,7 @@ async function resolveInlineBranchFields(
 const processEntry = async (
   json: any,
   contentFolder: string,
-  collections: Config["collections"],
+  collections: Config['collections'],
   branch?: string,
   conditions?: Record<string, string>,
 ): Promise<any> => {
@@ -351,13 +272,11 @@ const processEntry = async (
 
   const configFields = collectionConfig.fields ?? {};
   const referenceFieldNames = Object.keys(configFields).filter(
-    (key: string) => configFields[key].format === "reference",
+    (key: string) => configFields[key].format === 'reference',
   );
-  const imageFieldNames = Object.keys(configFields).filter(
-    (key: string) => configFields[key].format === "image",
-  );
+  const imageFieldNames = Object.keys(configFields).filter((key: string) => configFields[key].format === 'image');
   const conditionalFieldNames = Object.keys(configFields).filter(
-    (key: string) => configFields[key].format === "conditional",
+    (key: string) => configFields[key].format === 'conditional',
   );
 
   const formattedFields: Record<string, any> = {};
@@ -382,7 +301,7 @@ const processEntry = async (
 
     if (referenceFieldNames.includes(key)) {
       const fieldConfig = configFields[key];
-      const isSingle = fieldConfig.reference?.cardinality === "one";
+      const isSingle = fieldConfig.reference?.cardinality === 'one';
 
       let parsedPaths: string[] = [];
 
@@ -393,11 +312,7 @@ const processEntry = async (
         try {
           const parsed = JSON.parse(value);
           parsedPaths = Array.isArray(parsed)
-            ? parsed
-                .map((item: string) =>
-                  toContentPathLocal(String(item), contentFolder),
-                )
-                .filter(Boolean)
+            ? parsed.map((item: string) => toContentPathLocal(String(item), contentFolder)).filter(Boolean)
             : [];
         } catch (_e) {
           /* not valid JSON — skip */
@@ -407,12 +322,7 @@ const processEntry = async (
       const references: any[] = [];
       for (const refPath of parsedPaths) {
         const raw = await readContentFile(refPath, branch);
-        const resolved = await processEntry(
-          raw,
-          contentFolder,
-          collections,
-          branch,
-        );
+        const resolved = await processEntry(raw, contentFolder, collections, branch);
         if (resolved) references.push(resolved);
       }
 
@@ -423,11 +333,7 @@ const processEntry = async (
       if (value == null || !String(value).trim()) {
         value = null;
       } else {
-        const resolved = await resolveImageFieldValue(
-          String(value).trim(),
-          contentFolder,
-          branch,
-        );
+        const resolved = await resolveImageFieldValue(String(value).trim(), contentFolder, branch);
         value = resolved ?? null;
       }
     }
@@ -450,18 +356,11 @@ const processEntry = async (
     const rawMdx = await readRawFile(mdxPath, branch);
     if (rawMdx) {
       formattedFields[fieldName] = await parseRichText(rawMdx, {
-        resolveImage: (mediaId) =>
-          resolveImageFieldValue(mediaId, contentFolder, branch),
-        resolveReference: (refKey) =>
-          resolveReferenceEmbedValue(
-            refKey,
-            contentFolder,
-            collections,
-            branch,
-          ),
+        resolveImage: (mediaId) => resolveImageFieldValue(mediaId, contentFolder, branch),
+        resolveReference: (refKey) => resolveReferenceEmbedValue(refKey, contentFolder, collections, branch),
       });
     } else {
-      formattedFields[fieldName] = { type: "doc", content: [] };
+      formattedFields[fieldName] = { type: 'doc', content: [] };
     }
   }
 
@@ -475,15 +374,14 @@ const listCollectionFiles = async (
   branch?: string,
 ): Promise<string[]> => {
   const dirPath = `${contentFolder}/${collectionName}`;
-  const hasGitHubRepoConfig =
-    !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
+  const hasGitHubRepoConfig = !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
 
   if (isProductionMode() && hasGitHubRepoConfig) {
-    return listGitHubFiles(dirPath, ".json", branch);
+    return listGitHubFiles(dirPath, '.json', branch);
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    const { listLocalCollectionFiles } = await import("./lib/localReader");
+  if (process.env.NODE_ENV !== 'production') {
+    const { listLocalCollectionFiles } = await import('./lib/localReader');
     return listLocalCollectionFiles(dirPath);
   }
   return [];
@@ -493,7 +391,7 @@ const listCollectionFiles = async (
 // QueryBuilder — chainable, type-safe content selector
 // ---------------------------------------------------------------------------
 
-type SortDirection = "asc" | "desc";
+type SortDirection = 'asc' | 'desc';
 
 /**
  * Chainable query builder for reading collection entries.
@@ -528,9 +426,8 @@ export class QueryBuilder<
   private _octoConfig: TOctoConfig;
   private _conditions: Record<string, string> | undefined;
   private _filters: ((entry: TEntryMap[C]) => boolean)[] = [];
-  private _sortField: Extract<keyof TEntryMap[C]["fields"], string> | null =
-    null;
-  private _sortDir: SortDirection = "asc";
+  private _sortField: Extract<keyof TEntryMap[C]['fields'], string> | null = null;
+  private _sortDir: SortDirection = 'asc';
   private _skip = 0;
   private _limit: number | null = null;
   private _includeDrafts = false;
@@ -565,11 +462,9 @@ export class QueryBuilder<
    * Multiple `.filter()` calls are ANDed together.
    */
   filter(
-    predicate:
-      | ((entry: TEntryMap[C]) => boolean)
-      | Partial<TEntryMap[C]["fields"]>,
+    predicate: ((entry: TEntryMap[C]) => boolean) | Partial<TEntryMap[C]['fields']>,
   ): QueryBuilder<TEntryMap, TOctoConfig, C> {
-    if (typeof predicate === "function") {
+    if (typeof predicate === 'function') {
       this._filters.push(predicate);
     } else {
       const match = predicate;
@@ -587,8 +482,8 @@ export class QueryBuilder<
    * Sort entries by a field name.
    */
   sort(
-    field: Extract<keyof TEntryMap[C]["fields"], string>,
-    direction: SortDirection = "asc",
+    field: Extract<keyof TEntryMap[C]['fields'], string>,
+    direction: SortDirection = 'asc',
   ): QueryBuilder<TEntryMap, TOctoConfig, C> {
     this._sortField = field;
     this._sortDir = direction;
@@ -623,34 +518,22 @@ export class QueryBuilder<
     const contentFolder = this._octoConfig.contentFolder;
     const collections = this._octoConfig.collections;
     const branch = await resolvePublishedBranch();
-    const files = await listCollectionFiles(
-      this._collection,
-      contentFolder,
-      branch,
-    );
+    const files = await listCollectionFiles(this._collection, contentFolder, branch);
 
-    const rawEntries = await Promise.all(
-      files.map((f) => readContentFile(f, branch)),
-    );
+    const rawEntries = await Promise.all(files.map((f) => readContentFile(f, branch)));
     const processed: TEntryMap[C][] = [];
 
     for (const raw of rawEntries) {
       if (!raw) continue;
-      const entry = await processEntry(
-        raw,
-        contentFolder,
-        collections,
-        branch,
-        this._conditions,
-      );
+      const entry = await processEntry(raw, contentFolder, collections, branch, this._conditions);
       if (entry) processed.push(entry as TEntryMap[C]);
     }
 
     let result = this._includeDrafts
       ? processed
       : processed.filter((entry) => {
-          const status = (entry as any).sys?.status || "merged";
-          return status !== "draft" && status !== "archived";
+          const status = (entry as any).sys?.status || 'merged';
+          return status !== 'draft' && status !== 'archived';
         });
 
     for (const fn of this._filters) {
@@ -659,7 +542,7 @@ export class QueryBuilder<
 
     if (this._sortField) {
       const field = this._sortField;
-      const dir = this._sortDir === "asc" ? 1 : -1;
+      const dir = this._sortDir === 'asc' ? 1 : -1;
       result.sort((a, b) => {
         const av = (a.fields as any)[field];
         const bv = (b.fields as any)[field];
@@ -703,33 +586,21 @@ export class QueryBuilder<
     const contentFolder = this._octoConfig.contentFolder;
     const collections = this._octoConfig.collections;
     const branch = await resolvePublishedBranch();
-    const files = await listCollectionFiles(
-      this._collection,
-      contentFolder,
-      branch,
-    );
-    const rawEntries = await Promise.all(
-      files.map((f) => readContentFile(f, branch)),
-    );
+    const files = await listCollectionFiles(this._collection, contentFolder, branch);
+    const rawEntries = await Promise.all(files.map((f) => readContentFile(f, branch)));
     const processed: TEntryMap[C][] = [];
 
     for (const raw of rawEntries) {
       if (!raw) continue;
-      const entry = await processEntry(
-        raw,
-        contentFolder,
-        collections,
-        branch,
-        this._conditions,
-      );
+      const entry = await processEntry(raw, contentFolder, collections, branch, this._conditions);
       if (entry) processed.push(entry as TEntryMap[C]);
     }
 
     let filtered = this._includeDrafts
       ? processed
       : processed.filter((entry) => {
-          const status = (entry as any).sys?.status || "merged";
-          return status !== "draft" && status !== "archived";
+          const status = (entry as any).sys?.status || 'merged';
+          return status !== 'draft' && status !== 'archived';
         });
 
     for (const fn of this._filters) {
@@ -738,7 +609,7 @@ export class QueryBuilder<
 
     if (this._sortField) {
       const field = this._sortField;
-      const dir = this._sortDir === "asc" ? 1 : -1;
+      const dir = this._sortDir === 'asc' ? 1 : -1;
       filtered.sort((a, b) => {
         const av = (a.fields as any)[field];
         const bv = (b.fields as any)[field];
@@ -786,17 +657,10 @@ export class QueryBuilder<
  * const posts = await query('post').sort('publishedAt', 'desc').toArray();
  * ```
  */
-export function createQuery<
-  TEntryMap extends Record<string, any>,
-  TOctoConfig extends Config,
->(
+export function createQuery<TEntryMap extends Record<string, any>, TOctoConfig extends Config>(
   octoConfig: TOctoConfig,
-): <C extends keyof TEntryMap & string>(
-  collection: C,
-) => QueryBuilder<TEntryMap, TOctoConfig, C> {
-  return function <C extends keyof TEntryMap & string>(
-    collection: C,
-  ): QueryBuilder<TEntryMap, TOctoConfig, C> {
+): <C extends keyof TEntryMap & string>(collection: C) => QueryBuilder<TEntryMap, TOctoConfig, C> {
+  return function <C extends keyof TEntryMap & string>(collection: C): QueryBuilder<TEntryMap, TOctoConfig, C> {
     return new QueryBuilder<TEntryMap, TOctoConfig, C>(collection, octoConfig);
   };
 }

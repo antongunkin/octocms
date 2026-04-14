@@ -1,4 +1,4 @@
-import type { Config, ResolvedImageField, RichTextDocument } from "./types";
+import type { Config, ResolvedImageField, RichTextDocument } from './types';
 
 /**
  * Define the CMS configuration with full literal type inference.
@@ -37,7 +37,7 @@ export type FieldFormatToType = {
   text: string;
   markdown: string;
   richtext: RichTextDocument;
-  boolean: "true" | "false";
+  boolean: 'true' | 'false';
   number: number | null;
   datetime: string | null;
   image: ResolvedImageField;
@@ -52,33 +52,26 @@ export type FieldFormatToType = {
 
 /** Union of option `value` literals when `options` is a readonly tuple. */
 type OptionValues<Opts> =
-  Opts extends ReadonlyArray<{ readonly value: infer V }>
-    ? V extends string
-      ? V
-      : string
-    : string;
+  Opts extends ReadonlyArray<{ readonly value: infer V }> ? (V extends string ? V : string) : string;
 
 /** Extract the collection names defined in a config object. */
-export type CollectionNames<C extends Config> = Extract<
-  keyof C["collections"],
-  string
->;
+export type CollectionNames<C extends Config> = Extract<keyof C['collections'], string>;
 
 // ---------------------------------------------------------------------------
 // Conditional field type inference
 // ---------------------------------------------------------------------------
 
 /** Infer the resolved value type for a single field definition. */
-type InferSingleFieldType<F> = F extends { format: "string"; list: true }
+type InferSingleFieldType<F> = F extends { format: 'string'; list: true }
   ? string[]
-  : F extends { format: "boolean" }
-    ? "true" | "false"
-    : F extends { format: "select"; multiple: true; options: infer Opts }
+  : F extends { format: 'boolean' }
+    ? 'true' | 'false'
+    : F extends { format: 'select'; multiple: true; options: infer Opts }
       ? OptionValues<Opts>[]
-      : F extends { format: "select"; options: infer Opts }
+      : F extends { format: 'select'; options: infer Opts }
         ? OptionValues<Opts>
         : F extends {
-              format: "conditional";
+              format: 'conditional';
               conditional: { branches: infer B };
             }
           ? InferConditionalValue<B>
@@ -98,18 +91,13 @@ type InferBranchInlineFields<Fields> = {
  * - Inline branch (`fields`): produces an object type mapping field names to their inferred types.
  * - Reference branch (`collection`): produces `unknown` (resolved at runtime to the referenced entry).
  */
-type InferBranchValue<B> = B extends { fields: infer F }
-  ? InferBranchInlineFields<F>
-  : unknown;
+type InferBranchValue<B> = B extends { fields: infer F } ? InferBranchInlineFields<F> : unknown;
 
 /**
  * Infer the union of all branch value types for a conditional field.
  * This is the type the consumer gets after selecting a branch at query time.
  */
-type InferConditionalValue<Branches> = Branches extends readonly [
-  infer Head,
-  ...infer Tail,
-]
+type InferConditionalValue<Branches> = Branches extends readonly [infer Head, ...infer Tail]
   ? InferBranchValue<Head> | InferConditionalValue<Tail>
   : never;
 
@@ -117,13 +105,8 @@ type InferConditionalValue<Branches> = Branches extends readonly [
  * Extract the literal union of branch `key` strings from a conditional field's branches tuple.
  * Requires `as const` on the branches array in `cms/octocms.config.ts` for literal inference.
  */
-export type InferConditionalKeys<Branches> = Branches extends readonly [
-  infer Head,
-  ...infer Tail,
-]
-  ?
-      | (Head extends { key: infer K } ? (K extends string ? K : never) : never)
-      | InferConditionalKeys<Tail>
+export type InferConditionalKeys<Branches> = Branches extends readonly [infer Head, ...infer Tail]
+  ? (Head extends { key: infer K } ? (K extends string ? K : never) : never) | InferConditionalKeys<Tail>
   : never;
 
 // ---------------------------------------------------------------------------
@@ -131,10 +114,7 @@ export type InferConditionalKeys<Branches> = Branches extends readonly [
 // ---------------------------------------------------------------------------
 
 /** Infer the `fields` shape for a collection, mapping each field format to its TS type. */
-export type InferFields<
-  C extends Config,
-  Name extends CollectionNames<C>,
-> = C["collections"][Name] extends {
+export type InferFields<C extends Config, Name extends CollectionNames<C>> = C['collections'][Name] extends {
   fields: infer F;
 }
   ? {
@@ -156,16 +136,11 @@ export type InferEntry<C extends Config, Name extends CollectionNames<C>> = {
  * For a single collection, build `Record<fieldName, branchKeyUnion>` for every `format: 'conditional'` field.
  * If the collection has no conditional fields this resolves to `{}` (empty object / `never` keys).
  */
-export type InferConditions<
-  C extends Config,
-  Name extends CollectionNames<C>,
-> = C["collections"][Name] extends {
+export type InferConditions<C extends Config, Name extends CollectionNames<C>> = C['collections'][Name] extends {
   fields: infer F;
 }
   ? {
-      [K in Extract<keyof F, string> as F[K] extends { format: "conditional" }
-        ? K
-        : never]: F[K] extends {
+      [K in Extract<keyof F, string> as F[K] extends { format: 'conditional' } ? K : never]: F[K] extends {
         conditional: { branches: infer B };
       }
         ? InferConditionalKeys<B>

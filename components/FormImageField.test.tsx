@@ -1,48 +1,42 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
-import React from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as cmsActions from "../admin/actions";
-import { toast } from "../hooks/useToast";
-import FormImageField from "./FormImageField";
+import * as cmsActions from '../admin/actions';
+import { toast } from '../hooks/useToast';
+import FormImageField from './FormImageField';
 
 const { baseMediaEntry } = vi.hoisted(() => ({
   baseMediaEntry: {
-    id: "uuid-123",
-    title: "Existing photo",
-    originalName: "photo.png",
-    extension: "png",
-    folder: "/",
-    path: "public/media/uuid-123.png",
-    publicUrl: "/media/uuid-123.png",
+    id: 'uuid-123',
+    title: 'Existing photo',
+    originalName: 'photo.png',
+    extension: 'png',
+    folder: '/',
+    path: 'public/media/uuid-123.png',
+    publicUrl: '/media/uuid-123.png',
     width: null as number | null,
     height: null as number | null,
     hasBlurPlaceholder: false,
   },
 }));
 
-vi.mock("octocms/admin/actions", () => ({
+vi.mock('octocms/admin/actions', () => ({
   getMediaEntries: vi.fn(() => Promise.resolve([{ ...baseMediaEntry }])),
   uploadMedia: vi.fn(),
 }));
 
-vi.mock("../hooks/useToast", () => ({
+vi.mock('../hooks/useToast', () => ({
   toast: vi.fn(),
 }));
 
-vi.mock("../hooks/useConfig", () => ({
+vi.mock('../hooks/useConfig', () => ({
   useConfig: () => ({
-    projectName: "Test",
-    contentFolder: "cms/content",
-    mediaFolder: "public/media",
-    mediaAllowedFormats: ["png", "jpg", "jpeg", "gif", "webp", "svg", "ico"],
-    git: { baseBranch: "main" },
+    projectName: 'Test',
+    contentFolder: 'cms/content',
+    mediaFolder: 'public/media',
+    mediaAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico'],
+    git: { baseBranch: 'main' },
     collections: {},
   }),
 }));
@@ -51,95 +45,83 @@ afterEach(cleanup);
 
 beforeEach(() => {
   vi.mocked(cmsActions.uploadMedia).mockReset();
-  vi.mocked(cmsActions.getMediaEntries).mockImplementation(() =>
-    Promise.resolve([{ ...baseMediaEntry }]),
-  );
+  vi.mocked(cmsActions.getMediaEntries).mockImplementation(() => Promise.resolve([{ ...baseMediaEntry }]));
 });
 
-describe("FormImageField", () => {
-  it("renders label and select button when no value", () => {
+describe('FormImageField', () => {
+  it('renders label and select button when no value', () => {
     render(<FormImageField label="Cover Image" name="coverImage" value="" />);
 
-    expect(screen.getByText("Cover Image")).toBeDefined();
-    expect(screen.getByText("Select image")).toBeDefined();
+    expect(screen.getByText('Cover Image')).toBeDefined();
+    expect(screen.getByText('Select image')).toBeDefined();
   });
 
-  it("renders change button when value is set and entry is found", async () => {
+  it('renders change button when value is set and entry is found', async () => {
     render(<FormImageField label="Cover" name="cover" value="uuid-123" />);
 
-    expect(screen.getByText("Change image")).toBeDefined();
+    expect(screen.getByText('Change image')).toBeDefined();
   });
 
-  it("renders hidden input with the UUID value", () => {
-    const { container } = render(
-      <FormImageField label="Cover" name="coverImage" value="uuid-123" />,
-    );
+  it('renders hidden input with the UUID value', () => {
+    const { container } = render(<FormImageField label="Cover" name="coverImage" value="uuid-123" />);
 
-    const hidden = container.querySelector(
-      'input[type="hidden"]',
-    ) as HTMLInputElement;
+    const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement;
     expect(hidden).toBeDefined();
-    expect(hidden.name).toBe("coverImage");
-    expect(hidden.value).toBe("uuid-123");
+    expect(hidden.name).toBe('coverImage');
+    expect(hidden.value).toBe('uuid-123');
   });
 
-  it("renders hidden input with empty value when no image selected", () => {
-    const { container } = render(
-      <FormImageField label="Cover" name="coverImage" value="" />,
-    );
+  it('renders hidden input with empty value when no image selected', () => {
+    const { container } = render(<FormImageField label="Cover" name="coverImage" value="" />);
 
-    const hidden = container.querySelector(
-      'input[type="hidden"]',
-    ) as HTMLInputElement;
-    expect(hidden.value).toBe("");
+    const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+    expect(hidden.value).toBe('');
   });
 
-  it("shows destructive toast when uploadMedia returns failure", async () => {
+  it('shows destructive toast when uploadMedia returns failure', async () => {
     vi.mocked(cmsActions.uploadMedia).mockResolvedValue({
       success: false,
-      error: "upload failed",
+      error: 'upload failed',
     });
 
     render(<FormImageField label="Cover" name="coverImage" value="" />);
-    fireEvent.click(screen.getByText("Select image"));
+    fireEvent.click(screen.getByText('Select image'));
 
-    const fileInput = document.querySelector(
-      'input[type="file"]',
-    ) as HTMLInputElement;
-    const file = new File(["x"], "photo.png", { type: "image/png" });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['x'], 'photo.png', { type: 'image/png' });
     fireEvent.change(fileInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByText("Upload")).toBeDefined();
+      expect(screen.getByText('Upload')).toBeDefined();
     });
-    fireEvent.click(screen.getByText("Upload"));
+    fireEvent.click(screen.getByText('Upload'));
 
     await waitFor(() => {
       expect(vi.mocked(toast)).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: "upload failed",
-          variant: "destructive",
+          title: 'upload failed',
+          variant: 'destructive',
         }),
       );
     });
   });
 
-  it("shows success toast when uploadMedia returns success", async () => {
+  it('shows success toast when uploadMedia returns success', async () => {
     vi.mocked(cmsActions.uploadMedia).mockResolvedValue({
       success: true,
-      id: "new-media-id",
+      id: 'new-media-id',
     });
     vi.mocked(cmsActions.getMediaEntries).mockImplementation(() =>
       Promise.resolve([
         baseMediaEntry,
         {
-          id: "new-media-id",
-          title: "hero",
-          originalName: "hero.png",
-          extension: "png",
-          folder: "/",
-          path: "public/media/new-media-id.png",
-          publicUrl: "/media/new-media-id.png",
+          id: 'new-media-id',
+          title: 'hero',
+          originalName: 'hero.png',
+          extension: 'png',
+          folder: '/',
+          path: 'public/media/new-media-id.png',
+          publicUrl: '/media/new-media-id.png',
           width: null,
           height: null,
           hasBlurPlaceholder: false,
@@ -148,24 +130,22 @@ describe("FormImageField", () => {
     );
 
     render(<FormImageField label="Cover" name="coverImage" value="" />);
-    fireEvent.click(screen.getByText("Select image"));
+    fireEvent.click(screen.getByText('Select image'));
 
-    const fileInput = document.querySelector(
-      'input[type="file"]',
-    ) as HTMLInputElement;
-    const file = new File(["x"], "hero.png", { type: "image/png" });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['x'], 'hero.png', { type: 'image/png' });
     fireEvent.change(fileInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByText("Upload")).toBeDefined();
+      expect(screen.getByText('Upload')).toBeDefined();
     });
-    fireEvent.click(screen.getByText("Upload"));
+    fireEvent.click(screen.getByText('Upload'));
 
     await waitFor(() => {
       expect(vi.mocked(toast)).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: expect.stringContaining("hero.png"),
-          variant: "success",
+          title: expect.stringContaining('hero.png'),
+          variant: 'success',
         }),
       );
     });

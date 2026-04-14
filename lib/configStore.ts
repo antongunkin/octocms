@@ -1,4 +1,4 @@
-import type { Config } from "../types";
+import type { Config } from '../types';
 
 let _config: Config | null = null;
 
@@ -20,8 +20,8 @@ export function setConfig(config: Config): void {
 export function getConfig(): Config {
   if (!_config) {
     throw new Error(
-      "OctoCMS config not initialized. Make sure withOctoCMS(nextConfig, config) is called in next.config.ts " +
-        "and cms/__generated__/configInit.ts is imported in your admin layout.",
+      'OctoCMS config not initialized. Make sure withOctoCMS(nextConfig, config) is called in next.config.ts ' +
+        'and cms/__generated__/configInit.ts is imported in your admin layout.',
     );
   }
   return _config;

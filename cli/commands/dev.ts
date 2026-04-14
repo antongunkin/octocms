@@ -16,7 +16,7 @@ export type DevOptions = {
 };
 
 export async function devCommand(projectRoot: string, options: DevOptions = {}): Promise<void> {
-  const port = options.port ?? 3001;
+  const port = options.port ?? 3000;
 
   log.header('Development server');
 
