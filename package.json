@@ -1,0 +1,29 @@
+{
+  "name": "octocms",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./dist/index.js",
+    "./query": "./dist/query.js",
+    "./config": "./dist/config.js",
+    "./defineConfig": "./dist/defineConfig.js",
+    "./types": "./dist/types.js",
+    "./withOctoCMS": "./dist/withOctoCMS.js",
+    "./components/public": "./dist/components/public/index.js",
+    "./globals.css": "./globals.css",
+    "./docs/*": "./docs/*"
+  },
+  "bin": {
+    "octocms": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "globals.css"
+  ],
+  "peerDependencies": {
+    "next": ">=15",
+    "react": ">=18",
+    "react-dom": ">=18"
+  }
+}
