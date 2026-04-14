@@ -3,10 +3,16 @@
   "version": "0.1.0",
   "description": "A file-based CMS for Next.js — schema-driven, Git-backed, no database",
   "license": "MIT",
-  "keywords": ["cms", "nextjs", "headless-cms", "git-cms", "content-management"],
+  "keywords": [
+    "cms",
+    "nextjs",
+    "headless-cms",
+    "git-cms",
+    "content-management"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/octocms/octocms.git"
+    "url": "git+https://github.com/octocms/octocms.git"
   },
   "exports": {
     ".": {
@@ -41,9 +47,13 @@
     "./docs/*": "./docs/*"
   },
   "bin": {
-    "octocms": "./dist/cli/index.js"
+    "octocms": "dist/cli/index.js"
   },
-  "files": ["dist", "docs", "globals.css"],
+  "files": [
+    "dist",
+    "docs",
+    "globals.css"
+  ],
   "scripts": {
     "build": "tsup",
     "lint": "oxlint .",
