@@ -2,7 +2,7 @@
  * File templates used by `octocms init` and `octocms update`.
  */
 
-export const adminLayoutTemplate = `import '../../../cms/__generated__/configInit';
+export const adminLayoutTemplate = `import '../../cms/__generated__/configInit';
 import 'octocms/globals.css';
 import '@mdxeditor/editor/style.css';
 

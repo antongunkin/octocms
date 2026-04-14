@@ -42,14 +42,14 @@ describe('initCommand', () => {
 
   it('creates admin route files', async () => {
     await initCommand(TMP_DIR, { yes: true });
-    expect(existsSync(join(TMP_DIR, 'src', 'app', 'cms', 'layout.tsx'))).toBe(true);
-    expect(existsSync(join(TMP_DIR, 'src', 'app', 'cms', '[[...path]]', 'page.tsx'))).toBe(true);
+    expect(existsSync(join(TMP_DIR, 'app', 'cms', 'layout.tsx'))).toBe(true);
+    expect(existsSync(join(TMP_DIR, 'app', 'cms', '[[...path]]', 'page.tsx'))).toBe(true);
   });
 
   it('creates hello page demo route', async () => {
     await initCommand(TMP_DIR, { yes: true });
-    expect(existsSync(join(TMP_DIR, 'src', 'app', 'hello', 'page.tsx'))).toBe(true);
-    const page = readFileSync(join(TMP_DIR, 'src', 'app', 'hello', 'page.tsx'), 'utf8');
+    expect(existsSync(join(TMP_DIR, 'app', 'hello', 'page.tsx'))).toBe(true);
+    const page = readFileSync(join(TMP_DIR, 'app', 'hello', 'page.tsx'), 'utf8');
     expect(page).toContain("from 'cms/__generated__/query'");
     expect(page).toContain("query('helloPage').first()");
   });

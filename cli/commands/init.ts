@@ -121,19 +121,19 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   log.info('Creating files...');
 
   // Admin route files
-  const cmsRouteDir = join(projectRoot, 'src', 'app', 'cms');
+  const cmsRouteDir = join(projectRoot, 'app', 'cms');
   mkdirSync(join(cmsRouteDir, '[[...path]]'), { recursive: true });
 
   writeFileSync(join(cmsRouteDir, 'layout.tsx'), adminLayoutTemplate, 'utf8');
-  log.success('src/app/cms/layout.tsx');
+  log.success('app/cms/layout.tsx');
 
   writeFileSync(join(cmsRouteDir, '[[...path]]', 'page.tsx'), adminPageTemplate, 'utf8');
-  log.success('src/app/cms/[[...path]]/page.tsx');
+  log.success('app/cms/[[...path]]/page.tsx');
 
   // Hello page demo route
-  mkdirSync(join(projectRoot, 'src', 'app', 'hello'), { recursive: true });
-  writeFileSync(join(projectRoot, 'src', 'app', 'hello', 'page.tsx'), helloPageTemplate, 'utf8');
-  log.success('src/app/hello/page.tsx');
+  mkdirSync(join(projectRoot, 'app', 'hello'), { recursive: true });
+  writeFileSync(join(projectRoot, 'app', 'hello', 'page.tsx'), helloPageTemplate, 'utf8');
+  log.success('app/hello/page.tsx');
 
   // Demo content
   const contentDir = join(projectRoot, 'cms', 'content', 'helloPage');

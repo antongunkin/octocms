@@ -91,7 +91,7 @@ describe('nextConfigTemplate', () => {
 
 describe('adminLayoutTemplate', () => {
   it('imports configInit for cold-start config hydration', () => {
-    expect(adminLayoutTemplate).toContain("import '../../../cms/__generated__/configInit'");
+    expect(adminLayoutTemplate).toContain("import '../../cms/__generated__/configInit'");
   });
 
   it('imports globals.css and mdxeditor styles', () => {
