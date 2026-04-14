@@ -14,10 +14,12 @@ import { log } from '../lib/logger';
 import {
   adminLayoutTemplate,
   adminPageTemplate,
-  demoPostJson,
-  demoPostMarkdown,
+  demoHelloPageJson,
+  envLocalTemplate,
+  helloPageTemplate,
   nextConfigTemplate,
   octoConfigTemplate,
+  readmeTemplate,
   tsconfigPaths,
 } from '../lib/templates';
 
@@ -79,6 +81,21 @@ async function gatherAnswers(options: InitOptions): Promise<InitAnswers> {
   }
 }
 
+/** Detect the dev port from the project's package.json dev script. Defaults to 3000. */
+function detectDevPort(projectRoot: string): number {
+  try {
+    const pkg = JSON.parse(readFileSync(join(projectRoot, 'package.json'), 'utf8')) as {
+      scripts?: Record<string, string>;
+    };
+    const devScript = pkg.scripts?.dev ?? '';
+    const match = /(?:-p|--port)[= ](\d+)/.exec(devScript);
+    if (match) return parseInt(match[1], 10);
+  } catch {
+    // ignore
+  }
+  return 3000;
+}
+
 export async function initCommand(projectRoot: string, options: InitOptions = {}): Promise<void> {
   log.header('Initialize a new project');
 
@@ -113,16 +130,16 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   writeFileSync(join(cmsRouteDir, '[[...path]]', 'page.tsx'), adminPageTemplate, 'utf8');
   log.success('src/app/cms/[[...path]]/page.tsx');
 
+  // Hello page demo route
+  mkdirSync(join(projectRoot, 'src', 'app', 'hello'), { recursive: true });
+  writeFileSync(join(projectRoot, 'src', 'app', 'hello', 'page.tsx'), helloPageTemplate, 'utf8');
+  log.success('src/app/hello/page.tsx');
+
   // Demo content
-  const demoId = '001';
-  const contentDir = join(projectRoot, 'cms', 'content', 'post');
+  const contentDir = join(projectRoot, 'cms', 'content', 'helloPage');
   mkdirSync(contentDir, { recursive: true });
-
-  writeFileSync(join(contentDir, `post-${demoId}.json`), demoPostJson(demoId), 'utf8');
-  log.success(`cms/content/post/post-${demoId}.json`);
-
-  writeFileSync(join(contentDir, `post-${demoId}.body.md`), demoPostMarkdown, 'utf8');
-  log.success(`cms/content/post/post-${demoId}.body.md`);
+  writeFileSync(join(contentDir, 'helloPage-0000.json'), demoHelloPageJson(), 'utf8');
+  log.success('cms/content/helloPage/helloPage-0000.json');
 
   // Generated types directory
   mkdirSync(join(projectRoot, 'cms', '__generated__'), { recursive: true });
@@ -167,22 +184,51 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
       }
       if (changed) {
         writeFileSync(tsconfigPath, JSON.stringify(tsconfig, null, 2) + '\n', 'utf8');
-        log.success('tsconfig.json — added octocms/* path aliases');
+        log.success('tsconfig.json — added path aliases');
       } else {
         log.success('tsconfig.json — path aliases already present');
       }
     } catch {
-      log.warn('tsconfig.json — could not parse; add octocms/* paths manually');
+      log.warn('tsconfig.json — could not parse; add path aliases manually');
     }
   } else {
-    log.warn('tsconfig.json not found — create one with octocms/* path aliases');
+    log.warn('tsconfig.json not found — create one with the required path aliases');
   }
 
+  // .env.local — write stub only if it doesn't already exist
+  const envLocalPath = join(projectRoot, '.env.local');
+  if (!existsSync(envLocalPath)) {
+    writeFileSync(envLocalPath, envLocalTemplate(), 'utf8');
+    log.success('.env.local — environment variable stubs');
+  } else {
+    log.success('.env.local — already exists, skipped');
+  }
+
+  // README.md — write only if it doesn't already exist
+  const readmePath = join(projectRoot, 'README.md');
+  if (!existsSync(readmePath)) {
+    writeFileSync(readmePath, readmeTemplate(answers.projectName), 'utf8');
+    log.success('README.md — setup guide');
+  } else {
+    log.success('README.md — already exists, skipped');
+  }
+
+  // Generate types (best-effort — may fail if octocms is not yet installed)
   log.blank();
+  log.info('Generating types...');
+  try {
+    const { typesGenCommand } = await import('./typesGen');
+    await typesGenCommand(projectRoot);
+  } catch (e) {
+    log.warn(`Type generation failed: ${String((e as Error).message)}`);
+    log.warn('Run `npx octocms types:gen` after installing dependencies.');
+  }
+
+  const port = detectDevPort(projectRoot);
   log.info('Next steps:');
-  log.info('  1. Add GitHub App credentials to .env.local (see README.md)');
-  log.info('  2. Run: npm run octocms types:gen');
-  log.info('  3. Run: npm run dev');
-  log.info('  4. Visit: http://localhost:3000/cms');
+  log.info('  1. Fill in GitHub App credentials in .env.local (see README.md)');
+  log.info('  2. Run: npm run dev');
+  log.info(`  3. Visit demo page: http://localhost:${port}/hello`);
+  log.info(`  4. Visit CMS admin:  http://localhost:${port}/cms`);
   log.blank();
 }

@@ -14,20 +14,19 @@ Use it when an AI agent needs to create, read, update, or delete content entries
 Content lives in the `cms/content/` directory as JSON files. Each collection has its own subfolder.
 
 **File naming:**
-
 - **`hasMany` collections** (multiple entries): `cms/content/{type}/{type}-{uuid}.json` — UUID is generated via `crypto.randomUUID()`
 - **Singleton collections** (single entry): `cms/content/{type}/{type}-0000.json` — fixed ID `0000`
 
 ## Collections
 
-| Collection | Label     | Type      |
-| ---------- | --------- | --------- |
-| `post`     | Post      | hasMany   |
-| `item`     | Item      | hasMany   |
+| Collection | Label | Type |
+| --- | --- | --- |
+| `post` | Post | hasMany |
+| `item` | Item | hasMany |
 | `homePage` | Home Page | singleton |
-| `blog`     | Blog      | singleton |
-| `author`   | Author    | hasMany   |
-| `role`     | Role      | hasMany   |
+| `blog` | Blog | singleton |
+| `author` | Author | hasMany |
+| `role` | Role | hasMany |
 
 ## Entry JSON structure
 
@@ -48,13 +47,13 @@ Every entry file has this shape:
 
 ## Entry status values
 
-| Status      | Meaning                                    | Visible on public site |
-| ----------- | ------------------------------------------ | ---------------------- |
-| `draft`     | Newly created, never published             | No                     |
-| `published` | Live on public site                        | Yes                    |
-| `changed`   | Edited after publish, not yet re-published | Yes (shows latest)     |
-| `merged`    | On main branch, baseline state             | Yes                    |
-| `archived`  | Soft-deleted                               | No                     |
+| Status | Meaning | Visible on public site |
+| --- | --- | --- |
+| `draft` | Newly created, never published | No |
+| `published` | Live on public site | Yes |
+| `changed` | Edited after publish, not yet re-published | Yes (shows latest) |
+| `merged` | On main branch, baseline state | Yes |
+| `archived` | Soft-deleted | No |
 
 When creating a new entry, set `"status": "draft"`.
 
@@ -72,8 +71,8 @@ Example: A post entry `post-abc123.json` with a `body` markdown field stores its
 
 Use this table to match a public URL to its content collection and entry:
 
-| URL pattern   | Collection    | How to find the entry                    |
-| ------------- | ------------- | ---------------------------------------- |
+| URL pattern | Collection | How to find the entry |
+| --- | --- | --- |
 | `/blog/:slug` | `post` (Post) | Match `fields.slug` from the URL segment |
 
 ## Creating a new entry
@@ -105,9 +104,9 @@ Use this table to match a public URL to its content collection and entry:
 4. Optionally create a public page route using the `query()` API:
 
 ```typescript
-import { query } from "octocms/query";
+import { query } from 'octocms/query';
 
-const entries = await query("collectionName")
-  .sort("fieldName", "desc")
+const entries = await query('collectionName')
+  .sort('fieldName', 'desc')
   .toArray();
 ```

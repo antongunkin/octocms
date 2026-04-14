@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   adminLayoutTemplate,
   adminPageTemplate,
-  demoPostJson,
-  demoPostMarkdown,
+  demoHelloPageJson,
+  helloPageTemplate,
   nextConfigTemplate,
   octoConfigTemplate,
   tsconfigPaths,
@@ -53,12 +53,11 @@ describe('octoConfigTemplate', () => {
     expect(out).not.toContain('publishedPointerBranch');
   });
 
-  it('includes demo post collection', () => {
+  it('includes helloPage singleton collection', () => {
     const out = octoConfigTemplate({ projectName: 'Test', baseBranch: 'main' });
-    expect(out).toContain('post: {');
+    expect(out).toContain('helloPage: {');
     expect(out).toContain("format: 'string'");
-    expect(out).toContain("format: 'slug'");
-    expect(out).toContain("format: 'markdown'");
+    expect(out).toContain("format: 'text'");
   });
 });
 
@@ -111,31 +110,37 @@ describe('adminPageTemplate', () => {
   });
 });
 
-describe('demoPostJson', () => {
+describe('demoHelloPageJson', () => {
   it('returns valid JSON with sys and fields', () => {
-    const json = JSON.parse(demoPostJson('001'));
-    expect(json.sys.id).toBe('001');
-    expect(json.sys.type).toBe('post');
+    const json = JSON.parse(demoHelloPageJson());
+    expect(json.sys.id).toBe('0000');
+    expect(json.sys.type).toBe('helloPage');
     expect(json.sys.status).toBe('merged');
     expect(json.fields.title).toBe('Hello World');
-    expect(json.fields.slug).toBe('hello-world');
-    expect(json.fields.publishedAt).toBeTruthy();
+    expect(json.fields.description).toBeTruthy();
   });
 });
 
-describe('demoPostMarkdown', () => {
-  it('contains welcome text', () => {
-    expect(demoPostMarkdown).toContain('Hello World');
-    expect(demoPostMarkdown).toContain('OctoCMS');
+describe('helloPageTemplate', () => {
+  it('imports query from cms/__generated__/query', () => {
+    expect(helloPageTemplate).toContain("from 'cms/__generated__/query'");
+  });
+
+  it('queries helloPage collection', () => {
+    expect(helloPageTemplate).toContain("query('helloPage').first()");
   });
 });
 
 describe('tsconfigPaths', () => {
-  it('includes all required aliases', () => {
+  it('includes required aliases', () => {
     const paths = tsconfigPaths();
-    expect(paths['octocms/config']).toBeUndefined();
-    expect(paths['octocms/*']).toEqual(['./octocms/*']);
     expect(paths['@/*']).toEqual(['./src/*']);
     expect(paths['cms/__generated__']).toEqual(['./cms/__generated__/index.ts']);
+    expect(paths['cms/__generated__/*']).toEqual(['./cms/__generated__/*']);
+  });
+
+  it('does not include octocms/* alias (resolved via node_modules when installed as npm package)', () => {
+    const paths = tsconfigPaths();
+    expect(paths['octocms/*']).toBeUndefined();
   });
 });

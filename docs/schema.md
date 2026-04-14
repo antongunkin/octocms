@@ -135,6 +135,7 @@ Write your body content here in Markdown.
 | `heroHeadline` | Hero — Headline | `string` | — | plain text |
 | `heroHeadlineAccent` | Hero — Headline Accent | `string` | — | plain text |
 | `heroDescription` | Hero — Description | `text` | — | plain text |
+| `heroImage` | Hero — Image | `image` | — | media entry UUID string |
 | `howItWorksTitle` | How It Works — Title | `string` | — | plain text |
 | `howItWorksDescription` | How It Works — Description | `text` | — | plain text |
 | `steps` | How It Works — Steps | `json` | — | any valid JSON value |
@@ -163,6 +164,7 @@ Write your body content here in Markdown.
     "heroHeadline": "Example hero — headline",
     "heroHeadlineAccent": "Example hero — headline accent",
     "heroDescription": "Example hero — description text",
+    "heroImage": "<media-entry-uuid>",
     "howItWorksTitle": "Example how it works — title",
     "howItWorksDescription": "Example how it works — description text",
     "steps": null,

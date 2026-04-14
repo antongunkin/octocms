@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'fs';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 
 /**
  * Walk up from `startDir` until we find a directory containing a
@@ -28,12 +28,17 @@ export function resolveProjectRoot(startDir?: string): string {
 export async function loadProjectConfig(projectRoot: string) {
   // Dynamic import so jiti stays an optional peer when published
   const { createJiti } = await import('jiti');
+  // In this monorepo, octocms/ lives at the project root. When installed as an npm
+  // package it lives in node_modules/octocms — jiti resolves it normally in that case.
+  const alias: Record<string, string> = {};
+  const localOctocms = resolve(projectRoot, 'octocms');
+  if (existsSync(localOctocms)) {
+    alias['octocms/'] = localOctocms + '/';
+  }
   const jiti = createJiti(join(projectRoot, '__cli_loader__.ts'), {
     fsCache: false,
     moduleCache: false,
-    alias: {
-      'octocms/': join(projectRoot, 'octocms/'),
-    },
+    alias,
   });
   const mod = (await jiti.import(join(projectRoot, 'cms', 'octocms.config.ts'), {
     default: true,
@@ -50,12 +55,15 @@ export async function loadProjectConfig(projectRoot: string) {
  */
 export async function loadCollections(projectRoot: string): Promise<readonly string[]> {
   const { createJiti } = await import('jiti');
+  const alias: Record<string, string> = {};
+  const localOctocms = resolve(projectRoot, 'octocms');
+  if (existsSync(localOctocms)) {
+    alias['octocms/'] = localOctocms + '/';
+  }
   const jiti = createJiti(join(projectRoot, '__cli_loader__.ts'), {
     fsCache: false,
     moduleCache: false,
-    alias: {
-      'octocms/': join(projectRoot, 'octocms/'),
-    },
+    alias,
   });
   const mod = (await jiti.import(join(projectRoot, 'octocms/admin/consts.ts'), {
     default: true,
@@ -72,12 +80,15 @@ export async function loadCollections(projectRoot: string): Promise<readonly str
  */
 export async function loadFieldTypes(projectRoot: string): Promise<readonly string[]> {
   const { createJiti } = await import('jiti');
+  const alias: Record<string, string> = {};
+  const localOctocms = resolve(projectRoot, 'octocms');
+  if (existsSync(localOctocms)) {
+    alias['octocms/'] = localOctocms + '/';
+  }
   const jiti = createJiti(join(projectRoot, '__cli_loader__.ts'), {
     fsCache: false,
     moduleCache: false,
-    alias: {
-      'octocms/': join(projectRoot, 'octocms/'),
-    },
+    alias,
   });
   const mod = (await jiti.import(join(projectRoot, 'octocms/admin/consts.ts'), {
     default: true,

@@ -8,7 +8,14 @@
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-import { generateContentDecls, generateEnums, generateIndex, generateTypes } from '../lib/codegen';
+import {
+  generateConfigInit,
+  generateContentDecls,
+  generateEnums,
+  generateIndex,
+  generateQuery,
+  generateTypes,
+} from '../lib/codegen';
 import { log } from '../lib/logger';
 import { loadCollections, loadFieldTypes, loadProjectConfig } from '../lib/project';
 import { validateConfig } from '../lib/validateConfig';
@@ -41,6 +48,8 @@ export async function typesGenCommand(projectRoot: string): Promise<void> {
     { name: 'enums.ts', content: generateEnums(config, collections, fieldTypes) },
     { name: 'content.d.ts', content: generateContentDecls(config, collections) },
     { name: 'index.ts', content: generateIndex() },
+    { name: 'query.ts', content: generateQuery() },
+    { name: 'configInit.ts', content: generateConfigInit() },
   ];
 
   for (const file of files) {

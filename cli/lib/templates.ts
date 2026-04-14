@@ -27,14 +27,11 @@ ${gitBlock}
   mediaFolder: 'public/media',
   mediaAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif'],
   collections: {
-    post: {
-      label: 'Posts',
-      hasMany: true,
+    helloPage: {
+      label: 'Hello Page',
       fields: {
         title: { label: 'Title', format: 'string', entryTitle: true, required: true },
-        slug: { label: 'Slug', format: 'slug', slugSource: 'title', required: true },
-        body: { label: 'Body', format: 'markdown' },
-        publishedAt: { label: 'Published At', format: 'datetime', defaultNow: true },
+        description: { label: 'Description', format: 'text' },
       },
     },
   },
@@ -59,15 +56,13 @@ export default withOctoCMS(nextConfig, configOctoCMS);
 `;
 }
 
-export function demoPostJson(id: string): string {
-  const now = new Date().toISOString();
+export function demoHelloPageJson(): string {
   return JSON.stringify(
     {
-      sys: { id, type: 'post', status: 'merged' },
+      sys: { id: '0000', type: 'helloPage', status: 'merged' },
       fields: {
         title: 'Hello World',
-        slug: 'hello-world',
-        publishedAt: now,
+        description: 'Welcome to your new OctoCMS site! Edit this content in the CMS admin panel.',
       },
     },
     null,
@@ -75,12 +70,80 @@ export function demoPostJson(id: string): string {
   );
 }
 
-export const demoPostMarkdown = `# Hello World
+export const helloPageTemplate = `import { query } from 'cms/__generated__/query';
 
-Welcome to your new OctoCMS site! This is a demo post.
-
-Edit this content in the CMS admin panel at \`/cms\`.
+export default async function HelloPage() {
+  const page = await query('helloPage').first();
+  if (!page) return null;
+  return (
+    <main>
+      <h1>{page.fields.title}</h1>
+      <p>{page.fields.description}</p>
+    </main>
+  );
+}
 `;
+
+export function readmeTemplate(projectName: string): string {
+  return `# ${projectName}
+
+Built with [OctoCMS](https://octocms.com) — a file-based CMS on Next.js.
+
+## Setup
+
+### 1. Create a GitHub App
+
+Follow the [OctoCMS GitHub App setup guide](https://octocms.com/docs/github-app) to create a GitHub App for authentication.
+
+### 2. Configure environment variables
+
+Copy the values from your GitHub App into \`.env.local\`:
+
+\`\`\`bash
+# GitHub App credentials (required for CMS auth)
+GITHUB_ID=your_github_app_client_id
+GITHUB_SECRET=your_github_app_client_secret
+
+# NextAuth (generate secret: openssl rand -base64 32)
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+
+# GitHub repo for content storage (required in production)
+GITHUB_REPO_OWNER=your_github_username_or_org
+GITHUB_REPO_NAME=your_repo_name
+
+# Optional: static GitHub token for private repos / higher API rate limits
+# CMS_GITHUB_TOKEN=your_github_pat
+\`\`\`
+
+### 3. Run the dev server
+
+\`\`\`bash
+npm run dev
+\`\`\`
+
+Open [http://localhost:3000/cms](http://localhost:3000/cms) to access the CMS admin.
+`;
+}
+
+export function envLocalTemplate(): string {
+  return `# GitHub App credentials (required for CMS auth)
+# Create a GitHub App at: https://github.com/settings/apps/new
+GITHUB_ID=
+GITHUB_SECRET=
+
+# NextAuth secret — generate with: openssl rand -base64 32
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
+
+# GitHub repo for content storage (required in production)
+GITHUB_REPO_OWNER=
+GITHUB_REPO_NAME=
+
+# Optional: static GitHub token for private repos or higher API rate limits
+# CMS_GITHUB_TOKEN=
+`;
+}
 
 const AGENT_DOCS_MARKER = '<!-- octocms:agent-docs -->';
 
@@ -107,7 +170,6 @@ export function tsconfigPaths(): Record<string, string[]> {
   return {
     'cms/__generated__': ['./cms/__generated__/index.ts'],
     'cms/__generated__/*': ['./cms/__generated__/*'],
-    'octocms/*': ['./octocms/*'],
     '@/*': ['./src/*'],
   };
 }
