@@ -20,8 +20,7 @@
 
 import { fmt, log } from './lib/logger';
 import { resolveProjectRoot } from './lib/project';
-
-const VERSION = '0.0.0';
+import { version as VERSION } from '../package.json';
 
 const HELP = `
   ${fmt.bold('OctoCMS CLI')} v${VERSION}
