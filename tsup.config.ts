@@ -2,7 +2,11 @@ import { defineConfig } from 'tsup';
 
 const external = ['next', 'react', 'react-dom', 'next-auth', 'sharp'];
 
-// Output .js / .d.ts so the exports map entries match without needing "type": "module"
+// jiti must be external for the CLI — tsup bundling it inlines CJS require() calls
+// (require("os") etc.) that break at runtime in an ESM context.
+const cliExternal = [...external, 'jiti'];
+
+// Output .js / .d.ts — package has "type": "module" so Node treats .js as ESM
 const outExtension = () => ({ js: '.js', dts: '.d.ts' });
 
 export default defineConfig([
@@ -28,7 +32,7 @@ export default defineConfig([
     entry: { 'cli/index': 'cli/index.ts' },
     format: ['esm'],
     dts: false,
-    external,
+    external: cliExternal,
     outExtension,
     sourcemap: true,
   },

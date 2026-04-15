@@ -16,6 +16,12 @@ import {
   adminPageTemplate,
   demoHelloPageJson,
   envLocalTemplate,
+  generatedConfigInitTemplate,
+  generatedContentDeclsTemplate,
+  generatedEnumsTemplate,
+  generatedIndexTemplate,
+  generatedQueryTemplate,
+  generatedTypesTemplate,
   helloPageTemplate,
   nextConfigTemplate,
   octoConfigTemplate,
@@ -141,8 +147,22 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   writeFileSync(join(contentDir, 'helloPage-0000.json'), demoHelloPageJson(), 'utf8');
   log.success('cms/content/helloPage/helloPage-0000.json');
 
-  // Generated types directory
-  mkdirSync(join(projectRoot, 'cms', '__generated__'), { recursive: true });
+  // cms/__generated__/ — write static starter files (schema-accurate for helloPage demo)
+  // These are valid immediately; re-run `npx octocms types:gen` after editing the schema.
+  const generatedDir = join(projectRoot, 'cms', '__generated__');
+  mkdirSync(generatedDir, { recursive: true });
+  const generatedFiles: [string, string][] = [
+    ['types.ts', generatedTypesTemplate],
+    ['enums.ts', generatedEnumsTemplate],
+    ['content.d.ts', generatedContentDeclsTemplate],
+    ['index.ts', generatedIndexTemplate],
+    ['query.ts', generatedQueryTemplate],
+    ['configInit.ts', generatedConfigInitTemplate],
+  ];
+  for (const [name, content] of generatedFiles) {
+    writeFileSync(join(generatedDir, name), content, 'utf8');
+    log.success(`cms/__generated__/${name}`);
+  }
 
   // Media directory
   mkdirSync(join(projectRoot, 'public', 'media'), { recursive: true });
@@ -213,22 +233,14 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
     log.success('README.md — already exists, skipped');
   }
 
-  // Generate types (best-effort — may fail if octocms is not yet installed)
-  log.blank();
-  log.info('Generating types...');
-  try {
-    const { typesGenCommand } = await import('./typesGen');
-    await typesGenCommand(projectRoot);
-  } catch (e) {
-    log.warn(`Type generation failed: ${String((e as Error).message)}`);
-    log.warn('Run `npx octocms types:gen` after installing dependencies.');
-  }
-
   const port = detectDevPort(projectRoot);
   log.info('Next steps:');
   log.info('  1. Fill in GitHub App credentials in .env.local (see README.md)');
   log.info('  2. Run: npm run dev');
   log.info(`  3. Visit demo page: http://localhost:${port}/hello`);
   log.info(`  4. Visit CMS admin:  http://localhost:${port}/cms`);
+  log.info('');
+  log.info('  After editing cms/octocms.config.ts, regenerate types:');
+  log.info('  npx octocms types:gen');
   log.blank();
 }

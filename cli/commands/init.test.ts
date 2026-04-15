@@ -92,6 +92,29 @@ describe('initCommand', () => {
     expect(existsSync(join(TMP_DIR, 'public', 'media'))).toBe(true);
   });
 
+  it('writes static cms/__generated__ files without running codegen', async () => {
+    await initCommand(TMP_DIR, { yes: true });
+    const gen = (f: string) => join(TMP_DIR, 'cms', '__generated__', f);
+    expect(existsSync(gen('types.ts'))).toBe(true);
+    expect(existsSync(gen('enums.ts'))).toBe(true);
+    expect(existsSync(gen('content.d.ts'))).toBe(true);
+    expect(existsSync(gen('index.ts'))).toBe(true);
+    expect(existsSync(gen('query.ts'))).toBe(true);
+    expect(existsSync(gen('configInit.ts'))).toBe(true);
+
+    const types = readFileSync(gen('types.ts'), 'utf8');
+    expect(types).toContain('HelloPageEntry');
+    expect(types).toContain("type: 'helloPage'");
+
+    const query = readFileSync(gen('query.ts'), 'utf8');
+    expect(query).toContain("from 'octocms/query'");
+    expect(query).toContain('createQuery<EntryMap, OctoConfig>');
+
+    const configInit = readFileSync(gen('configInit.ts'), 'utf8');
+    expect(configInit).toContain("from 'octocms/lib/configStore'");
+    expect(configInit).toContain('setConfig(configOctoCMS)');
+  });
+
   it('creates .env.local stub', async () => {
     await initCommand(TMP_DIR, { yes: true });
     expect(existsSync(join(TMP_DIR, '.env.local'))).toBe(true);

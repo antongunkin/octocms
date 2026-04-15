@@ -2,6 +2,100 @@
  * File templates used by `octocms init` and `octocms update`.
  */
 
+const CODEGEN_BANNER = `/*
+ * AUTO-GENERATED — DO NOT EDIT.
+ * Generated from cms/octocms.config.ts.
+ * Run \`npx octocms types:gen\` to regenerate.
+ */
+
+`;
+
+/** Static cms/__generated__/types.ts for the helloPage demo schema. */
+export const generatedTypesTemplate = CODEGEN_BANNER + `import type { EntryStatus } from 'octocms/types';
+
+export interface HelloPageFields {
+  title: string;
+  description: string;
+}
+
+export interface HelloPageEntry {
+  sys: { id: string; type: 'helloPage'; status: EntryStatus };
+  fields: HelloPageFields;
+}
+
+export type AnyEntry = HelloPageEntry;
+
+export type EntryMap = {
+  helloPage: HelloPageEntry;
+};
+`;
+
+/** Static cms/__generated__/enums.ts for the helloPage demo schema. */
+export const generatedEnumsTemplate = CODEGEN_BANNER + `export const CollectionName = {
+  HelloPage: 'helloPage',
+} as const;
+export type CollectionName = (typeof CollectionName)[keyof typeof CollectionName];
+
+export const COLLECTION_NAMES = ['helloPage'] as const;
+
+export const FieldFormat = {
+  String: 'string',
+  Text: 'text',
+  Markdown: 'markdown',
+  Boolean: 'boolean',
+  Reference: 'reference',
+  Image: 'image',
+  Number: 'number',
+  Datetime: 'datetime',
+  Json: 'json',
+  Slug: 'slug',
+  Select: 'select',
+  Url: 'url',
+  Color: 'color',
+  Conditional: 'conditional',
+  Richtext: 'richtext',
+} as const;
+export type FieldFormat = (typeof FieldFormat)[keyof typeof FieldFormat];
+`;
+
+/** Static cms/__generated__/content.d.ts for the helloPage demo schema. */
+export const generatedContentDeclsTemplate = CODEGEN_BANNER + `import type { EntryStatus } from 'octocms/types';
+
+// Raw on-disk types (before query() processing).
+export interface RawHelloPageFields {
+  title: string;
+  description: string;
+}
+
+export interface RawHelloPageEntry {
+  sys: { id: string; type: 'helloPage'; status: EntryStatus };
+  fields: RawHelloPageFields;
+}
+`;
+
+/** Static cms/__generated__/index.ts — always the same shape. */
+export const generatedIndexTemplate = CODEGEN_BANNER + `export * from './types';
+export * from './enums';
+export * from './query';
+`;
+
+/** Static cms/__generated__/query.ts — always the same shape (schema-independent). */
+export const generatedQueryTemplate = CODEGEN_BANNER + `import { createQuery } from 'octocms/query';
+import { configOctoCMS, type OctoConfig } from '../octocms.config';
+import type { EntryMap } from './types';
+
+// configOctoCMS is widened to Config for admin internals; cast back to OctoConfig so
+// createQuery preserves literal collection/field names for type-safe queries.
+export const query = createQuery<EntryMap, OctoConfig>(configOctoCMS as unknown as OctoConfig);
+`;
+
+/** Static cms/__generated__/configInit.ts — always the same shape (schema-independent). */
+export const generatedConfigInitTemplate = CODEGEN_BANNER + `import { configOctoCMS } from '../octocms.config';
+import { setConfig } from 'octocms/lib/configStore';
+
+setConfig(configOctoCMS);
+`;
+
 export const adminLayoutTemplate = `import '../../cms/__generated__/configInit';
 import 'octocms/globals.css';
 import '@mdxeditor/editor/style.css';
