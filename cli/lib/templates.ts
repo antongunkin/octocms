@@ -11,7 +11,9 @@ const CODEGEN_BANNER = `/*
 `;
 
 /** Static cms/__generated__/types.ts for the helloPage demo schema. */
-export const generatedTypesTemplate = CODEGEN_BANNER + `import type { EntryStatus } from 'octocms/types';
+export const generatedTypesTemplate =
+  CODEGEN_BANNER +
+  `import type { EntryStatus } from 'octocms/types';
 
 export interface HelloPageFields {
   title: string;
@@ -31,7 +33,9 @@ export type EntryMap = {
 `;
 
 /** Static cms/__generated__/enums.ts for the helloPage demo schema. */
-export const generatedEnumsTemplate = CODEGEN_BANNER + `export const CollectionName = {
+export const generatedEnumsTemplate =
+  CODEGEN_BANNER +
+  `export const CollectionName = {
   HelloPage: 'helloPage',
 } as const;
 export type CollectionName = (typeof CollectionName)[keyof typeof CollectionName];
@@ -59,7 +63,9 @@ export type FieldFormat = (typeof FieldFormat)[keyof typeof FieldFormat];
 `;
 
 /** Static cms/__generated__/content.d.ts for the helloPage demo schema. */
-export const generatedContentDeclsTemplate = CODEGEN_BANNER + `import type { EntryStatus } from 'octocms/types';
+export const generatedContentDeclsTemplate =
+  CODEGEN_BANNER +
+  `import type { EntryStatus } from 'octocms/types';
 
 // Raw on-disk types (before query() processing).
 export interface RawHelloPageFields {
@@ -74,13 +80,17 @@ export interface RawHelloPageEntry {
 `;
 
 /** Static cms/__generated__/index.ts — always the same shape. */
-export const generatedIndexTemplate = CODEGEN_BANNER + `export * from './types';
+export const generatedIndexTemplate =
+  CODEGEN_BANNER +
+  `export * from './types';
 export * from './enums';
 export * from './query';
 `;
 
 /** Static cms/__generated__/query.ts — always the same shape (schema-independent). */
-export const generatedQueryTemplate = CODEGEN_BANNER + `import { createQuery } from 'octocms/query';
+export const generatedQueryTemplate =
+  CODEGEN_BANNER +
+  `import { createQuery } from 'octocms/query';
 import { configOctoCMS, type OctoConfig } from '../octocms.config';
 import type { EntryMap } from './types';
 
@@ -90,7 +100,9 @@ export const query = createQuery<EntryMap, OctoConfig>(configOctoCMS as unknown 
 `;
 
 /** Static cms/__generated__/configInit.ts — always the same shape (schema-independent). */
-export const generatedConfigInitTemplate = CODEGEN_BANNER + `import { configOctoCMS } from '../octocms.config';
+export const generatedConfigInitTemplate =
+  CODEGEN_BANNER +
+  `import { configOctoCMS } from '../octocms.config';
 import { setConfig } from 'octocms/lib/configStore';
 
 setConfig(configOctoCMS);
