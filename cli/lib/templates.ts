@@ -103,14 +103,12 @@ export const query = createQuery<EntryMap, OctoConfig>(configOctoCMS as unknown 
 export const generatedConfigInitTemplate =
   CODEGEN_BANNER +
   `import { configOctoCMS } from '../octocms.config';
-import { setConfig } from 'octocms/lib/configStore';
+import { setConfig } from 'octocms/config';
 
 setConfig(configOctoCMS);
 `;
 
 export const adminLayoutTemplate = `import '../../cms/__generated__/configInit';
-import 'octocms/globals.css';
-import '@mdxeditor/editor/style.css';
 
 export { AdminLayout as default, metadata } from 'octocms/admin/pages/AdminLayout';
 `;
@@ -156,7 +154,9 @@ import { configOctoCMS } from './cms/octocms.config';
 export { configOctoCMS } from './cms/octocms.config';
 export type { OctoConfig } from './cms/octocms.config';
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  transpilePackages: ['octocms'],
+};
 
 export default withOctoCMS(nextConfig, configOctoCMS);
 `;

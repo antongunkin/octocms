@@ -279,7 +279,7 @@ export function generateConfigInit(): string {
   return (
     CODEGEN_BANNER +
     `import { configOctoCMS } from '../octocms.config';
-import { setConfig } from 'octocms/lib/configStore';
+import { setConfig } from 'octocms/config';
 
 setConfig(configOctoCMS);
 `

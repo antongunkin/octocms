@@ -94,9 +94,9 @@ describe('adminLayoutTemplate', () => {
     expect(adminLayoutTemplate).toContain("import '../../cms/__generated__/configInit'");
   });
 
-  it('imports globals.css and mdxeditor styles', () => {
-    expect(adminLayoutTemplate).toContain("import 'octocms/globals.css'");
-    expect(adminLayoutTemplate).toContain("import '@mdxeditor/editor/style.css'");
+  it('does not duplicate CSS imports (AdminLayout.tsx source handles them)', () => {
+    expect(adminLayoutTemplate).not.toContain("import 'octocms/globals.css'");
+    expect(adminLayoutTemplate).not.toContain("import '@mdxeditor/editor/style.css'");
   });
 
   it('re-exports AdminLayout', () => {

@@ -111,7 +111,7 @@ describe('initCommand', () => {
     expect(query).toContain('createQuery<EntryMap, OctoConfig>');
 
     const configInit = readFileSync(gen('configInit.ts'), 'utf8');
-    expect(configInit).toContain("from 'octocms/lib/configStore'");
+    expect(configInit).toContain("from 'octocms/config'");
     expect(configInit).toContain('setConfig(configOctoCMS)');
   });
 
