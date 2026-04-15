@@ -53,6 +53,7 @@
     },
     "./admin/AdminApp": "./admin/AdminApp.tsx",
     "./admin/pages/AdminLayout": "./admin/pages/AdminLayout.tsx",
+    "./lib/configStore": "./lib/configStore.ts",
     "./globals.css": "./globals.css",
     "./docs/*": "./docs/*"
   },

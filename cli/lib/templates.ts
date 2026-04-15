@@ -103,7 +103,7 @@ export const query = createQuery<EntryMap, OctoConfig>(configOctoCMS as unknown 
 export const generatedConfigInitTemplate =
   CODEGEN_BANNER +
   `import { configOctoCMS } from '../octocms.config';
-import { setConfig } from 'octocms/config';
+import { setConfig } from 'octocms/lib/configStore';
 
 setConfig(configOctoCMS);
 `;
