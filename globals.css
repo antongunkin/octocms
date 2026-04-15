@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Scan compiled octocms dist for Tailwind class names used by admin components */
+@source "../dist";
+
 /* Scope dark: variants to descendants of any .dark element (admin-only, not <html>) */
 @custom-variant dark (&:is(.dark *));
 
