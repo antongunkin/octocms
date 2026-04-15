@@ -109,11 +109,21 @@ setConfig(configOctoCMS);
 `;
 
 export const adminLayoutTemplate = `import '../../cms/__generated__/configInit';
+import 'octocms/globals.css';
+import '@mdxeditor/editor/style.css';
 
 export { AdminLayout as default, metadata } from 'octocms/admin/pages/AdminLayout';
 `;
 
 export const adminPageTemplate = `export { AdminApp as default } from 'octocms/admin/AdminApp';
+`;
+
+export const nextAuthRouteTemplate = `import NextAuth from 'next-auth';
+import { authOptions } from 'octocms/admin/auth';
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
 `;
 
 export function octoConfigTemplate(opts: { projectName: string; baseBranch: string; pointerBranch?: string }): string {

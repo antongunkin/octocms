@@ -23,6 +23,7 @@ import {
   generatedQueryTemplate,
   generatedTypesTemplate,
   helloPageTemplate,
+  nextAuthRouteTemplate,
   nextConfigTemplate,
   octoConfigTemplate,
   readmeTemplate,
@@ -135,6 +136,12 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
 
   writeFileSync(join(cmsRouteDir, '[[...path]]', 'page.tsx'), adminPageTemplate, 'utf8');
   log.success('app/cms/[[...path]]/page.tsx');
+
+  // NextAuth API route
+  const authRouteDir = join(projectRoot, 'app', 'api', 'auth', '[...nextauth]');
+  mkdirSync(authRouteDir, { recursive: true });
+  writeFileSync(join(authRouteDir, 'route.ts'), nextAuthRouteTemplate, 'utf8');
+  log.success('app/api/auth/[...nextauth]/route.ts');
 
   // Hello page demo route
   mkdirSync(join(projectRoot, 'app', 'hello'), { recursive: true });
