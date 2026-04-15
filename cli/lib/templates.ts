@@ -164,9 +164,7 @@ import { configOctoCMS } from './cms/octocms.config';
 export { configOctoCMS } from './cms/octocms.config';
 export type { OctoConfig } from './cms/octocms.config';
 
-const nextConfig: NextConfig = {
-  transpilePackages: ['octocms'],
-};
+const nextConfig: NextConfig = {};
 
 export default withOctoCMS(nextConfig, configOctoCMS);
 `;

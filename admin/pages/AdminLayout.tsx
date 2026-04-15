@@ -1,5 +1,3 @@
-import '../../globals.css';
-import '@mdxeditor/editor/style.css';
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 

@@ -51,10 +51,31 @@
       "require": "./dist/components/public/index.cjs",
       "import": "./dist/components/public/index.js"
     },
-    "./admin/AdminApp": "./admin/AdminApp.tsx",
-    "./admin/pages/AdminLayout": "./admin/pages/AdminLayout.tsx",
-    "./admin/auth": "./admin/auth.ts",
-    "./lib/configStore": "./lib/configStore.ts",
+    "./lib/configStore": {
+      "types": "./dist/lib/configStore.d.ts",
+      "require": "./dist/lib/configStore.cjs",
+      "import": "./dist/lib/configStore.js"
+    },
+    "./admin/*": {
+      "types": "./dist/admin/*.d.ts",
+      "import": "./dist/admin/*.js"
+    },
+    "./components/*": {
+      "types": "./dist/components/*.d.ts",
+      "import": "./dist/components/*.js"
+    },
+    "./hooks/*": {
+      "types": "./dist/hooks/*.d.ts",
+      "import": "./dist/hooks/*.js"
+    },
+    "./lib/*": {
+      "types": "./dist/lib/*.d.ts",
+      "import": "./dist/lib/*.js"
+    },
+    "./utils/*": {
+      "types": "./dist/utils/*.d.ts",
+      "import": "./dist/utils/*.js"
+    },
     "./globals.css": "./globals.css",
     "./docs/*": "./docs/*"
   },
@@ -64,22 +85,10 @@
   "files": [
     "dist",
     "docs",
-    "globals.css",
-    "admin",
-    "components",
-    "hooks",
-    "lib",
-    "utils",
-    "index.ts",
-    "query.ts",
-    "config.ts",
-    "defineConfig.ts",
-    "github-public.ts",
-    "types.ts",
-    "withOctoCMS.ts"
+    "globals.css"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run checks && npm run build",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
@@ -93,6 +102,7 @@
   },
   "peerDependencies": {
     "next": ">=15",
+    "next-auth": ">=4",
     "react": ">=18",
     "react-dom": ">=18"
   },
@@ -111,7 +121,6 @@
     "glob": "^11.0.0",
     "lucide-react": "^1.7.0",
     "minisearch": "^7.2.0",
-    "next-auth": "^4.24.13",
     "octokit": "^4.1.4",
     "react-markdown": "^10.1.0",
     "rehype-sanitize": "^6.0.0",
