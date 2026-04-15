@@ -18,30 +18,37 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },
     "./query": {
       "types": "./dist/query.d.ts",
+      "require": "./dist/query.cjs",
       "import": "./dist/query.js"
     },
     "./config": {
       "types": "./dist/config.d.ts",
+      "require": "./dist/config.cjs",
       "import": "./dist/config.js"
     },
     "./defineConfig": {
       "types": "./dist/defineConfig.d.ts",
+      "require": "./dist/defineConfig.cjs",
       "import": "./dist/defineConfig.js"
     },
     "./types": {
       "types": "./dist/types.d.ts",
+      "require": "./dist/types.cjs",
       "import": "./dist/types.js"
     },
     "./withOctoCMS": {
       "types": "./dist/withOctoCMS.d.ts",
+      "require": "./dist/withOctoCMS.cjs",
       "import": "./dist/withOctoCMS.js"
     },
     "./components/public": {
       "types": "./dist/components/public/index.d.ts",
+      "require": "./dist/components/public/index.cjs",
       "import": "./dist/components/public/index.js"
     },
     "./admin/AdminApp": "./admin/AdminApp.tsx",
