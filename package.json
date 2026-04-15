@@ -67,10 +67,12 @@
     "components",
     "hooks",
     "lib",
+    "utils",
     "index.ts",
     "query.ts",
     "config.ts",
     "defineConfig.ts",
+    "github-public.ts",
     "types.ts",
     "withOctoCMS.ts"
   ],
