@@ -108,6 +108,30 @@ import { setConfig } from 'octocms/lib/configStore';
 setConfig(configOctoCMS);
 `;
 
+/**
+ * Minimal root layout written when `app/layout.tsx` does not already exist.
+ * The configInit import is the critical side-effect; the rest is a Next.js
+ * boilerplate shell.
+ */
+export const rootLayoutTemplate = `import '../cms/__generated__/configInit';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'My App',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+`;
+
+/** The one-liner prepended to an existing root layout to register the config. */
+export const rootLayoutConfigInitImport = `import '../cms/__generated__/configInit';\n`;
+
 export const adminLayoutTemplate = `import '../../cms/__generated__/configInit';
 import 'octocms/globals.css';
 import '@mdxeditor/editor/style.css';

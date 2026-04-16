@@ -27,6 +27,8 @@ import {
   nextConfigTemplate,
   octoConfigTemplate,
   readmeTemplate,
+  rootLayoutConfigInitImport,
+  rootLayoutTemplate,
   tsconfigPaths,
 } from '../lib/templates';
 
@@ -136,6 +138,22 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
 
   writeFileSync(join(cmsRouteDir, '[[...path]]', 'page.tsx'), adminPageTemplate, 'utf8');
   log.success('app/cms/[[...path]]/page.tsx');
+
+  // Root layout — ensure configInit is imported so public page serverless functions
+  // initialize the OctoCMS config on cold start (not just admin routes).
+  const rootLayoutPath = join(projectRoot, 'app', 'layout.tsx');
+  if (!existsSync(rootLayoutPath)) {
+    writeFileSync(rootLayoutPath, rootLayoutTemplate, 'utf8');
+    log.success('app/layout.tsx — created with configInit import');
+  } else {
+    const existing = readFileSync(rootLayoutPath, 'utf8');
+    if (!existing.includes('configInit')) {
+      writeFileSync(rootLayoutPath, rootLayoutConfigInitImport + existing, 'utf8');
+      log.success('app/layout.tsx — added configInit import');
+    } else {
+      log.success('app/layout.tsx — configInit import already present');
+    }
+  }
 
   // NextAuth API route
   const authRouteDir = join(projectRoot, 'app', 'api', 'auth', '[...nextauth]');

@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 import { log } from '../lib/logger';
-import { adminLayoutTemplate, adminPageTemplate } from '../lib/templates';
+import { adminLayoutTemplate, adminPageTemplate, rootLayoutConfigInitImport } from '../lib/templates';
 
 type FileCheck = {
   path: string;
@@ -52,6 +52,33 @@ export async function updateCommand(projectRoot: string): Promise<void> {
         log.step(`${file.displayPath} — updated`);
         allUpToDate = false;
       }
+    }
+  }
+
+  // Root layout — ensure configInit is imported so public page serverless functions
+  // initialize the OctoCMS config on cold start (not just admin routes).
+  // Try both src/app/ and app/ layouts; patch whichever exists.
+  const rootLayoutCandidates: Array<{ path: string; importLine: string }> = [
+    {
+      path: join(projectRoot, 'src', 'app', 'layout.tsx'),
+      importLine: `import '../../cms/__generated__/configInit';\n`,
+    },
+    {
+      path: join(projectRoot, 'app', 'layout.tsx'),
+      importLine: rootLayoutConfigInitImport,
+    },
+  ];
+
+  for (const { path, importLine } of rootLayoutCandidates) {
+    if (existsSync(path)) {
+      const existing = readFileSync(path, 'utf8');
+      if (!existing.includes('configInit')) {
+        writeFileSync(path, importLine + existing, 'utf8');
+        const rel = path.replace(projectRoot + '/', '');
+        log.step(`${rel} — added configInit import`);
+        allUpToDate = false;
+      }
+      break;
     }
   }
 
