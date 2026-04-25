@@ -360,12 +360,14 @@ describe('runChat — proposal events', () => {
 
   it('drops proposals after maxProposalsPerTurn and surfaces an error in the tool result', async () => {
     vi.doMock('../admin/actions/files', () => ({
-      getContentFiles: vi.fn().mockResolvedValue([
-        'cms/content/post/post-a.json',
-        'cms/content/post/post-b.json',
-        'cms/content/post/post-c.json',
-        'cms/content/post/post-d.json',
-      ]),
+      getContentFiles: vi
+        .fn()
+        .mockResolvedValue([
+          'cms/content/post/post-a.json',
+          'cms/content/post/post-b.json',
+          'cms/content/post/post-c.json',
+          'cms/content/post/post-d.json',
+        ]),
       getFile: vi.fn().mockResolvedValue({ sys: { id: 'x', type: 'post' }, fields: { title: 'T' } }),
     }));
     vi.doMock('./search', () => ({ searchContent: vi.fn(), clearSearchCache: vi.fn() }));

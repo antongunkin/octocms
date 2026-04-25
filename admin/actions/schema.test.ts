@@ -1,6 +1,14 @@
+import fsPromises from 'fs/promises';
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Config } from '../../types';
+
+import * as githubModule from '../github';
+
+import * as buildModule from './build';
+import * as filesModule from './files';
+import { getSchema, previewSchemaChange, saveSchema } from './schema';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -58,16 +66,6 @@ const baseConfig: Config = {
     },
   },
 };
-
-// ---------------------------------------------------------------------------
-// Imports of the unit-under-test (after vi.mock so they pick up the mocks)
-// ---------------------------------------------------------------------------
-
-import fsPromises from 'fs/promises';
-import * as buildModule from './build';
-import * as filesModule from './files';
-import * as githubModule from '../github';
-import { getSchema, previewSchemaChange, saveSchema } from './schema';
 
 const mockedFs = vi.mocked(fsPromises);
 const mockedGithub = vi.mocked(githubModule);

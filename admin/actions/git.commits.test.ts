@@ -57,7 +57,17 @@ vi.mock('../../lib/configStore', () => ({
   }),
 }));
 
-const buildCommit = (overrides: Partial<{ sha: string; message: string; authorName: string; date: string; ghLogin: string | null; ghAvatar: string | null; htmlUrl: string }> = {}) => {
+const buildCommit = (
+  overrides: Partial<{
+    sha: string;
+    message: string;
+    authorName: string;
+    date: string;
+    ghLogin: string | null;
+    ghAvatar: string | null;
+    htmlUrl: string;
+  }> = {},
+) => {
   const sha = overrides.sha ?? 'abcdef1234567890';
   return {
     sha,
@@ -87,9 +97,7 @@ const buildCommit = (overrides: Partial<{ sha: string; message: string; authorNa
 
 const mockOctokit = (commits: any[]) => {
   const listCommits = vi.fn().mockResolvedValue({ data: commits });
-  vi.mocked(github.getPublicOctokits).mockReturnValue([
-    { rest: { repos: { listCommits } } } as any,
-  ]);
+  vi.mocked(github.getPublicOctokits).mockReturnValue([{ rest: { repos: { listCommits } } } as any]);
   return listCommits;
 };
 
@@ -189,9 +197,7 @@ describe('getEntryCommits', () => {
 
   it('returns empty shape and logs when Octokit throws', async () => {
     const listCommits = vi.fn().mockRejectedValue(new Error('Network fail'));
-    vi.mocked(github.getPublicOctokits).mockReturnValue([
-      { rest: { repos: { listCommits } } } as any,
-    ]);
+    vi.mocked(github.getPublicOctokits).mockReturnValue([{ rest: { repos: { listCommits } } } as any]);
 
     const result = await getEntryCommits('cms/content/post/post-abc.json');
 

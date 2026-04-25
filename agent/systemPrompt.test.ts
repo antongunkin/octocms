@@ -32,7 +32,7 @@ const minimalConfig: Config = {
 } as unknown as Config;
 
 describe('buildSystemPrompt', () => {
-  it('includes today\'s date in YYYY-MM-DD form', () => {
+  it("includes today's date in YYYY-MM-DD form", () => {
     const prompt = buildSystemPrompt({ config: minimalConfig, now: new Date('2026-04-25T12:34:00Z') });
     expect(prompt).toContain("Today's date is 2026-04-25");
   });
@@ -56,9 +56,7 @@ describe('buildSystemPrompt', () => {
   it('embeds style exemplars when provided', () => {
     const prompt = buildSystemPrompt({
       config: minimalConfig,
-      styleExemplars: [
-        { type: 'post', title: 'Hello', body: 'This is a sample body.' },
-      ],
+      styleExemplars: [{ type: 'post', title: 'Hello', body: 'This is a sample body.' }],
     });
     expect(prompt).toContain('Recent posts (style reference)');
     expect(prompt).toContain('Example 1 — post: "Hello"');

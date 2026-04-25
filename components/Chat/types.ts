@@ -4,10 +4,7 @@
  * Mirrors `octocms/agent` shapes so the API contract stays one source of
  * truth — when the engine adds an event, both ends pick it up automatically.
  */
-export type {
-  NormalizedMessage,
-  NormalizedContentBlock,
-} from '../../agent/providers/types';
+export type { NormalizedMessage, NormalizedContentBlock } from '../../agent/providers/types';
 export type { ChatEvent } from '../../agent/chat';
 export type { StyleExemplar } from '../../agent/systemPrompt';
 export type { Proposal, EditProposal, CreateProposal } from '../../agent/proposals';

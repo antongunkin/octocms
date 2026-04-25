@@ -8,12 +8,7 @@
  * (the `tool` role on our normalised wire — see provider adapters).
  */
 import type { Config } from '../types';
-import type {
-  ChatProvider,
-  NormalizedContentBlock,
-  NormalizedMessage,
-  NormalizedTool,
-} from './providers/types';
+import type { ChatProvider, NormalizedContentBlock, NormalizedMessage, NormalizedTool } from './providers/types';
 import type { AgentConfig } from './types';
 import type { Proposal } from './proposals';
 import { estimateCostUSD } from './pricing';
@@ -28,7 +23,14 @@ export type ChatEvent =
   | { type: 'tool_result'; toolUseId: string; name: string; result: string; isError?: boolean }
   | { type: 'proposal'; proposal: Proposal }
   | { type: 'turn_stop'; stopReason: 'end_turn' | 'tool_use' | 'max_tokens' | 'stop_sequence' | 'other' }
-  | { type: 'usage'; inputTokens: number; outputTokens: number; cachedInputTokens?: number; costUSDDelta: number; totalCostUSD: number }
+  | {
+      type: 'usage';
+      inputTokens: number;
+      outputTokens: number;
+      cachedInputTokens?: number;
+      costUSDDelta: number;
+      totalCostUSD: number;
+    }
   | { type: 'budget_exceeded'; reason: 'input_tokens' | 'output_tokens' | 'spend' | 'max_turns' | 'proposal_cap' }
   | { type: 'done' }
   | { type: 'error'; message: string };
@@ -121,7 +123,12 @@ export async function* runChat(input: RunChatInput): AsyncGenerator<ChatEvent> {
     // Bookkeeping — budget + usage event
     totalInputTokens += usage.inputTokens;
     totalOutputTokens += usage.outputTokens;
-    const costDelta = estimateCostUSD(input.agentConfig, usage.inputTokens, usage.outputTokens, usage.cachedInputTokens);
+    const costDelta = estimateCostUSD(
+      input.agentConfig,
+      usage.inputTokens,
+      usage.outputTokens,
+      usage.cachedInputTokens,
+    );
     const cumulative = recordTurn(input.agentConfig, {
       input: usage.inputTokens,
       output: usage.outputTokens,

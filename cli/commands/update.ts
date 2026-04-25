@@ -105,8 +105,7 @@ export async function updateCommand(projectRoot: string): Promise<void> {
     },
   ];
   // Pick the first whose parent `app/` directory exists. Fall back to bare `app/`.
-  const chatRoot =
-    chatRouteRoots.find((r) => existsSync(join(r.file, '..', '..', '..', '..'))) ?? chatRouteRoots[1];
+  const chatRoot = chatRouteRoots.find((r) => existsSync(join(r.file, '..', '..', '..', '..'))) ?? chatRouteRoots[1];
   {
     const expected = agentChatRouteTemplate({ depth: chatRoot.depth });
     if (!existsSync(chatRoot.file)) {

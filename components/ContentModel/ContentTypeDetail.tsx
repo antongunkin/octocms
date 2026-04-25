@@ -284,10 +284,7 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
                         return (
                           <TableRow
                             key={key}
-                            className={cn(
-                              'group hover:bg-muted/30',
-                              dragKey === key && 'opacity-40',
-                            )}
+                            className={cn('group hover:bg-muted/30', dragKey === key && 'opacity-40')}
                             draggable
                             onDragStart={() => setDragKey(key)}
                             onDragOver={(e) => e.preventDefault()}
@@ -360,10 +357,7 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
                                 aria-label={field.entryTitle ? 'Current entry title' : 'Set as entry title'}
                               >
                                 <Star
-                                  className={cn(
-                                    'h-3.5 w-3.5',
-                                    field.entryTitle && 'fill-amber-400 text-amber-500',
-                                  )}
+                                  className={cn('h-3.5 w-3.5', field.entryTitle && 'fill-amber-400 text-amber-500')}
                                 />
                               </button>
                             </TableCell>
@@ -437,8 +431,14 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
                     <CardTitle>Tips</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 pb-4 text-xs text-muted-foreground">
-                    <p>Drag fields by the grip handle to reorder them. The order is reflected in generated types and the editor UI.</p>
-                    <p>The starred field is the <strong>entry title</strong> — it appears in entry lists and is the default slug source.</p>
+                    <p>
+                      Drag fields by the grip handle to reorder them. The order is reflected in generated types and the
+                      editor UI.
+                    </p>
+                    <p>
+                      The starred field is the <strong>entry title</strong> — it appears in entry lists and is the
+                      default slug source.
+                    </p>
                   </CardContent>
                 </Card>
               </div>

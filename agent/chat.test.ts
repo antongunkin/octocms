@@ -92,7 +92,14 @@ describe('runChat — tool use loop', () => {
     // Stub `searchContent` so we don't spin up the embedder.
     vi.doMock('./search', () => ({
       searchContent: vi.fn().mockResolvedValue([
-        { id: 'post-a', path: 'cms/content/post/post-a.json', collection: 'post', score: 0.9, title: 'A', excerpt: 'A!' },
+        {
+          id: 'post-a',
+          path: 'cms/content/post/post-a.json',
+          collection: 'post',
+          score: 0.9,
+          title: 'A',
+          excerpt: 'A!',
+        },
       ]),
       clearSearchCache: vi.fn(),
     }));
@@ -161,9 +168,7 @@ describe('runChat — tool use loop', () => {
         provider,
       }),
     );
-    const toolResult = events.find((e) => e.type === 'tool_result') as
-      | { result: string; isError: boolean }
-      | undefined;
+    const toolResult = events.find((e) => e.type === 'tool_result') as { result: string; isError: boolean } | undefined;
     expect(toolResult).toBeDefined();
     expect(toolResult!.isError).toBe(true);
     expect(JSON.parse(toolResult!.result).error).toContain('noSuchTool');

@@ -104,7 +104,11 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
               }
             }}
           />
-          <Button size="sm" variant="destructive" onClick={() => onReject(proposal.id, rejectReason.trim() || undefined)}>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => onReject(proposal.id, rejectReason.trim() || undefined)}
+          >
             Confirm reject
           </Button>
           <Button
@@ -163,9 +167,9 @@ function StatusBadge({ status }: { status: ProposalUiState['status'] }) {
  */
 function EditProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 'edit' }> }) {
   const config = useConfig();
-  const collection = (config.collections as Record<string, { fields: Record<string, { label: string; format: string }> }>)[
-    proposal.collection
-  ];
+  const collection = (
+    config.collections as Record<string, { fields: Record<string, { label: string; format: string }> }>
+  )[proposal.collection];
   const fields = collection?.fields ?? {};
   const [before, setBefore] = React.useState<Record<string, unknown> | null>(null);
   const [loadStatus, setLoadStatus] = React.useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
@@ -240,9 +244,9 @@ function EditProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 'e
 
 function CreateProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 'create' }> }) {
   const config = useConfig();
-  const collection = (config.collections as Record<string, { label: string; fields: Record<string, { label: string; format: string }> }>)[
-    proposal.collection
-  ];
+  const collection = (
+    config.collections as Record<string, { label: string; fields: Record<string, { label: string; format: string }> }>
+  )[proposal.collection];
   const fields = collection?.fields ?? {};
   return (
     <div className="space-y-2">

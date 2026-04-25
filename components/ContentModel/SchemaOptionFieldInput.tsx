@@ -110,16 +110,10 @@ function renderControl({
         />
       );
     case 'boolean':
-      return (
-        <BooleanToggle value={value === true} onChange={onChange} disabled={disabled} label={spec.label} />
-      );
+      return <BooleanToggle value={value === true} onChange={onChange} disabled={disabled} label={spec.label} />;
     case 'enum':
       return (
-        <Select
-          value={typeof value === 'string' ? value : ''}
-          onValueChange={(v) => onChange(v)}
-          disabled={disabled}
-        >
+        <Select value={typeof value === 'string' ? value : ''} onValueChange={(v) => onChange(v)} disabled={disabled}>
           <SelectTrigger className="h-9 text-sm">
             <SelectValue placeholder="Select…" />
           </SelectTrigger>
@@ -162,7 +156,11 @@ function renderControl({
         );
       }
       return (
-        <StringListEditor value={Array.isArray(value) ? (value as string[]) : []} onChange={onChange} disabled={disabled} />
+        <StringListEditor
+          value={Array.isArray(value) ? (value as string[]) : []}
+          onChange={onChange}
+          disabled={disabled}
+        />
       );
     default:
       return <p className="text-xs text-muted-foreground">Unsupported option type: {spec.type}</p>;
@@ -376,9 +374,7 @@ function SelectOptionsEditor({
       <Button type="button" variant="outline" size="sm" onClick={add} disabled={disabled} className="h-7 text-xs">
         <Plus className="mr-1 h-3 w-3" /> Add option
       </Button>
-      {valueDuplicates.size > 0 ? (
-        <p className="text-xs text-destructive">Option values must be unique.</p>
-      ) : null}
+      {valueDuplicates.size > 0 ? <p className="text-xs text-destructive">Option values must be unique.</p> : null}
     </div>
   );
 }

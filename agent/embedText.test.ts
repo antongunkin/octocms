@@ -46,18 +46,12 @@ describe('entryToEmbeddingText', () => {
   });
 
   it('inlines companion content under the field name', () => {
-    const text = entryToEmbeddingText(
-      { fields: { title: 'Post' } },
-      { body: '# Hello\nworld', footer: 'Goodbye' },
-    );
+    const text = entryToEmbeddingText({ fields: { title: 'Post' } }, { body: '# Hello\nworld', footer: 'Goodbye' });
     expect(text).toBe('title: Post\nbody: # Hello\nworld\nfooter: Goodbye');
   });
 
   it('lets companion content win when a field name appears in both', () => {
-    const text = entryToEmbeddingText(
-      { fields: { body: 'placeholder string' } },
-      { body: 'real markdown content' },
-    );
+    const text = entryToEmbeddingText({ fields: { body: 'placeholder string' } }, { body: 'real markdown content' });
     expect(text).toBe('body: real markdown content');
   });
 

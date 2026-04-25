@@ -11,13 +11,7 @@
 import type { LocalProvider, OpenAIProvider } from '../types';
 import { providerApiKeyEnv } from '../featureFlag';
 
-import type {
-  ChatProvider,
-  ChatStreamInput,
-  NormalizedMessage,
-  NormalizedTool,
-  ProviderEvent,
-} from './types';
+import type { ChatProvider, ChatStreamInput, NormalizedMessage, NormalizedTool, ProviderEvent } from './types';
 
 type OpenAISdk = typeof import('openai');
 
@@ -129,9 +123,7 @@ export class OpenAIChatProvider implements ChatProvider {
     const envName = providerApiKeyEnv(this.provider);
     const apiKey = envName ? process.env[envName] : undefined;
     const baseURL =
-      this.provider.type === 'local'
-        ? this.provider.baseURL
-        : (this.provider as OpenAIProvider).baseURL ?? undefined;
+      this.provider.type === 'local' ? this.provider.baseURL : ((this.provider as OpenAIProvider).baseURL ?? undefined);
 
     if (this.provider.type === 'openai' && !apiKey) {
       yield {
@@ -142,13 +134,15 @@ export class OpenAIChatProvider implements ChatProvider {
     }
 
     const OpenAI = (sdk as unknown as { default: new (opts: unknown) => unknown }).default ?? sdk;
-    const client = new (OpenAI as new (opts: { apiKey?: string; baseURL?: string }) => {
-      chat: {
-        completions: {
-          create: (req: unknown) => Promise<AsyncIterable<unknown>>;
+    const client = new (
+      OpenAI as new (opts: { apiKey?: string; baseURL?: string }) => {
+        chat: {
+          completions: {
+            create: (req: unknown) => Promise<AsyncIterable<unknown>>;
+          };
         };
-      };
-    })({
+      }
+    )({
       // Local servers usually don't need a key; pass a dummy if none provided to satisfy the SDK guard.
       apiKey: apiKey ?? (this.provider.type === 'local' ? 'lm-studio' : ''),
       ...(baseURL ? { baseURL } : {}),
@@ -180,7 +174,11 @@ export class OpenAIChatProvider implements ChatProvider {
     try {
       for await (const chunk of stream as AsyncIterable<{
         choices?: { delta?: { content?: string; tool_calls?: unknown[] }; finish_reason?: string }[];
-        usage?: { prompt_tokens?: number; completion_tokens?: number; prompt_tokens_details?: { cached_tokens?: number } };
+        usage?: {
+          prompt_tokens?: number;
+          completion_tokens?: number;
+          prompt_tokens_details?: { cached_tokens?: number };
+        };
       }>) {
         const choice = chunk.choices?.[0];
         const delta = choice?.delta;

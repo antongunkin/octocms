@@ -175,9 +175,7 @@ function applyEvent(state: State, assistantId: string, event: ChatEvent): State 
     case 'tool_use_complete': {
       next = {
         ...current,
-        toolCalls: current.toolCalls.map((tc) =>
-          tc.id === event.id ? { ...tc, parsedInput: event.input } : tc,
-        ),
+        toolCalls: current.toolCalls.map((tc) => (tc.id === event.id ? { ...tc, parsedInput: event.input } : tc)),
       };
       break;
     }
@@ -418,10 +416,7 @@ export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamRet
 
       // Build the request body from the SAME state we're dispatching into,
       // so the server sees the full history including the new user message.
-      const historyToSend: NormalizedMessage[] = [
-        ...stateRef.current.history,
-        { role: 'user', content: wireText },
-      ];
+      const historyToSend: NormalizedMessage[] = [...stateRef.current.history, { role: 'user', content: wireText }];
 
       await runRequest(assistantId, historyToSend, files);
     },
@@ -441,10 +436,7 @@ export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamRet
       const assistantId = `a_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       dispatch({ type: 'submit_system', text: visibleText, entryId, assistantId, wireText });
 
-      const historyToSend: NormalizedMessage[] = [
-        ...stateRef.current.history,
-        { role: 'user', content: wireText },
-      ];
+      const historyToSend: NormalizedMessage[] = [...stateRef.current.history, { role: 'user', content: wireText }];
       await runRequest(assistantId, historyToSend);
     },
     [runRequest],

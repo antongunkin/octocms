@@ -35,13 +35,7 @@ import RichTextOptionsEditor from './RichTextOptionsEditor';
 import SchemaImpactList from './SchemaImpactList';
 import SchemaOptionFieldInput from './SchemaOptionFieldInput';
 import { describeInvalidFieldKey, slugifyFieldKey } from './fieldKey';
-import {
-  draftToField,
-  emptyDraft,
-  fieldToDraft,
-  reorderFields,
-  type FieldDraft,
-} from './fieldOptions';
+import { draftToField, emptyDraft, fieldToDraft, reorderFields, type FieldDraft } from './fieldOptions';
 
 interface BaseProps {
   open: boolean;
@@ -60,11 +54,7 @@ interface BaseProps {
   };
 }
 
-type Props = BaseProps &
-  (
-    | { mode: 'add'; existingFieldKey?: never }
-    | { mode: 'edit'; existingFieldKey: string }
-  );
+type Props = BaseProps & ({ mode: 'add'; existingFieldKey?: never } | { mode: 'edit'; existingFieldKey: string });
 
 const NAME_LIMIT = 60;
 const KEY_LIMIT = 64;
@@ -84,9 +74,7 @@ export default function FieldDialog(props: Props) {
   const initialKey: string | null = nested ? nested.initialKey : props.mode === 'edit' ? props.existingFieldKey : null;
 
   // Two-step state for Add mode.
-  const [step, setStep] = useState<'format' | 'options'>(
-    props.mode === 'add' && !initialField ? 'format' : 'options',
-  );
+  const [step, setStep] = useState<'format' | 'options'>(props.mode === 'add' && !initialField ? 'format' : 'options');
 
   const [draft, setDraft] = useState<FieldDraft>(() => {
     if (initialField) return fieldToDraft(initialKey ?? '', initialField);
@@ -98,15 +86,12 @@ export default function FieldDialog(props: Props) {
   const [preview, setPreview] = useState<PreviewSchemaResult | null>(null);
 
   // Inline nested-field dialog state (for conditional branches).
-  const [nestedDialog, setNestedDialog] = useState<
-    | null
-    | {
-        branchIdx: number;
-        nestedKey: string | null;
-        initial: CollectionField | null;
-        save: (key: string, field: CollectionField) => void;
-      }
-  >(null);
+  const [nestedDialog, setNestedDialog] = useState<null | {
+    branchIdx: number;
+    nestedKey: string | null;
+    initial: CollectionField | null;
+    save: (key: string, field: CollectionField) => void;
+  }>(null);
 
   // Reset on open.
   useEffect(() => {
@@ -216,9 +201,7 @@ export default function FieldDialog(props: Props) {
     if (nested) return doSubmit();
     if (!keyChanged && !formatChanged) return doSubmit();
     setPreviewing(true);
-    const opts = keyChanged
-      ? { fieldRenames: { [type]: { [initialKey ?? '']: trimmedKey } } }
-      : {};
+    const opts = keyChanged ? { fieldRenames: { [type]: { [initialKey ?? '']: trimmedKey } } } : {};
     const result = await previewSchemaChange(buildNextSchema(), opts);
     setPreviewing(false);
     setPreview(result);
@@ -239,9 +222,7 @@ export default function FieldDialog(props: Props) {
         }
       : {
           message:
-            initialField === null
-              ? `CMS: add field ${type}.${trimmedKey}`
-              : `CMS: update field ${type}.${trimmedKey}`,
+            initialField === null ? `CMS: add field ${type}.${trimmedKey}` : `CMS: update field ${type}.${trimmedKey}`,
         };
     const result = await saveSchema(buildNextSchema(), opts);
     setBusy(false);
@@ -310,7 +291,17 @@ export default function FieldDialog(props: Props) {
                 ) : (
                   <ChangeTypeMenu
                     currentFormat={draft.format}
-                    onChange={(next) => setDraft((d) => ({ ...emptyDraft(next), label: d.label, key: d.key, hint: d.hint, required: d.required, searchable: d.searchable, entryTitle: d.entryTitle }))}
+                    onChange={(next) =>
+                      setDraft((d) => ({
+                        ...emptyDraft(next),
+                        label: d.label,
+                        key: d.key,
+                        hint: d.hint,
+                        required: d.required,
+                        searchable: d.searchable,
+                        entryTitle: d.entryTitle,
+                      }))
+                    }
                   />
                 )}
               </div>
@@ -318,7 +309,7 @@ export default function FieldDialog(props: Props) {
               {/* Common fields */}
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-foreground">Label</label>
+                  <span className="mb-1 block text-xs font-medium text-foreground">Label</span>
                   <Input
                     value={draft.label}
                     maxLength={NAME_LIMIT}
@@ -329,7 +320,7 @@ export default function FieldDialog(props: Props) {
                   {labelError ? <p className="mt-1 text-[11px] text-destructive">{labelError}</p> : null}
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-foreground">Key</label>
+                  <span className="mb-1 block text-xs font-medium text-foreground">Key</span>
                   <Input
                     value={draft.key}
                     maxLength={KEY_LIMIT}
@@ -341,14 +332,21 @@ export default function FieldDialog(props: Props) {
                     className="font-mono text-sm"
                     aria-invalid={Boolean(keyError || duplicateKey)}
                   />
-                  <p className={cn('mt-1 text-[11px] text-muted-foreground', (keyError || duplicateKey) && 'text-destructive')}>
-                    {duplicateKey ? `Key "${trimmedKey}" already exists on this content type.` : (keyError ?? 'Used in JSON, generated types, and the API.')}
+                  <p
+                    className={cn(
+                      'mt-1 text-[11px] text-muted-foreground',
+                      (keyError || duplicateKey) && 'text-destructive',
+                    )}
+                  >
+                    {duplicateKey
+                      ? `Key "${trimmedKey}" already exists on this content type.`
+                      : (keyError ?? 'Used in JSON, generated types, and the API.')}
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-medium text-foreground">Hint</label>
+                <span className="mb-1 block text-xs font-medium text-foreground">Hint</span>
                 <Input
                   value={draft.hint}
                   onChange={(e) => setDraft((d) => ({ ...d, hint: e.target.value }))}
@@ -401,9 +399,7 @@ export default function FieldDialog(props: Props) {
                           }))
                         }
                         availableCollections={Object.keys(schema.collections)}
-                        selectOptions={
-                          (draft.options.options as { label: string; value: string }[] | undefined) ?? []
-                        }
+                        selectOptions={(draft.options.options as { label: string; value: string }[] | undefined) ?? []}
                         disabled={busy}
                       />
                     ))}
@@ -477,7 +473,15 @@ export default function FieldDialog(props: Props) {
               </Button>
             ) : (
               <Button onClick={previewIfNeeded} disabled={!canSubmit}>
-                {previewing ? 'Previewing…' : busy ? 'Saving…' : nested ? 'Apply' : (keyChanged || formatChanged) && initialField ? 'Preview' : 'Save'}
+                {previewing
+                  ? 'Previewing…'
+                  : busy
+                    ? 'Saving…'
+                    : nested
+                      ? 'Apply'
+                      : (keyChanged || formatChanged) && initialField
+                        ? 'Preview'
+                        : 'Save'}
               </Button>
             )}
           </DialogFooter>
@@ -489,7 +493,7 @@ export default function FieldDialog(props: Props) {
           <FieldDialog
             mode="edit"
             existingFieldKey={nestedDialog.nestedKey}
-            open={true}
+            open
             onOpenChange={(o) => !o && setNestedDialog(null)}
             schema={schema}
             type={type}
@@ -505,7 +509,7 @@ export default function FieldDialog(props: Props) {
         ) : (
           <FieldDialog
             mode="add"
-            open={true}
+            open
             onOpenChange={(o) => !o && setNestedDialog(null)}
             schema={schema}
             type={type}
@@ -659,9 +663,12 @@ function EntryTitleToggle({
   const Icon = checked ? StarFilled : Star;
   return (
     <label
+      aria-label="Entry title"
       className={cn(
         'flex cursor-pointer items-start gap-2 rounded-md border p-2.5 text-xs transition',
-        checked ? 'border-amber-300 bg-amber-50 dark:border-amber-900 dark:bg-amber-950' : 'border-border bg-background',
+        checked
+          ? 'border-amber-300 bg-amber-50 dark:border-amber-900 dark:bg-amber-950'
+          : 'border-border bg-background',
         (disabled || !allowed) && 'cursor-not-allowed opacity-50',
       )}
       title={allowed ? '' : 'Entry title must be a non-list string, text, or slug field.'}

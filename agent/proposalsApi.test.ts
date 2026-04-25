@@ -107,9 +107,7 @@ describe('acceptProposalRoute', () => {
   it('400s when the body is not JSON', async () => {
     vi.doMock('./configStore', () => ({ getAgentConfig: () => enabledAgentConfig, setAgentConfig: vi.fn() }));
     const { acceptProposalRoute } = await import('./proposalsApi');
-    const res = await acceptProposalRoute(
-      new Request('http://test/accept', { method: 'POST', body: 'not-json' }),
-    );
+    const res = await acceptProposalRoute(new Request('http://test/accept', { method: 'POST', body: 'not-json' }));
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toMatch(/JSON/i);

@@ -40,9 +40,7 @@ export function buildSystemPrompt({ config, styleExemplars, now }: SystemPromptI
   const exemplarsBlock =
     styleExemplars && styleExemplars.length > 0
       ? '\n\n## Recent posts (style reference)\n' +
-        styleExemplars
-          .map((e, i) => `### Example ${i + 1} — ${e.type}: "${e.title}"\n${e.body.trim()}`)
-          .join('\n\n')
+        styleExemplars.map((e, i) => `### Example ${i + 1} — ${e.type}: "${e.title}"\n${e.body.trim()}`).join('\n\n')
       : '';
 
   return `You are the editorial assistant for the OctoCMS CMS. You help editors find, summarize, and improve their content.

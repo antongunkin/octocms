@@ -11,12 +11,7 @@ import { diffSchema, type DiffOptions, type SchemaChange } from '../../schema/di
 import { migrateEntry, migrateReferences, type ContentEntry } from '../../schema/migrateContent';
 import type { Config } from '../../types';
 
-import {
-  commitMultipleFilesToGitHub,
-  getGitHubFile,
-  isProductionMode,
-  type GitHubBatchChange,
-} from '../github';
+import { commitMultipleFilesToGitHub, getGitHubFile, isProductionMode, type GitHubBatchChange } from '../github';
 import { buildJsons } from './build';
 import { assertFeatureBranchForWritesIfRequired, getContentFiles, getFile } from './files';
 import { actionErr, actionOk, getErrorMessage, type ActionResult } from './utils';
@@ -81,10 +76,7 @@ export interface PreviewSchemaResult {
  * Run the schema diff, the validator, and a content scan to predict which
  * entries the change will touch. Read-only — never writes anything.
  */
-export const previewSchemaChange = async (
-  next: Config,
-  options: DiffOptions = {},
-): Promise<PreviewSchemaResult> => {
+export const previewSchemaChange = async (next: Config, options: DiffOptions = {}): Promise<PreviewSchemaResult> => {
   const errors: string[] = [];
 
   try {
@@ -215,7 +207,7 @@ function coerceContentEntry(raw: unknown, filePath: string): ContentEntry | null
   if (typeof type !== 'string' || typeof id !== 'string') return null;
   return {
     sys: { ...(sys as ContentEntry['sys']), type, id },
-    fields: (fields && typeof fields === 'object' ? (fields as Record<string, unknown>) : {}),
+    fields: fields && typeof fields === 'object' ? (fields as Record<string, unknown>) : {},
     path: filePath,
   };
 }
@@ -341,10 +333,7 @@ export interface SaveSchemaOptions extends DiffOptions {
  * Gated by `assertFeatureBranchForWritesIfRequired` — production refuses to
  * write directly to `git.baseBranch`.
  */
-export const saveSchema = async (
-  next: Config,
-  options: SaveSchemaOptions = {},
-): Promise<ActionResult> => {
+export const saveSchema = async (next: Config, options: SaveSchemaOptions = {}): Promise<ActionResult> => {
   try {
     // 1. Validate (throws on failure).
     validateConfig(next, Object.keys(next.collections));
@@ -446,7 +435,8 @@ export const saveSchema = async (
     const { files: schemaFiles } = regenerateAll(next);
 
     // 4. Commit.
-    const message = options.message ?? `CMS: update schema (${changes.length} change${changes.length === 1 ? '' : 's'})`;
+    const message =
+      options.message ?? `CMS: update schema (${changes.length} change${changes.length === 1 ? '' : 's'})`;
 
     if (isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();

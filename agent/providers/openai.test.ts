@@ -62,7 +62,12 @@ describe('OpenAIChatProvider — text streaming', () => {
     };
     const adapter = new OpenAIChatProvider(provider);
     const events = await collect(
-      adapter.streamChat({ messages: [{ role: 'user', content: 'hi' }], tools: [], systemPrompt: 'sys', maxOutputTokens: 100 }),
+      adapter.streamChat({
+        messages: [{ role: 'user', content: 'hi' }],
+        tools: [],
+        systemPrompt: 'sys',
+        maxOutputTokens: 100,
+      }),
     );
 
     expect(events).toEqual([
@@ -91,17 +96,13 @@ describe('OpenAIChatProvider — tool calls', () => {
           choices: [
             {
               delta: {
-                tool_calls: [
-                  { index: 0, id: 'call_1', function: { name: 'searchContent', arguments: '{"qu' } },
-                ],
+                tool_calls: [{ index: 0, id: 'call_1', function: { name: 'searchContent', arguments: '{"qu' } }],
               },
             },
           ],
         },
         {
-          choices: [
-            { delta: { tool_calls: [{ index: 0, function: { arguments: 'ery":"foo"}' } }] } },
-          ],
+          choices: [{ delta: { tool_calls: [{ index: 0, function: { arguments: 'ery":"foo"}' } }] } }],
         },
         { choices: [{ delta: {}, finish_reason: 'tool_calls' }] },
         { choices: [], usage: { prompt_tokens: 5, completion_tokens: 2 } },
@@ -118,7 +119,11 @@ describe('OpenAIChatProvider — tool calls', () => {
       adapter.streamChat({
         messages: [{ role: 'user', content: 'find foo' }],
         tools: [
-          { name: 'searchContent', description: 'x', inputSchema: { type: 'object', properties: { query: { type: 'string' } } } },
+          {
+            name: 'searchContent',
+            description: 'x',
+            inputSchema: { type: 'object', properties: { query: { type: 'string' } } },
+          },
         ],
         systemPrompt: 's',
         maxOutputTokens: 50,
@@ -153,7 +158,12 @@ describe('OpenAIChatProvider — local provider', () => {
     };
     const adapter = new OpenAIChatProvider(provider);
     await collect(
-      adapter.streamChat({ messages: [{ role: 'user', content: 'hi' }], tools: [], systemPrompt: '', maxOutputTokens: 10 }),
+      adapter.streamChat({
+        messages: [{ role: 'user', content: 'hi' }],
+        tools: [],
+        systemPrompt: '',
+        maxOutputTokens: 10,
+      }),
     );
     expect(FakeOpenAI.lastInit).toMatchObject({ baseURL: 'http://localhost:1234/v1' });
   });
@@ -167,7 +177,12 @@ describe('OpenAIChatProvider — local provider', () => {
       pricing: { inputPerM: 1, outputPerM: 1, cachedInputPerM: 0 },
     });
     const events = await collect(
-      adapter.streamChat({ messages: [{ role: 'user', content: 'hi' }], tools: [], systemPrompt: '', maxOutputTokens: 10 }),
+      adapter.streamChat({
+        messages: [{ role: 'user', content: 'hi' }],
+        tools: [],
+        systemPrompt: '',
+        maxOutputTokens: 10,
+      }),
     );
     expect(events[0]).toMatchObject({ type: 'error' });
     expect((events[0] as { message: string }).message).toContain('OPENAI_API_KEY');

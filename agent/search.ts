@@ -21,12 +21,7 @@ import path from 'path';
 
 import type { Config } from '../admin/types';
 import { getConfig } from '../lib/configStore';
-import {
-  buildEntryExcerpt,
-  collectionFromPath,
-  resolveEntryId,
-  resolveEntryTitle,
-} from '../lib/resolveEntryTitle';
+import { buildEntryExcerpt, collectionFromPath, resolveEntryId, resolveEntryTitle } from '../lib/resolveEntryTitle';
 
 import { getDefaultEmbedder, type Embedder } from './embedder';
 import { loadEmbeddings, type EmbeddingsStore } from './embeddings';
@@ -161,9 +156,10 @@ export async function searchContent(query: string, options: SearchOptions = {}):
   const excerptLength = options.excerptLength ?? 200;
   const hits: SearchHit[] = [];
   for (const { path: p, score } of top) {
-    const payload = (await readEntryPayload(p, options.branch)) as
-      | { sys?: { id?: unknown; type?: unknown }; fields?: Record<string, unknown> }
-      | null;
+    const payload = (await readEntryPayload(p, options.branch)) as {
+      sys?: { id?: unknown; type?: unknown };
+      fields?: Record<string, unknown>;
+    } | null;
     const collection = collectionFromPath(config, p);
     hits.push({
       id: resolveEntryId(config, p, payload ?? undefined),

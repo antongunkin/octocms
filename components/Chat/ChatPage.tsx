@@ -77,7 +77,11 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <UsageBadge totalCostUSD={usage.totalCostUSD} inputTokens={usage.inputTokens} outputTokens={usage.outputTokens} />
+          <UsageBadge
+            totalCostUSD={usage.totalCostUSD}
+            inputTokens={usage.inputTokens}
+            outputTokens={usage.outputTokens}
+          />
           {status === 'streaming' ? (
             <Button
               variant="destructive"
@@ -92,13 +96,7 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
               Stop
             </Button>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={reset}
-              disabled={entries.length === 0}
-              className="gap-1.5"
-            >
+            <Button variant="outline" size="sm" onClick={reset} disabled={entries.length === 0} className="gap-1.5">
               <RefreshCw className="h-3.5 w-3.5" />
               New conversation
             </Button>

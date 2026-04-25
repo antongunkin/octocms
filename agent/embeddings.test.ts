@@ -228,11 +228,10 @@ describe('embedEntry / embedAll (with mock embedder)', () => {
 
   it('re-embeds when the dim has changed (model swap)', async () => {
     const first = await embedEntry('cms/content/post/post-1.json', { collections: mockCollections });
-    const store = upsertEntryInStore(
-      { model: 'old', dim: 999, entries: {} },
-      'cms/content/post/post-1.json',
-      { hash: first!.hash, vec: encodeFloat32(first!.vec) },
-    );
+    const store = upsertEntryInStore({ model: 'old', dim: 999, entries: {} }, 'cms/content/post/post-1.json', {
+      hash: first!.hash,
+      vec: encodeFloat32(first!.vec),
+    });
     mock.callCount = 0;
     const second = await embedEntry('cms/content/post/post-1.json', { collections: mockCollections, store });
     expect(second!.skipped).toBe(false);
@@ -255,10 +254,7 @@ describe('embedEntry / embedAll (with mock embedder)', () => {
     const first = await embedAll(['cms/content/post/post-1.json', 'cms/content/post/post-2.json'], {
       collections: mockCollections,
     });
-    expect(Object.keys(first.entries).sort()).toEqual([
-      'cms/content/post/post-1.json',
-      'cms/content/post/post-2.json',
-    ]);
+    expect(Object.keys(first.entries).sort()).toEqual(['cms/content/post/post-1.json', 'cms/content/post/post-2.json']);
     expect(first.dim).toBe(mock.dim);
     expect(first.model).toBe(mock.modelId);
 

@@ -8,13 +8,7 @@
 import type { AnthropicProvider } from '../types';
 import { providerApiKeyEnv } from '../featureFlag';
 
-import type {
-  ChatProvider,
-  ChatStreamInput,
-  NormalizedMessage,
-  NormalizedTool,
-  ProviderEvent,
-} from './types';
+import type { ChatProvider, ChatStreamInput, NormalizedMessage, NormalizedTool, ProviderEvent } from './types';
 
 type AnthropicSdk = typeof import('@anthropic-ai/sdk');
 
@@ -129,9 +123,11 @@ export class AnthropicChatProvider implements ChatProvider {
     }
 
     const Anthropic = (sdk as unknown as { default: new (opts: { apiKey: string }) => unknown }).default ?? sdk;
-    const client = new (Anthropic as new (opts: { apiKey: string }) => {
-      messages: { stream: (req: unknown) => AsyncIterable<unknown> & { finalMessage(): Promise<unknown> } };
-    })({ apiKey });
+    const client = new (
+      Anthropic as new (opts: { apiKey: string }) => {
+        messages: { stream: (req: unknown) => AsyncIterable<unknown> & { finalMessage(): Promise<unknown> } };
+      }
+    )({ apiKey });
 
     const stream = client.messages.stream({
       model: this.provider.model,

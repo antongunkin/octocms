@@ -77,19 +77,16 @@ export function fieldsToFormStrings(fields: Record<string, unknown>): Record<str
  * Returns `null` if no match. Used by `proposeEdit` to validate that the model
  * referenced a real entry before emitting a proposal.
  */
-export async function resolveEntryPath(
-  collection: string,
-  entryId: string,
-  config: Config,
-): Promise<string | null> {
+export async function resolveEntryPath(collection: string, entryId: string, config: Config): Promise<string | null> {
   if (!(collection in config.collections)) return null;
   const cleanId = entryId.trim().replace(/\.json$/, '');
-  const { getContentFiles } = (await import('../admin/actions/files')) as typeof import(
-    '../admin/actions/files'
-  );
+  const { getContentFiles } = (await import('../admin/actions/files')) as typeof import('../admin/actions/files');
   const entries = await getContentFiles(collection).catch(() => [] as string[]);
   const match = entries.find((p) => {
-    const stem = p.split('/').pop()?.replace(/\.json$/, '');
+    const stem = p
+      .split('/')
+      .pop()
+      ?.replace(/\.json$/, '');
     return stem === cleanId;
   });
   return match ?? null;
@@ -102,9 +99,8 @@ export async function resolveEntryPath(
  * payload + current entry state on disk.
  */
 export async function acceptProposal(proposal: Proposal): Promise<AcceptResult> {
-  const { saveFile, newFile, getFile } = (await import('../admin/actions/files')) as typeof import(
-    '../admin/actions/files'
-  );
+  const { saveFile, newFile, getFile } =
+    (await import('../admin/actions/files')) as typeof import('../admin/actions/files');
 
   if (proposal.kind === 'edit') {
     let existing: { sys?: Record<string, unknown>; fields?: Record<string, unknown> };

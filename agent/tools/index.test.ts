@@ -41,7 +41,14 @@ describe('searchContent tool', () => {
 
   it('forwards options and serialises hits', async () => {
     const stub = vi.fn().mockResolvedValue([
-      { id: 'post-a', path: 'cms/content/post/post-a.json', collection: 'post', score: 0.91234, title: 'A', excerpt: 'a!' },
+      {
+        id: 'post-a',
+        path: 'cms/content/post/post-a.json',
+        collection: 'post',
+        score: 0.91234,
+        title: 'A',
+        excerpt: 'a!',
+      },
     ]);
     vi.doMock('../search', () => ({ searchContent: stub, clearSearchCache: vi.fn() }));
     const { getToolHandler } = await import('./index');
@@ -75,7 +82,14 @@ describe('findEntryForDocument tool', () => {
 
   it('falls back to search when no URL hint is provided', async () => {
     const stub = vi.fn().mockResolvedValue([
-      { id: 'post-a', path: 'cms/content/post/post-a.json', collection: 'post', score: 0.85, title: 'A', excerpt: 'ex' },
+      {
+        id: 'post-a',
+        path: 'cms/content/post/post-a.json',
+        collection: 'post',
+        score: 0.85,
+        title: 'A',
+        excerpt: 'ex',
+      },
     ]);
     vi.doMock('../search', () => ({ searchContent: stub, clearSearchCache: vi.fn() }));
     const { getToolHandler } = await import('./index');

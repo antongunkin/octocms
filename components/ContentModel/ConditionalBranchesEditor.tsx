@@ -123,7 +123,7 @@ export default function ConditionalBranchesEditor({
                   <div className="flex-1 space-y-2">
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-[11px] font-medium text-muted-foreground">Label</label>
+                        <span className="block text-[11px] font-medium text-muted-foreground">Label</span>
                         <Input
                           value={branch.label}
                           onChange={(e) => updateBranch(idx, { label: e.target.value })}
@@ -132,15 +132,12 @@ export default function ConditionalBranchesEditor({
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-medium text-muted-foreground">Key</label>
+                        <span className="block text-[11px] font-medium text-muted-foreground">Key</span>
                         <Input
                           value={branch.key}
                           onChange={(e) => updateBranch(idx, { key: e.target.value })}
                           disabled={disabled}
-                          className={cn(
-                            'h-8 font-mono text-xs',
-                            (keyInvalid || duplicate) && 'border-destructive/50',
-                          )}
+                          className={cn('h-8 font-mono text-xs', (keyInvalid || duplicate) && 'border-destructive/50')}
                         />
                       </div>
                     </div>
@@ -172,7 +169,9 @@ export default function ConditionalBranchesEditor({
                           onValueChange={(v) =>
                             onChange(
                               branches.map((b, i) =>
-                                i === idx ? ({ key: b.key, label: b.label, collection: v } as ConditionalBranchConfig) : b,
+                                i === idx
+                                  ? ({ key: b.key, label: b.label, collection: v } as ConditionalBranchConfig)
+                                  : b,
                               ),
                             )
                           }
@@ -229,7 +228,8 @@ export default function ConditionalBranchesEditor({
         <Plus className="mr-1 h-3.5 w-3.5" /> Add branch
       </Button>
 
-      {branches.some((b) => !b.key) || branches.length > 0 && new Set(branches.map((b) => b.key)).size !== branches.length ? (
+      {branches.some((b) => !b.key) ||
+      (branches.length > 0 && new Set(branches.map((b) => b.key)).size !== branches.length) ? (
         <p className="text-xs text-destructive">All branches must have a unique non-empty key.</p>
       ) : null}
       {usedKeys.size > 0 ? null : null}

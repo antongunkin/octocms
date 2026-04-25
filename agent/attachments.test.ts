@@ -47,9 +47,7 @@ describe('checkAttachmentSize / checkAttachmentCount', () => {
 
 describe('wrapAttachmentText', () => {
   it('prefixes the text with the filename so the model knows it came from a file', () => {
-    expect(wrapAttachmentText('report.pdf', 'Hello world')).toBe(
-      '[Attached document: report.pdf]\n\nHello world',
-    );
+    expect(wrapAttachmentText('report.pdf', 'Hello world')).toBe('[Attached document: report.pdf]\n\nHello world');
   });
 });
 
@@ -81,9 +79,7 @@ describe('normalizeAttachments', () => {
         extractPdfText: async () => 'fake pdf text',
       },
     );
-    expect(result.blocks).toEqual([
-      { type: 'text', text: '[Attached document: a.pdf]\n\nfake pdf text' },
-    ]);
+    expect(result.blocks).toEqual([{ type: 'text', text: '[Attached document: a.pdf]\n\nfake pdf text' }]);
   });
 
   it('extracts DOCX text on every provider', async () => {
@@ -100,9 +96,7 @@ describe('normalizeAttachments', () => {
         extractDocxText: async () => 'Hello DOCX',
       },
     );
-    expect(result.blocks).toEqual([
-      { type: 'text', text: '[Attached document: note.docx]\n\nHello DOCX' },
-    ]);
+    expect(result.blocks).toEqual([{ type: 'text', text: '[Attached document: note.docx]\n\nHello DOCX' }]);
   });
 
   it('inlines plain text and markdown directly', async () => {

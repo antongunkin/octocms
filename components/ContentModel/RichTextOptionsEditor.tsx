@@ -59,7 +59,10 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
 
   return (
     <div className="space-y-4">
-      <Section title="Toolbar" description="All buttons are enabled by default. Turn off any you do not want to expose.">
+      <Section
+        title="Toolbar"
+        description="All buttons are enabled by default. Turn off any you do not want to expose."
+      >
         <div className="grid gap-1 sm:grid-cols-2">
           {TOOLBAR_KEYS.map(({ key, label }) => {
             const on = toolbar[key] !== false;
@@ -71,12 +74,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
                   disabled && 'cursor-not-allowed opacity-50',
                 )}
               >
-                <input
-                  type="checkbox"
-                  checked={on}
-                  disabled={disabled}
-                  onChange={() => setToolbar(key, !on)}
-                />
+                <input type="checkbox" checked={on} disabled={disabled} onChange={() => setToolbar(key, !on)} />
                 <span>{label}</span>
               </label>
             );
@@ -91,16 +89,14 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
               type="checkbox"
               checked={Boolean(embeds.references)}
               disabled={disabled}
-              onChange={(e) =>
-                setEmbeds({ references: e.target.checked ? { display: 'both' } : undefined })
-              }
+              onChange={(e) => setEmbeds({ references: e.target.checked ? { display: 'both' } : undefined })}
             />
             <span>References to other entries</span>
           </label>
           {embeds.references ? (
             <div className="space-y-1.5 rounded-md border border-border bg-muted/20 p-2">
               <div>
-                <label className="block text-[11px] font-medium text-muted-foreground">Display</label>
+                <span className="block text-[11px] font-medium text-muted-foreground">Display</span>
                 <Select
                   value={embeds.references.display ?? 'both'}
                   onValueChange={(v) =>
@@ -121,9 +117,9 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
                 </Select>
               </div>
               <div>
-                <label className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                <span className="mb-1 block text-[11px] font-medium text-muted-foreground">
                   Allowed collections (none = any)
-                </label>
+                </span>
                 <div className="flex flex-wrap gap-1">
                   {availableCollections.length === 0 ? (
                     <span className="text-[11px] italic text-muted-foreground">No collections defined yet.</span>
@@ -199,9 +195,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
       >
         <ComponentsEditor
           value={embeds.components ?? {}}
-          onChange={(v) =>
-            setEmbeds({ components: Object.keys(v).length > 0 ? v : undefined })
-          }
+          onChange={(v) => setEmbeds({ components: Object.keys(v).length > 0 ? v : undefined })}
           disabled={disabled}
         />
       </Section>
@@ -209,15 +203,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
   );
 }
 
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <div>
@@ -331,7 +317,7 @@ function ComponentsEditor({
           <div key={name} className="rounded-md border border-border bg-background p-2 space-y-1.5">
             <div className="grid grid-cols-2 gap-1.5">
               <div>
-                <label className="block text-[11px] font-medium text-muted-foreground">Name (PascalCase)</label>
+                <span className="block text-[11px] font-medium text-muted-foreground">Name (PascalCase)</span>
                 <Input
                   value={name}
                   onChange={(e) => renameComponent(name, e.target.value)}
@@ -340,7 +326,7 @@ function ComponentsEditor({
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-muted-foreground">Display label</label>
+                <span className="block text-[11px] font-medium text-muted-foreground">Display label</span>
                 <Input
                   value={def.label}
                   onChange={(e) => updateComponent(name, { label: e.target.value })}
@@ -350,7 +336,7 @@ function ComponentsEditor({
               </div>
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-muted-foreground">Kind</label>
+              <span className="block text-[11px] font-medium text-muted-foreground">Kind</span>
               <Select
                 value={def.kind}
                 onValueChange={(v) => updateComponent(name, { kind: v as 'inline' | 'block' })}
@@ -367,7 +353,7 @@ function ComponentsEditor({
             </div>
 
             <div>
-              <label className="mb-1 block text-[11px] font-medium text-muted-foreground">Props</label>
+              <span className="mb-1 block text-[11px] font-medium text-muted-foreground">Props</span>
               <PropsEditor
                 value={def.props}
                 onChange={(props) => updateComponent(name, { props })}

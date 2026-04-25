@@ -153,9 +153,7 @@ export const FIELD_FORMAT_META: Readonly<Record<FieldFormat, FieldFormatMeta>> =
     format: 'color',
     label: 'Colour',
     description: 'Hex colour stored as `#rrggbb`. Optionally show a synced text input.',
-    optionFields: [
-      { key: 'allowInput', label: 'Show hex text input', type: 'boolean', defaultValue: false },
-    ],
+    optionFields: [{ key: 'allowInput', label: 'Show hex text input', type: 'boolean', defaultValue: false }],
     storageNote: '`#rrggbb` hex string',
     placeholderValue: '"#000000"',
   },

@@ -141,10 +141,7 @@ describe('chatRoute — multipart attachments', () => {
    * preserves filename + size metadata. Hand-rolled so we don't depend on
    * Node's FormData→Request serialization (which can drop filenames in Node 20).
    */
-  function multipartRequest(
-    messages: unknown,
-    files: Array<{ name: string; type: string; body: string }>,
-  ): Request {
+  function multipartRequest(messages: unknown, files: Array<{ name: string; type: string; body: string }>): Request {
     const boundary = '----TestBoundary' + Math.random().toString(36).slice(2);
     const CRLF = '\r\n';
     let body = '';

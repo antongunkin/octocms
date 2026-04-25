@@ -41,11 +41,7 @@ type EntryPayload = {
  * filename stem when no title field is configured or populated. Mirrors
  * `getEntryList` exactly so search hits and the entry list agree.
  */
-export function resolveEntryTitle(
-  config: Config,
-  filePath: string,
-  entry: EntryPayload | null | undefined,
-): string {
+export function resolveEntryTitle(config: Config, filePath: string, entry: EntryPayload | null | undefined): string {
   const fallback = defaultEntryId(config, filePath);
   if (!entry) return fallback;
 
@@ -72,11 +68,7 @@ export function resolveEntryTitle(
  * Resolve the entry id — `sys.id` for media (kept for parity with `getEntryList`),
  * filename stem for everything else.
  */
-export function resolveEntryId(
-  config: Config,
-  filePath: string,
-  entry: EntryPayload | null | undefined,
-): string {
+export function resolveEntryId(config: Config, filePath: string, entry: EntryPayload | null | undefined): string {
   const fallback = defaultEntryId(config, filePath);
   if (!entry) return fallback;
   const collectionType = typeof entry.sys?.type === 'string' ? entry.sys.type : collectionFromPath(config, filePath);
@@ -117,7 +109,11 @@ export function buildEntryExcerpt(
 
 function stringifyForExcerpt(value: unknown): string {
   if (typeof value === 'string') return value.trim();
-  if (Array.isArray(value)) return value.filter((v) => typeof v === 'string').join(', ').trim();
+  if (Array.isArray(value))
+    return value
+      .filter((v) => typeof v === 'string')
+      .join(', ')
+      .trim();
   return '';
 }
 

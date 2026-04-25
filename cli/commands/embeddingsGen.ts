@@ -8,8 +8,7 @@
  * fast no-op (hash-keyed skip).
  */
 
-import { mkdirSync, writeFileSync } from 'fs';
-import { promises as fsPromises } from 'fs';
+import { mkdirSync, promises as fsPromises, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 
 import { glob } from 'glob';

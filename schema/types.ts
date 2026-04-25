@@ -6,6 +6,8 @@
  * surface (`octocms/types`, `octocms/defineConfig`, `octocms/query`).
  */
 
+import type { FieldFormat } from '../types';
+
 export type {
   FieldFormat,
   ReferenceFieldConfig,
@@ -23,8 +25,6 @@ export type {
   SearchConfig,
   Config,
 } from '../types';
-
-import type { FieldFormat } from '../types';
 
 /**
  * Type marker for a single configurable option on a field format. The visual

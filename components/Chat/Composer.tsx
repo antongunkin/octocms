@@ -6,7 +6,8 @@ import { Paperclip, Send, X } from 'lucide-react';
 import { Button } from '../ui/button';
 
 /** Allowed file types for chat attachments — kept in sync with `classifyAttachment`. */
-const ACCEPTED_TYPES = '.pdf,.docx,.txt,.md,.markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown';
+const ACCEPTED_TYPES =
+  '.pdf,.docx,.txt,.md,.markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown';
 
 type Props = {
   disabled?: boolean;
@@ -118,7 +119,11 @@ export function Composer({
               </button>
             </div>
           ))}
-          {error && <span className="text-xs text-destructive" role="alert">{error}</span>}
+          {error && (
+            <span className="text-xs text-destructive" role="alert">
+              {error}
+            </span>
+          )}
         </div>
       )}
 
@@ -138,7 +143,11 @@ export function Composer({
           size="icon"
           disabled={disabled || atCapacity}
           aria-label="Attach files"
-          title={atCapacity ? `Attachment limit reached (${maxAttachmentsPerTurn})` : 'Attach files (PDF / DOCX / .txt / .md)'}
+          title={
+            atCapacity
+              ? `Attachment limit reached (${maxAttachmentsPerTurn})`
+              : 'Attach files (PDF / DOCX / .txt / .md)'
+          }
           onClick={() => fileRef.current?.click()}
         >
           <Paperclip className="h-4 w-4" />

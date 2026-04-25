@@ -171,9 +171,7 @@ describe('getEntryDiff', () => {
       if (path.endsWith('post-p1.json')) {
         return {
           content:
-            ref === 'main'
-              ? makeEntry({ title: 'X', hero: 'old-uuid' })
-              : makeEntry({ title: 'X', hero: 'new-uuid' }),
+            ref === 'main' ? makeEntry({ title: 'X', hero: 'old-uuid' }) : makeEntry({ title: 'X', hero: 'new-uuid' }),
           sha: 'x',
         };
       }

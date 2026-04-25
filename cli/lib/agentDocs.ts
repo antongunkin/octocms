@@ -255,9 +255,7 @@ export function generateAgentOverview(cfg: Config, collectionNames: readonly str
   lines.push(
     '3. Run `npm run types:gen` to regenerate `cms/__generated__/` (TypeScript types, query helper, literal-typed schema shim)',
   );
-  lines.push(
-    '4. Run `npm run docs:gen` and `npm run agent-docs:gen` to refresh `docs/generated/` and `octocms/docs/`',
-  );
+  lines.push('4. Run `npm run docs:gen` and `npm run agent-docs:gen` to refresh `docs/generated/` and `octocms/docs/`');
   lines.push('5. Optionally create a public page route using the `query()` API:', '');
   lines.push('```typescript');
   lines.push("import { query } from 'octocms/query';");

@@ -35,9 +35,7 @@ export function Message({ entry, proposals, onAcceptProposal, onRejectProposal }
         <div
           className={cn(
             'inline-block rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words',
-            isUser
-              ? 'bg-blue-600 text-white text-left'
-              : 'bg-muted text-foreground border border-border/50',
+            isUser ? 'bg-blue-600 text-white text-left' : 'bg-muted text-foreground border border-border/50',
           )}
         >
           {entry.kind === 'assistant' ? (
@@ -100,12 +98,7 @@ function AssistantBody({
         .map((id) => proposals[id])
         .filter((p): p is ProposalUiState => Boolean(p))
         .map((p) => (
-          <ProposalCard
-            key={p.proposal.id}
-            state={p}
-            onAccept={onAcceptProposal}
-            onReject={onRejectProposal}
-          />
+          <ProposalCard key={p.proposal.id} state={p} onAccept={onAcceptProposal} onReject={onRejectProposal} />
         ))}
       {entry.text && <div>{entry.text}</div>}
       {entry.streaming && entry.text && (

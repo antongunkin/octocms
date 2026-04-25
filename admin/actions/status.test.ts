@@ -98,7 +98,7 @@ describe('publishEntry', () => {
     const out = await publishEntry(PATH);
 
     expect(out).toEqual({ success: true });
-    const saved = JSON.parse((vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string));
+    const saved = JSON.parse(vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string);
     expect(saved.sys.status).toBe('published');
   });
 
@@ -109,7 +109,7 @@ describe('publishEntry', () => {
     const out = await publishEntry(PATH);
 
     expect(out).toEqual({ success: true });
-    const saved = JSON.parse((vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string));
+    const saved = JSON.parse(vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string);
     expect(saved.sys.status).toBe('published');
   });
 
@@ -132,7 +132,7 @@ describe('publishEntry', () => {
     const out = await publishEntry(PATH);
 
     expect(out).toEqual({ success: true });
-    const saved = JSON.parse((vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string));
+    const saved = JSON.parse(vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string);
     expect(saved.sys.status).toBe('published');
     expect(saved.fields.steps).toEqual(entry.fields.steps);
   });
@@ -176,7 +176,7 @@ describe('archiveEntry', () => {
     const out = await archiveEntry(PATH);
 
     expect(out).toEqual({ success: true });
-    const saved = JSON.parse((vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string));
+    const saved = JSON.parse(vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string);
     expect(saved.sys.status).toBe('archived');
   });
 
@@ -190,7 +190,7 @@ describe('archiveEntry', () => {
     const out = await archiveEntry(PATH);
 
     expect(out).toEqual({ success: true });
-    const saved = JSON.parse((vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string));
+    const saved = JSON.parse(vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string);
     expect(saved.sys.status).toBe('archived');
     expect(saved.fields.steps).toEqual(entry.fields.steps);
   });
@@ -224,7 +224,7 @@ describe('restoreEntry', () => {
     const out = await restoreEntry(PATH);
 
     expect(out).toEqual({ success: true });
-    const saved = JSON.parse((vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string));
+    const saved = JSON.parse(vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string);
     expect(saved.sys.status).toBe('draft');
   });
 

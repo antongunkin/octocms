@@ -76,9 +76,7 @@ describe('migrateEntry', () => {
     ];
     const result = migrateEntry(entry({ fields: { title: 'Hi', body: 'merged inline', tagline: 'x' } }), changes);
     expect(result.entry?.fields).toEqual({ title: 'Hi' });
-    expect(result.companionOps).toEqual([
-      { kind: 'delete', path: 'cms/content/post/post-p1.body.md' },
-    ]);
+    expect(result.companionOps).toEqual([{ kind: 'delete', path: 'cms/content/post/post-p1.body.md' }]);
   });
 
   it('renames a field key inside fields', () => {

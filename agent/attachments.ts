@@ -46,28 +46,17 @@ export function classifyAttachment(filename: string, mediaType: string): Attachm
   const lowered = filename.toLowerCase();
   const mt = (mediaType || '').toLowerCase();
   if (mt === 'application/pdf' || lowered.endsWith('.pdf')) return 'pdf';
-  if (
-    mt === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-    lowered.endsWith('.docx')
-  ) {
+  if (mt === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || lowered.endsWith('.docx')) {
     return 'docx';
   }
-  if (
-    mt.startsWith('text/') ||
-    lowered.endsWith('.txt') ||
-    lowered.endsWith('.md') ||
-    lowered.endsWith('.markdown')
-  ) {
+  if (mt.startsWith('text/') || lowered.endsWith('.txt') || lowered.endsWith('.md') || lowered.endsWith('.markdown')) {
     return 'text';
   }
   return 'unsupported';
 }
 
 /** Validate a file against the per-attachment limit. Returns null if ok. */
-export function checkAttachmentSize(
-  bytes: number,
-  config: Pick<AgentConfig, 'maxAttachmentBytes'>,
-): string | null {
+export function checkAttachmentSize(bytes: number, config: Pick<AgentConfig, 'maxAttachmentBytes'>): string | null {
   if (bytes > config.maxAttachmentBytes) {
     return `File exceeds the ${formatBytes(config.maxAttachmentBytes)} per-file limit (got ${formatBytes(bytes)}).`;
   }
@@ -75,10 +64,7 @@ export function checkAttachmentSize(
 }
 
 /** Validate the count of attachments against the per-turn cap. */
-export function checkAttachmentCount(
-  count: number,
-  config: Pick<AgentConfig, 'maxAttachmentsPerTurn'>,
-): string | null {
+export function checkAttachmentCount(count: number, config: Pick<AgentConfig, 'maxAttachmentsPerTurn'>): string | null {
   if (count > config.maxAttachmentsPerTurn) {
     return `Too many attachments — limit is ${config.maxAttachmentsPerTurn} per turn (got ${count}).`;
   }
@@ -204,9 +190,7 @@ async function extractDocxTextDefault(bytes: Uint8Array): Promise<string> {
   try {
     mammoth = (await import('mammoth')) as unknown as typeof import('mammoth');
   } catch {
-    throw new Error(
-      "Optional peer dependency 'mammoth' is not installed. Run: npm install mammoth",
-    );
+    throw new Error("Optional peer dependency 'mammoth' is not installed. Run: npm install mammoth");
   }
   // mammoth's `extractRawText` is happy with a `{ buffer }` input — Buffer is
   // a Uint8Array subclass in Node, so this works without a copy.
@@ -239,9 +223,7 @@ async function extractPdfTextDefault(bytes: Uint8Array): Promise<string> {
     try {
       pdfjs = (await import('pdfjs-dist')) as unknown as PdfJsModule;
     } catch {
-      throw new Error(
-        "Optional peer dependency 'pdfjs-dist' is not installed. Run: npm install pdfjs-dist",
-      );
+      throw new Error("Optional peer dependency 'pdfjs-dist' is not installed. Run: npm install pdfjs-dist");
     }
   }
 

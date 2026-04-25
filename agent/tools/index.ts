@@ -66,7 +66,12 @@ const searchContentTool: ToolHandler = {
       type: 'object',
       properties: {
         query: { type: 'string', description: 'Natural-language search query.' },
-        k: { type: 'integer', description: 'Number of results to return (1–25). Defaults to 8.', minimum: 1, maximum: 25 },
+        k: {
+          type: 'integer',
+          description: 'Number of results to return (1–25). Defaults to 8.',
+          minimum: 1,
+          maximum: 25,
+        },
         collection: {
           type: 'string',
           description: 'Optional collection name to restrict the search (e.g. "post").',
@@ -138,8 +143,7 @@ const getEntryTool: ToolHandler = {
         id: { type: 'string', description: 'Filename stem, e.g. "post-abc".' },
         collection: {
           type: 'string',
-          description:
-            'Optional collection name. If omitted, the tool searches all collections by id (slower).',
+          description: 'Optional collection name. If omitted, the tool searches all collections by id (slower).',
         },
       },
       required: ['id'],
@@ -151,9 +155,8 @@ const getEntryTool: ToolHandler = {
       return JSON.stringify({ error: 'id is required and must be a non-empty string' });
     }
     const cleanId = id.trim().replace(/\.json$/, '');
-    const { getFile, getContentFiles } = (await import('../../admin/actions/files')) as typeof import(
-      '../../admin/actions/files'
-    );
+    const { getFile, getContentFiles } =
+      (await import('../../admin/actions/files')) as typeof import('../../admin/actions/files');
 
     const colName = typeof collection === 'string' && collection.trim() ? collection.trim() : undefined;
     if (colName && !ctx.config.collections[colName as keyof typeof ctx.config.collections]) {
@@ -165,7 +168,10 @@ const getEntryTool: ToolHandler = {
     for (const c of candidates) {
       const entries = await getContentFiles(c).catch(() => [] as string[]);
       const match = entries.find((p) => {
-        const stem = p.split('/').pop()?.replace(/\.json$/, '');
+        const stem = p
+          .split('/')
+          .pop()
+          ?.replace(/\.json$/, '');
         return stem === cleanId;
       });
       if (!match) continue;
@@ -260,9 +266,8 @@ const proposeEditTool: ToolHandler = {
     const merged = { ...existing.fields, ...(fieldChanges as Record<string, unknown>) };
     const stringFields = fieldsToFormStrings(merged);
 
-    const { validateEntryFields } = (await import('../../lib/validateEntryFields')) as typeof import(
-      '../../lib/validateEntryFields'
-    );
+    const { validateEntryFields } =
+      (await import('../../lib/validateEntryFields')) as typeof import('../../lib/validateEntryFields');
     const validation = validateEntryFields(cleanCollection, stringFields);
     if (!validation.ok) {
       return JSON.stringify({
@@ -312,7 +317,10 @@ const proposeNewEntryTool: ToolHandler = {
             'Full proposed `fields` object. Required fields must be present. For markdown fields pass the full body as a string. For reference (cardinality:many) fields pass an array of filename stems.',
           additionalProperties: true,
         },
-        reasoning: { type: 'string', description: 'One sentence explaining why this entry. Shown verbatim on the card.' },
+        reasoning: {
+          type: 'string',
+          description: 'One sentence explaining why this entry. Shown verbatim on the card.',
+        },
       },
       required: ['collection', 'fields', 'reasoning'],
     },
@@ -340,9 +348,8 @@ const proposeNewEntryTool: ToolHandler = {
     }
 
     const stringFields = fieldsToFormStrings(fields as Record<string, unknown>);
-    const { validateEntryFields } = (await import('../../lib/validateEntryFields')) as typeof import(
-      '../../lib/validateEntryFields'
-    );
+    const { validateEntryFields } =
+      (await import('../../lib/validateEntryFields')) as typeof import('../../lib/validateEntryFields');
     const validation = validateEntryFields(cleanCollection, stringFields);
     if (!validation.ok) {
       return JSON.stringify({
@@ -534,12 +541,10 @@ async function findEntryByFieldValues(
   fieldValues: Record<string, string>,
   ctx: ToolContext,
 ): Promise<{ id: string; path: string; collection: string; score: number; title: string; excerpt: string } | null> {
-  const { getFile, getContentFiles } = (await import('../../admin/actions/files')) as typeof import(
-    '../../admin/actions/files'
-  );
-  const { resolveEntryTitle, resolveEntryId, buildEntryExcerpt } = (await import(
-    '../../lib/resolveEntryTitle'
-  )) as typeof import('../../lib/resolveEntryTitle');
+  const { getFile, getContentFiles } =
+    (await import('../../admin/actions/files')) as typeof import('../../admin/actions/files');
+  const { resolveEntryTitle, resolveEntryId, buildEntryExcerpt } =
+    (await import('../../lib/resolveEntryTitle')) as typeof import('../../lib/resolveEntryTitle');
 
   const entries = await getContentFiles(collectionName).catch(() => [] as string[]);
   for (const p of entries) {
@@ -555,7 +560,10 @@ async function findEntryByFieldValues(
       if (typeof actual !== 'string' || actual !== expected) {
         // Also accept matching against the filename stem when the placeholder is `id`.
         if (key === 'id') {
-          const stem = p.split('/').pop()?.replace(/\.json$/, '');
+          const stem = p
+            .split('/')
+            .pop()
+            ?.replace(/\.json$/, '');
           if (stem === expected) continue;
         }
         allMatch = false;

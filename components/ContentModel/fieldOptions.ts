@@ -146,7 +146,7 @@ function cloneBranches(branches: readonly ConditionalBranchConfig[]): Conditiona
     return {
       key: b.key,
       label: b.label,
-      fields: { ...(b.fields ?? {}) },
+      fields: { ...b.fields },
     } as ConditionalBranchConfig;
   });
 }

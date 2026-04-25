@@ -164,4 +164,3 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
     </Dialog>
   );
 }
-

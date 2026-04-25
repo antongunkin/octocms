@@ -48,7 +48,12 @@ export function isProposal(p: unknown): p is Proposal {
   if (obj.kind !== 'edit' && obj.kind !== 'create') return false;
   if (typeof obj.collection !== 'string' || !obj.collection) return false;
   if (obj.kind === 'edit') {
-    return typeof obj.entryPath === 'string' && !!obj.entryPath && typeof obj.fieldChanges === 'object' && obj.fieldChanges !== null;
+    return (
+      typeof obj.entryPath === 'string' &&
+      !!obj.entryPath &&
+      typeof obj.fieldChanges === 'object' &&
+      obj.fieldChanges !== null
+    );
   }
   return typeof obj.fields === 'object' && obj.fields !== null;
 }
