@@ -7,6 +7,8 @@ import { glob } from 'glob';
 import { cookies } from 'next/headers';
 
 import { getConfig } from '../../lib/configStore';
+import { getAgentConfig } from '../../agent/configStore';
+import { syncEmbeddingsAfterRemove, syncEmbeddingsAfterUpsert } from '../../agent/embeddingsHook';
 import { BRANCH_HISTORY_FILE_PATH, mergeHistoryContentWithAppendedEntry } from '../../lib/branchHistory';
 import { getPostBlogPublicPath } from '../../lib/blogPublicPath';
 import { companionMarkdownPathsForEntry, companionRichTextPathsForEntry } from '../../lib/companionMarkdown';
@@ -42,6 +44,30 @@ const CMS_ACTIVE_BRANCH_COOKIE = 'cms-active-branch';
 
 function normalizeContentPath(p: string): string {
   return p.replace(/\\/g, '/');
+}
+
+/** Best-effort embedding store sync after content writes. No-op when the agent isn't configured. */
+async function syncEmbeddingsForUpsertIfEnabled(
+  entryPath: string,
+  payload: { sys?: { type?: string }; fields?: Record<string, unknown> },
+  companions: Record<string, string>,
+  branch: string | undefined,
+  isProduction: boolean,
+): Promise<void> {
+  const agentConfig = getAgentConfig();
+  if (!agentConfig) return;
+  const config = getConfig();
+  await syncEmbeddingsAfterUpsert({ agentConfig, config, entryPath, payload, companions, branch, isProduction });
+}
+
+async function syncEmbeddingsForRemoveIfEnabled(
+  entryPath: string,
+  branch: string | undefined,
+  isProduction: boolean,
+): Promise<void> {
+  const agentConfig = getAgentConfig();
+  if (!agentConfig) return;
+  await syncEmbeddingsAfterRemove({ agentConfig, entryPath, branch, isProduction });
 }
 
 /** Records the entry path under the active branch in `cms/branch-history.json` (GitHub or local). Best-effort. */
@@ -405,7 +431,13 @@ export const saveFile = async (
 
       const strFields: Record<string, string> = {};
       for (const [k, v] of Object.entries(rawFields)) {
-        strFields[k] = v == null ? '' : String(v);
+        if (v == null) {
+          strFields[k] = '';
+        } else if (typeof v === 'object') {
+          strFields[k] = JSON.stringify(v);
+        } else {
+          strFields[k] = String(v);
+        }
       }
       const validated = validateEntryFields(entryType, strFields);
       if (!validated.ok) {
@@ -504,6 +536,7 @@ export const saveFile = async (
       }
 
       await persistBranchHistoryEntryIfNeeded(activeBranch, fileName);
+      await syncEmbeddingsForUpsertIfEnabled(fileName, payload, markdownContents, activeBranch, true);
       const built = await buildJsons(fileName, { blogPaths });
 
       return built.success ? actionOk() : built;
@@ -527,6 +560,7 @@ export const saveFile = async (
       await fsPromises.writeFile(path.join(process.cwd(), rtPath), rtContent, 'utf8');
     }
     await persistBranchHistoryEntryIfNeeded(activeBranchDev, fileName);
+    await syncEmbeddingsForUpsertIfEnabled(fileName, payload, markdownContents, activeBranchDev, false);
     const built = await buildJsons(fileName, { blogPaths });
 
     return built.success ? actionOk() : built;
@@ -568,6 +602,7 @@ export const newFile = async (type: string): Promise<NewFileResult> => {
       }
 
       await persistBranchHistoryEntryIfNeeded(activeBranch, file);
+      await syncEmbeddingsForUpsertIfEnabled(file, values, {}, activeBranch, true);
       const built = await buildJsons(file);
 
       return built.success ? { success: true, path: file } : { success: false, error: built.error };
@@ -578,6 +613,7 @@ export const newFile = async (type: string): Promise<NewFileResult> => {
     const filePath = path.join(process.cwd(), file);
     await fsPromises.writeFile(filePath, normalizedData, 'utf8');
     await persistBranchHistoryEntryIfNeeded(activeBranchDev, file);
+    await syncEmbeddingsForUpsertIfEnabled(file, values, {}, activeBranchDev, false);
     const built = await buildJsons(file);
 
     return built.success ? { success: true, path: file } : { success: false, error: built.error };
@@ -628,6 +664,7 @@ export const removeFile = async (fileName: string): Promise<ActionResult> => {
         applyMutation(activeBranch, { type: 'delete', path: fileName });
       }
 
+      await syncEmbeddingsForRemoveIfEnabled(fileName, activeBranch, true);
       const built = await buildJsons(fileName, { blogPaths });
 
       return built.success ? actionOk() : built;
@@ -642,6 +679,7 @@ export const removeFile = async (fileName: string): Promise<ActionResult> => {
         /* best-effort — companion may not exist */
       }
     }
+    await syncEmbeddingsForRemoveIfEnabled(fileName, undefined, false);
     const built = await buildJsons(fileName, { blogPaths });
 
     return built.success ? actionOk() : built;

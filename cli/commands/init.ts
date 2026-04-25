@@ -14,6 +14,8 @@ import { log } from '../lib/logger';
 import {
   adminLayoutTemplate,
   adminPageTemplate,
+  agentChatRouteTemplate,
+  agentProposalRouteTemplate,
   demoHelloPageJson,
   envLocalTemplate,
   generatedConfigInitTemplate,
@@ -160,6 +162,35 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   mkdirSync(authRouteDir, { recursive: true });
   writeFileSync(join(authRouteDir, 'route.ts'), nextAuthRouteTemplate, 'utf8');
   log.success('app/api/auth/[...nextauth]/route.ts');
+
+  // Chat-agent routes — thin re-exports of handlers in `octocms/agent`.
+  // The handlers are opt-in (the agent feature is gated by config + provider
+  // key at runtime); shipping the routes by default costs nothing when the
+  // agent is disabled — every endpoint 404s in that case.
+  // Depth from `app/api/agent/route.ts` to project root = 4.
+  const chatRouteDir = join(projectRoot, 'app', 'api', 'agent');
+  mkdirSync(chatRouteDir, { recursive: true });
+  writeFileSync(join(chatRouteDir, 'route.ts'), agentChatRouteTemplate({ depth: 4 }), 'utf8');
+  log.success('app/api/agent/route.ts');
+
+  // Depth from `app/api/agent/proposals/<endpoint>/route.ts` to project root = 5.
+  const proposalsBaseDir = join(projectRoot, 'app', 'api', 'agent', 'proposals');
+  const acceptRouteDir = join(proposalsBaseDir, 'accept');
+  const rejectRouteDir = join(proposalsBaseDir, 'reject');
+  mkdirSync(acceptRouteDir, { recursive: true });
+  mkdirSync(rejectRouteDir, { recursive: true });
+  writeFileSync(
+    join(acceptRouteDir, 'route.ts'),
+    agentProposalRouteTemplate({ handlerExport: 'acceptProposalRoute', depth: 5 }),
+    'utf8',
+  );
+  log.success('app/api/agent/proposals/accept/route.ts');
+  writeFileSync(
+    join(rejectRouteDir, 'route.ts'),
+    agentProposalRouteTemplate({ handlerExport: 'rejectProposalRoute', depth: 5 }),
+    'utf8',
+  );
+  log.success('app/api/agent/proposals/reject/route.ts');
 
   // Hello page demo route
   mkdirSync(join(projectRoot, 'app', 'hello'), { recursive: true });

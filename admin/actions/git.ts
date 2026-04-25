@@ -7,10 +7,12 @@ import { cookies } from 'next/headers';
 import { getConfig } from '../../lib/configStore';
 
 import {
+  assertGitHubConfig,
   createGitHubBranch,
   createGitHubCMSPullRequest,
   createGitHubPullRequest,
   getGitHubFile,
+  getPublicOctokits,
   getPublishedBranch,
   getPublishedPointerRef,
   isProductionMode,
@@ -18,6 +20,7 @@ import {
   markPRReadyForReview,
   saveGitHubFile,
 } from '../github';
+import type { EntryCommit, EntryCommitHistory } from '../../types';
 import {
   BRANCH_HISTORY_FILE_PATH,
   parseBranchHistoryFile,
@@ -291,5 +294,63 @@ export const publishBranch = async (branchName: string): Promise<ActionResult> =
     return actionOk();
   } catch (e) {
     return actionErr(new Error(`Failed to publish branch: ${getErrorMessage(e)}`));
+  }
+};
+
+/**
+ * Fetch the last 5 commits that touched the given entry file for display in the
+ * editor History panel. Production-only (dev mode writes to the local FS so there
+ * is no GitHub history to show). Best-effort: any failure resolves to an empty
+ * shape so the UI never throws.
+ */
+export const getEntryCommits = async (filePath: string): Promise<EntryCommitHistory> => {
+  const empty: EntryCommitHistory = { commits: [], seeAllUrl: '' };
+
+  if (!isProductionMode()) {
+    return empty;
+  }
+  if (!filePath) {
+    return empty;
+  }
+
+  try {
+    const { owner, repo } = assertGitHubConfig();
+    const [octokit] = getPublicOctokits();
+    const baseBranch = getConfig().git.baseBranch;
+
+    const { data } = await octokit.rest.repos.listCommits({
+      owner,
+      repo,
+      path: filePath,
+      per_page: 5,
+    });
+
+    const commits: EntryCommit[] = data.slice(0, 5).map((c) => {
+      const gitAuthor = c.commit.author;
+      const committer = c.commit.committer;
+      const ghAuthor = c.author;
+
+      const message = (c.commit.message || '').split('\n', 1)[0];
+      const login = ghAuthor?.login ?? null;
+      const name = gitAuthor?.name || ghAuthor?.login || 'unknown';
+      const avatarUrl = ghAuthor?.avatar_url ?? null;
+      const committedAt = gitAuthor?.date || committer?.date || '';
+
+      return {
+        sha: c.sha,
+        shortSha: c.sha.slice(0, 7),
+        message,
+        author: { login, name, avatarUrl },
+        committedAt,
+        url: c.html_url,
+      };
+    });
+
+    const seeAllUrl = `https://github.com/${owner}/${repo}/commits/${encodeURIComponent(baseBranch)}/${encodeURI(filePath)}`;
+
+    return { commits, seeAllUrl };
+  } catch (e) {
+    logCmsServerError({ operation: 'getEntryCommits', message: getErrorMessage(e) });
+    return empty;
   }
 };

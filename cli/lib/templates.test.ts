@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   adminLayoutTemplate,
   adminPageTemplate,
+  agentProposalRouteTemplate,
   demoHelloPageJson,
   helloPageTemplate,
   nextConfigTemplate,
@@ -142,5 +143,26 @@ describe('tsconfigPaths', () => {
   it('does not include octocms/* alias (resolved via node_modules when installed as npm package)', () => {
     const paths = tsconfigPaths();
     expect(paths['octocms/*']).toBeUndefined();
+  });
+});
+
+describe('agentProposalRouteTemplate', () => {
+  it('produces the right `..` depth and named export for the accept handler', () => {
+    const out = agentProposalRouteTemplate({ handlerExport: 'acceptProposalRoute', depth: 5 });
+    expect(out).toContain("import '../../../../../cms/__generated__/configInit';");
+    expect(out).toContain("export { acceptProposalRoute as POST } from 'octocms/agent';");
+  });
+
+  it('produces the right `..` depth and named export for the reject handler', () => {
+    const out = agentProposalRouteTemplate({ handlerExport: 'rejectProposalRoute', depth: 6 });
+    expect(out).toContain("import '../../../../../../cms/__generated__/configInit';");
+    expect(out).toContain("export { rejectProposalRoute as POST } from 'octocms/agent';");
+  });
+
+  it('does not import any other server modules — keeps the route file thin', () => {
+    const out = agentProposalRouteTemplate({ handlerExport: 'acceptProposalRoute', depth: 5 });
+    // Only two non-blank lines outside comments: the side-effect import and the re-export.
+    const importLines = out.split('\n').filter((l) => l.trim().startsWith('import ') || l.trim().startsWith('export '));
+    expect(importLines).toHaveLength(2);
   });
 });

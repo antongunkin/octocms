@@ -150,6 +150,63 @@ const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
 `;
 
+/**
+ * Build a thin re-export Route Handler for one of the chat-agent endpoints.
+ *
+ * The actual handler lives in `octocms/agent/proposalsApi.ts` (see
+ * `acceptProposalRoute` / `rejectProposalRoute`). The user-app file just:
+ *   1. side-effect-imports `cms/__generated__/configInit` so
+ *      `getAgentConfig()` resolves on cold start (Route Handlers don't run
+ *      `app/layout.tsx`); and
+ *   2. re-exports the package handler as `POST`.
+ *
+ * `depth` is the number of `..` segments needed to reach the project root
+ * from the route file's directory, so the import path resolves to
+ * `cms/__generated__/configInit` regardless of where the route lives.
+ * For `app/api/agent/proposals/accept/route.ts` that is 5; for the same
+ * file under `src/app/...` it is 6.
+ */
+export function agentProposalRouteTemplate(opts: {
+  /** Named export to pull from `octocms/agent`. */
+  handlerExport: 'acceptProposalRoute' | 'rejectProposalRoute';
+  /** Number of `..` segments from the route directory to project root. */
+  depth: number;
+}): string {
+  const upDirs = '../'.repeat(opts.depth);
+  return `// Side-effect import: registers \`configOctoCMS\` + \`agentConfig\` into the
+// runtime stores so \`getAgentConfig()\` resolves on cold start. Route Handlers
+// don't run \`app/layout.tsx\`, so this import has to live here.
+import '${upDirs}cms/__generated__/configInit';
+
+export { ${opts.handlerExport} as POST } from 'octocms/agent';
+`;
+}
+
+/**
+ * Build a thin re-export Route Handler for the chat-agent SSE endpoint.
+ *
+ * The actual handler lives in `octocms/agent/chatApi.ts`
+ * (`chatRoute` / `chatStatusRoute`). The user-app file just:
+ *   1. side-effect-imports `cms/__generated__/configInit` so
+ *      `getAgentConfig()` resolves on cold start (Route Handlers don't run
+ *      `app/layout.tsx`); and
+ *   2. re-exports `chatRoute` as `POST` and `chatStatusRoute` as `GET`.
+ *
+ * `depth` is the number of `..` segments needed to reach the project root
+ * from the route file's directory. For `app/api/agent/route.ts` that is 4;
+ * for `src/app/api/agent/route.ts` it is 5.
+ */
+export function agentChatRouteTemplate(opts: { depth: number }): string {
+  const upDirs = '../'.repeat(opts.depth);
+  return `// Side-effect import: registers \`configOctoCMS\` + \`agentConfig\` into the
+// runtime stores so \`getAgentConfig()\` resolves on cold start. Route Handlers
+// don't run \`app/layout.tsx\`, so this import has to live here.
+import '${upDirs}cms/__generated__/configInit';
+
+export { chatRoute as POST, chatStatusRoute as GET } from 'octocms/agent';
+`;
+}
+
 export function octoConfigTemplate(opts: { projectName: string; baseBranch: string; pointerBranch?: string }): string {
   const gitBlock = opts.pointerBranch
     ? `  git: {\n    baseBranch: '${opts.baseBranch}',\n    publishedPointerBranch: '${opts.pointerBranch}',\n  },`

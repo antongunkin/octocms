@@ -1,4 +1,4 @@
-import { revalidatePath, updateTag } from 'next/cache';
+import { revalidatePath, revalidateTag, updateTag } from 'next/cache';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { buildJsons } from './build';
@@ -9,6 +9,7 @@ beforeEach(() => {
 
 vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
   updateTag: vi.fn(),
 }));
 
@@ -109,12 +110,21 @@ describe('buildJsons', () => {
     expect(calls.filter((p) => p.startsWith('/blog/') && p !== '/blog' && p !== '/blog/[slug]')).toEqual([]);
   });
 
-  it('returns failure when updateTag throws', async () => {
-    vi.mocked(updateTag).mockImplementationOnce(() => {
-      throw new Error('tag error');
+  it('falls back to revalidateTag when updateTag throws (Route Handler context)', async () => {
+    // updateTag throws outside Server Actions; the proposal accept Route Handler
+    // hits this path. buildJsons must keep the cache invalidation working via
+    // revalidateTag instead of bubbling the error up.
+    vi.mocked(updateTag).mockImplementation(() => {
+      throw new Error('updateTag can only be called from within a Server Action');
     });
 
     const result = await buildJsons();
-    expect(result).toEqual({ success: false, error: 'tag error' });
+    expect(result).toEqual({ success: true });
+
+    // Both public cache tags must have been invalidated via the fallback.
+    expect(vi.mocked(revalidateTag).mock.calls.map(([t]) => t)).toEqual(['homePage', 'blog']);
+    for (const call of vi.mocked(revalidateTag).mock.calls) {
+      expect(call[1]).toEqual({ expire: 0 });
+    }
   });
 });

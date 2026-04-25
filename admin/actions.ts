@@ -5,3 +5,6 @@ export * from './actions/git';
 export * from './actions/media';
 export * from './actions/search';
 export * from './actions/status';
+export * from './actions/diff';
+export * from './actions/schema';
+export * from './actions/agent';

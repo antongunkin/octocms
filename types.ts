@@ -215,6 +215,14 @@ export type Collection = {
   label: string;
   hasMany?: boolean;
   fields: Record<string, CollectionField>;
+  /**
+   * Optional URL template for entries in this collection, e.g.
+   * `'/blog/[slug]'`. Used by the chat agent's `findEntryForDocument` tool to
+   * match an uploaded document to a specific entry by URL hint. Hand-edit the
+   * field in `cms/schema.json`; the Visual Schema Editor doesn't surface it
+   * yet (out of scope for v1).
+   */
+  routeTemplate?: string;
 };
 
 /** Git / GitHub integration — branch names live in config (not environment variables). */
@@ -276,6 +284,34 @@ export type EntryListItem = {
   status: EntryStatus;
   /** ISO 8601 last-modified timestamp. Populated from fs.stat in dev mode; undefined in production. */
   updatedAt?: string;
+};
+
+/** A single commit entry shown in the editor History panel. */
+export type EntryCommit = {
+  sha: string;
+  /** First 7 characters of the sha, pre-computed server-side. */
+  shortSha: string;
+  /** First line of the commit message only. */
+  message: string;
+  author: {
+    /** GitHub login when the commit author is a recognised GitHub user, otherwise null. */
+    login: string | null;
+    /** Git author name. Falls back to GitHub login, then 'unknown'. */
+    name: string;
+    avatarUrl: string | null;
+  };
+  /** ISO 8601 commit timestamp. Prefers author.date, falls back to committer.date. */
+  committedAt: string;
+  /** GitHub URL to the commit, e.g. https://github.com/{owner}/{repo}/commit/{sha}. */
+  url: string;
+};
+
+/** Return shape of `getEntryCommits()`. */
+export type EntryCommitHistory = {
+  /** Up to 5 commits, newest first. Empty in dev mode or on error. */
+  commits: EntryCommit[];
+  /** File-commits page on GitHub, empty string when unavailable. */
+  seeAllUrl: string;
 };
 
 /** A reference item stored in a reference field value. */

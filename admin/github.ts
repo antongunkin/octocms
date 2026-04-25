@@ -278,6 +278,128 @@ export const saveGitHubBinaryFile = async (filePath: string, buffer: Buffer, mes
 };
 
 /**
+ * A single file change in a multi-file commit. `delete` removes the path
+ * from the tree; `upsert-text` and `upsert-binary` create or update it.
+ */
+export type GitHubBatchChange =
+  | { kind: 'upsert-text'; path: string; content: string }
+  | { kind: 'upsert-binary'; path: string; content: Buffer }
+  | { kind: 'delete'; path: string };
+
+/**
+ * Commit multiple file changes atomically as a single GitHub commit on
+ * `branch`. Used by the visual schema editor to write `cms/schema.json`
+ * plus regenerated artifacts plus migrated entry files in one commit.
+ *
+ * Implementation: builds a git tree off the branch's current HEAD, creates a
+ * single commit, then fast-forwards the branch. If `branch` does not exist,
+ * it is created from `git.baseBranch` first (mirrors `ensureBranchExists`).
+ *
+ * Throws if all `changes` are no-ops (e.g. all deletes target missing paths)
+ * — GitHub rejects empty trees.
+ */
+export const commitMultipleFilesToGitHub = async (
+  changes: readonly GitHubBatchChange[],
+  message: string,
+  branch?: string,
+): Promise<{ sha: string }> => {
+  if (changes.length === 0) {
+    throw new Error('commitMultipleFilesToGitHub: no changes provided');
+  }
+
+  const octokit = await getWriteOctokit();
+  const { owner, repo, branch: configBranch } = assertGitHubConfig();
+  const targetBranch = branch || configBranch;
+
+  await ensureBranchExists(octokit, owner, repo, targetBranch);
+
+  const { data: ref } = await octokit.rest.git.getRef({
+    owner,
+    repo,
+    ref: `heads/${targetBranch}`,
+  });
+  const headSha = ref.object.sha;
+
+  const { data: headCommit } = await octokit.rest.git.getCommit({
+    owner,
+    repo,
+    commit_sha: headSha,
+  });
+  const baseTreeSha = headCommit.tree.sha;
+
+  const tree: {
+    path: string;
+    mode: '100644';
+    type: 'blob';
+    sha?: string | null;
+    content?: string;
+  }[] = [];
+
+  for (const change of changes) {
+    if (change.kind === 'delete') {
+      tree.push({ path: change.path, mode: '100644', type: 'blob', sha: null });
+      continue;
+    }
+    if (change.kind === 'upsert-text') {
+      // Push content directly. GitHub will create a blob server-side.
+      tree.push({ path: change.path, mode: '100644', type: 'blob', content: change.content });
+      continue;
+    }
+    // Binary: must upload as a blob first, then reference its SHA.
+    const { data: blob } = await octokit.rest.git.createBlob({
+      owner,
+      repo,
+      content: change.content.toString('base64'),
+      encoding: 'base64',
+    });
+    tree.push({ path: change.path, mode: '100644', type: 'blob', sha: blob.sha });
+  }
+
+  let newTreeSha: string;
+  try {
+    const { data: newTree } = await octokit.rest.git.createTree({
+      owner,
+      repo,
+      base_tree: baseTreeSha,
+      tree,
+    });
+    newTreeSha = newTree.sha;
+  } catch (error: any) {
+    throw new Error(`GitHub createTree failed: ${formatGitHubApiError(error)}`);
+  }
+
+  if (newTreeSha === baseTreeSha) {
+    throw new Error('commitMultipleFilesToGitHub: changes produced no diff (every file was already up to date)');
+  }
+
+  const { data: newCommit } = await octokit.rest.git.createCommit({
+    owner,
+    repo,
+    message,
+    tree: newTreeSha,
+    parents: [headSha],
+  });
+
+  try {
+    await octokit.rest.git.updateRef({
+      owner,
+      repo,
+      ref: `heads/${targetBranch}`,
+      sha: newCommit.sha,
+    });
+  } catch (error: any) {
+    if (error.status === 422) {
+      throw new Error(
+        `Branch "${targetBranch}" moved while committing. Retry the schema save: ${formatGitHubApiError(error)}`,
+      );
+    }
+    throw new Error(`GitHub updateRef failed: ${formatGitHubApiError(error)}`);
+  }
+
+  return { sha: newCommit.sha };
+};
+
+/**
  * Delete a file from the GitHub repo via a commit.
  */
 export const deleteGitHubFile = async (filePath: string, message: string, branch?: string) => {

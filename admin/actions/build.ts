@@ -4,7 +4,7 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 
 import { glob } from 'glob';
-import { revalidatePath, updateTag } from 'next/cache';
+import { revalidatePath, revalidateTag, updateTag } from 'next/cache';
 
 import { getConfig } from '../../lib/configStore';
 import { companionMarkdownPathsForEntry, companionRichTextPathsForEntry } from '../../lib/companionMarkdown';
@@ -114,7 +114,17 @@ async function buildAndWriteSearchIndex(): Promise<void> {
 export const buildJsons = async (_editedFileName?: string, options?: BuildJsonsOptions): Promise<ActionResult> => {
   try {
     for (const tag of PUBLIC_CACHE_TAGS) {
-      updateTag(tag);
+      // `updateTag` gives read-your-own-writes inside a Server Action (the
+      // editor save path). When called from a Route Handler — e.g. the
+      // proposal accept endpoint at `/api/agent/proposals/accept` — the
+      // runtime throws ("updateTag can only be called from within a Server
+      // Action"); fall back to `revalidateTag` with immediate expiry, which
+      // is allowed everywhere and produces the same fresh-data outcome.
+      try {
+        updateTag(tag);
+      } catch {
+        revalidateTag(tag, { expire: 0 });
+      }
     }
 
     revalidatePath('/', 'layout');

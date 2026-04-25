@@ -1,6 +1,9 @@
 import React, { Suspense } from 'react';
 
+import { ChatPage } from './pages/ChatPage';
 import { CollectionPage } from './pages/CollectionPage';
+import { ContentModelPage } from './pages/ContentModelPage';
+import { ContentTypePage } from './pages/ContentTypePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { EntryPage } from './pages/EntryPage';
 import { MediaPage } from './pages/MediaPage';
@@ -18,9 +21,12 @@ type AdminAppProps = {
  *
  * Route segments map to admin pages:
  *   /cms            → DashboardPage
+ *   /cms/chat       → ChatPage (gated on `isAgentEnabled(agentConfig)`)
  *   /cms/search     → SearchPage
  *   /cms/media      → MediaPage (library)
  *   /cms/media/<id> → MediaPage with that asset selected (detail panel)
+ *   /cms/content-model       → ContentModelPage
+ *   /cms/content-model/<type>→ ContentTypePage
  *   /cms/<type>     → CollectionPage
  *   /cms/<type>/<id>→ EntryPage
  */
@@ -44,9 +50,21 @@ async function AdminAppRouter({ params }: AdminAppProps) {
     return <SearchPage />;
   }
 
+  if (segments[0] === 'chat') {
+    return <ChatPage />;
+  }
+
   if (segments[0] === 'media') {
     const initialMediaId = segments.length >= 2 ? segments[1] : undefined;
     return <MediaPage initialMediaId={initialMediaId} />;
+  }
+
+  if (segments[0] === 'content-model') {
+    if (segments.length === 1) {
+      return <ContentModelPage />;
+    }
+    const [, type] = segments;
+    return <ContentTypePage type={type} />;
   }
 
   if (segments.length === 1) {

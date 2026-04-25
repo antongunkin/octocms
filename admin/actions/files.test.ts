@@ -587,6 +587,44 @@ describe('saveFile', () => {
     expect(out).toEqual({ success: false, error: 'Extras must be valid JSON', fieldErrors: expect.any(Object) });
     expect(fsPromises.writeFile).not.toHaveBeenCalled();
   });
+
+  it('accepts json field as a native object (as returned by getFile — publishEntry path)', async () => {
+    // Bug: publishEntry calls saveFile with the parsed entry from getFile.
+    // JSON fields are JS objects, not strings. String({}) === "[object Object]" fails JSON validation.
+    const input = {
+      sys: { id: 'abc', type: 'post' },
+      fields: { title: 'Widget', slug: 'widget', extras: { key: 'val', tags: [1, 2] } },
+    };
+    const out = await saveFile(input, 'cms/content/post/abc.json');
+    expect(out).toEqual({ success: true });
+    const expectedPayload = {
+      sys: { id: 'abc', type: 'post' },
+      fields: { title: 'Widget', slug: 'widget', extras: { key: 'val', tags: [1, 2] } },
+    };
+    expect(fsPromises.writeFile).toHaveBeenCalledWith(
+      path.join(process.cwd(), 'cms/content/post/abc.json'),
+      `${JSON.stringify(expectedPayload, null, 2)}\n`,
+      'utf8',
+    );
+  });
+
+  it('accepts json field as a native array (as returned by getFile — publishEntry path)', async () => {
+    const input = {
+      sys: { id: 'abc', type: 'post' },
+      fields: { title: 'Widget', slug: 'widget', extras: [{ step: 1 }, { step: 2 }] },
+    };
+    const out = await saveFile(input, 'cms/content/post/abc.json');
+    expect(out).toEqual({ success: true });
+    const expectedPayload = {
+      sys: { id: 'abc', type: 'post' },
+      fields: { title: 'Widget', slug: 'widget', extras: [{ step: 1 }, { step: 2 }] },
+    };
+    expect(fsPromises.writeFile).toHaveBeenCalledWith(
+      path.join(process.cwd(), 'cms/content/post/abc.json'),
+      `${JSON.stringify(expectedPayload, null, 2)}\n`,
+      'utf8',
+    );
+  });
 });
 
 // ─── newFile ──────────────────────────────────────────────────────────────────

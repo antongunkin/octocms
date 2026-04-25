@@ -4,7 +4,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
-import { GitBranch, ExternalLink, Plus, X, RefreshCw, Radio, Search, Image, FileText } from 'lucide-react';
+import {
+  GitBranch,
+  ExternalLink,
+  Plus,
+  X,
+  RefreshCw,
+  Radio,
+  Search,
+  Image,
+  FileText,
+  Settings,
+  Bot,
+} from 'lucide-react';
 
 import {
   getIsProduction,
@@ -14,6 +26,7 @@ import {
   setActiveBranch,
   listCMSBranches,
   publishBranch,
+  getAgentClientStatus,
   type CMSBranch,
 } from '../../admin/actions';
 import { toast } from '../../hooks/useToast';
@@ -38,6 +51,7 @@ const Header = ({ title: _title }: HeaderProps) => {
   const { data } = useSession();
   const pathname = usePathname();
   const [isProduction, setIsProduction] = useState(false);
+  const [agentEnabled, setAgentEnabled] = useState(false);
   const [activeBranch, setActiveBranchState] = useState<string>('');
   const [isFeatureBranch, setIsFeatureBranch] = useState(false);
   const [cmsBranches, setCmsBranches] = useState<CMSBranch[]>([]);
@@ -50,6 +64,7 @@ const Header = ({ title: _title }: HeaderProps) => {
     getIsProduction().then(setIsProduction);
     getBranch().then(setActiveBranchState);
     hasActiveBranch().then(setIsFeatureBranch);
+    getAgentClientStatus().then((s) => setAgentEnabled(s.enabled));
 
     const handler = () => {
       getBranch().then(setActiveBranchState);
@@ -157,6 +172,18 @@ const Header = ({ title: _title }: HeaderProps) => {
           <NavLink href="/cms/search" active={pathname.startsWith('/cms/search')} icon={<Search className="h-4 w-4" />}>
             Search
           </NavLink>
+          <NavLink
+            href="/cms/content-model"
+            active={pathname.startsWith('/cms/content-model')}
+            icon={<Settings className="h-4 w-4" />}
+          >
+            Content Model
+          </NavLink>
+          {agentEnabled && (
+            <NavLink href="/cms/chat" active={pathname.startsWith('/cms/chat')} icon={<Bot className="h-4 w-4" />}>
+              Chat
+            </NavLink>
+          )}
         </nav>
       </div>
 
@@ -334,11 +361,11 @@ function NavLink({
   return (
     <Button
       asChild
-      variant={active ? 'secondary' : 'ghost'}
+      variant="ghost"
       size="sm"
       className={cn(
-        'gap-1.5 h-8 px-3 text-sm font-normal',
-        active ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground',
+        'gap-1.5 h-8 px-3 text-sm hover:bg-transparent',
+        active ? 'text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground font-medium',
       )}
     >
       <Link href={href}>

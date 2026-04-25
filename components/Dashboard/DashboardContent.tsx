@@ -24,23 +24,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { StatusBadge } from '../StatusBadge';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
+import { relativeTime } from '../../lib/relativeTime';
 import type { EntryListItem, EntryStatus } from '../../types';
 
 const PAGE_SIZE = 20;
 
 const ALL_STATUSES: EntryStatus[] = ['draft', 'changed', 'published', 'merged', 'archived'];
-
-function relativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.round(diff / 60_000);
-  if (mins < 2) return 'Just now';
-  if (mins < 60) return `${mins} minute${mins === 1 ? '' : 's'} ago`;
-  const hrs = Math.round(mins / 60);
-  if (hrs < 24) return `${hrs} hour${hrs === 1 ? '' : 's'} ago`;
-  const days = Math.round(hrs / 24);
-  if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
 
 type Props = {
   entries: EntryListItem[];

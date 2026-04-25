@@ -9,7 +9,13 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 import { log } from '../lib/logger';
-import { adminLayoutTemplate, adminPageTemplate, rootLayoutConfigInitImport } from '../lib/templates';
+import {
+  adminLayoutTemplate,
+  adminPageTemplate,
+  agentChatRouteTemplate,
+  agentProposalRouteTemplate,
+  rootLayoutConfigInitImport,
+} from '../lib/templates';
 
 type FileCheck = {
   path: string;
@@ -79,6 +85,81 @@ export async function updateCommand(projectRoot: string): Promise<void> {
         allUpToDate = false;
       }
       break;
+    }
+  }
+
+  // Chat-agent SSE route — ensure `app/api/agent/route.ts` exists as a thin re-export.
+  // Depth from the route file to project root:
+  //   - bare `app/api/agent/route.ts`     → 4
+  //   - `src/app/api/agent/route.ts`      → 5
+  const chatRouteRoots: Array<{ file: string; depth: number; rel: string }> = [
+    {
+      file: join(projectRoot, 'src', 'app', 'api', 'agent', 'route.ts'),
+      depth: 5,
+      rel: 'src/app/api/agent/route.ts',
+    },
+    {
+      file: join(projectRoot, 'app', 'api', 'agent', 'route.ts'),
+      depth: 4,
+      rel: 'app/api/agent/route.ts',
+    },
+  ];
+  // Pick the first whose parent `app/` directory exists. Fall back to bare `app/`.
+  const chatRoot =
+    chatRouteRoots.find((r) => existsSync(join(r.file, '..', '..', '..', '..'))) ?? chatRouteRoots[1];
+  {
+    const expected = agentChatRouteTemplate({ depth: chatRoot.depth });
+    if (!existsSync(chatRoot.file)) {
+      mkdirSync(join(chatRoot.file, '..'), { recursive: true });
+      writeFileSync(chatRoot.file, expected, 'utf8');
+      log.step(`${chatRoot.rel} — created`);
+      allUpToDate = false;
+    } else {
+      const current = readFileSync(chatRoot.file, 'utf8');
+      if (current === expected) {
+        log.success(`${chatRoot.rel} — up to date`);
+      } else {
+        log.info(`${chatRoot.rel} — present (skipped, not auto-rewritten)`);
+      }
+    }
+  }
+
+  // Chat-agent proposal routes — ensure both endpoints exist as thin re-exports.
+  // We pick the first layout root that already has an `app/` directory inside it
+  // and write to that, mirroring the convention used by the rest of the project.
+  // Depth from `app/api/agent/proposals/<endpoint>/route.ts` to project root:
+  //   - bare `app/...`    → 5
+  //   - `src/app/...`     → 6
+  const proposalRouteRoots: Array<{ baseDir: string; depth: number; rel: string }> = [
+    {
+      baseDir: join(projectRoot, 'src', 'app', 'api', 'agent', 'proposals'),
+      depth: 6,
+      rel: 'src/app/api/agent/proposals',
+    },
+    { baseDir: join(projectRoot, 'app', 'api', 'agent', 'proposals'), depth: 5, rel: 'app/api/agent/proposals' },
+  ];
+  // Pick the first whose parent `app/` directory exists. Fall back to bare `app/`.
+  const root = proposalRouteRoots.find((r) => existsSync(join(r.baseDir, '..', '..', '..'))) ?? proposalRouteRoots[1];
+
+  for (const endpoint of ['accept', 'reject'] as const) {
+    const file = join(root.baseDir, endpoint, 'route.ts');
+    const expected = agentProposalRouteTemplate({
+      handlerExport: endpoint === 'accept' ? 'acceptProposalRoute' : 'rejectProposalRoute',
+      depth: root.depth,
+    });
+    if (!existsSync(file)) {
+      mkdirSync(join(file, '..'), { recursive: true });
+      writeFileSync(file, expected, 'utf8');
+      log.step(`${root.rel}/${endpoint}/route.ts — created`);
+      allUpToDate = false;
+    } else {
+      const current = readFileSync(file, 'utf8');
+      if (current === expected) {
+        log.success(`${root.rel}/${endpoint}/route.ts — up to date`);
+      } else {
+        // Don't clobber: route file exists but differs (user may have customised).
+        log.info(`${root.rel}/${endpoint}/route.ts — present (skipped, not auto-rewritten)`);
+      }
     }
   }
 

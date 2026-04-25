@@ -5,12 +5,13 @@
  * OctoCMS CLI — command-line tools for managing an OctoCMS project.
  *
  * Commands:
- *   init        Initialize OctoCMS in a Next.js project
- *   dev         Start development server with config watching
- *   types:gen   Generate TypeScript types from next.config.ts
- *   validate    Validate all content entries against the schema
- *   update      Regenerate admin route files
- *   agent-docs  Inject AI agent doc links into AGENTS.md
+ *   init             Initialize OctoCMS in a Next.js project
+ *   dev              Start development server with config watching
+ *   types:gen        Generate TypeScript types from next.config.ts
+ *   embeddings:gen   Generate cms/__generated__/embeddings.json for the chat agent
+ *   validate         Validate all content entries against the schema
+ *   update           Regenerate admin route files
+ *   agent-docs       Inject AI agent doc links into AGENTS.md
  *
  * Usage:
  *   octocms <command> [options]
@@ -28,12 +29,13 @@ const HELP = `
   Usage: octocms <command> [options]
 
   ${fmt.bold('Commands:')}
-    init         Initialize OctoCMS in a Next.js project
-    dev          Start development server with config watching
-    types:gen    Generate TypeScript types from next.config.ts
-    validate     Validate all content entries against the schema
-    update       Regenerate admin route files
-    agent-docs   Inject AI agent doc links into AGENTS.md
+    init             Initialize OctoCMS in a Next.js project
+    dev              Start development server with config watching
+    types:gen        Generate TypeScript types from next.config.ts
+    embeddings:gen   Generate cms/__generated__/embeddings.json for the chat agent
+    validate         Validate all content entries against the schema
+    update           Regenerate admin route files
+    agent-docs       Inject AI agent doc links into AGENTS.md
 
   ${fmt.bold('Options:')}
     --help      Show this help message
@@ -74,6 +76,20 @@ const COMMAND_HELP: Record<string, string> = {
   Validates the config before generating.
 
   ${fmt.bold('Usage:')} octocms types:gen
+
+  ${fmt.bold('Options:')}
+    --help      Show this help message
+`,
+  'embeddings:gen': `
+  ${fmt.bold('octocms embeddings:gen')} — Generate cms/__generated__/embeddings.json
+
+  Walks every content entry, embeds new/changed entries via the local
+  @huggingface/transformers model (Xenova/bge-small-en-v1.5, 384 dims), and
+  writes the merged store. Re-running on unchanged content is a fast no-op.
+
+  Requires the @huggingface/transformers peer dep installed.
+
+  ${fmt.bold('Usage:')} octocms embeddings:gen
 
   ${fmt.bold('Options:')}
     --help      Show this help message
@@ -133,7 +149,7 @@ function parseArgs(argv: string[]): { command: string | null; flags: Record<stri
       flags.port = arg.slice(7);
     } else if (!arg.startsWith('-') && !command) {
       // Handle compound commands as single tokens
-      if (arg === 'types:gen' || arg === 'agent-docs') {
+      if (arg === 'types:gen' || arg === 'embeddings:gen' || arg === 'agent-docs') {
         command = arg;
       } else {
         command = arg;
@@ -185,6 +201,12 @@ async function main(): Promise<void> {
         const projectRoot = resolveProjectRoot();
         const { typesGenCommand } = await import('./commands/typesGen');
         await typesGenCommand(projectRoot);
+        break;
+      }
+      case 'embeddings:gen': {
+        const projectRoot = resolveProjectRoot();
+        const { embeddingsGenCommand } = await import('./commands/embeddingsGen');
+        await embeddingsGenCommand(projectRoot);
         break;
       }
       case 'validate': {

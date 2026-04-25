@@ -28,6 +28,13 @@ const external = [
   'remark-mdx',
   'slugify',
   'glob',
+  // Optional peer deps for the chat agent — kept external so absence at install time is fine
+  '@anthropic-ai/sdk',
+  '@huggingface/transformers',
+  'mammoth',
+  'openai',
+  'pdfjs-dist',
+  /^pdfjs-dist\//,
 ];
 
 // jiti must be external for the CLI — tsup bundling it inlines CJS require() calls
@@ -50,6 +57,7 @@ const allEntry = Object.fromEntries(
       'withOctoCMS.ts',
       'github-public.ts',
       'admin/**/*.{ts,tsx}',
+      'agent/**/*.{ts,tsx}',
       'components/**/*.{ts,tsx}',
       'hooks/**/*.{ts,tsx}',
       'lib/**/*.{ts,tsx}',
@@ -67,6 +75,7 @@ const cjsEntry = {
   defineConfig: 'defineConfig.ts',
   types: 'types.ts',
   withOctoCMS: 'withOctoCMS.ts',
+  'agent/index': 'agent/index.ts',
   'lib/configStore': 'lib/configStore.ts',
   'components/public/index': 'components/public/index.ts',
 };

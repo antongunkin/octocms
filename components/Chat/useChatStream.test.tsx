@@ -1,0 +1,140 @@
+import { act, renderHook } from '@testing-library/react';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { useChatStream } from './useChatStream';
+
+/**
+ * Build an SSE-style ReadableStream from a list of body chunks (strings) and
+ * an optional `delayMs` between chunks. Lets us test the streaming/abort
+ * path without spinning up a real server.
+ */
+function makeSseStream(chunks: string[], delayMs = 0): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  let i = 0;
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      if (i >= chunks.length) {
+        controller.close();
+        return;
+      }
+      const chunk = chunks[i++];
+      if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+      controller.enqueue(encoder.encode(chunk));
+    },
+  });
+}
+
+describe('useChatStream — stop()', () => {
+  let originalFetch: typeof globalThis.fetch;
+  let lastInit: RequestInit | null = null;
+
+  beforeEach(() => {
+    originalFetch = globalThis.fetch;
+    lastInit = null;
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.restoreAllMocks();
+  });
+
+  it('aborts the in-flight fetch and flips status to "stopped"', async () => {
+    let abortReceived = false;
+    globalThis.fetch = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      lastInit = init ?? null;
+      // Listen for abort so we can verify the signal propagated.
+      init?.signal?.addEventListener('abort', () => {
+        abortReceived = true;
+      });
+      return new Response(
+        // Drip-feed SSE chunks so we have time to abort mid-stream.
+        makeSseStream(
+          [
+            'data: {"type":"text_delta","text":"Hello "}\n\n',
+            'data: {"type":"text_delta","text":"world"}\n\n',
+            'data: {"type":"done"}\n\n',
+          ],
+          50,
+        ),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'text/event-stream' },
+        },
+      );
+    }) as typeof globalThis.fetch;
+
+    const { result } = renderHook(() => useChatStream());
+
+    // Kick off a streaming request — don't await; we need to abort while it's mid-flight.
+    let sendPromise: Promise<void> = Promise.resolve();
+    act(() => {
+      sendPromise = result.current.send('test');
+    });
+
+    // Wait one microtask so fetch is in-flight and status is 'streaming'.
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+    expect(result.current.status).toBe('streaming');
+
+    // Stop mid-stream.
+    act(() => {
+      result.current.stop();
+    });
+
+    // The send promise should resolve cleanly (no thrown error) — abort is swallowed.
+    await act(async () => {
+      await sendPromise;
+    });
+
+    expect(result.current.status).toBe('stopped');
+    expect(abortReceived).toBe(true);
+    // The fetch was issued with a signal — that's the abort hook.
+    expect(lastInit?.signal).toBeDefined();
+  });
+
+  it('does nothing when called while idle', () => {
+    globalThis.fetch = vi.fn(() => Promise.resolve(new Response(makeSseStream([])))) as typeof globalThis.fetch;
+    const { result } = renderHook(() => useChatStream());
+    expect(result.current.status).toBe('idle');
+    act(() => {
+      result.current.stop();
+    });
+    expect(result.current.status).toBe('idle');
+  });
+
+  it('reset() also cancels any in-flight stream', async () => {
+    let aborted = false;
+    globalThis.fetch = vi.fn(async (_url, init?: RequestInit) => {
+      init?.signal?.addEventListener('abort', () => {
+        aborted = true;
+      });
+      return new Response(makeSseStream(['data: {"type":"done"}\n\n'], 100), {
+        status: 200,
+        headers: { 'Content-Type': 'text/event-stream' },
+      });
+    }) as typeof globalThis.fetch;
+
+    const { result } = renderHook(() => useChatStream());
+    let p: Promise<void> = Promise.resolve();
+    act(() => {
+      p = result.current.send('test');
+    });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+    expect(result.current.status).toBe('streaming');
+
+    act(() => {
+      result.current.reset();
+    });
+    await act(async () => {
+      await p;
+    });
+    expect(aborted).toBe(true);
+    // After reset(), the hook is back to its initial idle state.
+    expect(result.current.status).toBe('idle');
+    expect(result.current.entries).toEqual([]);
+  });
+});

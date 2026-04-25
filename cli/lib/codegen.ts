@@ -6,10 +6,13 @@
  */
 
 import type { CollectionField, Config, ConditionalBranchConfig } from '../../types';
+import { generateAgentIndex, generateAgentOverview, generateAgentSchema } from './agentDocs';
+import { generateSchemaDocs } from './schemaDocs';
+import { validateConfig } from './validateConfig';
 
 export const CODEGEN_BANNER = `/*
  * AUTO-GENERATED — DO NOT EDIT.
- * Generated from cms/octocms.config.ts.
+ * Generated from cms/schema.json.
  * Run \`npx octocms types:gen\` to regenerate.
  */
 
@@ -267,6 +270,123 @@ export const query = createQuery<EntryMap, OctoConfig>(configOctoCMS as unknown 
 }
 
 /**
+ * Serialize a config value to TypeScript source.
+ *
+ * Output matches the project's oxfmt style closely enough that no post-format
+ * step is needed — important because the visual Content Model editor regenerates
+ * this shim from a server action running on Vercel in production, where
+ * spawning `oxfmt` (a dev tool) is not possible.
+ *
+ * Style rules emitted directly:
+ *  - Single quotes for strings (escaped if needed).
+ *  - Bare keys when the property name is a valid JS identifier; quoted otherwise.
+ *  - Trailing commas after every element of multi-line arrays/objects.
+ *  - `as const` appended to the `options` / `defaultOptions` arrays of select
+ *    fields so option `value` strings narrow to literal-union types.
+ *
+ * As a safety net, `cms/__generated__/schema.ts` is also listed in oxfmt's
+ * `ignorePatterns` (`.oxfmtrc.json`) so any future style drift will not fail
+ * `npm run fmt:check`.
+ */
+const JS_IDENT = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+const RESERVED = new Set([
+  'break',
+  'case',
+  'catch',
+  'class',
+  'const',
+  'continue',
+  'debugger',
+  'default',
+  'delete',
+  'do',
+  'else',
+  'export',
+  'extends',
+  'false',
+  'finally',
+  'for',
+  'function',
+  'if',
+  'import',
+  'in',
+  'instanceof',
+  'new',
+  'null',
+  'return',
+  'super',
+  'switch',
+  'this',
+  'throw',
+  'true',
+  'try',
+  'typeof',
+  'var',
+  'void',
+  'while',
+  'with',
+  'yield',
+]);
+
+function quoteString(s: string): string {
+  // Single-quoted; escape backslashes, single quotes, and control chars.
+  return `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r')}'`;
+}
+
+function formatKey(k: string): string {
+  return JS_IDENT.test(k) && !RESERVED.has(k) ? k : quoteString(k);
+}
+
+export function serializeConfigToTS(cfg: Config): string {
+  function emit(value: unknown, indent: string, parentFieldFormat?: string, key?: string): string {
+    if (value === null) return 'null';
+    if (typeof value === 'boolean') return value ? 'true' : 'false';
+    if (typeof value === 'number') return String(value);
+    if (typeof value === 'string') return quoteString(value);
+    if (Array.isArray(value)) {
+      const needsAsConst = parentFieldFormat === 'select' && (key === 'options' || key === 'defaultOptions');
+      const suffix = needsAsConst ? ' as const' : '';
+      if (value.length === 0) return `[]${suffix}`;
+      const inner = indent + '  ';
+      const items = value.map((v) => `${inner}${emit(v, inner)}`).join(',\n');
+      return `[\n${items},\n${indent}]${suffix}`;
+    }
+    if (typeof value === 'object') {
+      const obj = value as Record<string, unknown>;
+      const fmt = typeof obj.format === 'string' ? obj.format : undefined;
+      const inner = indent + '  ';
+      const entries = Object.entries(obj).map(([k, v]) => `${inner}${formatKey(k)}: ${emit(v, inner, fmt, k)}`);
+      return `{\n${entries.join(',\n')},\n${indent}}`;
+    }
+    throw new Error(`Unsupported value type in schema: ${typeof value}`);
+  }
+  return emit(cfg, '');
+}
+
+/**
+ * Generate `cms/__generated__/schema.ts` — a TypeScript shim that re-emits
+ * `cms/schema.json` as a `defineConfig()` call. This preserves literal types
+ * (collection names, field names, field formats, select option values) for the
+ * downstream `query()` type inference, which JSON imports cannot do on their own.
+ *
+ * `cms/schema.json` is the source of truth; this shim mirrors it. `npm run
+ * types:check` fails if they drift.
+ */
+export function generateSchemaShim(cfg: Config): string {
+  // Use a relative import (not the `octocms/*` alias) because this file is
+  // pulled in by `cms/octocms.config.ts`, which Next.js loads through the
+  // CommonJS resolver for `next.config.ts` — that resolver does not honour
+  // tsconfig paths. The original hand-written config used the same workaround.
+  return (
+    CODEGEN_BANNER +
+    `import { defineConfig } from '../../octocms/defineConfig';
+
+export const schema = defineConfig(${serializeConfigToTS(cfg)});
+`
+  );
+}
+
+/**
  * Generate `configInit.ts` — a side-effect module that imports the app config
  * and registers it with the `octocms` config store.
  *
@@ -278,10 +398,76 @@ export const query = createQuery<EntryMap, OctoConfig>(configOctoCMS as unknown 
 export function generateConfigInit(): string {
   return (
     CODEGEN_BANNER +
-    `import { configOctoCMS } from '../octocms.config';
+    `import * as userConfig from '../octocms.config';
 import { setConfig } from 'octocms/lib/configStore';
+import { setAgentConfig } from 'octocms/agent/configStore';
 
-setConfig(configOctoCMS);
+setConfig(userConfig.configOctoCMS);
+if (userConfig.agentConfig) setAgentConfig(userConfig.agentConfig);
 `
   );
+}
+
+// ---------------------------------------------------------------------------
+// regenerateAll — single entry point that produces every schema-driven file
+// ---------------------------------------------------------------------------
+
+/**
+ * The fixed list of supported field formats. Mirrors `FieldFormat` in
+ * `octocms/types.ts` and `FIELD_TYPES` in `octocms/admin/consts.ts`.
+ *
+ * Kept as a runtime constant so `regenerateAll()` does not need to import
+ * `octocms/admin/consts` (which would pull admin code into the CLI surface).
+ */
+export const FIELD_FORMATS = [
+  'string',
+  'text',
+  'markdown',
+  'boolean',
+  'reference',
+  'image',
+  'number',
+  'datetime',
+  'json',
+  'slug',
+  'select',
+  'url',
+  'color',
+  'conditional',
+  'richtext',
+] as const;
+
+/**
+ * Regenerate every schema-driven artifact in memory and return them as a
+ * `path -> content` map. The visual schema-editor server action commits the
+ * map as a single batch; the `npm run *:gen` scripts pick the subset they
+ * need and write to disk.
+ *
+ * Throws if the config is invalid (via `validateConfig`).
+ *
+ * Output paths are repo-relative and stable. Excluded from this map:
+ *  - `docs/generated/api-routes.md` — built by scanning `src/app/api/` on disk,
+ *    not derivable from the schema. The `generate-docs.ts` script writes it
+ *    separately.
+ */
+export function regenerateAll(cfg: Config): { files: Record<string, string> } {
+  const collectionNames = Object.keys(cfg.collections);
+  validateConfig(cfg, collectionNames);
+
+  return {
+    files: {
+      'cms/schema.json': JSON.stringify(cfg, null, 2) + '\n',
+      'cms/__generated__/schema.ts': generateSchemaShim(cfg),
+      'cms/__generated__/types.ts': generateTypes(cfg, collectionNames),
+      'cms/__generated__/enums.ts': generateEnums(cfg, collectionNames, FIELD_FORMATS),
+      'cms/__generated__/content.d.ts': generateContentDecls(cfg, collectionNames),
+      'cms/__generated__/index.ts': generateIndex(),
+      'cms/__generated__/query.ts': generateQuery(),
+      'cms/__generated__/configInit.ts': generateConfigInit(),
+      'docs/generated/schema.md': generateSchemaDocs(cfg, collectionNames, FIELD_FORMATS),
+      'octocms/docs/index.md': generateAgentIndex(),
+      'octocms/docs/overview.md': generateAgentOverview(cfg, collectionNames),
+      'octocms/docs/schema.md': generateAgentSchema(cfg, collectionNames),
+    },
+  };
 }

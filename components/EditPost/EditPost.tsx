@@ -1,7 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React, { Suspense, useCallback, useEffect, useState, useTransition } from 'react';
+import dynamic from 'next/dynamic';
+import React, { Suspense, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import {
   saveFile,
@@ -23,10 +25,18 @@ import { useConfig } from '../../hooks/useConfig';
 import FormFields from '../FormFields';
 import InlineEntryEditor from '../InlineEntryEditor/InlineEntryEditor';
 import LinkedBySection from '../LinkedBySection/LinkedBySection';
+import { DiffView } from '../DiffView';
+import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui';
 import { toast } from '../../hooks/useToast';
 import CreateBranchDialog from '../CreateBranchDialog';
+
+const HistorySection = dynamic(() => import('../HistorySection/HistorySection'), {
+  ssr: false,
+  loading: () => null,
+});
 
 const EditPostInner = ({ post }: { post: any }) => {
   const config = useConfig();
@@ -40,6 +50,7 @@ const EditPostInner = ({ post }: { post: any }) => {
   const [activeBranchSet, setActiveBranchSet] = useState(true);
   const [createBranchOpen, setCreateBranchOpen] = useState(false);
   const [pendingSaveArgs, setPendingSaveArgs] = useState<{ sys: any; fields: any } | null>(null);
+  const [viewMode, setViewMode] = useState<'edit' | 'diff'>('edit');
 
   useEffect(() => {
     getIsProduction().then((isProd) => {
@@ -184,44 +195,128 @@ const EditPostInner = ({ post }: { post: any }) => {
     });
   };
 
+  const collectionLabel = useMemo(() => {
+    return config.collections[post?.sys?.type as keyof typeof config.collections]?.label ?? post?.sys?.type ?? '';
+  }, [config, post?.sys?.type]);
+
+  const fieldCount = useMemo(() => {
+    const fields = config.collections[post?.sys?.type as keyof Config['collections']]?.fields;
+    return fields ? Object.keys(fields).length : 0;
+  }, [config, post?.sys?.type]);
+
+  const entryTitle = useMemo(() => {
+    const fields = config.collections[post?.sys?.type as keyof Config['collections']]?.fields;
+    if (!fields || !post?.fields) return '';
+    const titleKey = Object.keys(fields).find((k) => fields[k]?.entryTitle);
+    if (titleKey && typeof post.fields[titleKey] === 'string') {
+      return post.fields[titleKey] as string;
+    }
+    return '';
+  }, [config, post?.sys?.type, post?.fields]);
+
+  // The Edit/Diff toggle is only useful when there's an unmerged delta to compare:
+  // - In production: a feature branch must be active (cookie set).
+  // - In dev: always allow — the local `git` can always compare the working tree to base.
+  // Archived entries hide the toggle (no editing workflow there).
+  const diffToggleVisible = currentStatus !== 'archived' && (isProduction ? activeBranchSet : true);
+
+  // If we lose visibility while in Diff mode (e.g. branch cleared), fall back to Edit.
+  useEffect(() => {
+    if (!diffToggleVisible && viewMode === 'diff') {
+      setViewMode('edit');
+    }
+  }, [diffToggleVisible, viewMode]);
+
   if (!post?.fields) {
     return 'No selected post';
   }
 
   return (
-    <div className="relative flex-1 w-full flex flex-col">
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-border bg-background flex-none">
-        <Button asChild variant="ghost" size="sm">
-          <a href={`/cms/${post?.sys?.type}`}>Back</a>
-        </Button>
-        <div className="mr-auto">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-0.5">
-            {config.collections[post?.sys?.type as keyof typeof config.collections]?.label ?? post?.sys?.type}
-            <StatusBadge status={currentStatus} />
+    <div className="relative flex-1 w-full flex flex-col bg-background">
+      {/* Subheader: back + breadcrumb + title + actions */}
+      <div className="flex-none border-b border-border bg-background">
+        <div className="max-w-[1320px] mx-auto w-full flex items-start gap-4 px-8 py-5">
+          <Button asChild variant="outline" size="sm" className="gap-1.5 mt-0.5">
+            <a href={`/cms/${post?.sys?.type}`}>
+              <ChevronLeft className="h-4 w-4" />
+              Back
+            </a>
+          </Button>
+          <div className="flex flex-col gap-1.5 min-w-0 flex-[0_1_auto]">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+              <span>Content</span>
+              <ChevronRight className="h-3 w-3" />
+              <span>{collectionLabel}</span>
+              {entryTitle && (
+                <>
+                  <ChevronRight className="h-3 w-3" />
+                  <span className="truncate">{entryTitle}</span>
+                </>
+              )}
+              <StatusBadge status={currentStatus} className="ml-1" />
+            </div>
+            <h1 className="text-[26px] font-semibold tracking-[-0.015em] leading-[1.2] text-foreground">
+              {entryTitle || collectionLabel}
+            </h1>
           </div>
-          <h1 className="text-xl font-semibold text-foreground">
-            {config.collections[post?.sys?.type as keyof typeof config.collections]?.label ?? post?.sys?.type}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          {currentStatus === 'archived' ? (
-            <>
-              <Button variant="outline" size="sm" onClick={handleRestore} disabled={isSaving}>
-                Restore
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
-                Delete permanently
-              </Button>
-            </>
-          ) : (
-            <Button variant="outline" size="sm" onClick={handleArchive} disabled={isSaving}>
-              Archive
-            </Button>
+          <div className="flex-1" />
+          {diffToggleVisible && (
+            <div
+              role="tablist"
+              aria-label="Edit or Diff view"
+              className="inline-flex mt-0.5 rounded-md border border-border bg-muted/40 p-0.5"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={viewMode === 'edit'}
+                onClick={() => setViewMode('edit')}
+                className={cn(
+                  'px-3 py-1 text-[13px] font-medium rounded transition-colors',
+                  viewMode === 'edit'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={viewMode === 'diff'}
+                onClick={() => setViewMode('diff')}
+                className={cn(
+                  'px-3 py-1 text-[13px] font-medium rounded transition-colors',
+                  viewMode === 'diff'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                Diff
+              </button>
+            </div>
           )}
+          <div className="flex items-center gap-2 mt-0.5">
+            {currentStatus === 'archived' ? (
+              <>
+                <Button variant="outline" size="sm" onClick={handleRestore} disabled={isSaving}>
+                  Restore
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
+                  Delete permanently
+                </Button>
+              </>
+            ) : (
+              <Button variant="outline" size="sm" onClick={handleArchive} disabled={isSaving}>
+                Archive
+              </Button>
+            )}
+          </div>
         </div>
       </div>
+
       <form
-        className="flex flex-1 min-h-0 overflow-hidden"
+        className="flex-1 min-h-0 overflow-y-auto"
         onSubmit={handleSubmit}
         onInput={(e) => {
           const t = e.target;
@@ -236,62 +331,81 @@ const EditPostInner = ({ post }: { post: any }) => {
           }
         }}
       >
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-[1000px] mx-auto">
-            <FormFields
-              selectedFile={selectedFile}
-              fields={post?.fields}
-              fieldErrors={fieldErrors}
-              onClearFieldError={clearFieldError}
-            />
-          </div>
-        </div>
-        <div className="w-80 flex-none border-l border-border bg-background flex flex-col overflow-hidden">
-          <div className="flex items-center px-4 py-3 border-b border-border flex-none">
-            <h2 className="text-sm font-medium text-foreground">Entry details</h2>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground w-14 flex-none text-xs">ID</span>
-                <span className="text-foreground text-xs truncate">{post?.sys?.id}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground w-14 flex-none text-xs">Type</span>
-                <span className="text-foreground text-xs">
-                  {config.collections[post?.sys?.type as keyof typeof config.collections]?.label ?? post?.sys?.type}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground w-14 flex-none text-xs">Status</span>
-                <StatusBadge status={currentStatus} />
-              </div>
+        <div className="max-w-[1320px] mx-auto w-full px-8 py-7 pb-32 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-8">
+          {/* Form / Diff column */}
+          {viewMode === 'diff' && selectedFile ? (
+            <div className="min-w-0">
+              <DiffView collectionType={selectedType as string} entryPath={selectedFile.path} />
             </div>
-            <div className="space-y-2">
-              <Button
-                type="submit"
-                variant="default"
-                size="sm"
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white"
-                disabled={isSaving || Object.keys(fieldErrors).length > 0}
-              >
-                {isSaving ? 'Saving...' : 'Save'}
-              </Button>
-              {(currentStatus === 'draft' || currentStatus === 'changed') && (
+          ) : (
+            <section className="rounded-lg border border-border bg-card overflow-hidden">
+              <header className="flex items-center gap-2.5 px-5 py-4 border-b border-border bg-muted/40">
+                <h2 className="text-[15px] font-semibold text-foreground">{collectionLabel}</h2>
+                <span className="text-[13px] text-muted-foreground">· {fieldCount} fields</span>
+              </header>
+              <div className="px-5 py-6">
+                <FormFields
+                  selectedFile={selectedFile}
+                  fields={post?.fields}
+                  fieldErrors={fieldErrors}
+                  onClearFieldError={clearFieldError}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* Sidebar column */}
+          <aside className="flex flex-col gap-4 lg:sticky lg:top-4 lg:self-start">
+            <Card>
+              <CardContent>
                 <Button
-                  type="button"
+                  type="submit"
                   variant="default"
                   size="sm"
-                  className="w-full bg-green-600 hover:bg-green-500 text-white"
-                  onClick={handlePublish}
-                  disabled={isSaving}
+                  className="w-full"
+                  disabled={isSaving || Object.keys(fieldErrors).length > 0}
                 >
-                  Publish
+                  {isSaving ? 'Saving...' : 'Save'}
                 </Button>
-              )}
-            </div>
+                {(currentStatus === 'draft' || currentStatus === 'changed') && (
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="sm"
+                    className="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white"
+                    onClick={handlePublish}
+                    disabled={isSaving}
+                  >
+                    Publish
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Entry details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-[64px_1fr] gap-y-2.5 gap-x-3 text-[13px]">
+                  <div className="text-muted-foreground">ID</div>
+                  <div className="text-foreground font-mono text-xs truncate" title={post?.sys?.id}>
+                    {post?.sys?.id}
+                  </div>
+                  <div className="text-muted-foreground">Type</div>
+                  <div className="text-foreground">{collectionLabel}</div>
+                  <div className="text-muted-foreground">Status</div>
+                  <div>
+                    <StatusBadge status={currentStatus} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {selectedFile && <HistorySection entryPath={selectedFile.path} />}
+
             {selectedFile && <LinkedBySection entryPath={selectedFile.path} />}
-          </div>
+          </aside>
         </div>
       </form>
 
