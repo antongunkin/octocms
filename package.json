@@ -1,6 +1,6 @@
 {
   "name": "octocms",
-  "version": "0.3.8",
+  "version": "0.4.0",
   "description": "A file-based CMS for Next.js — schema-driven, Git-backed, no database",
   "license": "MIT",
   "type": "module",
@@ -141,11 +141,21 @@
     "zod": ">=4"
   },
   "peerDependenciesMeta": {
-    "@anthropic-ai/sdk": { "optional": true },
-    "@huggingface/transformers": { "optional": true },
-    "mammoth": { "optional": true },
-    "openai": { "optional": true },
-    "pdfjs-dist": { "optional": true }
+    "@anthropic-ai/sdk": {
+      "optional": true
+    },
+    "@huggingface/transformers": {
+      "optional": true
+    },
+    "mammoth": {
+      "optional": true
+    },
+    "openai": {
+      "optional": true
+    },
+    "pdfjs-dist": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
