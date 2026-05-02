@@ -136,11 +136,51 @@ export const adminLayoutTemplate = `import '../../cms/__generated__/configInit';
 import 'octocms/globals.css';
 import '@mdxeditor/editor/style.css';
 
-export { AdminLayout as default, metadata } from 'octocms/admin/pages/AdminLayout';
+export { AdminLayout as default, metadata } from 'octocms/admin';
 `;
 
-export const adminPageTemplate = `export { AdminApp as default } from 'octocms/admin/AdminApp';
+/**
+ * Catch-all admin route — every \`/cms/*\` URL renders the package's
+ * \`AdminApp\` server component, which dispatches to the right page and wraps
+ * each branch in its own \`<Suspense fallback={<MatchingSkeleton/>}>\`.
+ * One file in the user app; the package owns the routing.
+ */
+export const adminPageTemplate = `export { AdminApp as default } from 'octocms/admin';
 `;
+
+/**
+ * Admin error boundary — rendered by Next.js when anything in the catch-all
+ * tree throws during render. Re-uses the shared \`AdminErrorView\` so GitHub
+ * config / auth / availability / rate-limit copy stays consistent with the
+ * public-page error boundary.
+ */
+export const adminErrorTemplate = `'use client';
+
+export { AdminError as default } from 'octocms/admin';
+`;
+
+/**
+ * Historical template values used by \`octocms update\` to recognise an
+ * unmodified install when migrating between routing models. Each entry is
+ * the literal file content shipped by a previous OctoCMS version. If a
+ * user-app file matches one of these byte-for-byte, \`update\` will replace
+ * it with the current template; otherwise it leaves it alone.
+ */
+export const LEGACY_ADMIN_LAYOUT_TEMPLATES: ReadonlyArray<string> = [
+  // 0.4.x — re-exported from the deep path.
+  `import '../../cms/__generated__/configInit';
+import 'octocms/globals.css';
+import '@mdxeditor/editor/style.css';
+
+export { AdminLayout as default, metadata } from 'octocms/admin/pages/AdminLayout';
+`,
+];
+
+export const LEGACY_ADMIN_CATCH_ALL_TEMPLATES: ReadonlyArray<string> = [
+  // 0.4.x — re-exported from the deep path.
+  `export { AdminApp as default } from 'octocms/admin/AdminApp';
+`,
+];
 
 export const nextAuthRouteTemplate = `import NextAuth from 'next-auth';
 import { authOptions } from 'octocms/admin/auth';

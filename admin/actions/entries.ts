@@ -9,12 +9,34 @@ import type { EntryListItem, EntryStatus } from '../../types';
 
 import { getContentFiles, getFile } from './files';
 import { isProductionMode } from '../github';
+import { getMediaEntries } from './media';
 import { getEntryTitleField } from './utils';
 
 export const getEntryList = async (collection: string = '**'): Promise<EntryListItem[]> => {
   const config = getConfig();
   const files = await getContentFiles(collection);
   const entries: EntryListItem[] = [];
+
+  // Build a media lookup so we can resolve thumbnail URLs for any entry that
+  // has an `image` field. One batched call regardless of entry count.
+  const mediaList = await getMediaEntries().catch(() => []);
+  const mediaById = new Map<string, { ext: string; publicUrl: string }>();
+  for (const m of mediaList) {
+    mediaById.set(m.id, { ext: m.extension, publicUrl: m.publicUrl });
+  }
+
+  const imageFieldKeyByType = new Map<string, string | null>();
+  function firstImageFieldKey(type: string): string | null {
+    if (imageFieldKeyByType.has(type)) return imageFieldKeyByType.get(type) ?? null;
+    const collection = (config as Config).collections[type as keyof Config['collections']];
+    if (!collection) {
+      imageFieldKeyByType.set(type, null);
+      return null;
+    }
+    const key = Object.keys(collection.fields).find((k) => collection.fields[k].format === 'image') ?? null;
+    imageFieldKeyByType.set(type, key);
+    return key;
+  }
 
   for (const file of files) {
     const nameWithoutFolder = file.replace(`${config.contentFolder}/`, '').replace('.json', '');
@@ -26,6 +48,7 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
     let title = id;
     let status: EntryStatus = 'merged';
     let updatedAt: string | undefined;
+    let thumbnailUrl: string | undefined;
 
     try {
       const content = await getFile(file);
@@ -39,8 +62,20 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
         if (typeof mediaTitle === 'string' && mediaTitle.trim() !== '') {
           title = mediaTitle.trim();
         }
-      } else if (titleField && content?.fields?.[titleField]) {
-        title = content.fields[titleField];
+        const ext = typeof content?.fields?.extension === 'string' ? content.fields.extension : '';
+        if (ext) thumbnailUrl = `/media/${id}.${ext}`;
+      } else {
+        if (titleField && content?.fields?.[titleField]) {
+          title = content.fields[titleField];
+        }
+        const imgKey = firstImageFieldKey(type);
+        if (imgKey) {
+          const value = content?.fields?.[imgKey];
+          if (typeof value === 'string' && value.trim()) {
+            const hit = mediaById.get(value.trim());
+            if (hit) thumbnailUrl = hit.publicUrl;
+          }
+        }
       }
       if (content?.sys?.status) {
         status = content.sys.status;
@@ -58,7 +93,7 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
       }
     }
 
-    entries.push({ type, id, path: file, title, status, updatedAt });
+    entries.push({ type, id, path: file, title, status, updatedAt, thumbnailUrl });
   }
 
   entries.sort((a, b) => a.title.localeCompare(b.title));

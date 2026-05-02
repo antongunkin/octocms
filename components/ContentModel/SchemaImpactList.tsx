@@ -89,8 +89,8 @@ function ImpactRow({ item, asLink }: { item: SchemaImpactItem; asLink: boolean }
     </span>
   );
 
-  // /cms/<type>/<id> matches the existing entry-editor route.
-  const href = `/cms/${item.type}/${item.id}`;
+  // /cms/content/<type>/<id> matches the existing entry-editor route.
+  const href = `/cms/content/${item.type}/${item.id}`;
 
   return (
     <li>

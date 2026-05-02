@@ -6,7 +6,7 @@ The auto-generated [`schema.md`](./schema.md) describes the *current* schema (co
 
 ## File location
 
-The schema lives in **`cms/schema.json`** at the repo root. It is plain JSON, hand-editable, and the visual Content Model editor at `/cms/content-model` writes to the same file. Both flows go through the same validator and the same codegen.
+The schema lives in **`cms/schema.json`** at the repo root. It is plain JSON, hand-editable, and the visual Content Model editor at `/cms/model` writes to the same file. Both flows go through the same validator and the same codegen.
 
 `cms/octocms.config.ts` is **not** the source of truth. It is a thin TypeScript binding that re-exports `cms/__generated__/schema.ts` (a literal-typed mirror of `cms/schema.json`). Do not edit `cms/octocms.config.ts` or anything in `cms/__generated__/` by hand — those files are regenerated from the JSON.
 
@@ -151,7 +151,7 @@ Workflow for hand-edits:
 6. Commit `cms/schema.json` plus every regenerated file in the same commit. Production CI enforces this — `npm run types:check`, `docs:check`, and `agent-docs:check` all fail if generated files drift.
 
 > [!IMPORTANT]
-> Always commit `cms/schema.json` together with the regenerated files in `cms/__generated__/`, `docs/generated/`, and `octocms/docs/`. CI will reject a commit where they have drifted. The visual editor (`/cms/content-model`) commits all of these atomically; hand-edits must run the regenerators yourself.
+> Always commit `cms/schema.json` together with the regenerated files in `cms/__generated__/`, `docs/generated/`, and `octocms/docs/`. CI will reject a commit where they have drifted. The visual editor (`/cms/model`) commits all of these atomically; hand-edits must run the regenerators yourself.
 
 ## Migrating existing content
 
@@ -167,7 +167,7 @@ Common scenarios:
 | Remove a field | Delete the key from every entry's `fields` object. For `markdown` / `richtext`, also delete the companion `.md` / `.mdx` file. |
 | Change a field's format | Coerce values per-entry. Some coercions are lossy (e.g. `select` → `string` keeps the value; `markdown` → `string` cannot recover companion file content). When in doubt, prefer the visual editor — it surfaces a preview of which entries lose data. |
 
-If the migration is non-trivial, it is usually safer to make the change through the visual editor at `/cms/content-model`, which runs `previewSchemaChange()` first and shows a per-entry impact list with data-loss flags before committing.
+If the migration is non-trivial, it is usually safer to make the change through the visual editor at `/cms/model`, which runs `previewSchemaChange()` first and shows a per-entry impact list with data-loss flags before committing.
 
 ## Branch / commit semantics
 
@@ -184,5 +184,5 @@ For the full per-format option set and current examples, see the auto-generated 
 - [`overview.md`](./overview.md) — How to manage **content entries** (auto-generated from the schema).
 - [`schema.md`](./schema.md) — Per-collection field definitions and example JSON for the **current** schema (auto-generated).
 - [`docs/content-model.md`](../../docs/content-model.md) — Developer-facing description of entry storage.
-- [`docs/content-model-editor.md`](../../docs/content-model-editor.md) — How to use the visual editor at `/cms/content-model`.
+- [`docs/content-model-editor.md`](../../docs/content-model-editor.md) — How to use the visual editor at `/cms/model`.
 - [`docs/schema-editor.md`](../../docs/schema-editor.md) — Programmatic schema editing API (`diffSchema`, `migrateEntry`, `previewSchemaChange`, `saveSchema`).

@@ -284,6 +284,13 @@ export type EntryListItem = {
   status: EntryStatus;
   /** ISO 8601 last-modified timestamp. Populated from fs.stat in dev mode; undefined in production. */
   updatedAt?: string;
+  /**
+   * Public URL for a small preview image, when one is available.
+   * - For media entries: their own `/media/<id>.<ext>`.
+   * - For other entries: the first `image`-format field resolved through the media library.
+   * Undefined when no image can be resolved.
+   */
+  thumbnailUrl?: string;
 };
 
 /** A single commit entry shown in the editor History panel. */

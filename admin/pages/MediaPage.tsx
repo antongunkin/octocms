@@ -1,19 +1,12 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { getServerSession } from 'next-auth';
 
 import MediaManager from '../../components/MediaManager/MediaManager';
+import { ErrorBoundary } from '../../components/ErrorBoundary';
 import { getMediaEntries } from '../actions';
 import { authOptions } from '../auth';
 
-export function MediaPage({ initialMediaId }: { initialMediaId?: string }) {
-  return (
-    <Suspense fallback={null}>
-      <MediaPageContent initialMediaId={initialMediaId} />
-    </Suspense>
-  );
-}
-
-async function MediaPageContent({ initialMediaId }: { initialMediaId?: string }) {
+export async function MediaPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -22,5 +15,9 @@ async function MediaPageContent({ initialMediaId }: { initialMediaId?: string })
 
   const files = await getMediaEntries();
 
-  return <MediaManager files={files} initialMediaId={initialMediaId} />;
+  return (
+    <ErrorBoundary label="media library">
+      <MediaManager files={files} />
+    </ErrorBoundary>
+  );
 }

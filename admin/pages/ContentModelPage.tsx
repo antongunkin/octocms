@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { getServerSession } from 'next-auth';
 
 import ContentModelList from '../../components/ContentModel/ContentModelList';
@@ -6,15 +6,7 @@ import { getEntryList } from '../actions';
 import { getSchema } from '../actions/schema';
 import { authOptions } from '../auth';
 
-export function ContentModelPage() {
-  return (
-    <Suspense fallback={null}>
-      <ContentModelPageContent />
-    </Suspense>
-  );
-}
-
-async function ContentModelPageContent() {
+export async function ContentModelPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {

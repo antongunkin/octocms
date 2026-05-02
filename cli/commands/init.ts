@@ -12,6 +12,7 @@ import readline from 'readline';
 
 import { log } from '../lib/logger';
 import {
+  adminErrorTemplate,
   adminLayoutTemplate,
   adminPageTemplate,
   agentChatRouteTemplate,
@@ -131,7 +132,8 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   log.blank();
   log.info('Creating files...');
 
-  // Admin route files
+  // Admin route files — three thin re-exports. The package owns dispatch +
+  // per-component Suspense + skeletons via the `octocms/admin` barrel.
   const cmsRouteDir = join(projectRoot, 'app', 'cms');
   mkdirSync(join(cmsRouteDir, '[[...path]]'), { recursive: true });
 
@@ -140,6 +142,9 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
 
   writeFileSync(join(cmsRouteDir, '[[...path]]', 'page.tsx'), adminPageTemplate, 'utf8');
   log.success('app/cms/[[...path]]/page.tsx');
+
+  writeFileSync(join(cmsRouteDir, 'error.tsx'), adminErrorTemplate, 'utf8');
+  log.success('app/cms/error.tsx');
 
   // Root layout — ensure configInit is imported so public page serverless functions
   // initialize the OctoCMS config on cold start (not just admin routes).

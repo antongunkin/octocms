@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import React, { Suspense, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
@@ -150,7 +151,7 @@ const EditPostInner = ({ post }: { post: any }) => {
       }
 
       onFileClick(undefined);
-      router.push(`/cms/${post?.sys?.type}`);
+      router.push(`/cms/content/${post?.sys?.type}`);
     }
   };
 
@@ -237,10 +238,10 @@ const EditPostInner = ({ post }: { post: any }) => {
       <div className="flex-none border-b border-border bg-background">
         <div className="max-w-[1320px] mx-auto w-full flex items-start gap-4 px-8 py-5">
           <Button asChild variant="outline" size="sm" className="gap-1.5 mt-0.5">
-            <a href={`/cms/${post?.sys?.type}`}>
+            <Link href={`/cms/content/${post?.sys?.type}`}>
               <ChevronLeft className="h-4 w-4" />
               Back
-            </a>
+            </Link>
           </Button>
           <div className="flex flex-col gap-1.5 min-w-0 flex-[0_1_auto]">
             <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">

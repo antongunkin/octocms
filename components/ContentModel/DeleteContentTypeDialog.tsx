@@ -77,7 +77,7 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
         variant: 'success',
       });
       onOpenChange(false);
-      router.push('/cms/content-model');
+      router.push('/cms/model');
       router.refresh();
     } else {
       toast({

@@ -48,6 +48,22 @@ const MINISEARCH_OPTIONS: Options<SearchDocument> = {
 
 // --- Public functions ---
 
+/**
+ * Build the admin entry-editor href for a search hit. The hit's `id` is the
+ * MiniSearch document id, encoded as `<type>/<filename-stem>` by
+ * `entryToDocument`. The admin route at `/cms/content/<type>/<filename-stem>`
+ * matches the per-segment route file at
+ * `src/app/cms/content/[type]/[id]/page.tsx`.
+ *
+ * Use this for click navigation in admin search surfaces (full-page,
+ * `CommandK` palette). For public-collection links, use `result.url`.
+ */
+export function entryAdminHref(result: { id: string }): string {
+  const [type, ...rest] = result.id.split('/');
+  const id = rest.join('/');
+  return `/cms/content/${type}/${id}`;
+}
+
 /** Return searchable field names for a collection based on format + searchable flag. */
 export function getSearchableFields(collectionName: string, config: Config): string[] {
   const col = config.collections[collectionName as keyof typeof config.collections];
@@ -239,13 +255,14 @@ function entryToDocument(
     }
   }
 
-  // Resolve URL for public search
+  // Resolve URL for public search. Admin search must include every entry, so
+  // a missing pattern field leaves `url` empty rather than dropping the entry.
+  // Public consumers filter on `url !== ''` to skip unresolvable entries.
   let url = '';
   if (publicCollections && type in publicCollections) {
     const urlConfig = publicCollections[type];
     const resolved = resolveUrlPattern(urlConfig.urlPattern, entry, id);
-    if (resolved === null) return null; // Missing field → exclude from public results
-    url = resolved;
+    if (resolved !== null) url = resolved;
   }
 
   const contentText = contentParts.join(' ');

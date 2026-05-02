@@ -1,15 +1,17 @@
 'use client';
 
 import { signIn, useSession } from 'next-auth/react';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { LogIn } from 'lucide-react';
 
 import { useConfig } from '../../hooks/useConfig';
 import { useTheme } from '../../admin/ThemeProvider';
 import { cn } from '../../lib/utils';
-import Header from '../../components/Header/Header';
 import Loading from '../Loading';
 import { Button } from '../ui/button';
+import { TopHeader } from './TopHeader';
+import { CommandK, useCommandK } from '../CommandK/CommandK';
+import { AdminGenericSkeleton } from '../skeletons/AdminGenericSkeleton';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -20,6 +22,7 @@ const Layout = ({ children }: LayoutProps) => {
   const { data: session, status } = useSession();
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { resolvedTheme } = useTheme();
+  const { open: cmdkOpen, setOpen: setCmdkOpen } = useCommandK();
 
   useEffect(() => {
     if (status !== 'loading') {
@@ -50,8 +53,16 @@ const Layout = ({ children }: LayoutProps) => {
         </div>
       ) : (
         <>
-          <Header title={`${config.projectName} CMS`} />
-          <main className="relative z-0 flex-1 flex">{children}</main>
+          <TopHeader onCommandK={() => setCmdkOpen(true)} />
+          <main className="relative z-0 flex-1 flex min-h-0">
+            {/* Inner Suspense so re-suspensions of the catch-all page (on
+                navigation between sub-routes) don't blank the chrome. The
+                generic skeleton fills the main slot until the per-branch
+                Suspense inside `AdminApp` takes over with the right per-page
+                skeleton. */}
+            <Suspense fallback={<AdminGenericSkeleton />}>{children}</Suspense>
+          </main>
+          <CommandK open={cmdkOpen} onOpenChange={setCmdkOpen} />
         </>
       )}
     </div>

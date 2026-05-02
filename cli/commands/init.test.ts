@@ -40,10 +40,29 @@ describe('initCommand', () => {
     expect(existsSync(join(TMP_DIR, 'cms', 'octocms.config.ts'))).toBe(true);
   });
 
-  it('creates admin route files', async () => {
+  it('creates the 3-file admin route surface (layout + catch-all page + error)', async () => {
     await initCommand(TMP_DIR, { yes: true });
     expect(existsSync(join(TMP_DIR, 'app', 'cms', 'layout.tsx'))).toBe(true);
     expect(existsSync(join(TMP_DIR, 'app', 'cms', '[[...path]]', 'page.tsx'))).toBe(true);
+    expect(existsSync(join(TMP_DIR, 'app', 'cms', 'error.tsx'))).toBe(true);
+    // No per-segment route files should be scaffolded.
+    expect(existsSync(join(TMP_DIR, 'app', 'cms', 'page.tsx'))).toBe(false);
+    expect(existsSync(join(TMP_DIR, 'app', 'cms', 'loading.tsx'))).toBe(false);
+    expect(existsSync(join(TMP_DIR, 'app', 'cms', 'content'))).toBe(false);
+    expect(existsSync(join(TMP_DIR, 'app', 'cms', 'media'))).toBe(false);
+    expect(existsSync(join(TMP_DIR, 'app', 'cms', 'model'))).toBe(false);
+    expect(existsSync(join(TMP_DIR, 'app', 'cms', 'chat'))).toBe(false);
+  });
+
+  it('admin route files re-export from the octocms/admin barrel', async () => {
+    await initCommand(TMP_DIR, { yes: true });
+    const layout = readFileSync(join(TMP_DIR, 'app', 'cms', 'layout.tsx'), 'utf8');
+    const page = readFileSync(join(TMP_DIR, 'app', 'cms', '[[...path]]', 'page.tsx'), 'utf8');
+    const error = readFileSync(join(TMP_DIR, 'app', 'cms', 'error.tsx'), 'utf8');
+    expect(layout).toContain("from 'octocms/admin'");
+    expect(page).toContain("from 'octocms/admin'");
+    expect(error).toContain("from 'octocms/admin'");
+    expect(error).toContain("'use client'");
   });
 
   it('creates hello page demo route', async () => {

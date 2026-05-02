@@ -4,7 +4,7 @@
  * `searchContent(query, options)` runs cosine similarity over the committed
  * embeddings store and returns ranked content hits. The agent calls this from
  * its `searchContent` tool; the same function is also handy for one-off
- * scripts and a future "semantic" tab on the SearchPage.
+ * scripts or other admin UI that needs retrieval.
  *
  * Reads only — never mutates content. Loads the same on-disk store the
  * embedding pipeline writes (`cms/__generated__/embeddings.json`), so search

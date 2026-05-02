@@ -69,7 +69,25 @@ export { Toaster } from './toaster';
 export { Toaster as SonnerToaster } from './sonner';
 
 export { Input } from './input';
+export type { InputProps } from './input';
+export { Textarea } from './textarea';
+export type { TextareaProps } from './textarea';
 
 export { Card, CardHeader, CardTitle, CardContent } from './card';
 
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './table';
+
+// ─── Redesign v2 primitives ────────────────────────────────────────────
+export { Kbd } from './kbd';
+export { Chip } from './chip';
+export { StatusBadge, STATUSES } from './status-badge';
+export { AvatarStack } from './avatar-stack';
+export { BranchChip } from './branch-chip';
+export { PublishButton } from './publish-button';
+export { Field } from './field';
+export { Banner } from './banner';
+export { Empty } from './empty';
+export { ToastCard } from './toast-card';
+export type { ToastCardTone } from './toast-card';
+export { TabsPill } from './tabs-pill';
+export type { TabsPillItem } from './tabs-pill';

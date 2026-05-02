@@ -4,6 +4,7 @@ import type { Config } from '../admin/types';
 
 import {
   buildSearchIndex,
+  entryAdminHref,
   getSearchableFields,
   querySearchIndex,
   resolveUrlPattern,
@@ -155,6 +156,33 @@ describe('stripMarkup', () => {
   });
 });
 
+describe('entryAdminHref', () => {
+  it('builds the admin editor path from a result id', () => {
+    expect(entryAdminHref({ id: 'post/post-p1' })).toBe('/cms/content/post/post-p1');
+  });
+
+  it('handles singleton collections (id is filename stem with no prefix)', () => {
+    expect(entryAdminHref({ id: 'homePage/0000' })).toBe('/cms/content/homePage/0000');
+  });
+
+  it('preserves multi-segment filename stems when ids contain extra slashes', () => {
+    // Defensive: should an indexer ever emit nested ids, the rest joins back with "/".
+    expect(entryAdminHref({ id: 'post/nested/path-id' })).toBe('/cms/content/post/nested/path-id');
+  });
+
+  it('keeps the editor target distinct from the public URL', () => {
+    // entryAdminHref must not depend on result.url — public URL like
+    // "/blog/typescript-guide" should never become the click target.
+    const result = { id: 'post/post-abc', url: '/blog/typescript-guide' };
+    expect(entryAdminHref(result)).toBe('/cms/content/post/post-abc');
+    expect(entryAdminHref(result)).not.toBe(result.url);
+  });
+
+  it('handles ids with hyphens and dots in the filename stem', () => {
+    expect(entryAdminHref({ id: 'author/author-jane.doe-42' })).toBe('/cms/content/author/author-jane.doe-42');
+  });
+});
+
 describe('resolveUrlPattern', () => {
   const entry = makeEntry('post', 'p1', { slug: 'hello-world', title: 'Hello' });
 
@@ -230,7 +258,6 @@ describe('buildSearchIndex + querySearchIndex', () => {
     const index = buildSearchIndex(entries, testConfig);
     const results = querySearchIndex(index, 'Widget');
     expect(results.length).toBe(2);
-    // Both items have "Widget" in the title
     expect(results.every((r) => r.type === 'item')).toBe(true);
   });
 
@@ -270,20 +297,7 @@ describe('buildSearchIndex + querySearchIndex', () => {
     const index = buildSearchIndex(entries, testConfig);
     const results = querySearchIndex(index, 'TypeScript');
     expect(results[0].id).toBe('post/post-p1');
-    // URL is stored in the index — we can check by re-loading
-    const miniResults = querySearchIndex(index, 'TypeScript');
-    expect(miniResults.length).toBeGreaterThan(0);
-  });
-
-  it('excludes entries with unresolvable URL patterns from public index', () => {
-    const noSlugEntry = makeEntry('post', 'p-no-slug', { title: 'No Slug Post' }, {});
-    const publicOnlyConfig: Config = {
-      ...testConfig,
-      search: { publicCollections: { post: { urlPattern: '/blog/:slug' } } },
-    };
-    const index = buildSearchIndex([noSlugEntry], publicOnlyConfig, ['post']);
-    const results = querySearchIndex(index, 'No Slug');
-    expect(results.length).toBe(0);
+    expect(results[0].url).toBe('/blog/typescript-guide');
   });
 
   it('searches string list fields (tags)', () => {
@@ -304,9 +318,58 @@ describe('buildSearchIndex + querySearchIndex', () => {
     const index = buildSearchIndex(entries, testConfig);
     const results = querySearchIndex(index, 'TypeScript');
     expect(results.length).toBeGreaterThan(0);
-    // All results should have a snippet field
     results.forEach((result) => {
       expect(typeof result.snippet).toBe('string');
     });
+  });
+
+  // --- New regression / sanity tests ---
+
+  it('indexes entries even when public urlPattern field is missing (admin search)', () => {
+    // Regression: previously returned null and excluded the entry from the
+    // entire index, breaking admin search for entries that lacked the field
+    // referenced by their public URL pattern.
+    const noSlugEntry = makeEntry('post', 'p-no-slug', { title: 'No Slug Post' }, {});
+    const publicOnlyConfig: Config = {
+      ...testConfig,
+      search: { publicCollections: { post: { urlPattern: '/blog/:slug' } } },
+    };
+    const index = buildSearchIndex([noSlugEntry], publicOnlyConfig);
+    const results = querySearchIndex(index, 'No Slug');
+    expect(results.length).toBe(1);
+    expect(results[0].id).toBe('post/post-p-no-slug');
+    // URL must be empty so the public route handler can filter it out.
+    expect(results[0].url).toBe('');
+  });
+
+  it('querySearchIndex returns empty array for whitespace-only queries', () => {
+    const index = buildSearchIndex(entries, testConfig);
+    expect(querySearchIndex(index, '\t\n')).toEqual([]);
+  });
+
+  it('search hits link to the admin editor, not the public URL', () => {
+    // Verifies the click target the UI builds via entryAdminHref(). A public
+    // URL like "/blog/typescript-guide" must never become the navigation target;
+    // the editor lives at /cms/content/<type>/<filename-stem>.
+    const index = buildSearchIndex(entries, testConfig);
+    const results = querySearchIndex(index, 'TypeScript');
+    expect(results.length).toBeGreaterThan(0);
+    expect(entryAdminHref(results[0])).toBe('/cms/content/post/post-p1');
+    // The public URL is still informational on the result, but distinct from the editor href.
+    expect(results[0].url).toBe('/blog/typescript-guide');
+  });
+
+  it('title boost surfaces title matches above body matches', () => {
+    const titled = makeEntry('post', 'p-title', { title: 'unique-keyword guide' }, { body: 'Body without it.' });
+    const bodied = makeEntry(
+      'post',
+      'p-body',
+      { title: 'Some Other Post', slug: 'other' },
+      { body: 'This body mentions unique-keyword many times.' },
+    );
+    const index = buildSearchIndex([titled, bodied], testConfig);
+    const results = querySearchIndex(index, 'unique-keyword');
+    expect(results.length).toBe(2);
+    expect(results[0].id).toBe('post/post-p-title');
   });
 });

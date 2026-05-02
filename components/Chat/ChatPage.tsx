@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Bot, CheckCheck, RefreshCw, StopCircle } from 'lucide-react';
 
 import { Button } from '../ui/button';
+import { ErrorBoundary } from '../ErrorBoundary';
 
 import { Composer } from './Composer';
 import { Message } from './Message';
@@ -117,13 +118,14 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
             </div>
           )}
           {entries.map((e) => (
-            <Message
-              key={e.id}
-              entry={e}
-              proposals={proposals}
-              onAcceptProposal={acceptProposal}
-              onRejectProposal={rejectProposal}
-            />
+            <ErrorBoundary key={e.id} label="message" resetKeys={[e.id]}>
+              <Message
+                entry={e}
+                proposals={proposals}
+                onAcceptProposal={acceptProposal}
+                onRejectProposal={rejectProposal}
+              />
+            </ErrorBoundary>
           ))}
 
           {pendingForLatest.length >= 2 && status !== 'streaming' && (
@@ -188,12 +190,14 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
 
       {/* Composer — disabled while streaming or after budget hit, but enabled
           after a Stop click so the user can immediately follow up. */}
-      <Composer
-        disabled={status === 'streaming' || status === 'budget_exceeded'}
-        maxAttachmentBytes={attachmentLimits.maxAttachmentBytes}
-        maxAttachmentsPerTurn={attachmentLimits.maxAttachmentsPerTurn}
-        onSubmit={send}
-      />
+      <ErrorBoundary label="composer">
+        <Composer
+          disabled={status === 'streaming' || status === 'budget_exceeded'}
+          maxAttachmentBytes={attachmentLimits.maxAttachmentBytes}
+          maxAttachmentsPerTurn={attachmentLimits.maxAttachmentsPerTurn}
+          onSubmit={send}
+        />
+      </ErrorBoundary>
     </div>
   );
 }

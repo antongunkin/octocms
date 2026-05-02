@@ -6,6 +6,7 @@ import type { Config } from '../admin/types';
 import { useConfig } from '../hooks/useConfig';
 import { jsonFieldValueToFormString } from '../lib/jsonField';
 
+import { ErrorBoundary } from './ErrorBoundary';
 import FormBooleanField from './FormBooleanField';
 import FormColorField from './FormColorField';
 import FormConditionalField from './FormConditionalField';
@@ -176,16 +177,17 @@ const FormFields = ({ selectedFile, fields, fieldErrors, onClearFieldError }: Fo
             );
           case 'reference':
             return (
-              <FormReferenceField
-                key={key}
-                label={label}
-                name={key}
-                value={formTextValue}
-                collection={def.collection}
-                reference={def.reference}
-                {...common}
-                onClearError={onClearFieldError}
-              />
+              <ErrorBoundary key={key} label="reference field" resetKeys={[key]}>
+                <FormReferenceField
+                  label={label}
+                  name={key}
+                  value={formTextValue}
+                  collection={def.collection}
+                  reference={def.reference}
+                  {...common}
+                  onClearError={onClearFieldError}
+                />
+              </ErrorBoundary>
             );
           case 'json':
             return (

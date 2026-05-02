@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ChevronDown,
@@ -8,59 +8,115 @@ import {
   ChevronRight,
   FileText,
   GitBranch,
-  MoreHorizontal,
+  Image as ImageIcon,
+  LayoutList,
   Plus,
   Search,
-  Settings,
 } from 'lucide-react';
 
 import { newFile } from '../../admin/actions';
 import { useConfig } from '../../hooks/useConfig';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { StatusBadge } from '../StatusBadge';
+import { LeftNavItem } from '../Layout/LeftNavItem';
 import { toast } from '../../hooks/useToast';
+import { entryEditUrl } from '../../lib/entryEditUrl';
 import { cn } from '../../lib/utils';
-import { relativeTime } from '../../lib/relativeTime';
 import type { EntryListItem, EntryStatus } from '../../types';
+import { formatUpdatedAt } from '../../utils/formatUpdatedAt';
 
 const PAGE_SIZE = 20;
-
 const ALL_STATUSES: EntryStatus[] = ['draft', 'changed', 'published', 'merged', 'archived'];
 
 type Props = {
   entries: EntryListItem[];
   collections: string[];
   hasBranch: boolean;
+  activeBranch: string;
+  selectedType?: string;
 };
 
-export default function DashboardContent({ entries, collections, hasBranch }: Props) {
+export default function DashboardContent({ entries, collections, hasBranch, activeBranch, selectedType }: Props) {
   const config = useConfig();
   const searchParams = useSearchParams();
-  const isBranched = searchParams.get('tab') === 'branched';
+  const isBranched = !selectedType && searchParams.get('tab') === 'branched';
+  const selectedTypeLabel = selectedType
+    ? (config.collections[selectedType as keyof typeof config.collections]?.label ?? selectedType)
+    : null;
 
   const hasManyCollections = collections.filter(
     (c) => config.collections[c as keyof typeof config.collections]?.hasMany,
   );
+  const addCollections = selectedType ? hasManyCollections.filter((c) => c === selectedType) : hasManyCollections;
 
+  const visibleEntries = useMemo(
+    () => (selectedType ? entries.filter((entry) => entry.type === selectedType) : entries),
+    [entries, selectedType],
+  );
   const branchedEntries = useMemo(() => entries.filter((e) => e.status !== 'merged'), [entries]);
 
+  const countByType = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const e of entries) {
+      counts[e.type] = (counts[e.type] ?? 0) + 1;
+    }
+    return counts;
+  }, [entries]);
+
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-muted/20">
+    <div className="flex flex-1 flex-col overflow-hidden">
       {/* Page header */}
-      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-4">
-        <h1 className="text-xl font-semibold text-foreground">{isBranched ? 'Branched content' : 'All content'}</h1>
-        <AddEntryButton collections={hasManyCollections} />
+      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
+        <div className="min-w-0 flex-1">
+          <div className="mb-px flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
+            <span style={{ color: 'var(--text-2)' }}>Content</span>
+          </div>
+          <div>
+            <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
+              {selectedTypeLabel ?? 'Content'}
+            </h1>
+          </div>
+        </div>
+        <div className="flex flex-none items-center gap-2">
+          <span className="text-[13px] font-medium text-[var(--text-2)]">
+            {selectedTypeLabel ? selectedTypeLabel : isBranched ? 'Branched content' : 'All content'}
+            <span className="ml-1.5 font-mono text-[12px] font-normal text-[var(--muted)]">
+              {isBranched ? branchedEntries.length : visibleEntries.length}
+            </span>
+          </span>
+          <AddEntryButton collections={addCollections} />
+        </div>
       </div>
 
-      {isBranched ? (
-        <BranchedView entries={branchedEntries} collections={collections} hasBranch={hasBranch} />
-      ) : (
-        <ContentTable entries={entries} collections={collections} />
-      )}
+      {/* Body: left nav + right content */}
+      <div className="flex flex-1 overflow-hidden">
+        <LeftPanel
+          entries={entries}
+          branchedCount={branchedEntries.length}
+          countByType={countByType}
+          collections={collections}
+          isBranched={isBranched}
+          selectedType={selectedType}
+        />
+
+        {isBranched ? (
+          <BranchedView
+            entries={branchedEntries}
+            collections={collections}
+            hasBranch={hasBranch}
+            activeBranch={activeBranch}
+          />
+        ) : (
+          <ContentTable
+            entries={visibleEntries}
+            collections={collections}
+            activeBranch={activeBranch}
+            lockedType={selectedType}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -83,7 +139,7 @@ function AddEntryButton({ collections }: { collections: string[] }) {
         return;
       }
       const parts = result.path.replace(`${config.contentFolder}/`, '').replace('.json', '').split('/');
-      router.push(`/cms/${parts[0]}/${parts[parts.length - 1]}`);
+      router.push(`/cms/content/${parts[0]}/${parts[parts.length - 1]}`);
     } finally {
       setCreating(false);
     }
@@ -94,10 +150,10 @@ function AddEntryButton({ collections }: { collections: string[] }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="sm" className="gap-1.5 bg-blue-600 text-white hover:bg-blue-700" disabled={creating}>
+        <Button size="sm" className="gap-1.5 bg-foreground text-background hover:bg-foreground/90" disabled={creating}>
           <Plus className="h-4 w-4" />
-          Add entry
-          <ChevronDown className="h-3 w-3" />
+          Add content
+          <ChevronDown className="h-3 w-3 opacity-70" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -113,21 +169,115 @@ function AddEntryButton({ collections }: { collections: string[] }) {
 }
 
 // ---------------------------------------------------------------------------
+// Left navigation panel
+// ---------------------------------------------------------------------------
+
+function LeftPanel({
+  entries,
+  branchedCount,
+  countByType,
+  collections,
+  isBranched,
+  selectedType,
+}: {
+  entries: EntryListItem[];
+  branchedCount: number;
+  countByType: Record<string, number>;
+  collections: string[];
+  isBranched: boolean;
+  selectedType?: string;
+}) {
+  const config = useConfig();
+
+  return (
+    <aside className="flex w-[248px] shrink-0 flex-col overflow-y-auto border-r border-border bg-[var(--surface-2)]">
+      <nav className="space-y-0.5 px-3 py-4">
+        <LeftNavItem
+          href="/cms/content"
+          icon={<LayoutList className="h-4 w-4" />}
+          label="All content"
+          count={entries.length}
+          active={!isBranched && !selectedType}
+        />
+        <LeftNavItem
+          href="/cms/content?tab=branched"
+          icon={<GitBranch className="h-4 w-4" />}
+          label="Branched content"
+          count={branchedCount}
+          active={isBranched}
+        />
+      </nav>
+
+      {collections.length > 0 && (
+        <div className="px-3 pb-4 pt-1">
+          <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+            Collections
+          </p>
+          <nav className="space-y-0.5">
+            {collections.map((c) => {
+              const label = config.collections[c as keyof typeof config.collections]?.label ?? c;
+              return (
+                <LeftNavItem
+                  key={c}
+                  href={`/cms/content/${c}`}
+                  icon={<FileText className="h-4 w-4" />}
+                  label={label}
+                  count={countByType[c] ?? 0}
+                  active={selectedType === c}
+                />
+              );
+            })}
+          </nav>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+
+// ---------------------------------------------------------------------------
 // All content table
 // ---------------------------------------------------------------------------
 
-function ContentTable({ entries, collections }: { entries: EntryListItem[]; collections: string[] }) {
+function ContentTable({
+  entries,
+  collections,
+  activeBranch,
+  lockedType,
+}: {
+  entries: EntryListItem[];
+  collections: string[];
+  activeBranch: string;
+  lockedType?: string;
+}) {
   const config = useConfig();
   const router = useRouter();
+  const searchRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState('any');
+  const [typeFilter, setTypeFilter] = useState(lockedType ?? 'any');
   const [statusFilter, setStatusFilter] = useState('any');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [page, setPage] = useState(0);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   const filtered = useMemo(() => {
     let result = entries;
-    if (typeFilter !== 'any') result = result.filter((e) => e.type === typeFilter);
+    if (lockedType) {
+      result = result.filter((e) => e.type === lockedType);
+    } else if (typeFilter !== 'any') {
+      result = result.filter((e) => e.type === typeFilter);
+    }
     if (statusFilter !== 'any') result = result.filter((e) => e.status === statusFilter);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -141,10 +291,14 @@ function ContentTable({ entries, collections }: { entries: EntryListItem[]; coll
       return sortOrder === 'newest' ? diff : -diff;
     });
     return result;
-  }, [entries, typeFilter, statusFilter, search, sortOrder]);
+  }, [entries, lockedType, typeFilter, statusFilter, search, sortOrder]);
 
-  const prevFiltersRef = React.useRef({ search, typeFilter, statusFilter, sortOrder });
-  React.useEffect(() => {
+  useEffect(() => {
+    if (lockedType) setTypeFilter(lockedType);
+  }, [lockedType]);
+
+  const prevFiltersRef = useRef({ search, typeFilter, statusFilter, sortOrder });
+  useEffect(() => {
     const prev = prevFiltersRef.current;
     if (
       prev.search !== search ||
@@ -157,129 +311,145 @@ function ContentTable({ entries, collections }: { entries: EntryListItem[]; coll
     }
   }, [search, typeFilter, statusFilter, sortOrder]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageItems = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const startIdx = page * PAGE_SIZE + 1;
+  const endIdx = Math.min((page + 1) * PAGE_SIZE, filtered.length);
+  const baseBranch = config.git.baseBranch;
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden p-6">
-      {/* Filter bar */}
-      <div className="mb-4 flex items-center gap-3">
-        <div className="relative max-w-sm flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Filter entries…"
-            className="pl-9"
-          />
-        </div>
-        <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Content type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="any">Any type</SelectItem>
-            {collections.map((c) => (
-              <SelectItem key={c} value={c}>
-                {config.collections[c as keyof typeof config.collections]?.label ?? c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-36">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="any">Any status</SelectItem>
-            {ALL_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s.charAt(0).toUpperCase() + s.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="ml-auto">
-          <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as 'newest' | 'oldest')}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest first</SelectItem>
-              <SelectItem value="oldest">Oldest first</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="flex-1 overflow-auto rounded-lg border border-border bg-background">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="font-medium text-muted-foreground">Name</TableHead>
-              <TableHead className="font-medium text-muted-foreground">Content Type</TableHead>
-              <TableHead className="font-medium text-muted-foreground">Updated</TableHead>
-              <TableHead className="font-medium text-muted-foreground">Author</TableHead>
-              <TableHead className="font-medium text-muted-foreground">Status</TableHead>
-              <TableHead className="w-10">
-                <Button variant="ghost" size="icon" className="h-7 w-7" disabled>
-                  <Settings className="h-4 w-4 text-muted-foreground" />
-                </Button>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pageItems.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-sm text-muted-foreground">
-                  No entries found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              pageItems.map((entry) => (
-                <EntryRow
-                  key={entry.path}
-                  entry={entry}
-                  onClick={() => router.push(`/cms/${entry.type}/${entry.id}`)}
-                />
-              ))
+    <div className="flex flex-1 flex-col overflow-hidden bg-[var(--bg)]">
+      <div className="scroll flex-1 overflow-auto px-6 pb-12 pt-5">
+        <div className="flex flex-col gap-4">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="relative min-w-[220px] flex-[0_1_420px]">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                ref={searchRef}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Filter entries…"
+                className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+              />
+              <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-border bg-[var(--surface-2)] px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                /
+              </kbd>
+            </div>
+            {!lockedType && (
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="h-9 w-[130px] shrink-0 rounded-full border-border text-sm font-normal">
+                  <SelectValue placeholder="Any type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Any type</SelectItem>
+                  {collections.map((collection) => (
+                    <SelectItem key={collection} value={collection}>
+                      {config.collections[collection as keyof typeof config.collections]?.label ?? collection}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
-          </TableBody>
-        </Table>
-      </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-9 w-[130px] shrink-0 rounded-full border-border text-sm font-normal">
+                <SelectValue placeholder="Any status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">Any status</SelectItem>
+                {ALL_STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s.charAt(0).toUpperCase() + s.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="ml-auto shrink-0">
+              <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as 'newest' | 'oldest')}>
+                <SelectTrigger className="h-9 w-[138px] rounded-full border-border text-sm font-normal">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest first</SelectItem>
+                  <SelectItem value="oldest">Oldest first</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-      {/* Pagination */}
-      <div className="mt-4 flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">
-          {filtered.length} {filtered.length === 1 ? 'entry' : 'entries'}
-        </span>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1"
-            onClick={() => setPage((p) => p - 1)}
-            disabled={page === 0}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
-          {totalPages > 1 && (
-            <span className="px-3 text-sm text-muted-foreground">
-              {page + 1} / {totalPages}
-            </span>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1"
-            onClick={() => setPage((p) => p + 1)}
-            disabled={page >= totalPages - 1}
-          >
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <div className="overflow-hidden rounded-xl border border-border bg-[var(--surface-1)] shadow-[var(--shadow-1)]">
+            <div className="overflow-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-[var(--surface-2)]">
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      Title
+                    </th>
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      Type
+                    </th>
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      Status
+                    </th>
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      Branch
+                    </th>
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      Updated
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pageItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="h-32 text-center text-sm text-muted-foreground">
+                        No entries found.
+                      </td>
+                    </tr>
+                  ) : (
+                    pageItems.map((entry) => (
+                      <EntryRow
+                        key={entry.path}
+                        entry={entry}
+                        activeBranch={activeBranch}
+                        baseBranch={baseBranch}
+                        onClick={() => router.push(entryEditUrl(entry))}
+                      />
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-border px-4 py-3">
+              <span className="text-sm text-muted-foreground">
+                {filtered.length === 0
+                  ? 'No entries'
+                  : `Showing ${startIdx}-${endIdx} of ${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'}`}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1 rounded-full px-3"
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={page === 0}
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                  Prev
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1 rounded-full px-3"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page >= totalPages - 1}
+                >
+                  Next
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -294,10 +464,12 @@ function BranchedView({
   entries,
   collections,
   hasBranch,
+  activeBranch,
 }: {
   entries: EntryListItem[];
   collections: string[];
   hasBranch: boolean;
+  activeBranch: string;
 }) {
   if (!hasBranch) {
     return (
@@ -329,31 +501,61 @@ function BranchedView({
     );
   }
 
-  return <ContentTable entries={entries} collections={collections} />;
+  return <ContentTable entries={entries} collections={collections} activeBranch={activeBranch} />;
 }
 
 // ---------------------------------------------------------------------------
-// Shared entry row
+// Entry row
 // ---------------------------------------------------------------------------
 
-function EntryRow({ entry, onClick }: { entry: EntryListItem; onClick: () => void }) {
+function EntryRow({
+  entry,
+  activeBranch,
+  baseBranch,
+  onClick,
+}: {
+  entry: EntryListItem;
+  activeBranch: string;
+  baseBranch: string;
+  onClick: () => void;
+}) {
   const config = useConfig();
+  const branchLabel = entry.status === 'merged' ? baseBranch : activeBranch || '—';
+
   return (
-    <TableRow className={cn('cursor-pointer', entry.status === 'archived' && 'opacity-60')} onClick={onClick}>
-      <TableCell className="font-medium">{entry.title}</TableCell>
-      <TableCell className="text-muted-foreground">
+    <tr
+      className={cn(
+        'cursor-pointer border-b border-border transition-colors hover:bg-[var(--surface-2)]',
+        entry.status === 'archived' && 'opacity-60',
+      )}
+      onClick={onClick}
+    >
+      <td className="px-4 py-3 text-sm font-medium text-foreground">
+        <span className="inline-flex items-center gap-2.5">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-[var(--surface-2)] text-muted-foreground">
+            {entry.thumbnailUrl ? (
+              <img src={entry.thumbnailUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+            ) : (
+              <ImageIcon className="h-3.5 w-3.5 opacity-60" />
+            )}
+          </span>
+          <span className="truncate">{entry.title}</span>
+        </span>
+      </td>
+      <td className="px-4 py-3 text-sm text-muted-foreground">
         {config.collections[entry.type as keyof typeof config.collections]?.label ?? entry.type}
-      </TableCell>
-      <TableCell className="text-muted-foreground">{entry.updatedAt ? relativeTime(entry.updatedAt) : '—'}</TableCell>
-      <TableCell className="text-muted-foreground">—</TableCell>
-      <TableCell>
+      </td>
+      <td className="px-4 py-3">
         <StatusBadge status={entry.status} />
-      </TableCell>
-      <TableCell>
-        <Button variant="ghost" size="icon" className="h-7 w-7" disabled onClick={(e) => e.stopPropagation()}>
-          <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-        </Button>
-      </TableCell>
-    </TableRow>
+      </td>
+      <td className="px-4 py-3">
+        <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+          <GitBranch className="h-3.5 w-3.5 shrink-0" />
+          <span className="font-mono text-xs">{branchLabel}</span>
+        </span>
+      </td>
+      <td className="px-4 py-3 text-sm text-muted-foreground">{formatUpdatedAt(entry.updatedAt)}</td>
+    </tr>
   );
 }
+

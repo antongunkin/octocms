@@ -61,6 +61,11 @@
       "require": "./dist/lib/configStore.cjs",
       "import": "./dist/lib/configStore.js"
     },
+    "./admin": {
+      "types": "./dist/admin/index.d.ts",
+      "require": "./dist/admin/index.cjs",
+      "import": "./dist/admin/index.js"
+    },
     "./admin/*": {
       "types": "./dist/admin/*.d.ts",
       "import": "./dist/admin/*.js"

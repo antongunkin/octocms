@@ -121,7 +121,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
       });
       onOpenChange(false);
       if (keyChanged) {
-        router.push(`/cms/content-model/${trimmedKey}`);
+        router.push(`/cms/model/${trimmedKey}`);
       }
       router.refresh();
     } else {

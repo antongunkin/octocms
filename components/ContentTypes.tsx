@@ -60,7 +60,7 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
       const parts = path.replace(`${config.contentFolder}/`, '').replace('.json', '').split('/');
       const file = { type: parts[0], id: parts[parts.length - 1], path };
       onFileClick(file);
-      router.push(`/cms/${file.type}/${file.id}`);
+      router.push(`/cms/content/${file.type}/${file.id}`);
     } finally {
       setCreating(false);
     }
@@ -127,7 +127,7 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
                     className={cn('cursor-pointer', entry.status === 'archived' && 'opacity-60')}
                     onClick={() => {
                       onFileClick(entry);
-                      router.push(`/cms/${entry.type}/${entry.id}`);
+                      router.push(`/cms/content/${entry.type}/${entry.id}`);
                     }}
                   >
                     <TableCell className="font-medium">{entry.title}</TableCell>

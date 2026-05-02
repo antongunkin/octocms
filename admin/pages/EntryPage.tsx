@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
-import React, { Suspense } from 'react';
+import React from 'react';
 
 import EditPost from '../../components/EditPost/EditPost';
 import { FileContextProvider } from '../../hooks/useFileState';
@@ -8,38 +8,38 @@ import { parseFileName } from '../../utils/parseFileName';
 import { getContentFiles, getFile } from '../actions';
 import { authOptions } from '../auth';
 
-export function EntryPage({ params }: { params: Promise<{ type: string; id: string }> }) {
-  return (
-    <Suspense fallback={null}>
-      <EntryPageContent params={params} />
-    </Suspense>
-  );
-}
+export async function EntryPage({ params }: { params: Promise<{ type: string; id: string }> }) {
+  const { type, id } = await params;
 
-async function EntryPageContent({ params }: { params: Promise<{ type: string; id: string }> }) {
+  if (!type) {
+    redirect(`/cms/content`);
+  }
+
+  // Media entries have a dedicated full-page editor at /cms/media/[id].
+  // Mounting them through `EditPost` would render an empty form because there
+  // is no `media` collection in the user's schema. The destination runs its
+  // own auth check, so this redirect is safe to do before authenticating.
+  if (type === 'media') {
+    redirect(`/cms/media/${id}`);
+  }
+
   const session = await getServerSession(authOptions);
 
   if (!session) {
     return null;
   }
 
-  const { type, id } = await params;
   const files = await getContentFiles();
-  const file = files.find((file) => file.includes(id));
+  const file = files.find((f) => f.includes(id));
   const parsedFileName = file ? parseFileName(file) : undefined;
-  let post;
-
-  if (!type) {
-    redirect(`/`);
-  }
 
   if (!parsedFileName) {
-    redirect(`/cms/${type}`);
+    // Unknown id — surface a clear 404 so broken links don't silently bounce
+    // the user back to a list page.
+    notFound();
   }
 
-  if (parsedFileName?.path) {
-    post = await getFile(parsedFileName.path);
-  }
+  const post = await getFile(parsedFileName.path);
 
   return (
     <FileContextProvider defaultType={type} defaultFile={parsedFileName}>

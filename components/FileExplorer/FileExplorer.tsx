@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useMemo } from 'react';
 
 import { cn } from '../../lib/utils';
@@ -81,12 +82,12 @@ const FileExplorer = ({ files = [], folders = [] }: FileExplorerProps) => {
                     : 'text-foreground hover:bg-accent',
                 )}
               >
-                <a
+                <Link
                   href={`/cms/media/${file.type === '/' ? '' : file.type + '/'}${file.id}`}
                   onClick={() => onFileClick(file)}
                 >
                   {file.id}
-                </a>
+                </Link>
               </Button>
             ))}
           </nav>

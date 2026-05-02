@@ -1,34 +1,24 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { getServerSession } from 'next-auth';
 
-import { getConfig } from '../../lib/configStore';
 import { authOptions } from '../auth';
-import DashboardContent from '../../components/Dashboard/DashboardContent';
-import { CMSSidebar } from '../../components/CMSSidebar/CMSSidebar';
-import { getEntryList, hasActiveBranch } from '../actions';
+// Dashboard home — sidebar belongs to ContentPage, not here.
 
-export function DashboardPage() {
-  return (
-    <Suspense fallback={null}>
-      <DashboardPageContent />
-    </Suspense>
-  );
-}
-
-async function DashboardPageContent() {
+export async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     return null;
   }
 
-  const [entries, hasBranch] = await Promise.all([getEntryList(), hasActiveBranch()]);
-  const collections = Object.keys(getConfig().collections);
-
   return (
-    <>
-      <CMSSidebar />
-      <DashboardContent entries={entries} collections={collections} hasBranch={hasBranch} />
-    </>
+    <div className="flex flex-1 flex-col overflow-hidden bg-muted/20">
+      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-4">
+        <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
+      </div>
+      <div className="flex flex-1 items-center justify-center p-6">
+        <p className="text-sm text-muted-foreground">Dashboard coming soon.</p>
+      </div>
+    </div>
   );
 }

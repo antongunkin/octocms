@@ -26,11 +26,15 @@ async function AdminLayoutInner({ children }: Readonly<{ children: React.ReactNo
   const initialTheme = await getThemeCookie();
   const config = getConfig();
 
+  // No Suspense around `<Layout>{children}</Layout>` here on purpose: the
+  // catch-all page (`AdminApp`) re-suspends on every back/forward navigation,
+  // and a Suspense at this level would blank the entire layout chrome
+  // (including the TopHeader). Layout itself owns the inner Suspense around
+  // `{children}` so the chrome stays mounted and the generic admin skeleton
+  // fills the main slot.
   return (
     <Provider initialTheme={initialTheme} config={config}>
-      <Suspense fallback={null}>
-        <Layout>{children}</Layout>
-      </Suspense>
+      <Layout>{children}</Layout>
       <Toaster />
     </Provider>
   );

@@ -84,7 +84,7 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
           schema.
         </p>
         <Button asChild variant="outline" size="sm">
-          <Link href="/cms/content-model">Back to Content Model</Link>
+          <Link href="/cms/model">Back to Content Model</Link>
         </Button>
       </div>
     );
@@ -161,7 +161,7 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
       <div className="flex items-start justify-between border-b border-border bg-background px-6 py-4">
         <div className="flex items-start gap-3">
           <Button asChild variant="ghost" size="icon" className="mt-0.5 h-8 w-8">
-            <Link href="/cms/content-model" aria-label="Back to Content Model">
+            <Link href="/cms/model" aria-label="Back to Content Model">
               <ChevronLeft className="h-4 w-4" />
             </Link>
           </Button>

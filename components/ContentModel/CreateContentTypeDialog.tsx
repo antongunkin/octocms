@@ -80,7 +80,7 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
         variant: 'success',
       });
       onOpenChange(false);
-      router.push(`/cms/content-model/${trimmedKey}`);
+      router.push(`/cms/model/${trimmedKey}`);
       router.refresh();
     } else {
       toast({

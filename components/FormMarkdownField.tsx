@@ -18,6 +18,7 @@ import {
 
 import { cn } from '../lib/utils';
 
+import { ErrorBoundary } from './ErrorBoundary';
 import { FieldHintAndError } from './FieldHintAndError';
 
 type FormMarkdownFieldProps = {
@@ -53,28 +54,30 @@ const FormMarkdownField = ({ label, name, value, required, hint, error, onClearE
         {required ? <span className="text-destructive ml-1">*</span> : null}
       </div>
       <input type="hidden" ref={markdownTextareRef} name={name} defaultValue={value} />
-      <MDXEditor
-        markdown=""
-        plugins={[
-          headingsPlugin(),
-          listsPlugin(),
-          quotePlugin(),
-          thematicBreakPlugin(),
-          toolbarPlugin({
-            toolbarContents: () => (
-              <>
-                <BoldItalicUnderlineToggles />
-                <CreateLink />
-                <ListsToggle />
-                <BlockTypeSelect />
-              </>
-            ),
-          }),
-        ]}
-        ref={markdownFieldRef}
-        onChange={onMarkdownChange}
-        className={cn('editor-markdown', error && 'editor-markdown--invalid')}
-      />
+      <ErrorBoundary label="markdown editor">
+        <MDXEditor
+          markdown=""
+          plugins={[
+            headingsPlugin(),
+            listsPlugin(),
+            quotePlugin(),
+            thematicBreakPlugin(),
+            toolbarPlugin({
+              toolbarContents: () => (
+                <>
+                  <BoldItalicUnderlineToggles />
+                  <CreateLink />
+                  <ListsToggle />
+                  <BlockTypeSelect />
+                </>
+              ),
+            }),
+          ]}
+          ref={markdownFieldRef}
+          onChange={onMarkdownChange}
+          className={cn('editor-markdown', error && 'editor-markdown--invalid')}
+        />
+      </ErrorBoundary>
       <FieldHintAndError hint={hint} error={error} />
     </div>
   );
