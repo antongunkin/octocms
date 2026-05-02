@@ -292,10 +292,7 @@ export function TopHeader({ onCommandK }: TopHeaderProps) {
               ))}
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="cursor-pointer gap-2 text-sm text-[var(--muted)]"
-              onSelect={handleClearBranch}
-            >
+            <DropdownMenuItem className="cursor-pointer gap-2 text-sm text-[var(--muted)]" onSelect={handleClearBranch}>
               <X className="h-4 w-4" />
               Back to main
             </DropdownMenuItem>

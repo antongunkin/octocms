@@ -29,7 +29,8 @@ export type RowItemProps = {
   onClick?: (e: React.MouseEvent) => void;
 };
 
-const ROW_CLASSES = 'flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent px-4 py-2.5 text-left no-underline';
+const ROW_CLASSES =
+  'flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent px-4 py-2.5 text-left no-underline';
 
 export function RowItem({ icon, title, sub, badge, kbd, mono, active, href, onMouseEnter, onClick }: RowItemProps) {
   const inner = (

@@ -220,11 +220,7 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
         />
 
         <div className="flex flex-1 flex-col overflow-hidden">
-          <MediaUploadBar
-            allowedFormats={config.mediaAllowedFormats}
-            onFiles={openUploadQueue}
-            disabled={isPending}
-          />
+          <MediaUploadBar allowedFormats={config.mediaAllowedFormats} onFiles={openUploadQueue} disabled={isPending} />
 
           {/* Search bar — same shape and tokens as /cms/content */}
           <div className="px-6 pb-3 pt-3">
@@ -247,9 +243,7 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
             {filteredFiles.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
                 <ImageIcon className="h-12 w-12" />
-                <p className="text-sm">
-                  {searchQuery ? 'No assets match this search' : 'No files in this folder yet'}
-                </p>
+                <p className="text-sm">{searchQuery ? 'No assets match this search' : 'No files in this folder yet'}</p>
               </div>
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
@@ -357,7 +351,11 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
 
 function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: ViewMode) => void }) {
   return (
-    <div className="inline-flex items-center rounded-full border border-border bg-background p-0.5" role="tablist" aria-label="View mode">
+    <div
+      className="inline-flex items-center rounded-full border border-border bg-background p-0.5"
+      role="tablist"
+      aria-label="View mode"
+    >
       <button
         type="button"
         role="tab"

@@ -81,7 +81,7 @@ export default function DashboardContent({ entries, collections, hasBranch, acti
         </div>
         <div className="flex flex-none items-center gap-2">
           <span className="text-[13px] font-medium text-[var(--text-2)]">
-            {selectedTypeLabel ? selectedTypeLabel : isBranched ? 'Branched content' : 'All content'}
+            {selectedTypeLabel ?? (isBranched ? 'Branched content' : 'All content')}
             <span className="ml-1.5 font-mono text-[12px] font-normal text-[var(--muted)]">
               {isBranched ? branchedEntries.length : visibleEntries.length}
             </span>
@@ -233,7 +233,6 @@ function LeftPanel({
     </aside>
   );
 }
-
 
 // ---------------------------------------------------------------------------
 // All content table
@@ -508,6 +507,10 @@ function BranchedView({
 // Entry row
 // ---------------------------------------------------------------------------
 
+function entryRowActivateKey(e: React.KeyboardEvent): boolean {
+  return e.key === 'Enter' || e.key === ' ';
+}
+
 function EntryRow({
   entry,
   activeBranch,
@@ -524,11 +527,17 @@ function EntryRow({
 
   return (
     <tr
+      tabIndex={0}
       className={cn(
         'cursor-pointer border-b border-border transition-colors hover:bg-[var(--surface-2)]',
         entry.status === 'archived' && 'opacity-60',
       )}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (!entryRowActivateKey(e)) return;
+        e.preventDefault();
+        onClick();
+      }}
     >
       <td className="px-4 py-3 text-sm font-medium text-foreground">
         <span className="inline-flex items-center gap-2.5">
@@ -558,4 +567,3 @@ function EntryRow({
     </tr>
   );
 }
-

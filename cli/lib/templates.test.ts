@@ -65,20 +65,20 @@ describe('tsconfigPaths', () => {
 describe('admin route templates (3-file model)', () => {
   it('layout re-exports from the octocms/admin barrel', () => {
     expect(adminLayoutTemplate).toContain("from 'octocms/admin'");
-    expect(adminLayoutTemplate).toContain("export { AdminLayout as default, metadata }");
+    expect(adminLayoutTemplate).toContain('export { AdminLayout as default, metadata }');
     expect(adminLayoutTemplate).toContain("import 'octocms/globals.css'");
     expect(adminLayoutTemplate).toContain("import '../../cms/__generated__/configInit'");
   });
 
   it('catch-all page re-exports AdminApp from the barrel', () => {
     expect(adminPageTemplate).toContain("from 'octocms/admin'");
-    expect(adminPageTemplate).toContain("export { AdminApp as default }");
+    expect(adminPageTemplate).toContain('export { AdminApp as default }');
   });
 
   it('error.tsx is a client component re-exporting AdminError from the barrel', () => {
     expect(adminErrorTemplate).toContain("'use client'");
     expect(adminErrorTemplate).toContain("from 'octocms/admin'");
-    expect(adminErrorTemplate).toContain("export { AdminError as default }");
+    expect(adminErrorTemplate).toContain('export { AdminError as default }');
   });
 });
 

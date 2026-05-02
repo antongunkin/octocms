@@ -183,7 +183,10 @@ export function MediaAsset({ file: initialFile, allFiles }: MediaAssetProps) {
                 Folder
               </Label>
               <Select value={folderDraft} onValueChange={setFolderDraft} disabled={isPending}>
-                <SelectTrigger id="media-asset-folder" className="h-9 w-full rounded-lg border-border text-sm font-normal">
+                <SelectTrigger
+                  id="media-asset-folder"
+                  className="h-9 w-full rounded-lg border-border text-sm font-normal"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

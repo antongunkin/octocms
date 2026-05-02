@@ -157,11 +157,15 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
       role="dialog"
       aria-modal="true"
       onClick={() => onOpenChange(false)}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onOpenChange(false);
+      }}
     >
       <div
         className="w-full max-w-[720px] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-1)]"
         style={{ boxShadow: 'var(--shadow-3)' }}
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 border-b border-[var(--border)] px-4 py-3.5">
           <Search size={18} className="text-[var(--muted)]" />
@@ -266,4 +270,3 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
     </div>
   );
 }
-

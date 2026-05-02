@@ -13,6 +13,14 @@ function Boom({ shouldThrow, message = 'kaboom' }: { shouldThrow: boolean; messa
   return <span>healthy</span>;
 }
 
+function ResetKeysErrorBoundaryWrapper({ shouldThrow, resetKey }: { shouldThrow: boolean; resetKey: number }) {
+  return (
+    <ErrorBoundary resetKeys={[resetKey]}>
+      <Boom shouldThrow={shouldThrow} />
+    </ErrorBoundary>
+  );
+}
+
 describe('ErrorBoundary', () => {
   it('renders children on the happy path', () => {
     render(
@@ -57,16 +65,9 @@ describe('ErrorBoundary', () => {
 
   it('auto-resets when resetKeys change', () => {
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    function Wrapper({ shouldThrow, resetKey }: { shouldThrow: boolean; resetKey: number }) {
-      return (
-        <ErrorBoundary resetKeys={[resetKey]}>
-          <Boom shouldThrow={shouldThrow} />
-        </ErrorBoundary>
-      );
-    }
-    const { rerender } = render(<Wrapper shouldThrow resetKey={1} />);
+    const { rerender } = render(<ResetKeysErrorBoundaryWrapper shouldThrow resetKey={1} />);
     expect(screen.getByRole('alert')).toBeTruthy();
-    rerender(<Wrapper shouldThrow={false} resetKey={2} />);
+    rerender(<ResetKeysErrorBoundaryWrapper shouldThrow={false} resetKey={2} />);
     expect(screen.queryByRole('alert')).toBeNull();
     expect(screen.getByText('healthy')).toBeTruthy();
     errSpy.mockRestore();

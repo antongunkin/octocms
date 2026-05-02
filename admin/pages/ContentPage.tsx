@@ -17,5 +17,7 @@ export async function ContentPage() {
   const [entries, hasBranch, activeBranch] = await Promise.all([getEntryList(), hasActiveBranch(), getBranch()]);
   const collections = Object.keys(getConfig().collections);
 
-  return <DashboardContent entries={entries} collections={collections} hasBranch={hasBranch} activeBranch={activeBranch} />;
+  return (
+    <DashboardContent entries={entries} collections={collections} hasBranch={hasBranch} activeBranch={activeBranch} />
+  );
 }

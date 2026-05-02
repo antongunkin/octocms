@@ -11,6 +11,10 @@ export type MediaListTableProps = {
   files: MediaFile[];
 };
 
+function rowActivateKey(e: React.KeyboardEvent): boolean {
+  return e.key === 'Enter' || e.key === ' ';
+}
+
 export function MediaListTable({ files }: MediaListTableProps) {
   const router = useRouter();
 
@@ -48,18 +52,19 @@ export function MediaListTable({ files }: MediaListTableProps) {
               files.map((file) => (
                 <tr
                   key={file.id}
+                  tabIndex={0}
                   onClick={() => router.push(`/cms/media/${file.id}`)}
+                  onKeyDown={(e) => {
+                    if (!rowActivateKey(e)) return;
+                    e.preventDefault();
+                    router.push(`/cms/media/${file.id}`);
+                  }}
                   className={cn('cursor-pointer border-b border-border transition-colors hover:bg-[var(--surface-2)]')}
                 >
                   <td className="px-4 py-2.5 text-sm font-medium text-foreground">
                     <span className="inline-flex items-center gap-2.5">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-[var(--surface-2)] text-muted-foreground">
-                        <img
-                          src={file.publicUrl}
-                          alt=""
-                          loading="lazy"
-                          className="h-full w-full object-cover"
-                        />
+                        <img src={file.publicUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
                       </span>
                       <span className="truncate">{file.title || file.originalName}</span>
                     </span>

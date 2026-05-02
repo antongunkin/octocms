@@ -3,6 +3,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MediaFile } from '../../types';
+import MediaManager from './MediaManager';
 
 const pushMock = vi.fn();
 const openMock = vi.fn();
@@ -31,8 +32,6 @@ vi.mock('../../hooks/useConfig', () => ({
     collections: {},
   }),
 }));
-
-import MediaManager from './MediaManager';
 
 const mockFile: MediaFile = {
   id: 'abc-123',

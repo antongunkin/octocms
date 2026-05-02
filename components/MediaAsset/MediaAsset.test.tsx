@@ -3,6 +3,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MediaFile } from '../../types';
+import { MediaAsset } from './MediaAsset';
 
 const pushMock = vi.fn();
 const openMock = vi.fn();
@@ -22,8 +23,6 @@ vi.mock('octocms/admin/actions', () => ({
 }));
 
 vi.mock('../../hooks/useToast', () => ({ toast: vi.fn() }));
-
-import { MediaAsset } from './MediaAsset';
 
 const mockFile: MediaFile = {
   id: 'abc-123',

@@ -44,16 +44,7 @@ const defaultIcon: Record<ToastCardTone, React.ReactNode> = {
   brand: <GitCommit className="h-3.5 w-3.5" />,
 };
 
-export function ToastCard({
-  tone = 'default',
-  icon,
-  title,
-  body,
-  action,
-  time,
-  onDismiss,
-  className,
-}: ToastCardProps) {
+export function ToastCard({ tone = 'default', icon, title, body, action, time, onDismiss, className }: ToastCardProps) {
   return (
     <div
       className={cn(
@@ -63,10 +54,7 @@ export function ToastCard({
     >
       <span aria-hidden className={cn('absolute left-0 top-0 bottom-0 w-[3px]', railClass[tone])} />
       <span
-        className={cn(
-          'inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg border',
-          chipClass[tone],
-        )}
+        className={cn('inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg border', chipClass[tone])}
       >
         {icon ?? defaultIcon[tone]}
       </span>
@@ -75,9 +63,7 @@ export function ToastCard({
           <div className="flex-1 min-w-0 truncate text-sm font-semibold tracking-[-0.005em] text-[var(--text)]">
             {title}
           </div>
-          {time && (
-            <span className="flex-none font-mono text-[10px] text-[var(--muted)]">{time}</span>
-          )}
+          {time && <span className="flex-none font-mono text-[10px] text-[var(--muted)]">{time}</span>}
         </div>
         {body && <div className="mt-1 text-xs leading-relaxed text-[var(--muted)]">{body}</div>}
         {(action || onDismiss) && (

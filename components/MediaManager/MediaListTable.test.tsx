@@ -2,14 +2,14 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { MediaFile } from '../../types';
+import { MediaListTable } from './MediaListTable';
+
 const pushMock = vi.fn();
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: pushMock, replace: vi.fn(), refresh: vi.fn() }),
 }));
-
-import { MediaListTable } from './MediaListTable';
-import type { MediaFile } from '../../types';
 
 const mockFile = (overrides: Partial<MediaFile> = {}): MediaFile => ({
   id: 'abc-123',

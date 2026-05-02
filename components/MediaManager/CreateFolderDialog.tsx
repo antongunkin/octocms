@@ -3,14 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { Button } from '../ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '../ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Label } from '../ui/label';
 
 export type CreateFolderDialogProps = {
@@ -68,7 +61,6 @@ export function CreateFolderDialog({ open, onOpenChange, existing, onCreate }: C
               id="new-folder-name"
               type="text"
               value={name}
-              autoFocus
               onChange={(e) => {
                 setName(e.target.value);
                 setError(null);

@@ -99,11 +99,7 @@ export default function ContentModelList({ schema, entries }: Props) {
                 </TableRow>
               ) : (
                 filtered.map((r) => (
-                  <TableRow
-                    key={r.key}
-                    className="cursor-pointer"
-                    onClick={() => router.push(`/cms/model/${r.key}`)}
-                  >
+                  <TableRow key={r.key} className="cursor-pointer" onClick={() => router.push(`/cms/model/${r.key}`)}>
                     <TableCell className="font-medium">
                       <span className="inline-flex items-center gap-2">
                         {r.hasMany ? (

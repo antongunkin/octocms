@@ -85,6 +85,32 @@ async function readStreamText(res: Response): Promise<string> {
   return out;
 }
 
+/**
+ * Build a multipart Request whose round-trip through `request.formData()`
+ * preserves filename + size metadata. Hand-rolled so we don't depend on
+ * Node's FormData→Request serialization (which can drop filenames in Node 20).
+ */
+function multipartRequest(messages: unknown, files: Array<{ name: string; type: string; body: string }>): Request {
+  const boundary = '----TestBoundary' + Math.random().toString(36).slice(2);
+  const CRLF = '\r\n';
+  let body = '';
+  body += `--${boundary}${CRLF}`;
+  body += `Content-Disposition: form-data; name="messages"${CRLF}${CRLF}`;
+  body += `${JSON.stringify(messages)}${CRLF}`;
+  for (const f of files) {
+    body += `--${boundary}${CRLF}`;
+    body += `Content-Disposition: form-data; name="files"; filename="${f.name}"${CRLF}`;
+    body += `Content-Type: ${f.type}${CRLF}${CRLF}`;
+    body += `${f.body}${CRLF}`;
+  }
+  body += `--${boundary}--${CRLF}`;
+  return new Request('http://test/agent', {
+    method: 'POST',
+    headers: { 'Content-Type': `multipart/form-data; boundary=${boundary}` },
+    body,
+  });
+}
+
 describe('chatRoute — auth + body parsing', () => {
   it('404s when the agent feature is disabled', async () => {
     vi.doMock('./configStore', () => ({ getAgentConfig: () => null, setAgentConfig: vi.fn() }));
@@ -136,32 +162,6 @@ describe('chatRoute — auth + body parsing', () => {
 });
 
 describe('chatRoute — multipart attachments', () => {
-  /**
-   * Build a multipart Request whose round-trip through `request.formData()`
-   * preserves filename + size metadata. Hand-rolled so we don't depend on
-   * Node's FormData→Request serialization (which can drop filenames in Node 20).
-   */
-  function multipartRequest(messages: unknown, files: Array<{ name: string; type: string; body: string }>): Request {
-    const boundary = '----TestBoundary' + Math.random().toString(36).slice(2);
-    const CRLF = '\r\n';
-    let body = '';
-    body += `--${boundary}${CRLF}`;
-    body += `Content-Disposition: form-data; name="messages"${CRLF}${CRLF}`;
-    body += `${JSON.stringify(messages)}${CRLF}`;
-    for (const f of files) {
-      body += `--${boundary}${CRLF}`;
-      body += `Content-Disposition: form-data; name="files"; filename="${f.name}"${CRLF}`;
-      body += `Content-Type: ${f.type}${CRLF}${CRLF}`;
-      body += `${f.body}${CRLF}`;
-    }
-    body += `--${boundary}--${CRLF}`;
-    return new Request('http://test/agent', {
-      method: 'POST',
-      headers: { 'Content-Type': `multipart/form-data; boundary=${boundary}` },
-      body,
-    });
-  }
-
   it('400s on too many attachments', async () => {
     vi.doMock('./configStore', () => ({ getAgentConfig: () => enabledAgentConfig, setAgentConfig: vi.fn() }));
     const { chatRoute } = await import('./chatApi');

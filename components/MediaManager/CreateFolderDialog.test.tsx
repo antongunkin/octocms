@@ -36,9 +36,7 @@ describe('CreateFolderDialog', () => {
 
   it('blocks duplicate names', () => {
     const onCreate = vi.fn();
-    render(
-      <CreateFolderDialog open existing={['blog']} onCreate={onCreate} onOpenChange={vi.fn()} />,
-    );
+    render(<CreateFolderDialog open existing={['blog']} onCreate={onCreate} onOpenChange={vi.fn()} />);
 
     fireEvent.change(screen.getByPlaceholderText(/blog-posts/), { target: { value: 'blog' } });
     fireEvent.click(screen.getByRole('button', { name: /create folder/i }));
