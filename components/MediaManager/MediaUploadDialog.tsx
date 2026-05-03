@@ -10,7 +10,7 @@
 
 import React, { useEffect, useState, useTransition } from 'react';
 
-import { uploadMedia } from '../../admin/actions';
+import { useUploadMedia } from '../../admin/query/hooks/useMediaMutations';
 import { toast } from '../../hooks/useToast';
 import { suggestedTitleFromFileName } from '../../lib/suggestedMediaTitle';
 import { Button } from '../ui/button';
@@ -33,6 +33,7 @@ type MediaUploadDialogProps = {
 export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }: MediaUploadDialogProps) {
   const [rows, setRows] = useState<UploadRow[]>([]);
   const [isPending, startTransition] = useTransition();
+  const uploadMutation = useUploadMedia();
 
   // Re-seed rows whenever the caller hands us a fresh `files` array.
   useEffect(() => {
@@ -61,12 +62,13 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
         formData.set('title', row.title.trim());
         formData.set('generateBlur', row.generateBlur ? '1' : '0');
 
-        const uploadResult = await uploadMedia(formData);
-        if (!uploadResult.success) {
-          toast({ title: uploadResult.error, variant: 'destructive' });
+        try {
+          const uploadResult = await uploadMutation.mutateAsync(formData);
+          uploadedIds.push(uploadResult.id);
+        } catch (e) {
+          toast({ title: e instanceof Error ? e.message : 'Upload failed', variant: 'destructive' });
           return;
         }
-        uploadedIds.push(uploadResult.id);
       }
 
       toast({ title: `Uploaded ${rows.length} file(s)`, variant: 'success' });

@@ -6,8 +6,6 @@ import { ContentTypeDetailSkeleton } from '../components/ContentModel/ContentTyp
 import { DashboardCollectionSkeleton } from '../components/Dashboard/DashboardContent.collection.skeleton';
 import { DashboardContentSkeleton } from '../components/Dashboard/DashboardContent.skeleton';
 import { EditPostSkeleton } from '../components/EditPost/EditPost.skeleton';
-import { MediaAssetSkeleton } from '../components/MediaAsset/MediaAsset.skeleton';
-import { MediaManagerSkeleton } from '../components/MediaManager/MediaManager.skeleton';
 import { AdminGenericSkeleton } from '../components/skeletons/AdminGenericSkeleton';
 
 import { ChatPage } from './pages/ChatPage';
@@ -70,18 +68,15 @@ async function AdminAppDispatcher({ params }: AdminAppProps) {
 
   if (segments[0] === 'media') {
     if (segments.length === 1) {
-      return (
-        <Suspense fallback={<MediaManagerSkeleton />}>
-          <MediaPage />
-        </Suspense>
-      );
+      // No Suspense fallback: `MediaManager` fetches via `useMediaList` and
+      // renders block-level skeletons (`MediaLeftPanelSkeleton` +
+      // `MediaGridSkeleton` / `MediaListTableSkeleton`).
+      return <MediaPage />;
     }
     const id = segments[1];
-    return (
-      <Suspense fallback={<MediaAssetSkeleton />} key={id}>
-        <MediaAssetPage id={id} />
-      </Suspense>
-    );
+    // Same: `MediaAsset` renders `MediaPreviewSkeleton` +
+    // `MediaMetadataFormSkeleton` while `useMediaAsset(id)` resolves.
+    return <MediaAssetPage id={id} key={id} />;
   }
 
   if (segments[0] === 'model') {

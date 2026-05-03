@@ -1,13 +1,19 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as cmsActions from '../../admin/actions';
-import { toast } from '../../hooks/useToast';
 import { MediaUploadDialog } from './MediaUploadDialog';
+import { renderWithQuery } from '../../admin/query/test/renderWithQuery';
+import { toast } from '../../hooks/useToast';
 
-vi.mock('octocms/admin/actions', () => ({
-  uploadMedia: vi.fn(),
+const { uploadMediaMock } = vi.hoisted(() => ({ uploadMediaMock: vi.fn() }));
+
+vi.mock('../../admin/actions/media', () => ({
+  uploadMedia: (...a: unknown[]) => uploadMediaMock(...a),
+  getMediaEntries: vi.fn(),
+  updateMediaMetadata: vi.fn(),
+  moveMedia: vi.fn(),
+  deleteMedia: vi.fn(),
 }));
 
 vi.mock('../../hooks/useToast', () => ({
@@ -17,7 +23,7 @@ vi.mock('../../hooks/useToast', () => ({
 afterEach(cleanup);
 
 beforeEach(() => {
-  vi.mocked(cmsActions.uploadMedia).mockReset();
+  uploadMediaMock.mockReset();
   vi.mocked(toast).mockReset();
 });
 
@@ -25,12 +31,12 @@ const file = (name: string) => new File(['x'], name, { type: 'image/png' });
 
 describe('MediaUploadDialog', () => {
   it('renders nothing when files is null', () => {
-    render(<MediaUploadDialog files={null} defaultFolder="/" onComplete={() => {}} onCancel={() => {}} />);
+    renderWithQuery(<MediaUploadDialog files={null} defaultFolder="/" onComplete={() => {}} onCancel={() => {}} />);
     expect(screen.queryByText('Set title for each image')).toBeNull();
   });
 
   it('shows one row per staged file with Title input + Generate blur checkbox', async () => {
-    render(
+    renderWithQuery(
       <MediaUploadDialog
         files={[file('first.png'), file('second.png')]}
         defaultFolder="/"
@@ -48,7 +54,9 @@ describe('MediaUploadDialog', () => {
   });
 
   it('rejects empty Title with a destructive toast', async () => {
-    render(<MediaUploadDialog files={[file('a.png')]} defaultFolder="/" onComplete={() => {}} onCancel={() => {}} />);
+    renderWithQuery(
+      <MediaUploadDialog files={[file('a.png')]} defaultFolder="/" onComplete={() => {}} onCancel={() => {}} />,
+    );
 
     const titleInput = document.getElementById('upload-title-0') as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: '   ' } });
@@ -62,10 +70,10 @@ describe('MediaUploadDialog', () => {
   });
 
   it('forwards generateBlur=1 by default and =0 when unchecked', async () => {
-    vi.mocked(cmsActions.uploadMedia).mockResolvedValue({ success: true, id: 'new-id' });
+    uploadMediaMock.mockResolvedValue({ success: true, id: 'new-id' });
     const onComplete = vi.fn();
 
-    render(
+    renderWithQuery(
       <MediaUploadDialog
         files={[file('a.png'), file('b.png')]}
         defaultFolder="blog"
@@ -82,7 +90,7 @@ describe('MediaUploadDialog', () => {
 
     await waitFor(() => expect(onComplete).toHaveBeenCalledWith(['new-id', 'new-id']));
 
-    const calls = vi.mocked(cmsActions.uploadMedia).mock.calls;
+    const calls = uploadMediaMock.mock.calls;
     expect(calls).toHaveLength(2);
     expect((calls[0][0] as FormData).get('generateBlur')).toBe('1');
     expect((calls[0][0] as FormData).get('folder')).toBe('blog');
@@ -90,10 +98,12 @@ describe('MediaUploadDialog', () => {
   });
 
   it('halts the batch on first failure and surfaces the error', async () => {
-    vi.mocked(cmsActions.uploadMedia).mockResolvedValue({ success: false, error: 'disk full' });
+    uploadMediaMock.mockResolvedValue({ success: false, error: 'disk full' });
     const onComplete = vi.fn();
 
-    render(<MediaUploadDialog files={[file('a.png')]} defaultFolder="/" onComplete={onComplete} onCancel={() => {}} />);
+    renderWithQuery(
+      <MediaUploadDialog files={[file('a.png')]} defaultFolder="/" onComplete={onComplete} onCancel={() => {}} />,
+    );
     fireEvent.click(screen.getByText('Upload'));
 
     await waitFor(() => {
@@ -106,7 +116,9 @@ describe('MediaUploadDialog', () => {
 
   it('calls onCancel when the user clicks Cancel', () => {
     const onCancel = vi.fn();
-    render(<MediaUploadDialog files={[file('a.png')]} defaultFolder="/" onComplete={() => {}} onCancel={onCancel} />);
+    renderWithQuery(
+      <MediaUploadDialog files={[file('a.png')]} defaultFolder="/" onComplete={() => {}} onCancel={onCancel} />,
+    );
 
     fireEvent.click(screen.getByText('Cancel'));
     expect(onCancel).toHaveBeenCalled();
