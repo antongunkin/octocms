@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { keepPreviousData } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ChevronDown,
@@ -14,7 +15,10 @@ import {
   Search,
 } from 'lucide-react';
 
-import { newFile } from '../../admin/actions';
+import { useEntryList } from '../../admin/query/hooks/useEntryList';
+import { useBranch } from '../../admin/query/hooks/useBranch';
+import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
+import { useNewFile } from '../../admin/query/hooks/useNewFile';
 import { useConfig } from '../../hooks/useConfig';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
@@ -26,21 +30,31 @@ import { cn } from '../../lib/utils';
 import type { EntryListItem, EntryStatus } from '../../types';
 import { formatUpdatedAt, formatUpdatedAtFull } from '../../utils/formatUpdatedAt';
 
+import { ContentTableSkeleton } from './skeletons/ContentTableSkeleton';
+import { LeftPanelSkeleton } from './skeletons/LeftPanelSkeleton';
+
 const PAGE_SIZE = 20;
 const ALL_STATUSES: EntryStatus[] = ['draft', 'changed', 'published', 'merged', 'archived'];
 
 type Props = {
-  entries: EntryListItem[];
-  collections: string[];
-  hasBranch: boolean;
-  activeBranch: string;
   selectedType?: string;
 };
 
-export default function DashboardContent({ entries, collections, hasBranch, activeBranch, selectedType }: Props) {
+export default function DashboardContent({ selectedType }: Props) {
   const config = useConfig();
   const searchParams = useSearchParams();
   const isBranched = !selectedType && searchParams.get('tab') === 'branched';
+
+  const entriesQuery = useEntryList(selectedType, { placeholderData: keepPreviousData });
+  const branchQuery = useBranch();
+  const hasActiveBranchQuery = useHasActiveBranch();
+
+  const entriesData = entriesQuery.data;
+  const isLoadingEntries = entriesQuery.isPending && !entriesData;
+  const collections = Object.keys(config.collections);
+  const activeBranch = branchQuery.data ?? '';
+  const hasBranch = hasActiveBranchQuery.data ?? false;
+
   const selectedTypeLabel = selectedType
     ? (config.collections[selectedType as keyof typeof config.collections]?.label ?? selectedType)
     : null;
@@ -50,6 +64,9 @@ export default function DashboardContent({ entries, collections, hasBranch, acti
   );
   const addCollections = selectedType ? hasManyCollections.filter((c) => c === selectedType) : hasManyCollections;
 
+  // Deps reference `entriesQuery.data` (stable identity from React Query) rather
+  // than a freshly-created `data ?? []` so memoization works.
+  const entries = useMemo<EntryListItem[]>(() => entriesData ?? [], [entriesData]);
   const visibleEntries = useMemo(
     () => (selectedType ? entries.filter((entry) => entry.type === selectedType) : entries),
     [entries, selectedType],
@@ -78,29 +95,29 @@ export default function DashboardContent({ entries, collections, hasBranch, acti
             </h1>
           </div>
         </div>
-        <div className="flex flex-none items-center gap-2">
-          <span className="text-[13px] font-medium text-[var(--text-2)]">
-            {selectedTypeLabel ?? (isBranched ? 'Branched content' : 'All content')}
-            <span className="ml-1.5 font-mono text-[12px] font-normal text-[var(--muted)]">
-              {isBranched ? branchedEntries.length : visibleEntries.length}
-            </span>
-          </span>
+        <div className="flex-none">
           <AddEntryButton collections={addCollections} />
         </div>
       </div>
 
       {/* Body: left nav + right content */}
       <div className="flex flex-1 overflow-hidden">
-        <LeftPanel
-          entries={entries}
-          branchedCount={branchedEntries.length}
-          countByType={countByType}
-          collections={collections}
-          isBranched={isBranched}
-          selectedType={selectedType}
-        />
+        {isLoadingEntries ? (
+          <LeftPanelSkeleton />
+        ) : (
+          <LeftPanel
+            entries={entries}
+            branchedCount={branchedEntries.length}
+            countByType={countByType}
+            collections={collections}
+            isBranched={isBranched}
+            selectedType={selectedType}
+          />
+        )}
 
-        {isBranched ? (
+        {isLoadingEntries ? (
+          <ContentTableSkeleton />
+        ) : isBranched ? (
           <BranchedView
             entries={branchedEntries}
             collections={collections}
@@ -127,22 +144,18 @@ export default function DashboardContent({ entries, collections, hasBranch, acti
 function AddEntryButton({ collections }: { collections: string[] }) {
   const config = useConfig();
   const router = useRouter();
-  const [creating, setCreating] = useState(false);
+  const newFileMutation = useNewFile();
 
   async function handleCreate(type: string) {
-    setCreating(true);
     try {
-      const result = await newFile(type);
-      if (!result.success) {
-        toast({ title: result.error, variant: 'destructive' });
-        return;
-      }
+      const result = await newFileMutation.mutateAsync(type);
       const parts = result.path.replace(`${config.contentFolder}/`, '').replace('.json', '').split('/');
       router.push(`/cms/content/${parts[0]}/${parts[parts.length - 1]}`);
-    } finally {
-      setCreating(false);
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Failed to create entry', variant: 'destructive' });
     }
   }
+  const creating = newFileMutation.isPending;
 
   if (collections.length === 0) return null;
 

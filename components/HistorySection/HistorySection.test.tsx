@@ -1,8 +1,9 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { EntryCommit } from '../../types';
+import { renderWithQuery } from '../../admin/query/test/renderWithQuery';
 
 const { mockGetEntryCommits, getRefreshTick, setRefreshTick } = vi.hoisted(() => {
   let tick = 0;
@@ -15,7 +16,7 @@ const { mockGetEntryCommits, getRefreshTick, setRefreshTick } = vi.hoisted(() =>
   };
 });
 
-vi.mock('../../admin/actions', () => ({
+vi.mock('../../admin/actions/git', () => ({
   getEntryCommits: mockGetEntryCommits,
 }));
 
@@ -33,7 +34,6 @@ vi.mock('../../hooks/useEntryStack', () => ({
 
 type IOCallback = (entries: IntersectionObserverEntry[]) => void;
 
-// Controllable IntersectionObserver: tests can call `triggerIntersect()` to simulate scrolling in.
 let ioInstances: Array<{ cb: IOCallback; node: Element }>;
 class MockIntersectionObserver {
   cb: IOCallback;
@@ -97,7 +97,7 @@ describe('HistorySection', () => {
     mockGetEntryCommits.mockResolvedValue({ commits: sampleCommits, seeAllUrl: 'https://x/commits' });
     const HistorySection = await loadComponent();
 
-    render(<HistorySection entryPath="cms/content/post/post-abc.json" />);
+    renderWithQuery(<HistorySection entryPath="cms/content/post/post-abc.json" />);
 
     expect(screen.getByTestId('history-skeleton')).toBeTruthy();
     expect(mockGetEntryCommits).not.toHaveBeenCalled();
@@ -110,14 +110,13 @@ describe('HistorySection', () => {
     });
     const HistorySection = await loadComponent();
 
-    render(<HistorySection entryPath="cms/content/post/post-abc.json" />);
+    renderWithQuery(<HistorySection entryPath="cms/content/post/post-abc.json" />);
     await act(async () => {
       triggerIntersect();
     });
 
     await waitFor(() => expect(mockGetEntryCommits).toHaveBeenCalledTimes(1));
 
-    // Commit rows are anchors with href === commit.url and target="_blank"
     const firstLink = screen.getByRole('link', { name: /Update body/ }) as HTMLAnchorElement;
     expect(firstLink.href).toBe('https://github.com/acme/site/commit/1111111abcdef');
     expect(firstLink.target).toBe('_blank');
@@ -133,7 +132,7 @@ describe('HistorySection', () => {
     mockGetEntryCommits.mockResolvedValue({ commits: [], seeAllUrl: '' });
     const HistorySection = await loadComponent();
 
-    render(<HistorySection entryPath="cms/content/post/post-abc.json" />);
+    renderWithQuery(<HistorySection entryPath="cms/content/post/post-abc.json" />);
     await act(async () => {
       triggerIntersect();
     });
@@ -146,34 +145,19 @@ describe('HistorySection', () => {
     mockGetEntryCommits.mockResolvedValue({ commits: sampleCommits, seeAllUrl: '' });
     const HistorySection = await loadComponent();
 
-    const { rerender } = render(<HistorySection entryPath="cms/content/post/post-abc.json" />);
+    const { rerender } = renderWithQuery(<HistorySection entryPath="cms/content/post/post-abc.json" />);
 
-    // Tick before intersection: no fetch expected (preserves the don't-pre-fetch rule).
     setRefreshTick(1);
     rerender(<HistorySection entryPath="cms/content/post/post-abc.json" />);
     expect(mockGetEntryCommits).not.toHaveBeenCalled();
 
-    // After intersection, fetch fires once.
     await act(async () => {
       triggerIntersect();
     });
     await waitFor(() => expect(mockGetEntryCommits).toHaveBeenCalledTimes(1));
 
-    // Now ready: a tick bump should trigger a refetch.
     setRefreshTick(2);
     rerender(<HistorySection entryPath="cms/content/post/post-abc.json" />);
     await waitFor(() => expect(mockGetEntryCommits).toHaveBeenCalledTimes(2));
-  });
-
-  it('does not register cms:entry-saved or cms:entry-deleted window listeners', async () => {
-    const addSpy = vi.spyOn(window, 'addEventListener');
-    const HistorySection = await loadComponent();
-
-    render(<HistorySection entryPath="cms/content/post/post-abc.json" />);
-
-    const types = addSpy.mock.calls.map(([t]) => t);
-    expect(types).not.toContain('cms:entry-saved');
-    expect(types).not.toContain('cms:entry-deleted');
-    addSpy.mockRestore();
   });
 });

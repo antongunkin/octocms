@@ -1,12 +1,12 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as cmsActions from '../admin/actions';
+import { renderWithQuery } from '../admin/query/test/renderWithQuery';
 import { toast } from '../hooks/useToast';
 import FormImageField from './FormImageField';
 
-const { baseMediaEntry } = vi.hoisted(() => ({
+const { baseMediaEntry, getMediaEntriesMock, uploadMediaMock } = vi.hoisted(() => ({
   baseMediaEntry: {
     id: 'uuid-123',
     title: 'Existing photo',
@@ -19,11 +19,22 @@ const { baseMediaEntry } = vi.hoisted(() => ({
     height: null as number | null,
     hasBlurPlaceholder: false,
   },
+  getMediaEntriesMock: vi.fn(),
+  uploadMediaMock: vi.fn(),
 }));
 
 vi.mock('octocms/admin/actions', () => ({
-  getMediaEntries: vi.fn(() => Promise.resolve([{ ...baseMediaEntry }])),
-  uploadMedia: vi.fn(),
+  getMediaEntries: (...a: unknown[]) => getMediaEntriesMock(...a),
+  uploadMedia: (...a: unknown[]) => uploadMediaMock(...a),
+}));
+
+// Hooks import directly from the action file rather than the barrel.
+vi.mock('../admin/actions/media', () => ({
+  getMediaEntries: (...a: unknown[]) => getMediaEntriesMock(...a),
+  uploadMedia: (...a: unknown[]) => uploadMediaMock(...a),
+  updateMediaMetadata: vi.fn(),
+  moveMedia: vi.fn(),
+  deleteMedia: vi.fn(),
 }));
 
 vi.mock('../hooks/useToast', () => ({
@@ -45,13 +56,13 @@ vi.mock('../hooks/useConfig', () => ({
 afterEach(cleanup);
 
 beforeEach(() => {
-  vi.mocked(cmsActions.uploadMedia).mockReset();
-  vi.mocked(cmsActions.getMediaEntries).mockImplementation(() => Promise.resolve([{ ...baseMediaEntry }]));
+  uploadMediaMock.mockReset();
+  getMediaEntriesMock.mockImplementation(() => Promise.resolve([{ ...baseMediaEntry }]));
 });
 
 describe('FormImageField', () => {
   it('renders label + both action buttons when no value', () => {
-    render(<FormImageField label="Cover Image" name="coverImage" value="" />);
+    renderWithQuery(<FormImageField label="Cover Image" name="coverImage" value="" />);
 
     expect(screen.getByText('Cover Image')).toBeDefined();
     expect(screen.getByText('Upload new image')).toBeDefined();
@@ -59,7 +70,7 @@ describe('FormImageField', () => {
   });
 
   it('keeps both action buttons visible when a value is already set', async () => {
-    render(<FormImageField label="Cover" name="cover" value="uuid-123" />);
+    renderWithQuery(<FormImageField label="Cover" name="cover" value="uuid-123" />);
 
     // No more "Change image" — the two action buttons are always present.
     expect(screen.queryByText('Change image')).toBeNull();
@@ -68,7 +79,7 @@ describe('FormImageField', () => {
   });
 
   it('renders hidden input with the UUID value', () => {
-    const { container } = render(<FormImageField label="Cover" name="coverImage" value="uuid-123" />);
+    const { container } = renderWithQuery(<FormImageField label="Cover" name="coverImage" value="uuid-123" />);
 
     const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement;
     expect(hidden).toBeDefined();
@@ -77,14 +88,14 @@ describe('FormImageField', () => {
   });
 
   it('renders hidden input with empty value when no image selected', () => {
-    const { container } = render(<FormImageField label="Cover" name="coverImage" value="" />);
+    const { container } = renderWithQuery(<FormImageField label="Cover" name="coverImage" value="" />);
 
     const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement;
     expect(hidden.value).toBe('');
   });
 
   it('rejects unsupported formats with a destructive toast', async () => {
-    render(<FormImageField label="Cover" name="coverImage" value="" />);
+    renderWithQuery(<FormImageField label="Cover" name="coverImage" value="" />);
 
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(['x'], 'document.pdf', { type: 'application/pdf' });
@@ -101,12 +112,12 @@ describe('FormImageField', () => {
   });
 
   it('shows destructive toast when uploadMedia fails', async () => {
-    vi.mocked(cmsActions.uploadMedia).mockResolvedValue({
+    uploadMediaMock.mockResolvedValue({
       success: false,
       error: 'upload failed',
     });
 
-    render(<FormImageField label="Cover" name="coverImage" value="" />);
+    renderWithQuery(<FormImageField label="Cover" name="coverImage" value="" />);
 
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(['x'], 'photo.png', { type: 'image/png' });
@@ -129,11 +140,11 @@ describe('FormImageField', () => {
   });
 
   it('shows success toast when uploadMedia succeeds', async () => {
-    vi.mocked(cmsActions.uploadMedia).mockResolvedValue({
+    uploadMediaMock.mockResolvedValue({
       success: true,
       id: 'new-media-id',
     });
-    vi.mocked(cmsActions.getMediaEntries).mockImplementation(() =>
+    getMediaEntriesMock.mockImplementation(() =>
       Promise.resolve([
         baseMediaEntry,
         {
@@ -151,7 +162,7 @@ describe('FormImageField', () => {
       ]),
     );
 
-    render(<FormImageField label="Cover" name="coverImage" value="" />);
+    renderWithQuery(<FormImageField label="Cover" name="coverImage" value="" />);
 
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(['x'], 'hero.png', { type: 'image/png' });
@@ -173,7 +184,7 @@ describe('FormImageField', () => {
   });
 
   it('opens the MediaSelectDialog when "Select existing image" is clicked', () => {
-    render(<FormImageField label="Cover" name="coverImage" value="" />);
+    renderWithQuery(<FormImageField label="Cover" name="coverImage" value="" />);
 
     fireEvent.click(screen.getByText('Select existing image'));
 

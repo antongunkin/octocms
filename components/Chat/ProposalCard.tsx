@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { AlertCircle, Check, CheckCircle2, FilePen, FilePlus, Loader2, X } from 'lucide-react';
 
+import { useEntry } from '../../admin/query/hooks/useEntry';
 import { useConfig } from '../../hooks/useConfig';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
@@ -171,33 +172,13 @@ function EditProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 'e
     config.collections as Record<string, { fields: Record<string, { label: string; format: string }> }>
   )[proposal.collection];
   const fields = collection?.fields ?? {};
-  const [before, setBefore] = React.useState<Record<string, unknown> | null>(null);
-  const [loadStatus, setLoadStatus] = React.useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const entryQuery = useEntry(proposal.entryPath);
+  const before = (entryQuery.data?.fields ?? null) as Record<string, unknown> | null;
 
-  React.useEffect(() => {
-    let cancelled = false;
-    setLoadStatus('loading');
-    (async () => {
-      try {
-        const { getFile } = await import('../../admin/actions');
-        const entry = await getFile(proposal.entryPath);
-        if (!cancelled) {
-          setBefore((entry?.fields ?? {}) as Record<string, unknown>);
-          setLoadStatus('ready');
-        }
-      } catch {
-        if (!cancelled) setLoadStatus('error');
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [proposal.entryPath]);
-
-  if (loadStatus === 'loading' || loadStatus === 'idle') {
+  if (entryQuery.isPending && entryQuery.data === undefined) {
     return <div className="text-xs text-muted-foreground">Loading current entry…</div>;
   }
-  if (loadStatus === 'error') {
+  if (entryQuery.isError) {
     return (
       <div className="text-xs text-destructive">
         Could not load <code className="font-mono">{proposal.entryPath}</code> to compute the diff.

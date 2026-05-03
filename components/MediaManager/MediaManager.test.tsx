@@ -1,19 +1,24 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MediaFile } from '../../types';
 import MediaManager from './MediaManager';
+import { queryKeys } from '../../admin/query/keys';
+import { createTestQueryClient, renderWithQuery } from '../../admin/query/test/renderWithQuery';
 
-const pushMock = vi.fn();
-const openMock = vi.fn();
+const { pushMock, openMock, getMediaEntriesMock } = vi.hoisted(() => ({
+  pushMock: vi.fn(),
+  openMock: vi.fn(),
+  getMediaEntriesMock: vi.fn(),
+}));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: pushMock, replace: vi.fn(), refresh: vi.fn() }),
 }));
 
-vi.mock('octocms/admin/actions', () => ({
-  getMediaEntries: vi.fn(),
+vi.mock('../../admin/actions/media', () => ({
+  getMediaEntries: (...a: unknown[]) => getMediaEntriesMock(...a),
   uploadMedia: vi.fn(),
   deleteMedia: vi.fn(),
   moveMedia: vi.fn(),
@@ -47,9 +52,16 @@ const mockFile: MediaFile = {
   hasBlurPlaceholder: false,
 };
 
+function renderWithFiles(files: MediaFile[]) {
+  const client = createTestQueryClient();
+  client.setQueryData(queryKeys.media.list(), files);
+  return renderWithQuery(<MediaManager />, { client });
+}
+
 beforeEach(() => {
   pushMock.mockReset();
   openMock.mockReset();
+  getMediaEntriesMock.mockReset();
   window.localStorage.clear();
   vi.stubGlobal('open', openMock);
 });
@@ -60,8 +72,16 @@ afterEach(() => {
 });
 
 describe('MediaManager', () => {
+  it('shows block-level skeletons while the media query is loading', () => {
+    getMediaEntriesMock.mockReturnValue(new Promise(() => {}));
+    renderWithQuery(<MediaManager />);
+
+    expect(screen.getByLabelText('Loading folders')).toBeDefined();
+    expect(screen.getByLabelText('Loading media grid')).toBeDefined();
+  });
+
   it('navigates to /cms/media/[id] when a card is clicked', () => {
-    render(<MediaManager files={[mockFile]} />);
+    renderWithFiles([mockFile]);
     const card = screen.getByText('A test').closest('button');
     expect(card).not.toBeNull();
     fireEvent.click(card!);
@@ -69,7 +89,7 @@ describe('MediaManager', () => {
   });
 
   it('persists newly created folders to localStorage', () => {
-    render(<MediaManager files={[mockFile]} />);
+    renderWithFiles([mockFile]);
     fireEvent.click(screen.getByRole('button', { name: /add folder/i }));
     const input = screen.getByPlaceholderText(/blog-posts/);
     fireEvent.change(input, { target: { value: 'campaigns' } });
@@ -80,34 +100,34 @@ describe('MediaManager', () => {
   });
 
   it('grid cards no longer render an "asset actions" overflow menu', () => {
-    render(<MediaManager files={[mockFile]} />);
+    renderWithFiles([mockFile]);
     expect(screen.queryByRole('button', { name: /asset actions/i })).toBeNull();
   });
 
   it('shows the assets count in the header', () => {
     const files = [mockFile, { ...mockFile, id: 'def-456', title: 'Second' }];
-    render(<MediaManager files={files} />);
+    renderWithFiles(files);
     const label = screen.getByText('Assets');
     // Count is rendered as a sibling <span> inside the same wrapper span.
     expect(label.querySelector('span')?.textContent).toBe('2');
   });
 
-  it('search input filters cards by title and originalName', () => {
+  it('search input filters cards by title and originalName', async () => {
     const files = [
       { ...mockFile, id: 'a', title: 'Hero shot', originalName: 'hero.png' },
       { ...mockFile, id: 'b', title: 'Logo mark', originalName: 'logo.svg', extension: 'svg' },
     ];
-    render(<MediaManager files={files} />);
+    renderWithFiles(files);
     expect(screen.getByText('Hero shot')).toBeDefined();
     expect(screen.getByText('Logo mark')).toBeDefined();
 
     fireEvent.change(screen.getByPlaceholderText(/Filter assets/i), { target: { value: 'logo' } });
-    expect(screen.queryByText('Hero shot')).toBeNull();
+    await waitFor(() => expect(screen.queryByText('Hero shot')).toBeNull());
     expect(screen.getByText('Logo mark')).toBeDefined();
   });
 
   it('pressing "/" focuses the search input', () => {
-    render(<MediaManager files={[mockFile]} />);
+    renderWithFiles([mockFile]);
     const input = screen.getByPlaceholderText(/Filter assets/i) as HTMLInputElement;
     expect(document.activeElement).not.toBe(input);
     fireEvent.keyDown(window, { key: '/' });
@@ -115,7 +135,7 @@ describe('MediaManager', () => {
   });
 
   it('switching to list view renders a table and persists the choice', () => {
-    render(<MediaManager files={[mockFile]} />);
+    renderWithFiles([mockFile]);
     // Default is grid → no table
     expect(document.querySelector('table')).toBeNull();
     fireEvent.click(screen.getByRole('tab', { name: /list view/i }));
@@ -125,20 +145,20 @@ describe('MediaManager', () => {
 
   it('default view mode is restored from localStorage on mount', () => {
     window.localStorage.setItem('octocms:media-view-mode', 'list');
-    render(<MediaManager files={[mockFile]} />);
+    renderWithFiles([mockFile]);
     expect(document.querySelector('table')).not.toBeNull();
   });
 
   it('clicking a row in list view also navigates to the asset', () => {
     window.localStorage.setItem('octocms:media-view-mode', 'list');
-    render(<MediaManager files={[mockFile]} />);
+    renderWithFiles([mockFile]);
     const row = screen.getByText('A test').closest('tr');
     fireEvent.click(row!);
     expect(pushMock).toHaveBeenCalledWith('/cms/media/abc-123');
   });
 
   it('shows the empty state when no files match', () => {
-    render(<MediaManager files={[mockFile]} />);
+    renderWithFiles([mockFile]);
     fireEvent.change(screen.getByPlaceholderText(/Filter assets/i), { target: { value: 'zzz' } });
     expect(screen.getByText(/No assets match this search/i)).toBeDefined();
   });

@@ -1,27 +1,26 @@
 'use client';
 
 import { ArrowLeft, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useEntry } from '../../admin/query/hooks/useEntry';
+import { useEntryBacklinks } from '../../admin/query/hooks/useEntryBacklinks';
 import {
-  getEntryBacklinks,
-  getFile,
-  getIsProduction,
-  hasActiveBranch,
-  removeFile,
-  saveFile,
-  publishEntry,
-  archiveEntry,
-  restoreEntry,
-} from '../../admin/actions';
+  useArchiveEntry,
+  usePublishEntry,
+  useRemoveFile,
+  useRestoreEntry,
+  useSaveFile,
+} from '../../admin/query/hooks/useEntryMutations';
+import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
+import { useIsProduction } from '../../admin/query/hooks/useIsProduction';
 import type { Config } from '../../admin/types';
 import { useConfig } from '../../hooks/useConfig';
 import { useEntryStack } from '../../hooks/useEntryStack';
 import { toast } from '../../hooks/useToast';
 import { toReferenceKey } from '../../lib/referenceKeys';
 import { validateEntryFields } from '../../lib/validateEntryFields';
-import type { EntryListItem, EntryStatus } from '../../types';
+import type { EntryStatus } from '../../types';
 import { StatusBadge } from '../StatusBadge';
 
 import FormFields from '../FormFields';
@@ -38,19 +37,31 @@ type InlineEntryEditorProps = {
   onClose: () => void;
 };
 
+type SaveFileError = Error & { fieldErrors?: Record<string, string> };
+
 const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: InlineEntryEditorProps) => {
   const config = useConfig();
-  const router = useRouter();
   const { bumpRefresh } = useEntryStack();
-  const [entry, setEntry] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const entryQuery = useEntry(entryPath);
+  const entry = entryQuery.data;
+  const isLoading = entryQuery.isPending && !entry;
+
+  const isProductionQuery = useIsProduction();
+  const hasActiveBranchQuery = useHasActiveBranch();
+  const isProduction = isProductionQuery.data ?? false;
+  const activeBranchSet = hasActiveBranchQuery.data ?? true;
+
+  const saveMutation = useSaveFile();
+  const removeMutation = useRemoveFile();
+  const publishMutation = usePublishEntry();
+  const archiveMutation = useArchiveEntry();
+  const restoreMutation = useRestoreEntry();
+  const isSaving =
+    saveMutation.isPending || publishMutation.isPending || archiveMutation.isPending || restoreMutation.isPending;
+
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [isSaving, startSaving] = useTransition();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [deleteBacklinks, setDeleteBacklinks] = useState<EntryListItem[]>([]);
-  const [isLoadingBacklinks, setIsLoadingBacklinks] = useState(false);
-  const [isProduction, setIsProduction] = useState(false);
-  const [activeBranchSet, setActiveBranchSet] = useState(true);
   const [createBranchOpen, setCreateBranchOpen] = useState(false);
   const [pendingSaveArgs, setPendingSaveArgs] = useState<{ sys: any; fields: any } | null>(null);
   // True once any save/delete inside this overlay has succeeded; consumed on close to bump refreshTick.
@@ -58,20 +69,11 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
 
   const collectionLabel = config.collections[entryType as keyof Config['collections']]?.label || entryType;
 
-  // Load entry data on mount
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getFile(entryPath);
-        setEntry(data);
-      } catch (_e) {
-        toast({ title: `Failed to load entry: ${entryId}`, variant: 'destructive' });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    load();
-  }, [entryPath, entryId]);
+  // Backlinks query — disabled until the delete dialog opens.
+  const referenceKey = toReferenceKey(entryPath);
+  const backlinksQuery = useEntryBacklinks(referenceKey, { enabled: isDeleteOpen });
+  const deleteBacklinks = backlinksQuery.data ?? [];
+  const isLoadingBacklinks = backlinksQuery.isPending && isDeleteOpen;
 
   // If the overlay unmounts while dirty (e.g. browser back, parent closeAll),
   // notify subscribers. The Back button calls handleClose directly and resets the flag.
@@ -83,22 +85,6 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
       }
     };
   }, [bumpRefresh]);
-
-  // Check production/branch status
-  useEffect(() => {
-    getIsProduction().then((isProd) => {
-      setIsProduction(isProd);
-      if (isProd) {
-        hasActiveBranch().then(setActiveBranchSet);
-      }
-    });
-
-    const handler = () => {
-      hasActiveBranch().then(setActiveBranchSet);
-    };
-    window.addEventListener('cms:branch-changed', handler);
-    return () => window.removeEventListener('cms:branch-changed', handler);
-  }, []);
 
   const clearFieldError = useCallback((name: string) => {
     setFieldErrors((prev) => {
@@ -120,25 +106,19 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
   }, [bumpRefresh, onClose]);
 
   const executeSave = useCallback(
-    (sys: any, fields: any) => {
-      startSaving(async () => {
-        const result = await saveFile({ sys, fields }, entryPath);
-        if (result.success) {
-          toast({ title: 'Saved successfully', variant: 'success' });
-          dirtyRef.current = true;
-          // Re-run server components in case any data flow elsewhere depends on this entry.
-          router.refresh();
-          const updated = await getFile(entryPath);
-          setEntry(updated);
-        } else {
-          if (result.fieldErrors) {
-            setFieldErrors(result.fieldErrors);
-          }
-          toast({ title: result.error, variant: 'destructive' });
-        }
-      });
+    async (sys: any, fields: any) => {
+      try {
+        await saveMutation.mutateAsync({ fileName: entryPath, data: { sys, fields } });
+        toast({ title: 'Saved successfully', variant: 'success' });
+        dirtyRef.current = true;
+        // Cache invalidation triggers refetch automatically; no need for manual setEntry.
+      } catch (e) {
+        const err = e as SaveFileError;
+        if (err.fieldErrors) setFieldErrors(err.fieldErrors);
+        toast({ title: err.message, variant: 'destructive' });
+      }
     },
-    [entryPath, router],
+    [entryPath, saveMutation],
   );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -167,91 +147,64 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
       return;
     }
 
-    executeSave(sys, fields);
+    void executeSave(sys, fields);
   };
 
   const handleBranchCreated = (_branchName: string, _prUrl: string, _prWarning?: string) => {
-    setActiveBranchSet(true);
     setCreateBranchOpen(false);
-    window.dispatchEvent(new Event('cms:branch-changed'));
+    // The branch mutation invalidates `git.hasActive`, so the gate updates automatically.
     if (pendingSaveArgs) {
-      executeSave(pendingSaveArgs.sys, pendingSaveArgs.fields);
+      void executeSave(pendingSaveArgs.sys, pendingSaveArgs.fields);
       setPendingSaveArgs(null);
     }
   };
 
-  const openDeleteDialog = async () => {
-    setIsLoadingBacklinks(true);
+  const openDeleteDialog = () => {
     setIsDeleteOpen(true);
-    try {
-      const referenceKey = toReferenceKey(entryPath);
-      const links = await getEntryBacklinks(referenceKey);
-      setDeleteBacklinks(links);
-    } catch (_e) {
-      setDeleteBacklinks([]);
-    } finally {
-      setIsLoadingBacklinks(false);
-    }
   };
 
   const handleDelete = async () => {
     setIsDeleteOpen(false);
-    const result = await removeFile(entryPath);
-    if (result.success) {
+    try {
+      await removeMutation.mutateAsync(entryPath);
       toast({ title: 'Entry removed', variant: 'success' });
       dirtyRef.current = true;
-      router.refresh();
       handleClose();
-    } else {
-      toast({ title: result.error, variant: 'destructive' });
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Delete failed', variant: 'destructive' });
     }
   };
 
   const currentStatus: EntryStatus = entry?.sys?.status || 'merged';
 
-  const handlePublish = () => {
-    startSaving(async () => {
-      const result = await publishEntry(entryPath);
-      if (result.success) {
-        toast({ title: 'Published successfully', variant: 'success' });
-        dirtyRef.current = true;
-        router.refresh();
-        const updated = await getFile(entryPath);
-        setEntry(updated);
-      } else {
-        toast({ title: result.error, variant: 'destructive' });
-      }
-    });
+  const handlePublish = async () => {
+    try {
+      await publishMutation.mutateAsync(entryPath);
+      toast({ title: 'Published successfully', variant: 'success' });
+      dirtyRef.current = true;
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Publish failed', variant: 'destructive' });
+    }
   };
 
-  const handleArchive = () => {
-    startSaving(async () => {
-      const result = await archiveEntry(entryPath);
-      if (result.success) {
-        toast({ title: 'Entry archived', variant: 'success' });
-        dirtyRef.current = true;
-        router.refresh();
-        const updated = await getFile(entryPath);
-        setEntry(updated);
-      } else {
-        toast({ title: result.error, variant: 'destructive' });
-      }
-    });
+  const handleArchive = async () => {
+    try {
+      await archiveMutation.mutateAsync(entryPath);
+      toast({ title: 'Entry archived', variant: 'success' });
+      dirtyRef.current = true;
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Archive failed', variant: 'destructive' });
+    }
   };
 
-  const handleRestore = () => {
-    startSaving(async () => {
-      const result = await restoreEntry(entryPath);
-      if (result.success) {
-        toast({ title: 'Entry restored', variant: 'success' });
-        dirtyRef.current = true;
-        router.refresh();
-        const updated = await getFile(entryPath);
-        setEntry(updated);
-      } else {
-        toast({ title: result.error, variant: 'destructive' });
-      }
-    });
+  const handleRestore = async () => {
+    try {
+      await restoreMutation.mutateAsync(entryPath);
+      toast({ title: 'Entry restored', variant: 'success' });
+      dirtyRef.current = true;
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Restore failed', variant: 'destructive' });
+    }
   };
 
   const selectedFile = { type: entryType, id: entryId, path: entryPath };
@@ -324,6 +277,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
             <div className="flex-1 overflow-y-auto p-10 px-5">
               <div className="mx-auto max-w-[1000px]">
                 <FormFields
+                  key={`${entryPath}-${entryQuery.dataUpdatedAt}`}
                   selectedFile={selectedFile}
                   fields={entry.fields}
                   fieldErrors={fieldErrors}

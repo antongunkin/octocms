@@ -4,8 +4,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle, FileText, Layers } from 'lucide-react';
 
-import { previewSchemaChange, saveSchema } from '../../admin/actions';
+import { previewSchemaChange } from '../../admin/actions';
 import type { PreviewSchemaResult } from '../../admin/actions/schema';
+import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import { toast } from '../../hooks/useToast';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
@@ -29,6 +30,7 @@ const KEY_LIMIT = 64;
 
 export default function EditContentTypeDialog({ open, onOpenChange, schema, type, entryCount }: Props) {
   const router = useRouter();
+  const saveSchemaMutation = useSaveSchema();
   const collection = schema.collections[type];
   const cardinalityLocked = entryCount > 0;
 
@@ -107,13 +109,14 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
   const doSave = async () => {
     setBusy(true);
     const next = buildNext();
-    const result = await saveSchema(next, {
-      ...(keyChanged ? { collectionRenames: { [type]: trimmedKey } } : {}),
-      message: keyChanged ? `CMS: rename content type ${type} → ${trimmedKey}` : `CMS: update content type ${type}`,
-    });
-    setBusy(false);
-
-    if (result.success) {
+    try {
+      await saveSchemaMutation.mutateAsync({
+        next,
+        options: {
+          ...(keyChanged ? { collectionRenames: { [type]: trimmedKey } } : {}),
+          message: keyChanged ? `CMS: rename content type ${type} → ${trimmedKey}` : `CMS: update content type ${type}`,
+        },
+      });
       toast({
         title: 'Content type updated',
         description: keyChanged ? `Renamed to ${trimmedKey}.` : `${trimmedLabel} saved.`,
@@ -123,13 +126,14 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
       if (keyChanged) {
         router.push(`/cms/model/${trimmedKey}`);
       }
-      router.refresh();
-    } else {
+    } catch (e) {
       toast({
         title: "Couldn't update content type",
-        description: result.error,
+        description: e instanceof Error ? e.message : 'Save failed',
         variant: 'destructive',
       });
+    } finally {
+      setBusy(false);
     }
   };
 

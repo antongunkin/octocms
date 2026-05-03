@@ -1,12 +1,15 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ImageIcon, Upload, X } from 'lucide-react';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
+import { uploadMedia } from '../../admin/actions';
+import { queryKeys } from '../../admin/query/keys';
+import { useMediaList } from '../../admin/query/hooks/useMediaList';
 import { useConfig } from '../../hooks/useConfig';
-import { getMediaEntries, uploadMedia } from '../../admin/actions';
 import { toast } from '../../hooks/useToast';
 import type { MediaFile } from '../../types';
 import { suggestedTitleFromFileName } from '../../lib/suggestedMediaTitle';
@@ -16,29 +19,25 @@ import { Label } from '../ui/label';
 
 const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
   const config = useConfig();
+  const queryClient = useQueryClient();
   const updateNode = useMdastNodeUpdater();
   const mediaIdAttr = mdastNode.attributes?.find((a: any) => a.type === 'mdxJsxAttribute' && a.name === 'mediaId');
   const currentMediaId = typeof mediaIdAttr?.value === 'string' ? mediaIdAttr.value : '';
 
   const [isOpen, setIsOpen] = useState(false);
-  const [mediaEntries, setMediaEntries] = useState<MediaFile[]>([]);
+  const { data: mediaEntries = [], refetch: refetchMedia } = useMediaList({ enabled: isOpen });
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const uploadInputRef = useRef<HTMLInputElement>(null);
   const [stagedFile, setStagedFile] = useState<File | null>(null);
   const [uploadTitle, setUploadTitle] = useState('');
-  const [loaded, setLoaded] = useState(false);
 
   const selectedEntry = mediaEntries.find((e) => e.id === currentMediaId);
 
   useEffect(() => {
-    if (!loaded && isOpen) {
-      getMediaEntries().then((entries) => {
-        setMediaEntries(entries);
-        setLoaded(true);
-      });
-    }
-  }, [isOpen, loaded]);
+    if (!isOpen) return;
+    void refetchMedia();
+  }, [isOpen, refetchMedia]);
 
   const updateMediaId = useCallback(
     (newId: string) => {
@@ -92,15 +91,14 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
         return;
       }
       const mediaId = uploadResult.id;
-      const fresh = await getMediaEntries();
-      setMediaEntries(fresh);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.media.list() });
       updateMediaId(mediaId);
       setStagedFile(null);
       setUploadTitle('');
       setIsOpen(false);
       toast({ title: `Uploaded "${file.name}"`, variant: 'success' });
     });
-  }, [stagedFile, uploadTitle, selectedFolder, updateMediaId]);
+  }, [stagedFile, uploadTitle, selectedFolder, updateMediaId, queryClient]);
 
   const folders = [...new Set(mediaEntries.map((f) => f.folder))];
   const filteredEntries = selectedFolder ? mediaEntries.filter((f) => f.folder === selectedFolder) : mediaEntries;

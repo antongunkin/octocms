@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileText, Layers } from 'lucide-react';
 
-import { saveSchema } from '../../admin/actions';
+import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import { toast } from '../../hooks/useToast';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
@@ -24,6 +24,7 @@ const KEY_LIMIT = 64;
 
 export default function CreateContentTypeDialog({ open, onOpenChange, schema }: Props) {
   const router = useRouter();
+  const saveSchemaMutation = useSaveSchema();
   const [name, setName] = useState('');
   const [key, setKey] = useState('');
   const [keyTouched, setKeyTouched] = useState(false);
@@ -70,10 +71,11 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
     };
 
     setBusy(true);
-    const result = await saveSchema(next, { message: `CMS: create content type ${trimmedKey}` });
-    setBusy(false);
-
-    if (result.success) {
+    try {
+      await saveSchemaMutation.mutateAsync({
+        next,
+        options: { message: `CMS: create content type ${trimmedKey}` },
+      });
       toast({
         title: 'Content type created',
         description: `${trimmedName} is ready to edit.`,
@@ -81,13 +83,14 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
       });
       onOpenChange(false);
       router.push(`/cms/model/${trimmedKey}`);
-      router.refresh();
-    } else {
+    } catch (e) {
       toast({
         title: "Couldn't create content type",
-        description: result.error,
+        description: e instanceof Error ? e.message : 'Save failed',
         variant: 'destructive',
       });
+    } finally {
+      setBusy(false);
     }
   };
 

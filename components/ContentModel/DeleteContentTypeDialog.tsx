@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { previewSchemaChange, saveSchema } from '../../admin/actions';
+import { previewSchemaChange } from '../../admin/actions';
 import type { PreviewSchemaResult } from '../../admin/actions/schema';
+import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import { toast } from '../../hooks/useToast';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
@@ -20,6 +21,7 @@ type Props = {
 
 export default function DeleteContentTypeDialog({ open, onOpenChange, schema, type }: Props) {
   const router = useRouter();
+  const saveSchemaMutation = useSaveSchema();
   const collection = schema.collections[type];
 
   const [preview, setPreview] = useState<PreviewSchemaResult | null>(null);
@@ -63,12 +65,11 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
   const doDelete = async () => {
     if (!canConfirm) return;
     setBusy(true);
-    const result = await saveSchema(buildNext(), {
-      message: `CMS: delete content type ${type}`,
-    });
-    setBusy(false);
-
-    if (result.success) {
+    try {
+      await saveSchemaMutation.mutateAsync({
+        next: buildNext(),
+        options: { message: `CMS: delete content type ${type}` },
+      });
       toast({
         title: 'Content type deleted',
         description: `${collection?.label ?? type} and ${ownEntries.length} ${
@@ -78,13 +79,14 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
       });
       onOpenChange(false);
       router.push('/cms/model');
-      router.refresh();
-    } else {
+    } catch (e) {
       toast({
         title: "Couldn't delete content type",
-        description: result.error,
+        description: e instanceof Error ? e.message : 'Save failed',
         variant: 'destructive',
       });
+    } finally {
+      setBusy(false);
     }
   };
 

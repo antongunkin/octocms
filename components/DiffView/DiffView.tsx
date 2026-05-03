@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 
+import { useEntryDiff } from '../../admin/query/hooks/useEntryDiff';
 import { useConfig } from '../../hooks/useConfig';
 import { stringifyFieldValue, type FieldDiff } from '../../lib/entryDiff';
 import type { CollectionField } from '../../types';
 import { cn } from '../../lib/utils';
-import type { EntryDiff } from '../../admin/actions/diff';
+
 import { DiffHunk } from './DiffHunk';
 
 type DiffViewProps = {
@@ -14,36 +15,12 @@ type DiffViewProps = {
   entryPath: string;
 };
 
-type Status = 'idle' | 'loading' | 'ready' | 'error';
-
 const LINE_NUMBERED_FORMATS = new Set(['markdown', 'richtext', 'text', 'json']);
 
 export function DiffView({ collectionType, entryPath }: DiffViewProps) {
   const config = useConfig();
-  const [diff, setDiff] = useState<EntryDiff | null>(null);
-  const [status, setStatus] = useState<Status>('idle');
-  const statusRef = useRef<Status>('idle');
-  statusRef.current = status;
-
-  useEffect(() => {
-    let cancelled = false;
-    setStatus('loading');
-    (async () => {
-      try {
-        const { getEntryDiff } = await import('../../admin/actions');
-        const result = await getEntryDiff(entryPath);
-        if (!cancelled) {
-          setDiff(result);
-          setStatus('ready');
-        }
-      } catch {
-        if (!cancelled) setStatus('error');
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [entryPath]);
+  const diffQuery = useEntryDiff(entryPath);
+  const diff = diffQuery.data;
 
   const collection = (config.collections as Record<string, { label: string; fields: Record<string, CollectionField> }>)[
     collectionType
@@ -54,7 +31,7 @@ export function DiffView({ collectionType, entryPath }: DiffViewProps) {
     return Object.entries(collection.fields);
   }, [collection]);
 
-  if (status === 'loading' || status === 'idle') {
+  if (diffQuery.isPending && !diff) {
     return (
       <div className="space-y-3">
         <div className="h-6 w-64 rounded bg-muted/40" />
@@ -64,7 +41,7 @@ export function DiffView({ collectionType, entryPath }: DiffViewProps) {
     );
   }
 
-  if (status === 'error' || !diff) {
+  if (diffQuery.isError || !diff) {
     return <p className="text-sm text-muted-foreground">Could not load diff.</p>;
   }
 

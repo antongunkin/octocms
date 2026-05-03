@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FileText, Link2, Search, X } from 'lucide-react';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
 import type { Config } from '../../admin/types';
 import { useConfig } from '../../hooks/useConfig';
-import { getEntryList } from '../../admin/actions';
+import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import type { EntryListItem } from '../../types';
 import { toReferenceKey } from '../../lib/referenceKeys';
 import { Button } from '../ui/button';
@@ -30,11 +30,20 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
   const currentDisplay = typeof displayAttr?.value === 'string' ? displayAttr.value : 'block';
 
   const [isOpen, setIsOpen] = useState(false);
-  const [entries, setEntries] = useState<EntryListItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionFilter, setCollectionFilter] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const [loaded, setLoaded] = useState(false);
+
+  const {
+    data: entries = [],
+    isPending: listPending,
+    isFetched,
+    refetch,
+  } = useEntryList(undefined, { enabled: Boolean(isOpen || currentId) });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    void refetch();
+  }, [isOpen, refetch]);
 
   // Find selected entry from the list once loaded (use content path — `id` is already `post-123`-style stem)
   const selectedEntry = useMemo(() => {
@@ -42,16 +51,6 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
     const refKey = toReferenceKey(currentId);
     return entries.find((e) => toReferenceKey(e.path) === refKey) ?? null;
   }, [currentId, entries]);
-
-  useEffect(() => {
-    if (!loaded && isOpen) {
-      startTransition(async () => {
-        const result = await getEntryList();
-        setEntries(result);
-        setLoaded(true);
-      });
-    }
-  }, [isOpen, loaded]);
 
   const updateAttributes = useCallback(
     (id: string, display: string) => {
@@ -143,7 +142,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           </div>
           <div className="flex-1">
             <span className="text-sm text-muted-foreground block mb-0.5">
-              {loaded ? 'Referenced entry not found' : 'Loading…'}
+              {isFetched && !listPending ? 'Referenced entry not found' : 'Loading…'}
             </span>
             <span className="text-xs text-muted-foreground">{currentId}</span>
           </div>
@@ -208,7 +207,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
 
           {/* Entry list */}
           <div className="flex-1 overflow-y-auto min-h-0 border border-border rounded-md">
-            {isPending ? (
+            {listPending && entries.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground text-sm">Loading entries…</div>
             ) : filteredEntries.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground text-sm">

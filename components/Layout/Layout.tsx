@@ -8,9 +8,9 @@ import { useConfig } from '../../hooks/useConfig';
 import type { Theme } from '../../admin/theme';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
+import { MainSlotSkeleton } from '../skeletons';
 import { TopHeader } from './TopHeader';
 import { CommandK, useCommandK } from '../CommandK/CommandK';
-import { AdminGenericSkeleton } from '../skeletons/AdminGenericSkeleton';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -51,13 +51,11 @@ const Layout = ({ children, initialTheme }: LayoutProps) => {
       ) : (
         <>
           <TopHeader onCommandK={() => setCmdkOpen(true)} initialTheme={initialTheme} />
-          <main className="relative z-0 flex-1 flex min-h-0">
-            {/* Inner Suspense so re-suspensions of the catch-all page (on
-                navigation between sub-routes) don't blank the chrome. The
-                generic skeleton fills the main slot until the per-branch
-                Suspense inside `AdminApp` takes over with the right per-page
-                skeleton. */}
-            <Suspense fallback={<AdminGenericSkeleton />}>{children}</Suspense>
+          <main className="relative z-0 flex flex-1 min-h-0">
+            {/* Catch-all `AdminApp` can suspend on `await params`. Keep `TopHeader`
+                mounted; show `MainSlotSkeleton` in the main slot instead of an
+                empty flash, then route-specific TanStack Query skeletons take over. */}
+            <Suspense fallback={<MainSlotSkeleton />}>{children}</Suspense>
           </main>
           <CommandK open={cmdkOpen} onOpenChange={setCmdkOpen} />
         </>

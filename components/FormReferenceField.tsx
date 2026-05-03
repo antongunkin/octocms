@@ -1,13 +1,16 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { GripVertical, Pencil, Plus, Search, Trash2 } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { getEntryList } from '../admin/actions/entries';
+import { useNewFile } from '../admin/query/hooks/useNewFile';
+import { queryKeys } from '../admin/query/keys';
 import type { Config, ReferenceFieldConfig } from '../admin/types';
 import { useConfig } from '../hooks/useConfig';
 import { useEntryStack } from '../hooks/useEntryStack';
 
-import { getEntryList, newFile } from '../admin/actions';
 import { toast } from '../hooks/useToast';
 import { toContentPath, toReferenceKey } from '../lib/referenceKeys';
 import { cn } from '../lib/utils';
@@ -103,6 +106,7 @@ const AddExistingModal = ({
   onSelect: (items: ReferenceItem[]) => void;
 }) => {
   const config = useConfig();
+  const queryClient = useQueryClient();
   const [entries, setEntries] = useState<EntryListItem[]>([]);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -118,17 +122,23 @@ const AddExistingModal = ({
     setTypeFilter('all');
 
     const load = async () => {
-      const allEntries: EntryListItem[] = [];
-      for (const col of allowedCollections) {
-        const list = await getEntryList(col);
-        allEntries.push(...list);
+      try {
+        const allEntries: EntryListItem[] = [];
+        for (const col of allowedCollections) {
+          const list = await queryClient.ensureQueryData({
+            queryKey: queryKeys.entries.list(col),
+            queryFn: () => getEntryList(col),
+          });
+          allEntries.push(...list);
+        }
+        setEntries(allEntries);
+      } finally {
+        setIsLoading(false);
       }
-      setEntries(allEntries);
-      setIsLoading(false);
     };
 
-    load();
-  }, [open, allowedCollections]);
+    void load();
+  }, [open, allowedCollections, queryClient]);
 
   // Focus search input when modal opens
   useEffect(() => {
@@ -274,7 +284,7 @@ const CreateNewModal = ({
 }) => {
   const config = useConfig();
   const [selectedType, setSelectedType] = useState(allowedCollections[0] || '');
-  const [isPending, startTransition] = useTransition();
+  const { mutateAsync: createEntry, isPending } = useNewFile();
 
   useEffect(() => {
     if (open && allowedCollections.length > 0) {
@@ -283,32 +293,29 @@ const CreateNewModal = ({
   }, [open, allowedCollections]);
 
   const handleCreate = () => {
-    startTransition(async () => {
-      const result = await newFile(selectedType);
+    void createEntry(selectedType)
+      .then((result) => {
+        const filePath = result.path;
+        const id = filePath.replace(`${config.contentFolder}/${selectedType}/`, '').replace('.json', '');
+        const referenceKey = toReferenceKey(filePath);
 
-      if (!result.success) {
-        toast({ title: result.error, variant: 'destructive' });
-        return;
-      }
+        const item: ReferenceItem = {
+          type: selectedType,
+          id,
+          path: referenceKey,
+          title: `New ${config.collections[selectedType as keyof Config['collections']]?.label || selectedType}`,
+        };
 
-      const filePath = result.path;
-      const id = filePath.replace(`${config.contentFolder}/${selectedType}/`, '').replace('.json', '');
-      const referenceKey = toReferenceKey(filePath);
-
-      const item: ReferenceItem = {
-        type: selectedType,
-        id,
-        path: referenceKey,
-        title: `New ${config.collections[selectedType as keyof Config['collections']]?.label || selectedType}`,
-      };
-
-      onCreate(item);
-      onOpenChange(false);
-      toast({
-        title: `Created new ${config.collections[selectedType as keyof Config['collections']]?.label || selectedType}`,
-        variant: 'success',
+        onCreate(item);
+        onOpenChange(false);
+        toast({
+          title: `Created new ${config.collections[selectedType as keyof Config['collections']]?.label || selectedType}`,
+          variant: 'success',
+        });
+      })
+      .catch((e: Error) => {
+        toast({ title: e.message, variant: 'destructive' });
       });
-    });
   };
 
   return (
@@ -371,6 +378,7 @@ const FormReferenceField = ({
   reference,
 }: FormReferenceFieldProps) => {
   const config = useConfig();
+  const queryClient = useQueryClient();
   const [items, setItems] = useState<ReferenceItem[]>([]);
   const [isExistingOpen, setIsExistingOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -404,7 +412,10 @@ const FormReferenceField = ({
     const fetchEntryMap = async () => {
       const allEntries: EntryListItem[] = [];
       for (const col of allowedCollections) {
-        const list = await getEntryList(col);
+        const list = await queryClient.ensureQueryData({
+          queryKey: queryKeys.entries.list(col),
+          queryFn: () => getEntryList(col),
+        });
         allEntries.push(...list);
       }
       return new Map(allEntries.map((e) => [toReferenceKey(e.path), e]));
@@ -486,8 +497,8 @@ const FormReferenceField = ({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTick]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- tick-driven title sync; first parse uses latest `value` once via `loadedRef`
+  }, [refreshTick, queryClient, allowedCollections]);
 
   const selectedKeys = useMemo(() => new Set(items.map((i) => i.path)), [items]);
 

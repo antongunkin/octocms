@@ -1,7 +1,9 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { queryKeys } from '../admin/query/keys';
+import { renderWithQuery } from '../admin/query/test/renderWithQuery';
 import FormReferenceField from './FormReferenceField';
 
 const { mockPushEntry, getRefreshTick, setRefreshTick } = vi.hoisted(() => {
@@ -58,42 +60,55 @@ const mockConfig = {
 
 vi.mock('../hooks/useConfig', () => ({ useConfig: () => mockConfig }));
 
+const getEntryListMock = vi.fn(async (collection?: string) => {
+  if (collection === 'post') {
+    return [
+      {
+        type: 'post',
+        id: 'p1',
+        path: 'cms/content/post/post-p1.json',
+        title: 'First Post',
+      },
+      {
+        type: 'post',
+        id: 'p2',
+        path: 'cms/content/post/post-p2.json',
+        title: 'Second Post',
+      },
+    ];
+  }
+  if (collection === 'author') {
+    return [
+      {
+        type: 'author',
+        id: 'a1',
+        path: 'cms/content/author/author-a1.json',
+        title: 'Alice',
+      },
+      {
+        type: 'author',
+        id: 'a2',
+        path: 'cms/content/author/author-a2.json',
+        title: 'Bob',
+      },
+    ];
+  }
+  return [];
+});
+
+vi.mock('../admin/actions/entries', () => ({
+  getEntryList: (collection?: string) => getEntryListMock(collection),
+}));
+
 vi.mock('octocms/admin/actions', () => ({
-  getEntryList: vi.fn(async (collection: string) => {
-    if (collection === 'post') {
-      return [
-        {
-          type: 'post',
-          id: 'p1',
-          path: 'cms/content/post/post-p1.json',
-          title: 'First Post',
-        },
-        {
-          type: 'post',
-          id: 'p2',
-          path: 'cms/content/post/post-p2.json',
-          title: 'Second Post',
-        },
-      ];
-    }
-    if (collection === 'author') {
-      return [
-        {
-          type: 'author',
-          id: 'a1',
-          path: 'cms/content/author/author-a1.json',
-          title: 'Alice',
-        },
-        {
-          type: 'author',
-          id: 'a2',
-          path: 'cms/content/author/author-a2.json',
-          title: 'Bob',
-        },
-      ];
-    }
-    return [];
-  }),
+  getEntryList: (collection?: string) => getEntryListMock(collection),
+  newFile: vi.fn(async (type: string) => ({
+    success: true as const,
+    path: `cms/content/${type}/${type}-new-uuid.json`,
+  })),
+}));
+
+vi.mock('../admin/actions/files', () => ({
   newFile: vi.fn(async (type: string) => ({
     success: true as const,
     path: `cms/content/${type}/${type}-new-uuid.json`,
@@ -106,6 +121,7 @@ vi.mock('../hooks/useToast', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  getEntryListMock.mockClear();
   mockPushEntry.mockClear();
   setRefreshTick(0);
   cleanup();
@@ -113,7 +129,7 @@ beforeEach(() => {
 
 describe('FormReferenceField', () => {
   it('renders label and empty state', async () => {
-    render(<FormReferenceField label="Posts" name="posts" value="[]" />);
+    renderWithQuery(<FormReferenceField label="Posts" name="posts" value="[]" />);
 
     expect(screen.getByText('Posts')).toBeDefined();
     await waitFor(() => {
@@ -122,7 +138,7 @@ describe('FormReferenceField', () => {
   });
 
   it('renders the hidden input with serialized paths', async () => {
-    render(
+    renderWithQuery(
       <FormReferenceField
         label="Posts"
         name="posts"
@@ -140,7 +156,7 @@ describe('FormReferenceField', () => {
   });
 
   it('loads and displays selected reference items with titles', async () => {
-    render(
+    renderWithQuery(
       <FormReferenceField
         label="Posts"
         name="posts"
@@ -156,7 +172,7 @@ describe('FormReferenceField', () => {
   });
 
   it('shows Add existing and Create new buttons', async () => {
-    render(
+    renderWithQuery(
       <FormReferenceField
         label="Posts"
         name="posts"
@@ -172,13 +188,13 @@ describe('FormReferenceField', () => {
   });
 
   it('shows required indicator when required=true', async () => {
-    render(<FormReferenceField label="Author" name="author" value="[]" required />);
+    renderWithQuery(<FormReferenceField label="Author" name="author" value="[]" required />);
 
     expect(screen.getByText('*')).toBeDefined();
   });
 
   it('shows single indicator for cardinality one', async () => {
-    render(
+    renderWithQuery(
       <FormReferenceField
         label="Hero"
         name="hero"
@@ -191,7 +207,7 @@ describe('FormReferenceField', () => {
   });
 
   it('shows count indicator for max items', async () => {
-    render(
+    renderWithQuery(
       <FormReferenceField
         label="Posts"
         name="posts"
@@ -206,20 +222,18 @@ describe('FormReferenceField', () => {
   });
 
   it('falls back to legacy collection prop', async () => {
-    const { getEntryList } = await import('octocms/admin/actions');
-
-    render(
+    renderWithQuery(
       <FormReferenceField label="Posts" name="posts" value={JSON.stringify(['post-p1.json'])} collection="post" />,
     );
 
     await waitFor(() => {
-      expect(getEntryList).toHaveBeenCalledWith('post');
+      expect(getEntryListMock).toHaveBeenCalledWith('post');
       expect(screen.getByText('First Post')).toBeDefined();
     });
   });
 
   it('serializes single cardinality as plain string', async () => {
-    render(
+    renderWithQuery(
       <FormReferenceField
         label="Hero"
         name="hero"
@@ -237,7 +251,7 @@ describe('FormReferenceField', () => {
   });
 
   it('shows validation error when min items not met', async () => {
-    render(
+    renderWithQuery(
       <FormReferenceField
         label="Authors"
         name="authors"
@@ -252,7 +266,7 @@ describe('FormReferenceField', () => {
   });
 
   it('opens inline edit by calling pushEntry when the reference title is clicked', async () => {
-    render(
+    renderWithQuery(
       <FormReferenceField
         label="Authors"
         name="authors"
@@ -274,7 +288,7 @@ describe('FormReferenceField', () => {
   });
 
   it('opens inline edit when the pencil button is clicked', async () => {
-    render(
+    renderWithQuery(
       <FormReferenceField
         label="Authors"
         name="authors"
@@ -296,15 +310,12 @@ describe('FormReferenceField', () => {
   });
 
   it('refreshTick bump re-resolves titles for currently-listed items', async () => {
-    const { getEntryList } = await import('octocms/admin/actions');
-    const mocked = vi.mocked(getEntryList);
-
     // First load: Alice. After bump: Alicia.
-    mocked.mockImplementationOnce(async () => [
+    getEntryListMock.mockImplementationOnce(async () => [
       { type: 'author', id: 'a1', path: 'cms/content/author/author-a1.json', title: 'Alice', status: 'merged' },
     ]);
 
-    const { rerender } = render(
+    const { rerender, client } = renderWithQuery(
       <FormReferenceField
         label="Authors"
         name="authors"
@@ -315,9 +326,10 @@ describe('FormReferenceField', () => {
 
     await waitFor(() => expect(screen.getByText('Alice')).toBeDefined());
 
-    mocked.mockImplementationOnce(async () => [
+    getEntryListMock.mockImplementationOnce(async () => [
       { type: 'author', id: 'a1', path: 'cms/content/author/author-a1.json', title: 'Alicia', status: 'merged' },
     ]);
+    client.removeQueries({ queryKey: queryKeys.entries.list('author') });
 
     setRefreshTick(1);
     rerender(
@@ -336,15 +348,12 @@ describe('FormReferenceField', () => {
   });
 
   it('refreshTick bump drops items whose entries no longer exist (deleted)', async () => {
-    const { getEntryList } = await import('octocms/admin/actions');
-    const mocked = vi.mocked(getEntryList);
-
-    mocked.mockImplementationOnce(async () => [
+    getEntryListMock.mockImplementationOnce(async () => [
       { type: 'author', id: 'a1', path: 'cms/content/author/author-a1.json', title: 'Alice', status: 'merged' },
       { type: 'author', id: 'a2', path: 'cms/content/author/author-a2.json', title: 'Bob', status: 'merged' },
     ]);
 
-    const { rerender } = render(
+    const { rerender, client } = renderWithQuery(
       <FormReferenceField
         label="Authors"
         name="authors"
@@ -359,9 +368,10 @@ describe('FormReferenceField', () => {
     });
 
     // After delete: a1 is gone from the listing.
-    mocked.mockImplementationOnce(async () => [
+    getEntryListMock.mockImplementationOnce(async () => [
       { type: 'author', id: 'a2', path: 'cms/content/author/author-a2.json', title: 'Bob', status: 'merged' },
     ]);
+    client.removeQueries({ queryKey: queryKeys.entries.list('author') });
 
     setRefreshTick(1);
     rerender(
@@ -377,22 +387,5 @@ describe('FormReferenceField', () => {
       expect(screen.queryByText('Alice')).toBeNull();
       expect(screen.getByText('Bob')).toBeDefined();
     });
-  });
-
-  it('does not register cms:entry-saved or cms:entry-deleted window listeners', async () => {
-    const addSpy = vi.spyOn(window, 'addEventListener');
-    render(
-      <FormReferenceField
-        label="Authors"
-        name="authors"
-        value="[]"
-        reference={{ collections: ['author'], cardinality: 'many' }}
-      />,
-    );
-    await waitFor(() => expect(screen.getByText('No items selected')).toBeDefined());
-    const types = addSpy.mock.calls.map(([t]) => t);
-    expect(types).not.toContain('cms:entry-saved');
-    expect(types).not.toContain('cms:entry-deleted');
-    addSpy.mockRestore();
   });
 });

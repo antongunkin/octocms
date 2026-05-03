@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import React, { Suspense, createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import { toContentPath } from '../lib/referenceKeys';
 import { toast } from './useToast';
@@ -51,13 +51,11 @@ const deriveEntryFromPath = (path: string): EntryStackEntry | null => {
   return { id, type, path, title: '' };
 };
 
-export const EntryStackProvider = ({
-  children,
-  rootEntry,
-}: {
-  children: React.ReactNode;
-  rootEntry: EntryStackEntry;
-}) => {
+/**
+ * `useSearchParams()` can suspend during static shell / hydration. Next.js expects a
+ * parent `Suspense` — we keep it here so `EditPost` (and `/design` demos) stay thin.
+ */
+function EntryStackProviderInner({ children, rootEntry }: { children: React.ReactNode; rootEntry: EntryStackEntry }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [refreshTick, setRefreshTick] = useState(0);
@@ -127,6 +125,18 @@ export const EntryStackProvider = ({
   );
 
   return <EntryStackContext.Provider value={value}>{children}</EntryStackContext.Provider>;
-};
+}
+
+export const EntryStackProvider = ({
+  children,
+  rootEntry,
+}: {
+  children: React.ReactNode;
+  rootEntry: EntryStackEntry;
+}) => (
+  <Suspense fallback={null}>
+    <EntryStackProviderInner rootEntry={rootEntry}>{children}</EntryStackProviderInner>
+  </Suspense>
+);
 
 export const useEntryStack = (): EntryStackContextValue => useContext(EntryStackContext);

@@ -1,54 +1,35 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ExternalLink } from 'lucide-react';
 
+import { useEntryCommits } from '../../admin/query/hooks/useEntryCommits';
+import { queryKeys } from '../../admin/query/keys';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useEntryStack } from '../../hooks/useEntryStack';
 import { relativeTime } from '../../lib/relativeTime';
-import type { EntryCommit } from '../../types';
 
 type HistorySectionProps = {
   entryPath: string;
   flat?: boolean;
 };
 
-type Status = 'idle' | 'loading' | 'ready' | 'error';
-
 const HistorySection = ({ entryPath, flat }: HistorySectionProps) => {
-  const [commits, setCommits] = useState<EntryCommit[]>([]);
-  const [seeAllUrl, setSeeAllUrl] = useState('');
-  const [status, setStatus] = useState<Status>('idle');
+  const [commitsEnabled, setCommitsEnabled] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const statusRef = useRef<Status>('idle');
   const { refreshTick } = useEntryStack();
+  const queryClient = useQueryClient();
 
-  statusRef.current = status;
+  const commitsQuery = useEntryCommits(entryPath, { enabled: commitsEnabled && Boolean(entryPath) });
 
-  // Stable fetch ref — kept so the IntersectionObserver callback always sees the latest entryPath.
-  const fetchRef = useRef<() => Promise<void>>(async () => {});
-  fetchRef.current = async () => {
-    if (!entryPath) return;
-    setStatus((s) => (s === 'ready' ? 'ready' : 'loading'));
-    try {
-      const { getEntryCommits } = await import('../../admin/actions');
-      const result = await getEntryCommits(entryPath);
-      setCommits(result.commits);
-      setSeeAllUrl(result.seeAllUrl);
-      setStatus('ready');
-    } catch (_e) {
-      setStatus('error');
-    }
-  };
-
-  // Layer B: defer the network call until the card enters the viewport.
+  // Layer B: enable the query only after the card enters the viewport.
   useEffect(() => {
     const node = rootRef.current;
     if (!node) return;
 
     if (typeof IntersectionObserver === 'undefined') {
-      // Fallback for environments without IO: fire immediately after mount.
-      fetchRef.current();
+      setCommitsEnabled(true);
       return;
     }
 
@@ -57,7 +38,7 @@ const HistorySection = ({ entryPath, flat }: HistorySectionProps) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             observer.disconnect();
-            fetchRef.current();
+            setCommitsEnabled(true);
             break;
           }
         }
@@ -69,27 +50,35 @@ const HistorySection = ({ entryPath, flat }: HistorySectionProps) => {
   }, [entryPath]);
 
   // Refetch when an inline-edit overlay closes after a save/delete — but only if we
-  // already fetched once (preserves the "don't pre-fetch before intersection" rule).
+  // already enabled the query (preserves the "don't pre-fetch before intersection" rule).
   useEffect(() => {
     if (refreshTick === 0) return;
-    if (statusRef.current === 'idle') return;
-    fetchRef.current();
-  }, [refreshTick]);
+    if (!commitsEnabled) return;
+    void queryClient.invalidateQueries({ queryKey: queryKeys.entries.commits(entryPath) });
+  }, [refreshTick, commitsEnabled, entryPath, queryClient]);
 
-  const isIdleOrLoading = status === 'idle' || status === 'loading';
-  const isEmpty = (status === 'ready' && commits.length === 0) || status === 'error';
+  const commits = commitsQuery.data?.commits ?? [];
+  const seeAllUrl = commitsQuery.data?.seeAllUrl ?? '';
+
+  const showSkeleton = !commitsEnabled || (commitsQuery.isPending && commitsQuery.data === undefined);
+  const showEmpty =
+    commitsEnabled &&
+    !commitsQuery.isPending &&
+    (commitsQuery.isError || (commitsQuery.isSuccess && commits.length === 0));
+  const showList = commitsEnabled && commitsQuery.isSuccess && commits.length > 0;
+  const showSeeAll = commitsEnabled && commitsQuery.isSuccess && Boolean(seeAllUrl);
 
   const body = (
     <>
-      {isIdleOrLoading && (
+      {showSkeleton && (
         <div className="space-y-2" data-testid="history-skeleton">
           <div className="h-8 rounded bg-muted/40" />
           <div className="h-8 rounded bg-muted/40" />
           <div className="h-8 rounded bg-muted/40" />
         </div>
       )}
-      {isEmpty && <p className="text-sm text-muted-foreground">No commits yet.</p>}
-      {status === 'ready' && commits.length > 0 && (
+      {showEmpty && <p className="text-sm text-muted-foreground">No commits yet.</p>}
+      {showList && (
         <ul className="space-y-2">
           {commits.map((c) => (
             <li key={c.sha}>
@@ -111,7 +100,7 @@ const HistorySection = ({ entryPath, flat }: HistorySectionProps) => {
           ))}
         </ul>
       )}
-      {status === 'ready' && seeAllUrl && (
+      {showSeeAll && (
         <a
           href={seeAllUrl}
           target="_blank"

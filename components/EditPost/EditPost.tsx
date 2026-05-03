@@ -3,19 +3,21 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import React, { Suspense, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 
+import { useEntry } from '../../admin/query/hooks/useEntry';
+import { useEntryList } from '../../admin/query/hooks/useEntryList';
+import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
+import { useIsProduction } from '../../admin/query/hooks/useIsProduction';
 import {
-  saveFile,
-  removeFile,
-  getIsProduction,
-  hasActiveBranch,
-  publishEntry,
-  archiveEntry,
-  restoreEntry,
-} from '../../admin/actions';
-import type { EntryStatus } from '../../types';
+  useArchiveEntry,
+  usePublishEntry,
+  useRemoveFile,
+  useRestoreEntry,
+  useSaveFile,
+} from '../../admin/query/hooks/useEntryMutations';
+import type { EntryStatus, SelectedFile } from '../../types';
 import { StatusBadge } from '../StatusBadge';
 import { useFileState } from '../../hooks/useFileState';
 import { EntryStackProvider, useEntryStack } from '../../hooks/useEntryStack';
@@ -33,39 +35,66 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { toast } from '../../hooks/useToast';
 import CreateBranchDialog from '../CreateBranchDialog';
 
+import { EntryFormSkeleton } from './skeletons/EntryFormSkeleton';
+import { EntrySidebarSkeleton } from './skeletons/EntrySidebarSkeleton';
+
 const HistorySection = dynamic(() => import('../HistorySection/HistorySection'), {
   ssr: false,
   loading: () => null,
 });
 
-const EditPostInner = ({ post }: { post: any }) => {
+type EditPostProps = {
+  type: string;
+  id: string;
+};
+
+type SaveFileError = Error & { fieldErrors?: Record<string, string> };
+
+const EditPostInner = ({ type, id }: EditPostProps) => {
   const config = useConfig();
-  const { selectedType, selectedFile, onFileClick } = useFileState();
+  const { onFileClick } = useFileState();
   const { stack, popEntry } = useEntryStack();
   const router = useRouter();
+
+  const isProductionQuery = useIsProduction();
+  const hasActiveBranchQuery = useHasActiveBranch();
+  const isProduction = isProductionQuery.data ?? false;
+  const activeBranchSet = hasActiveBranchQuery.data ?? true;
+
+  // Resolve the entry's file path from `type + id` via the entries list.
+  // The list cache is populated by /cms/content navigation; on a direct
+  // visit this fetches once.
+  const entryListQuery = useEntryList(type);
+  const resolvedEntryItem = entryListQuery.data?.find((e) => e.id === id);
+  const filePath = resolvedEntryItem?.path;
+
+  const entryQuery = useEntry(filePath);
+  const post = entryQuery.data;
+
+  const selectedFile: SelectedFile | undefined = filePath ? { type, id, path: filePath } : undefined;
+
+  // Sync the selectedFile into the FileContextProvider so other consumers
+  // (overlays, inline editors) see it. The context starts undefined and
+  // updates once the entry list resolves.
+  useEffect(() => {
+    onFileClick(selectedFile);
+    // Intentionally narrow deps so we don't loop on every onFileClick identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filePath, type, id]);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [isSaving, startSaving] = useTransition();
-  const [isProduction, setIsProduction] = useState(false);
-  const [activeBranchSet, setActiveBranchSet] = useState(true);
   const [createBranchOpen, setCreateBranchOpen] = useState(false);
   const [pendingSaveArgs, setPendingSaveArgs] = useState<{ sys: any; fields: any } | null>(null);
   const [viewMode, setViewMode] = useState<'edit' | 'diff'>('edit');
 
-  useEffect(() => {
-    getIsProduction().then((isProd) => {
-      setIsProduction(isProd);
-      if (isProd) {
-        hasActiveBranch().then(setActiveBranchSet);
-      }
-    });
-
-    const handler = () => {
-      hasActiveBranch().then(setActiveBranchSet);
-    };
-    window.addEventListener('cms:branch-changed', handler);
-    return () => window.removeEventListener('cms:branch-changed', handler);
-  }, []);
+  const saveMutation = useSaveFile();
+  const removeMutation = useRemoveFile();
+  const publishMutation = usePublishEntry();
+  const archiveMutation = useArchiveEntry();
+  const restoreMutation = useRestoreEntry();
+  const isSaving =
+    saveMutation.isPending || publishMutation.isPending || archiveMutation.isPending || restoreMutation.isPending;
 
   const clearFieldError = useCallback((name: string) => {
     setFieldErrors((prev) => {
@@ -77,27 +106,23 @@ const EditPostInner = ({ post }: { post: any }) => {
   }, []);
 
   const executeSave = useCallback(
-    (sys: any, fields: any) => {
-      if (!selectedFile?.path) return;
-      startSaving(async () => {
-        const result = await saveFile({ sys, fields }, selectedFile.path);
-        if (result.success) {
-          toast({ title: 'Saved successfully', variant: 'success' });
-          router.refresh();
-        } else {
-          if (result.fieldErrors) {
-            setFieldErrors(result.fieldErrors);
-          }
-          toast({ title: result.error, variant: 'destructive' });
-        }
-      });
+    async (sys: any, fields: any) => {
+      if (!filePath) return;
+      try {
+        await saveMutation.mutateAsync({ fileName: filePath, data: { sys, fields } });
+        toast({ title: 'Saved successfully', variant: 'success' });
+      } catch (e) {
+        const err = e as SaveFileError;
+        if (err.fieldErrors) setFieldErrors(err.fieldErrors);
+        toast({ title: err.message, variant: 'destructive' });
+      }
     },
-    [selectedFile, router],
+    [filePath, saveMutation],
   );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedFile?.path || !selectedType) return;
+    if (!filePath || !post) return;
 
     const formData = new FormData(e.currentTarget);
     const fields: Record<string, string> = {};
@@ -106,12 +131,12 @@ const EditPostInner = ({ post }: { post: any }) => {
     }
 
     // Rebuild conditional fields from dot-path FormData entries into nested JSON
-    const collectionFields = config.collections[selectedType as keyof Config['collections']]?.fields;
+    const collectionFields = config.collections[type as keyof Config['collections']]?.fields;
     if (collectionFields) {
       rebuildConditionalFields(collectionFields, fields);
     }
 
-    const validation = validateEntryFields(selectedType, fields);
+    const validation = validateEntryFields(type, fields);
     if (!validation.ok) {
       setFieldErrors(validation.fieldErrors);
       toast({ title: 'Please fix the highlighted fields', variant: 'destructive' });
@@ -119,7 +144,7 @@ const EditPostInner = ({ post }: { post: any }) => {
     }
 
     setFieldErrors({});
-    const sys = { ...post.sys, type: selectedType };
+    const sys = { ...post.sys, type };
 
     if (isProduction && !activeBranchSet) {
       setPendingSaveArgs({ sys, fields });
@@ -127,103 +152,151 @@ const EditPostInner = ({ post }: { post: any }) => {
       return;
     }
 
-    executeSave(sys, fields);
+    void executeSave(sys, fields);
   };
 
   const handleBranchCreated = (_branchName: string, _prUrl: string, _prWarning?: string) => {
-    setActiveBranchSet(true);
     setCreateBranchOpen(false);
-    window.dispatchEvent(new Event('cms:branch-changed'));
+    // The branch mutation invalidates `git.hasActive` so this hook re-renders
+    // with `activeBranchSet === true` automatically.
     if (pendingSaveArgs) {
-      executeSave(pendingSaveArgs.sys, pendingSaveArgs.fields);
+      void executeSave(pendingSaveArgs.sys, pendingSaveArgs.fields);
       setPendingSaveArgs(null);
     }
   };
 
-  const onRemove = async (fileName: string | undefined) => {
-    if (fileName) {
-      const result = await removeFile(fileName);
-
-      if (!result.success) {
-        toast({ title: result.error, variant: 'destructive' });
-        return;
-      }
-
+  const onRemove = async () => {
+    if (!filePath) return;
+    try {
+      await removeMutation.mutateAsync(filePath);
       onFileClick(undefined);
-      router.push(`/cms/content/${post?.sys?.type}`);
+      router.push(`/cms/content/${type}`);
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Delete failed', variant: 'destructive' });
     }
   };
 
   const currentStatus: EntryStatus = post?.sys?.status || 'merged';
 
-  const handlePublish = () => {
-    if (!selectedFile?.path) return;
-    startSaving(async () => {
-      const result = await publishEntry(selectedFile.path);
-      if (result.success) {
-        toast({ title: 'Published successfully', variant: 'success' });
-        router.refresh();
-      } else {
-        toast({ title: result.error, variant: 'destructive' });
-      }
-    });
+  const handlePublish = async () => {
+    if (!filePath) return;
+    try {
+      await publishMutation.mutateAsync(filePath);
+      toast({ title: 'Published successfully', variant: 'success' });
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Publish failed', variant: 'destructive' });
+    }
   };
 
-  const handleArchive = () => {
-    if (!selectedFile?.path) return;
-    startSaving(async () => {
-      const result = await archiveEntry(selectedFile.path);
-      if (result.success) {
-        toast({ title: 'Entry archived', variant: 'success' });
-        router.refresh();
-      } else {
-        toast({ title: result.error, variant: 'destructive' });
-      }
-    });
+  const handleArchive = async () => {
+    if (!filePath) return;
+    try {
+      await archiveMutation.mutateAsync(filePath);
+      toast({ title: 'Entry archived', variant: 'success' });
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Archive failed', variant: 'destructive' });
+    }
   };
 
-  const handleRestore = () => {
-    if (!selectedFile?.path) return;
-    startSaving(async () => {
-      const result = await restoreEntry(selectedFile.path);
-      if (result.success) {
-        toast({ title: 'Entry restored', variant: 'success' });
-        router.refresh();
-      } else {
-        toast({ title: result.error, variant: 'destructive' });
-      }
-    });
+  const handleRestore = async () => {
+    if (!filePath) return;
+    try {
+      await restoreMutation.mutateAsync(filePath);
+      toast({ title: 'Entry restored', variant: 'success' });
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Restore failed', variant: 'destructive' });
+    }
   };
 
-  const collectionLabel = useMemo(() => {
-    return config.collections[post?.sys?.type as keyof typeof config.collections]?.label ?? post?.sys?.type ?? '';
-  }, [config, post?.sys?.type]);
+  const collectionLabel = useMemo(
+    () => config.collections[type as keyof typeof config.collections]?.label ?? type,
+    [config, type],
+  );
 
   const entryTitle = useMemo(() => {
-    const fields = config.collections[post?.sys?.type as keyof Config['collections']]?.fields;
+    const fields = config.collections[type as keyof Config['collections']]?.fields;
     if (!fields || !post?.fields) return '';
     const titleKey = Object.keys(fields).find((k) => fields[k]?.entryTitle);
     if (titleKey && typeof post.fields[titleKey] === 'string') {
       return post.fields[titleKey] as string;
     }
     return '';
-  }, [config, post?.sys?.type, post?.fields]);
+  }, [config, type, post?.fields]);
 
-  // The Edit/Diff toggle is only useful when there's an unmerged delta to compare:
-  // - In production: a feature branch must be active (cookie set).
-  // - In dev: always allow — the local `git` can always compare the working tree to base.
-  // Archived entries hide the toggle (no editing workflow there).
+  // The Edit/Diff toggle is only useful when there's an unmerged delta to compare.
   const diffToggleVisible = currentStatus !== 'archived' && (isProduction ? activeBranchSet : true);
 
-  // If we lose visibility while in Diff mode (e.g. branch cleared), fall back to Edit.
   useEffect(() => {
     if (!diffToggleVisible && viewMode === 'diff') {
       setViewMode('edit');
     }
   }, [diffToggleVisible, viewMode]);
 
-  if (!post?.fields) {
-    return 'No selected post';
+  const isLoadingEntry =
+    (entryListQuery.isPending && !entryListQuery.data) ||
+    (entryQuery.isPending && !entryQuery.data && Boolean(filePath));
+  const entryListResolved = !entryListQuery.isPending || Boolean(entryListQuery.data);
+  const isNotFound = entryListResolved && !resolvedEntryItem;
+
+  // Header chrome that's safe to render before the entry resolves.
+  const headerChrome = (
+    <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
+          <Link href={`/cms/content/${type}`} aria-label="Back to collection">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+        <div className="min-w-0 flex-1">
+          <div className="mb-px flex items-center gap-1.5 text-[12px]" style={{ color: 'var(--text-2)' }}>
+            <Link
+              href="/cms/content"
+              className="hover:text-foreground transition-colors"
+              style={{ color: 'var(--text-2)' }}
+            >
+              Content
+            </Link>
+            <ChevronRight className="h-3 w-3 opacity-60" />
+            <span>{collectionLabel}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <h1 className="m-0 text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
+              {entryTitle || collectionLabel}
+            </h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (isLoadingEntry) {
+    return (
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {headerChrome}
+        <div className="flex-1 min-h-0 overflow-hidden flex">
+          <div className="flex-1 min-w-0 overflow-y-auto bg-bg">
+            <div className="max-w-[960px] mx-auto px-6 py-6 pb-32">
+              <EntryFormSkeleton />
+            </div>
+          </div>
+          <EntrySidebarSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  if (isNotFound || !post?.fields) {
+    return (
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {headerChrome}
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-muted-foreground">
+          <p className="text-sm font-medium">Entry not found.</p>
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/cms/content/${type}`}>Back to {collectionLabel}</Link>
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -232,7 +305,7 @@ const EditPostInner = ({ post }: { post: any }) => {
       <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
-            <Link href={`/cms/content/${post?.sys?.type}`} aria-label="Back to collection">
+            <Link href={`/cms/content/${type}`} aria-label="Back to collection">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
@@ -352,12 +425,13 @@ const EditPostInner = ({ post }: { post: any }) => {
         <div className="flex-1 min-w-0 overflow-y-auto bg-bg">
           <div className="max-w-[960px] mx-auto px-6 py-6 pb-32">
             {viewMode === 'diff' && selectedFile ? (
-              <DiffView collectionType={selectedType as string} entryPath={selectedFile.path} />
+              <DiffView collectionType={type} entryPath={selectedFile.path} />
             ) : (
               <section className="rounded-2xl border border-border bg-bg px-7 py-7 shadow-1">
                 <FormFields
+                  key={`${filePath ?? ''}-${entryQuery.dataUpdatedAt}`}
                   selectedFile={selectedFile}
-                  fields={post?.fields}
+                  fields={post.fields}
                   fieldErrors={fieldErrors}
                   onClearFieldError={clearFieldError}
                 />
@@ -376,8 +450,8 @@ const EditPostInner = ({ post }: { post: any }) => {
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-3 text-[12px]">
                 <span className="w-16 shrink-0 text-muted-foreground">ID</span>
-                <span className="flex-1 min-w-0 font-mono text-[11px] text-foreground truncate" title={post?.sys?.id}>
-                  {post?.sys?.id}
+                <span className="flex-1 min-w-0 font-mono text-[11px] text-foreground truncate" title={post.sys?.id}>
+                  {post.sys?.id}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-[12px]">
@@ -425,7 +499,7 @@ const EditPostInner = ({ post }: { post: any }) => {
               variant="destructive"
               onClick={async () => {
                 setIsDialogOpen(false);
-                await onRemove(selectedFile?.path);
+                await onRemove();
               }}
             >
               Delete permanently
@@ -442,20 +516,18 @@ const EditPostInner = ({ post }: { post: any }) => {
   );
 };
 
-const EditPost = ({ post }: { post: any }) => {
+const EditPost = ({ type, id }: EditPostProps) => {
   const rootEntry = {
-    id: post?.sys?.id || '',
-    type: post?.sys?.type || '',
+    id,
+    type,
     path: '',
     title: '',
   };
 
   return (
-    <Suspense fallback={null}>
-      <EntryStackProvider rootEntry={rootEntry}>
-        <EditPostInner post={post} />
-      </EntryStackProvider>
-    </Suspense>
+    <EntryStackProvider rootEntry={rootEntry}>
+      <EditPostInner type={type} id={id} />
+    </EntryStackProvider>
   );
 };
 

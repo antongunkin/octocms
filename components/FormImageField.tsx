@@ -1,9 +1,12 @@
 'use client';
 
 import { ImageIcon, ImagePlus, Upload, X } from 'lucide-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
-import { getMediaEntries } from '../admin/actions';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { queryKeys } from '../admin/query/keys';
+import { useMediaList } from '../admin/query/hooks/useMediaList';
 import { useConfig } from '../hooks/useConfig';
 import { toast } from '../hooks/useToast';
 import type { MediaFile } from '../types';
@@ -25,15 +28,14 @@ type FormImageFieldProps = {
 
 const FormImageField = ({ label, name, value, required, hint, error, onClearError }: FormImageFieldProps) => {
   const config = useConfig();
+  const queryClient = useQueryClient();
+  const mediaList = useMediaList();
   const [selected, setSelected] = useState(value || '');
-  const [mediaEntries, setMediaEntries] = useState<MediaFile[]>([]);
   const [pendingUpload, setPendingUpload] = useState<File[] | null>(null);
   const [showSelectDialog, setShowSelectDialog] = useState(false);
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    getMediaEntries().then(setMediaEntries);
-  }, []);
+  const mediaEntries = mediaList.data ?? [];
 
   const selectedEntry = mediaEntries.find((e) => e.id === selected);
   const previewUrl = selectedEntry?.publicUrl || '';
@@ -60,14 +62,12 @@ const FormImageField = ({ label, name, value, required, hint, error, onClearErro
         setPendingUpload(null);
         return;
       }
-      const fresh = await getMediaEntries();
-      setMediaEntries(fresh);
-      // First uploaded id wins as the field value (single-image field).
+      await queryClient.invalidateQueries({ queryKey: queryKeys.media.list() });
       setSelected(uploadedIds[0]);
       setPendingUpload(null);
       onClearError?.(name);
     },
-    [name, onClearError],
+    [name, onClearError, queryClient],
   );
 
   const handlePickExisting = useCallback(

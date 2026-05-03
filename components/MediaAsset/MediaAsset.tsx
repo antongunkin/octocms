@@ -1,32 +1,47 @@
 'use client';
 
-import { ArrowLeft, ChevronRight, ExternalLink, Trash2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight, ExternalLink, ImageIcon, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useMemo, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { deleteMedia, moveMedia, updateMediaMetadata } from '../../admin/actions';
+import { useMediaAsset } from '../../admin/query/hooks/useMediaAsset';
+import { useDeleteMedia, useMoveMedia, useUpdateMediaMetadata } from '../../admin/query/hooks/useMediaMutations';
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
-import type { MediaFile } from '../../types';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
+import { MediaMetadataFormSkeleton } from './skeletons/MediaMetadataFormSkeleton';
+import { MediaPreviewSkeleton } from './skeletons/MediaPreviewSkeleton';
+
 export type MediaAssetProps = {
-  file: MediaFile;
-  allFiles: MediaFile[];
+  id: string;
 };
 
-export function MediaAsset({ file: initialFile, allFiles }: MediaAssetProps) {
+export function MediaAsset({ id }: MediaAssetProps) {
   const router = useRouter();
-  const [file, setFile] = useState(initialFile);
-  const [titleDraft, setTitleDraft] = useState(initialFile.title);
-  const [folderDraft, setFolderDraft] = useState(initialFile.folder);
+  const { asset: file, allFiles, isLoading } = useMediaAsset(id);
+  const updateMetadataMutation = useUpdateMediaMetadata();
+  const moveMutation = useMoveMedia();
+  const deleteMutation = useDeleteMedia();
+  const isPending = updateMetadataMutation.isPending || moveMutation.isPending || deleteMutation.isPending;
+
+  const [titleDraft, setTitleDraft] = useState('');
+  const [folderDraft, setFolderDraft] = useState('/');
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const { folders: customFolders } = useMediaCustomFolders();
+
+  // Sync local drafts whenever the resolved asset changes (initial load,
+  // navigating between assets, or external invalidation).
+  useEffect(() => {
+    if (file) {
+      setTitleDraft(file.title);
+      setFolderDraft(file.folder);
+    }
+  }, [file]);
 
   const folders = useMemo(() => {
     const fromFiles = Array.from(new Set(allFiles.map((f) => f.folder).filter((f) => f !== '/')));
@@ -34,58 +49,93 @@ export function MediaAsset({ file: initialFile, allFiles }: MediaAssetProps) {
     return ['/', ...combined];
   }, [allFiles, customFolders]);
 
-  const folderLabel = file.folder === '/' ? 'Root' : file.folder;
+  const back = useCallback(() => router.push('/cms/media'), [router]);
 
-  const handleSaveTitle = useCallback(() => {
+  const handleSaveTitle = useCallback(async () => {
+    if (!file) return;
     const next = titleDraft.trim();
     if (!next) {
       toast({ title: 'Title is required', variant: 'destructive' });
       return;
     }
     if (next === file.title) return;
-    startTransition(async () => {
-      const result = await updateMediaMetadata(file.id, next);
-      if (!result.success) {
-        toast({ title: result.error, variant: 'destructive' });
-        return;
-      }
-      setFile((prev) => ({ ...prev, title: next }));
+    try {
+      await updateMetadataMutation.mutateAsync({ id: file.id, title: next });
       toast({ title: 'Title saved', variant: 'success' });
-    });
-  }, [titleDraft, file.id, file.title]);
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Save failed', variant: 'destructive' });
+    }
+  }, [file, titleDraft, updateMetadataMutation]);
 
-  const handleSaveFolder = useCallback(() => {
-    if (folderDraft === file.folder) return;
+  const handleSaveFolder = useCallback(async () => {
+    if (!file || folderDraft === file.folder) return;
     const next = folderDraft;
-    startTransition(async () => {
-      const result = await moveMedia(file.id, next);
-      if (!result.success) {
-        toast({ title: result.error, variant: 'destructive' });
-        return;
-      }
-      setFile((prev) => ({ ...prev, folder: next }));
+    try {
+      await moveMutation.mutateAsync({ id: file.id, folder: next });
       toast({ title: `Moved to ${next === '/' ? 'Root' : next}`, variant: 'success' });
-    });
-  }, [folderDraft, file.id, file.folder]);
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Move failed', variant: 'destructive' });
+    }
+  }, [file, folderDraft, moveMutation]);
 
-  const handleDelete = useCallback(() => {
-    startTransition(async () => {
-      const result = await deleteMedia(file.id);
-      if (!result.success) {
-        toast({ title: result.error, variant: 'destructive' });
-        setConfirmDelete(false);
-        return;
-      }
+  const handleDelete = useCallback(async () => {
+    if (!file) return;
+    try {
+      await deleteMutation.mutateAsync(file.id);
       toast({ title: `Deleted "${file.originalName}"`, variant: 'success' });
       router.push('/cms/media');
-    });
-  }, [file.id, file.originalName, router]);
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Delete failed', variant: 'destructive' });
+      setConfirmDelete(false);
+    }
+  }, [file, deleteMutation, router]);
 
   const openInNewTab = useCallback(() => {
+    if (!file) return;
     window.open(file.publicUrl, '_blank', 'noopener,noreferrer');
-  }, [file.publicUrl]);
+  }, [file]);
 
-  const back = () => router.push('/cms/media');
+  // Loading state — pre-skeleton render: keep header chrome but render block
+  // skeletons so chip widths stay stable while the list resolves.
+  if (isLoading) {
+    return (
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="-ml-2 h-7 w-7 text-muted-foreground"
+              onClick={back}
+              aria-label="Back to media"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        <div className="flex flex-1 overflow-hidden">
+          <MediaPreviewSkeleton />
+          <MediaMetadataFormSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  // Resolved but no match — empty state instead of server-side `notFound()`
+  // so navigation between assets stays inside the cached SPA.
+  if (!file) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-muted-foreground">
+        <ImageIcon className="h-12 w-12" />
+        <p className="text-sm">Asset not found.</p>
+        <Button variant="outline" size="sm" onClick={back}>
+          Back to media
+        </Button>
+      </div>
+    );
+  }
+
+  const folderLabel = file.folder === '/' ? 'Root' : file.folder;
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">

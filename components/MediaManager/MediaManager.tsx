@@ -4,12 +4,11 @@ import { ImageIcon, ChevronRight, LayoutGrid, List, Search, Upload } from 'lucid
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getMediaEntries } from '../../admin/actions';
+import { useMediaList } from '../../admin/query/hooks/useMediaList';
 import { useConfig } from '../../hooks/useConfig';
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
-import type { MediaFile } from '../../types';
 import { Button } from '../ui/button';
 
 import { CreateFolderDialog } from './CreateFolderDialog';
@@ -18,19 +17,20 @@ import { MediaLeftPanel } from './MediaLeftPanel';
 import { MediaListTable } from './MediaListTable';
 import { MediaUploadBar } from './MediaUploadBar';
 import { MediaUploadDialog } from './MediaUploadDialog';
-
-type MediaManagerProps = {
-  files: MediaFile[];
-};
+import { MediaGridSkeleton } from './skeletons/MediaGridSkeleton';
+import { MediaLeftPanelSkeleton } from './skeletons/MediaLeftPanelSkeleton';
+import { MediaListTableSkeleton } from './skeletons/MediaListTableSkeleton';
 
 type ViewMode = 'grid' | 'list';
 
 const VIEW_MODE_KEY = 'octocms:media-view-mode';
 
-const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
+const MediaManager = () => {
   const router = useRouter();
   const config = useConfig();
-  const [files, setFiles] = useState(initialFiles);
+  const mediaQuery = useMediaList();
+  const files = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
+  const isLoadingFiles = mediaQuery.isPending && !mediaQuery.data;
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [pendingUpload, setPendingUpload] = useState<File[] | null>(null);
@@ -116,8 +116,8 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
 
   const handleUploadComplete = useCallback(
     async (uploadedIds: string[]) => {
-      const fresh = await getMediaEntries();
-      setFiles(fresh);
+      // Cache invalidation happens inside `useUploadMedia` (called by
+      // `MediaUploadDialog`), so the list refetches automatically.
       setPendingUpload(null);
       // Open the asset editor for the first upload — others are still in the list.
       if (uploadedIds.length > 0) {
@@ -183,17 +183,21 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        <MediaLeftPanel
-          folders={folders}
-          selectedFolder={selectedFolder}
-          countByFolder={countByFolder}
-          totalCount={files.length}
-          customFolders={customFolders}
-          onSelectAll={() => setSelectedFolder(null)}
-          onSelectFolder={(f) => setSelectedFolder(f)}
-          onAddFolder={() => setShowCreateFolder(true)}
-          onDeleteFolder={(f) => setPendingFolderDelete(f)}
-        />
+        {isLoadingFiles ? (
+          <MediaLeftPanelSkeleton />
+        ) : (
+          <MediaLeftPanel
+            folders={folders}
+            selectedFolder={selectedFolder}
+            countByFolder={countByFolder}
+            totalCount={files.length}
+            customFolders={customFolders}
+            onSelectAll={() => setSelectedFolder(null)}
+            onSelectFolder={(f) => setSelectedFolder(f)}
+            onAddFolder={() => setShowCreateFolder(true)}
+            onDeleteFolder={(f) => setPendingFolderDelete(f)}
+          />
+        )}
 
         <div className="flex flex-1 flex-col overflow-hidden">
           <MediaUploadBar
@@ -220,7 +224,13 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
           </div>
 
           <div className="flex-1 overflow-y-auto px-6 pb-6">
-            {filteredFiles.length === 0 ? (
+            {isLoadingFiles ? (
+              viewMode === 'grid' ? (
+                <MediaGridSkeleton />
+              ) : (
+                <MediaListTableSkeleton />
+              )
+            ) : filteredFiles.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
                 <ImageIcon className="h-12 w-12" />
                 <p className="text-sm">{searchQuery ? 'No assets match this search' : 'No files in this folder yet'}</p>

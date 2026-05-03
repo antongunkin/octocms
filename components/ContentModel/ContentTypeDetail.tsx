@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { keepPreviousData } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ChevronRight,
@@ -16,7 +16,9 @@ import {
   Trash2,
 } from 'lucide-react';
 
-import { saveSchema } from '../../admin/actions';
+import { useEntryList } from '../../admin/query/hooks/useEntryList';
+import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
+import { useSchema } from '../../admin/query/hooks/useSchema';
 import { toast } from '../../hooks/useToast';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
@@ -36,16 +38,21 @@ import DeleteContentTypeDialog from './DeleteContentTypeDialog';
 import DeleteFieldDialog from './DeleteFieldDialog';
 import EditContentTypeDialog from './EditContentTypeDialog';
 import FieldDialog from './FieldDialog';
+import { FieldTableSkeleton } from './skeletons/FieldTableSkeleton';
 
 type Props = {
-  schema: Config;
   type: string;
-  entryCount: number;
 };
 
-export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
-  const router = useRouter();
-  const collection: Collection | undefined = schema.collections[type];
+export default function ContentTypeDetail({ type }: Props) {
+  const schemaQuery = useSchema();
+  const entriesQuery = useEntryList(type, { placeholderData: keepPreviousData });
+  const saveSchemaMutation = useSaveSchema();
+  const schema = schemaQuery.data;
+  const entries = entriesQuery.data ?? [];
+  const entryCount = entries.filter((e) => e.type === type).length;
+  const isLoading = schemaQuery.isPending && !schema;
+  const collection: Collection | undefined = schema?.collections[type];
 
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -74,6 +81,24 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
     () => (collection ? JSON.stringify({ [type]: collection }, null, 2) : ''),
     [collection, type],
   );
+
+  // Loading state — render the field-table skeleton while schema resolves.
+  if (isLoading || !schema) {
+    return (
+      <div className="flex flex-1 flex-col overflow-hidden bg-[var(--bg)]">
+        <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
+          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
+            <Link href="/cms/model" aria-label="Back to Content Model">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+        <div className="flex-1 px-6 pt-5">
+          <FieldTableSkeleton />
+        </div>
+      </div>
+    );
+  }
 
   if (!collection) {
     return (
@@ -106,19 +131,21 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
       ...schema,
       collections: { ...schema.collections, [type]: { ...collection, fields: nextFields } },
     };
-    const result = await saveSchema(next, { message });
-    if (result.success) {
+    try {
+      await saveSchemaMutation.mutateAsync({ next, options: { message } });
       toast({ title: onSuccessTitle, description: onSuccessDesc, variant: 'success' });
-      router.refresh();
-    } else {
+    } catch (e) {
       // Roll back optimistic order if reorder failed.
       setOrderOverride(null);
-      toast({ title: "Couldn't save", description: result.error, variant: 'destructive' });
+      toast({
+        title: "Couldn't save",
+        description: e instanceof Error ? e.message : 'Save failed',
+        variant: 'destructive',
+      });
     }
   };
 
   const reorderTo = async (nextOrder: string[]) => {
-    setOrderOverride(nextOrder);
     const nextFields: Record<string, CollectionField> = {};
     for (const k of nextOrder) {
       if (k in collection.fields) nextFields[k] = collection.fields[k]!;

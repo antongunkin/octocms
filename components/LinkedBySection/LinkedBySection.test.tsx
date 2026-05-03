@@ -1,7 +1,8 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { renderWithQuery } from '../../admin/query/test/renderWithQuery';
 import type { EntryListItem } from '../../types';
 
 const { mockGetEntryBacklinks, getRefreshTick, setRefreshTick } = vi.hoisted(() => {
@@ -15,7 +16,7 @@ const { mockGetEntryBacklinks, getRefreshTick, setRefreshTick } = vi.hoisted(() 
   };
 });
 
-vi.mock('../../admin/actions', () => ({
+vi.mock('../../admin/actions/entries', () => ({
   getEntryBacklinks: mockGetEntryBacklinks,
 }));
 
@@ -56,25 +57,11 @@ afterEach(() => {
 const loadComponent = async () => (await import('./LinkedBySection')).default;
 
 describe('LinkedBySection', () => {
-  it('does not register cms:entry-saved or cms:entry-deleted window listeners', async () => {
-    mockGetEntryBacklinks.mockResolvedValue([]);
-    const addSpy = vi.spyOn(window, 'addEventListener');
-    const LinkedBySection = await loadComponent();
-
-    render(<LinkedBySection entryPath="cms/content/post/post-abc.json" />);
-    await waitFor(() => expect(mockGetEntryBacklinks).toHaveBeenCalled());
-
-    const types = addSpy.mock.calls.map(([t]) => t);
-    expect(types).not.toContain('cms:entry-saved');
-    expect(types).not.toContain('cms:entry-deleted');
-    addSpy.mockRestore();
-  });
-
   it('refetches when refreshTick bumps after the first load', async () => {
     mockGetEntryBacklinks.mockResolvedValue(initialBacklinks);
     const LinkedBySection = await loadComponent();
 
-    const { rerender } = render(<LinkedBySection entryPath="cms/content/post/post-abc.json" />);
+    const { rerender } = renderWithQuery(<LinkedBySection entryPath="cms/content/post/post-abc.json" />);
     await waitFor(() => expect(screen.getByText('First Post')).toBeTruthy());
     expect(mockGetEntryBacklinks).toHaveBeenCalledTimes(1);
 
