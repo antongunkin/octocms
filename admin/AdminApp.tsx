@@ -5,7 +5,6 @@ import { ContentModelListSkeleton } from '../components/ContentModel/ContentMode
 import { ContentTypeDetailSkeleton } from '../components/ContentModel/ContentTypeDetail.skeleton';
 import { DashboardCollectionSkeleton } from '../components/Dashboard/DashboardContent.collection.skeleton';
 import { DashboardContentSkeleton } from '../components/Dashboard/DashboardContent.skeleton';
-import { DashboardListSkeleton } from '../components/Dashboard/DashboardContent.list.skeleton';
 import { EditPostSkeleton } from '../components/EditPost/EditPost.skeleton';
 import { MediaAssetSkeleton } from '../components/MediaAsset/MediaAsset.skeleton';
 import { MediaManagerSkeleton } from '../components/MediaManager/MediaManager.skeleton';
@@ -103,11 +102,7 @@ async function AdminAppDispatcher({ params }: AdminAppProps) {
 
   if (segments[0] === 'content') {
     if (segments.length === 1) {
-      return (
-        <Suspense fallback={<DashboardListSkeleton />}>
-          <ContentPage />
-        </Suspense>
-      );
+      return <ContentPage />;
     }
     if (segments.length === 2) {
       const [, type] = segments;

@@ -14,6 +14,8 @@ const external = [
   '@mdxeditor/editor',
   '@mdxeditor/editor/*',
   /^@radix-ui\//,
+  '@tanstack/react-query',
+  '@tanstack/react-query-devtools',
   'octokit',
   'sonner',
   'zod',
