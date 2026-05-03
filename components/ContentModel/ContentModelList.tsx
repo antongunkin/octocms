@@ -4,18 +4,21 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, FileText, Layers, Plus, Search } from 'lucide-react';
 
+import { useEntryList } from '../../admin/query/hooks/useEntryList';
+import { useSchema } from '../../admin/query/hooks/useSchema';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
-import type { Config, EntryListItem } from '../../types';
 import CreateContentTypeDialog from './CreateContentTypeDialog';
+import { SchemaTableSkeleton } from './skeletons/SchemaTableSkeleton';
 
-type Props = {
-  schema: Config;
-  entries: EntryListItem[];
-};
-
-export default function ContentModelList({ schema, entries }: Props) {
+export default function ContentModelList() {
   const router = useRouter();
+  const schemaQuery = useSchema();
+  const entriesQuery = useEntryList();
+  const schema = schemaQuery.data;
+  const entriesData = entriesQuery.data;
+  const entries = useMemo(() => entriesData ?? [], [entriesData]);
+  const isLoading = (schemaQuery.isPending && !schema) || (entriesQuery.isPending && !entriesData);
   const searchRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState('');
   const [createOpen, setCreateOpen] = useState(false);
@@ -33,6 +36,7 @@ export default function ContentModelList({ schema, entries }: Props) {
   }, []);
 
   const rows = useMemo(() => {
+    if (!schema) return [];
     const counts = new Map<string, number>();
     for (const e of entries) {
       counts.set(e.type, (counts.get(e.type) ?? 0) + 1);
@@ -82,7 +86,7 @@ export default function ContentModelList({ schema, entries }: Props) {
         </div>
       </div>
 
-      <CreateContentTypeDialog open={createOpen} onOpenChange={setCreateOpen} schema={schema} />
+      {schema ? <CreateContentTypeDialog open={createOpen} onOpenChange={setCreateOpen} schema={schema} /> : null}
 
       {/* Body */}
       <div className="flex flex-1 flex-col overflow-hidden bg-[var(--bg)]">
@@ -105,74 +109,78 @@ export default function ContentModelList({ schema, entries }: Props) {
               </div>
             </div>
 
-            {/* Table */}
-            <div className="overflow-hidden rounded-xl border border-border bg-[var(--surface-1)] shadow-[var(--shadow-1)]">
-              <div className="overflow-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border bg-[var(--surface-2)]">
-                      <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                        Name
-                      </th>
-                      <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                        Key
-                      </th>
-                      <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                        Cardinality
-                      </th>
-                      <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                        Fields
-                      </th>
-                      <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                        Entries
-                      </th>
-                      <th className="w-10 px-4 py-2.5" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="h-32 text-center text-sm text-muted-foreground">
-                          No content types match your search.
-                        </td>
+            {isLoading ? (
+              <SchemaTableSkeleton />
+            ) : (
+              /* Table */
+              <div className="overflow-hidden rounded-xl border border-border bg-[var(--surface-1)] shadow-[var(--shadow-1)]">
+                <div className="overflow-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border bg-[var(--surface-2)]">
+                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                          Name
+                        </th>
+                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                          Key
+                        </th>
+                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                          Cardinality
+                        </th>
+                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                          Fields
+                        </th>
+                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                          Entries
+                        </th>
+                        <th className="w-10 px-4 py-2.5" />
                       </tr>
-                    ) : (
-                      filtered.map((r, i) => (
-                        <tr
-                          key={r.key}
-                          onClick={() => router.push(`/cms/model/${r.key}`)}
-                          className={cn(
-                            'group cursor-pointer transition-colors hover:bg-[var(--surface-2)]/60',
-                            i > 0 && 'border-t border-border',
-                          )}
-                          onKeyDown={() => router.push(`/cms/model/${r.key}`)}
-                        >
-                          <td className="px-4 py-3 text-sm">
-                            <span className="inline-flex items-center gap-2 font-medium text-foreground">
-                              {r.hasMany ? (
-                                <Layers className="h-4 w-4 text-muted-foreground" />
-                              ) : (
-                                <FileText className="h-4 w-4 text-muted-foreground" />
-                              )}
-                              {r.label}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{r.key}</td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">
-                            {r.hasMany ? 'Many entries' : 'Singleton'}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">{r.fieldCount}</td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">{r.entryCount}</td>
-                          <td className="w-10 px-4 py-3 text-right">
-                            <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground opacity-60 transition-opacity group-hover:opacity-100" />
+                    </thead>
+                    <tbody>
+                      {filtered.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="h-32 text-center text-sm text-muted-foreground">
+                            No content types match your search.
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                      ) : (
+                        filtered.map((r, i) => (
+                          <tr
+                            key={r.key}
+                            onClick={() => router.push(`/cms/model/${r.key}`)}
+                            className={cn(
+                              'group cursor-pointer transition-colors hover:bg-[var(--surface-2)]/60',
+                              i > 0 && 'border-t border-border',
+                            )}
+                            onKeyDown={() => router.push(`/cms/model/${r.key}`)}
+                          >
+                            <td className="px-4 py-3 text-sm">
+                              <span className="inline-flex items-center gap-2 font-medium text-foreground">
+                                {r.hasMany ? (
+                                  <Layers className="h-4 w-4 text-muted-foreground" />
+                                ) : (
+                                  <FileText className="h-4 w-4 text-muted-foreground" />
+                                )}
+                                {r.label}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{r.key}</td>
+                            <td className="px-4 py-3 text-sm text-muted-foreground">
+                              {r.hasMany ? 'Many entries' : 'Singleton'}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-muted-foreground">{r.fieldCount}</td>
+                            <td className="px-4 py-3 text-sm text-muted-foreground">{r.entryCount}</td>
+                            <td className="w-10 px-4 py-3 text-right">
+                              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground opacity-60 transition-opacity group-hover:opacity-100" />
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

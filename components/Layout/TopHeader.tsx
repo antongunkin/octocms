@@ -5,10 +5,11 @@
 'use client';
 
 import * as React from 'react';
+import { useIsFetching, useIsMutating } from '@tanstack/react-query';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
-import { ExternalLink, Plus, RefreshCw, Search, X } from 'lucide-react';
+import { ExternalLink, Loader2, Plus, RefreshCw, Search, X } from 'lucide-react';
 
 import { useAgentStatus } from '../../admin/query/hooks/useAgentStatus';
 import { useBranch } from '../../admin/query/hooks/useBranch';
@@ -47,18 +48,6 @@ type TopHeaderProps = {
   initialTheme?: Theme;
 };
 
-/**
- * Other components (`EditPost`, `InlineEntryEditor`) still listen for the
- * `cms:branch-changed` window event to refresh their own state. Until those
- * migrate to React Query (Phase 4), branch mutations dispatch the event on
- * success so legacy listeners stay in sync.
- */
-function notifyBranchChanged() {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event('cms:branch-changed'));
-  }
-}
-
 export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps) {
   const { data } = useSession();
   const config = useConfig();
@@ -95,18 +84,15 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
     if (isBaseRow) {
       await clearBranchMutation.mutateAsync();
       toast({ title: `Viewing ${branch} (read-only)`, variant: 'success' });
-      notifyBranchChanged();
       return;
     }
     await setActiveBranchMutation.mutateAsync(branch);
     toast({ title: `Switched to ${branch}`, variant: 'success' });
-    notifyBranchChanged();
   };
 
   const handleClearBranch = async () => {
     await clearBranchMutation.mutateAsync();
     toast({ title: 'Back to main branch', variant: 'success' });
-    notifyBranchChanged();
   };
 
   const handleBranchCreated = (branchName: string, prUrl: string, prWarning?: string) => {
@@ -125,7 +111,6 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       toast({ title: 'Branch created', variant: 'success' });
     }
     if (prUrl) window.open(prUrl, '_blank');
-    notifyBranchChanged();
   };
 
   const handlePublish = async (branchName: string) => {
@@ -153,6 +138,11 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
   // `getBranchAheadCount(branch)` source is added.
   const ahead = 0;
 
+  /** Any TanStack query fetch or mutation in flight — logo pill shows a spinner instead of the external-link icon. */
+  const fetchingCount = useIsFetching();
+  const mutatingCount = useIsMutating();
+  const isHeaderLoading = fetchingCount > 0 || mutatingCount > 0;
+
   return (
     <header className="sticky top-0 z-50 flex h-14 flex-none items-center gap-[10px] border-b border-[var(--border)] bg-[var(--surface-1)] px-6 text-[var(--text)]">
       {/* Logo pill — transparent with border, links to main site */}
@@ -161,9 +151,15 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
         target="_blank"
         rel="noopener noreferrer"
         className="focus-ring inline-flex h-8 shrink-0 items-center gap-2 overflow-hidden whitespace-nowrap rounded-full border border-[var(--border)] bg-transparent px-3 text-[14px] font-bold tracking-[-0.01em] text-[var(--text)] no-underline"
+        aria-busy={isHeaderLoading}
+        aria-label={isHeaderLoading ? `${projectName} — loading` : `${projectName} — opens site in new tab`}
       >
         <span className="overflow-hidden text-ellipsis">{projectName}</span>
-        <ExternalLink size={12} className="shrink-0 opacity-75" />
+        {isHeaderLoading ? (
+          <Loader2 size={12} className="h-3 w-3 shrink-0 animate-spin text-[var(--st-changed)]" aria-hidden />
+        ) : (
+          <ExternalLink size={12} className="h-3 w-3 shrink-0 opacity-75" aria-hidden />
+        )}
       </a>
 
       <span className="mx-1 h-[22px] w-px bg-[var(--border)]" />

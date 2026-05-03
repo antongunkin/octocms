@@ -2,10 +2,13 @@ import React from 'react';
 import { getServerSession } from 'next-auth';
 
 import ContentModelList from '../../components/ContentModel/ContentModelList';
-import { getEntryList } from '../actions';
-import { getSchema } from '../actions/schema';
 import { authOptions } from '../auth';
 
+/**
+ * Auth-gated thin shell. `ContentModelList` fetches its own data via
+ * `useSchema` + `useEntryList` and renders block-level skeletons while
+ * pending. See `octocms/admin/query/hooks/useSchema.ts`.
+ */
 export async function ContentModelPage() {
   const session = await getServerSession(authOptions);
 
@@ -13,7 +16,5 @@ export async function ContentModelPage() {
     return null;
   }
 
-  const [schema, entries] = await Promise.all([getSchema(), getEntryList()]);
-
-  return <ContentModelList schema={schema} entries={entries} />;
+  return <ContentModelList />;
 }

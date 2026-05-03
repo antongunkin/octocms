@@ -141,9 +141,8 @@ export { AdminLayout as default, metadata } from 'octocms/admin';
 
 /**
  * Catch-all admin route — every \`/cms/*\` URL renders the package's
- * \`AdminApp\` server component, which dispatches to the right page and wraps
- * each branch in its own \`<Suspense fallback={<MatchingSkeleton/>}>\`.
- * One file in the user app; the package owns the routing.
+ * \`AdminApp\` async server component (awaits \`params\`, no outer Suspense).
+ * One file in the user app; the package owns the routing and granular loading.
  */
 export const adminPageTemplate = `export { AdminApp as default } from 'octocms/admin';
 `;

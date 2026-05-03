@@ -14,7 +14,7 @@
 import { ImageIcon, LayoutGrid, List, Search } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { getMediaEntries } from '../../admin/actions';
+import { useMediaList } from '../../admin/query/hooks/useMediaList';
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { cn } from '../../lib/utils';
 import type { MediaFile } from '../../types';
@@ -37,23 +37,18 @@ type MediaSelectDialogProps = {
 };
 
 export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: MediaSelectDialogProps) {
-  const [files, setFiles] = useState<MediaFile[]>([]);
+  const { data: files = [], isPending, refetch } = useMediaList({ enabled: open });
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [loading, setLoading] = useState(false);
   const { folders: customFolders } = useMediaCustomFolders();
   const searchRef = useRef<HTMLInputElement>(null);
 
-  // Load (or refresh) the media list each time the dialog re-opens.
+  // Refresh when the dialog opens so newly-uploaded images surface (shared cache with `/cms/media`).
   useEffect(() => {
     if (!open) return;
-    setLoading(true);
-    getMediaEntries()
-      .then(setFiles)
-      .catch(() => setFiles([]))
-      .finally(() => setLoading(false));
-  }, [open]);
+    void refetch();
+  }, [open, refetch]);
 
   // Persist the view-mode pick alongside the standalone /cms/media library.
   useEffect(() => {
@@ -142,7 +137,7 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 pb-6">
-              {loading ? (
+              {isPending && files.length === 0 ? (
                 <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Loading…</div>
               ) : filteredFiles.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">

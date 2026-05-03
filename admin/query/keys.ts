@@ -13,6 +13,7 @@ export const queryKeys = {
     detail: (filePath: string) => ['entries', 'detail', filePath] as const,
     commits: (filePath: string) => ['entries', 'commits', filePath] as const,
     backlinks: (referenceKey: string) => ['entries', 'backlinks', referenceKey] as const,
+    diff: (filePath: string) => ['entries', 'diff', filePath] as const,
   },
   media: {
     all: ['media'] as const,

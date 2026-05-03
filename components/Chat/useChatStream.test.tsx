@@ -1,6 +1,8 @@
-import { act, renderHook } from '@testing-library/react';
-import React from 'react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { queryKeys } from '../../admin/query/keys';
+import { withQuery } from '../../admin/query/test/renderWithQuery';
 
 import { useChatStream } from './useChatStream';
 
@@ -28,6 +30,7 @@ function makeSseStream(chunks: string[], delayMs = 0): ReadableStream<Uint8Array
 describe('useChatStream — stop()', () => {
   let originalFetch: typeof globalThis.fetch;
   let lastInit: RequestInit | null = null;
+  const { Wrapper } = withQuery();
 
   beforeEach(() => {
     originalFetch = globalThis.fetch;
@@ -64,7 +67,7 @@ describe('useChatStream — stop()', () => {
       );
     }) as typeof globalThis.fetch;
 
-    const { result } = renderHook(() => useChatStream());
+    const { result } = renderHook(() => useChatStream(), { wrapper: Wrapper });
 
     // Kick off a streaming request — don't await; we need to abort while it's mid-flight.
     let sendPromise: Promise<void> = Promise.resolve();
@@ -96,7 +99,7 @@ describe('useChatStream — stop()', () => {
 
   it('does nothing when called while idle', () => {
     globalThis.fetch = vi.fn(() => Promise.resolve(new Response(makeSseStream([])))) as typeof globalThis.fetch;
-    const { result } = renderHook(() => useChatStream());
+    const { result } = renderHook(() => useChatStream(), { wrapper: Wrapper });
     expect(result.current.status).toBe('idle');
     act(() => {
       result.current.stop();
@@ -116,7 +119,7 @@ describe('useChatStream — stop()', () => {
       });
     }) as typeof globalThis.fetch;
 
-    const { result } = renderHook(() => useChatStream());
+    const { result } = renderHook(() => useChatStream(), { wrapper: Wrapper });
     let p: Promise<void> = Promise.resolve();
     act(() => {
       p = result.current.send('test');
@@ -136,5 +139,67 @@ describe('useChatStream — stop()', () => {
     // After reset(), the hook is back to its initial idle state.
     expect(result.current.status).toBe('idle');
     expect(result.current.entries).toEqual([]);
+  });
+});
+
+describe('useChatStream — proposal accept', () => {
+  let originalFetch: typeof globalThis.fetch;
+
+  beforeEach(() => {
+    originalFetch = globalThis.fetch;
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.restoreAllMocks();
+  });
+
+  it('invalidates entries queries after a successful accept', async () => {
+    const proposal = {
+      id: 'prop-int-1',
+      toolUseId: 'tool-1',
+      reasoning: 'r',
+      summary: 'Edit title',
+      kind: 'edit' as const,
+      collection: 'post',
+      entryPath: 'cms/content/post/p.json',
+      entryId: 'p',
+      fieldChanges: { title: 'New' },
+    };
+    const proposalLine = `data: ${JSON.stringify({ type: 'proposal', proposal })}\n\n`;
+    const doneLine = `data: ${JSON.stringify({ type: 'done' })}\n\n`;
+
+    let agentCalls = 0;
+    globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
+      const u = String(url);
+      if (u.includes('proposals/accept')) {
+        return new Response(JSON.stringify({ ok: true, entryPath: 'cms/content/post/p.json' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      agentCalls += 1;
+      return new Response(makeSseStream([proposalLine, doneLine]), {
+        status: 200,
+        headers: { 'Content-Type': 'text/event-stream' },
+      });
+    }) as typeof globalThis.fetch;
+
+    const { Wrapper, client } = withQuery();
+    client.setQueryData(queryKeys.entries.list('post'), []);
+
+    const { result } = renderHook(() => useChatStream(), { wrapper: Wrapper });
+
+    await act(async () => {
+      await result.current.send('hi');
+    });
+    await waitFor(() => expect(result.current.proposals['prop-int-1']?.status.kind).toBe('pending'));
+
+    await act(async () => {
+      await result.current.acceptProposal('prop-int-1');
+    });
+
+    expect(agentCalls).toBeGreaterThanOrEqual(2);
+    expect(client.getQueryState(queryKeys.entries.list('post'))?.isInvalidated).toBe(true);
   });
 });

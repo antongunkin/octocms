@@ -3,6 +3,7 @@ import '@mdxeditor/editor/style.css';
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 
+import { AdminBootstrapSkeleton } from '../../components/skeletons';
 import Provider from '../provider';
 import { Toaster } from '../../components/ui/toaster';
 import Layout from '../../components/Layout/Layout';
@@ -26,12 +27,10 @@ async function AdminLayoutInner({ children }: Readonly<{ children: React.ReactNo
   const initialTheme = await getThemeCookie();
   const config = getConfig();
 
-  // No Suspense around `<Layout>{children}</Layout>` here on purpose: the
-  // catch-all page (`AdminApp`) re-suspends on every back/forward navigation,
-  // and a Suspense at this level would blank the entire layout chrome
-  // (including the TopHeader). Layout itself owns the inner Suspense around
-  // `{children}` so the chrome stays mounted and the generic admin skeleton
-  // fills the main slot.
+  // No Suspense around `<Layout>{children}</Layout>` here: the catch-all page
+  // suspends inside the client `Layout` `<main>` boundary so `TopHeader` stays
+  // mounted. `AdminLayout`'s outer `<Suspense>` only wraps this async inner
+  // (cookie read) and shows `AdminBootstrapSkeleton` until providers mount.
   return (
     <Provider config={config}>
       <Layout initialTheme={initialTheme}>{children}</Layout>
@@ -47,7 +46,7 @@ async function AdminLayoutInner({ children }: Readonly<{ children: React.ReactNo
  */
 export const AdminLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<AdminBootstrapSkeleton />}>
       <AdminLayoutInner>{children}</AdminLayoutInner>
     </Suspense>
   );

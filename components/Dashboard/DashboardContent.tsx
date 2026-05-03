@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { keepPreviousData } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ChevronDown,
@@ -44,7 +45,7 @@ export default function DashboardContent({ selectedType }: Props) {
   const searchParams = useSearchParams();
   const isBranched = !selectedType && searchParams.get('tab') === 'branched';
 
-  const entriesQuery = useEntryList();
+  const entriesQuery = useEntryList(selectedType, { placeholderData: keepPreviousData });
   const branchQuery = useBranch();
   const hasActiveBranchQuery = useHasActiveBranch();
 

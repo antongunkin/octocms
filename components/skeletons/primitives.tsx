@@ -20,24 +20,3 @@ export function ShimmerRow({ widths, className }: { widths: string[]; className?
     </div>
   );
 }
-
-/**
- * Mock TopHeader bar — matches real `TopHeader` height (56px) so route
- * loading shimmers don't pop the layout when the real header swaps in.
- */
-export function HeaderShimmer() {
-  return (
-    <div className="flex h-14 items-center gap-4 border-b border-border bg-background px-6">
-      <ShimmerBlock className="h-6 w-6 rounded-lg" />
-      <div className="flex gap-2">
-        <ShimmerBlock className="h-4 w-20" />
-        <ShimmerBlock className="h-4 w-20" />
-        <ShimmerBlock className="h-4 w-20" />
-      </div>
-      <div className="ml-auto flex gap-2">
-        <ShimmerBlock className="h-7 w-28 rounded-md" />
-        <ShimmerBlock className="h-7 w-7 rounded-full" />
-      </div>
-    </div>
-  );
-}

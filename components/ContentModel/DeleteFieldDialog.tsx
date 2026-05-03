@@ -17,10 +17,10 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
-import { previewSchemaChange, saveSchema } from '../../admin/actions';
+import { previewSchemaChange } from '../../admin/actions';
 import type { PreviewSchemaResult } from '../../admin/actions/schema';
+import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import { toast } from '../../hooks/useToast';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
@@ -37,7 +37,7 @@ interface Props {
 }
 
 export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fieldKey }: Props) {
-  const router = useRouter();
+  const saveSchemaMutation = useSaveSchema();
   const collection: Collection | undefined = schema.collections[type];
   const field: CollectionField | undefined = collection?.fields[fieldKey];
 
@@ -86,20 +86,25 @@ export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fi
   const doDelete = async () => {
     if (!canConfirm) return;
     setBusy(true);
-    const result = await saveSchema(buildNext(), {
-      message: `CMS: delete field ${type}.${fieldKey}`,
-    });
-    setBusy(false);
-    if (result.success) {
+    try {
+      await saveSchemaMutation.mutateAsync({
+        next: buildNext(),
+        options: { message: `CMS: delete field ${type}.${fieldKey}` },
+      });
       toast({
         title: 'Field deleted',
         description: `${field.label} (${fieldKey}) removed from ${collection.label}.`,
         variant: 'success',
       });
       onOpenChange(false);
-      router.refresh();
-    } else {
-      toast({ title: "Couldn't delete field", description: result.error, variant: 'destructive' });
+    } catch (e) {
+      toast({
+        title: "Couldn't delete field",
+        description: e instanceof Error ? e.message : 'Save failed',
+        variant: 'destructive',
+      });
+    } finally {
+      setBusy(false);
     }
   };
 

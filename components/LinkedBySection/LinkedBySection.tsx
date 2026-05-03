@@ -1,13 +1,14 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { Link2 } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 
-import { getEntryBacklinks } from '../../admin/actions';
+import { useEntryBacklinks } from '../../admin/query/hooks/useEntryBacklinks';
+import { queryKeys } from '../../admin/query/keys';
 import type { Config } from '../../admin/types';
 import { useConfig } from '../../hooks/useConfig';
 import { useEntryStack } from '../../hooks/useEntryStack';
-import type { EntryListItem } from '../../types';
 import { toReferenceKey } from '../../lib/referenceKeys';
 
 type LinkedBySectionProps = {
@@ -16,32 +17,19 @@ type LinkedBySectionProps = {
 
 const LinkedBySection = ({ entryPath }: LinkedBySectionProps) => {
   const config = useConfig();
-  const [backlinks, setBacklinks] = useState<EntryListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { pushEntry, refreshTick } = useEntryStack();
-  const hasLoadedRef = useRef(false);
+  const queryClient = useQueryClient();
 
-  // Derive the reference key for this entry (e.g. 'author-abc.json')
   const referenceKey = toReferenceKey(entryPath);
+  const backlinksQuery = useEntryBacklinks(referenceKey);
 
   useEffect(() => {
-    // Skip refresh-driven runs until the initial load has completed at least once,
-    // so a tick bump fired before the section ever rendered does not pre-fetch.
-    if (refreshTick > 0 && !hasLoadedRef.current) return;
+    if (refreshTick === 0) return;
+    void queryClient.invalidateQueries({ queryKey: queryKeys.entries.backlinks(referenceKey) });
+  }, [refreshTick, referenceKey, queryClient]);
 
-    const load = async () => {
-      try {
-        const links = await getEntryBacklinks(referenceKey);
-        setBacklinks(links);
-      } catch (_e) {
-        // Silently fail
-      } finally {
-        setIsLoading(false);
-        hasLoadedRef.current = true;
-      }
-    };
-    load();
-  }, [referenceKey, refreshTick]);
+  const backlinks = backlinksQuery.data ?? [];
+  const isLoading = backlinksQuery.isPending && backlinksQuery.data === undefined;
 
   if (isLoading) {
     return (

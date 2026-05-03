@@ -1,14 +1,15 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { EntryDiff } from '../../admin/actions/diff';
+import { renderWithQuery } from '../../admin/query/test/renderWithQuery';
 
 const { mockGetEntryDiff } = vi.hoisted(() => ({
   mockGetEntryDiff: vi.fn<(path: string) => Promise<EntryDiff>>(),
 }));
 
-vi.mock('../../admin/actions', () => ({
+vi.mock('../../admin/actions/diff', () => ({
   getEntryDiff: mockGetEntryDiff,
 }));
 
@@ -50,7 +51,7 @@ describe('DiffView', () => {
     mockGetEntryDiff.mockImplementation(() => new Promise(() => {}));
     const DiffView = await loadComponent();
 
-    const { container } = render(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
+    const { container } = renderWithQuery(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
     // Skeleton: three pulsing placeholder divs.
     expect(container.querySelector('.bg-muted\\/40')).toBeTruthy();
   });
@@ -59,7 +60,7 @@ describe('DiffView', () => {
     mockGetEntryDiff.mockResolvedValue(emptyDiff({ changed: false }));
     const DiffView = await loadComponent();
 
-    render(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
+    renderWithQuery(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
 
     await waitFor(() => expect(screen.getByText(/No unmerged changes for this entry/)).toBeTruthy());
     expect(screen.getByText(/cms\/edit-1/)).toBeTruthy();
@@ -70,7 +71,7 @@ describe('DiffView', () => {
     mockGetEntryDiff.mockRejectedValue(new Error('nope'));
     const DiffView = await loadComponent();
 
-    render(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
+    renderWithQuery(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
 
     await waitFor(() => expect(screen.getByText('Could not load diff.')).toBeTruthy());
   });
@@ -90,7 +91,7 @@ describe('DiffView', () => {
     );
     const DiffView = await loadComponent();
 
-    render(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
+    renderWithQuery(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
 
     await waitFor(() => expect(screen.getByText('Title')).toBeTruthy());
     expect(screen.getByText('Body')).toBeTruthy();
@@ -116,7 +117,7 @@ describe('DiffView', () => {
     );
     const DiffView = await loadComponent();
 
-    const { container } = render(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
+    const { container } = renderWithQuery(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
 
     await waitFor(() => expect(screen.getAllByText('No changes').length).toBeGreaterThanOrEqual(2));
     // The changed title field renders red and emerald hunk rows.
@@ -140,7 +141,7 @@ describe('DiffView', () => {
     );
     const DiffView = await loadComponent();
 
-    const { container } = render(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
+    const { container } = renderWithQuery(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
 
     await waitFor(() => expect(screen.getByText('Was')).toBeTruthy());
     expect(screen.getByText('Now')).toBeTruthy();
@@ -154,7 +155,7 @@ describe('DiffView', () => {
     mockGetEntryDiff.mockResolvedValue(emptyDiff());
     const DiffView = await loadComponent();
 
-    const { rerender } = render(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
+    const { rerender } = renderWithQuery(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
     await waitFor(() => expect(mockGetEntryDiff).toHaveBeenCalledWith('cms/content/post/post-p1.json'));
 
     rerender(<DiffView collectionType="post" entryPath="cms/content/post/post-p2.json" />);

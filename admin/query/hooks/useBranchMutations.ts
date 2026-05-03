@@ -19,6 +19,7 @@ import { invalidateAfterMutation } from '../invalidate';
 export function useSetActiveBranch() {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
+    mutationKey: ['git', 'setActiveBranch'],
     mutationFn: (branch) => setActiveBranch(branch),
     onSuccess: () => invalidateAfterMutation(qc, ['git']),
   });
@@ -27,6 +28,7 @@ export function useSetActiveBranch() {
 export function useClearBranch() {
   const qc = useQueryClient();
   return useMutation<void, Error, void>({
+    mutationKey: ['git', 'clearBranch'],
     mutationFn: () => clearBranch(),
     onSuccess: () => invalidateAfterMutation(qc, ['git']),
   });
@@ -35,6 +37,7 @@ export function useClearBranch() {
 export function usePublishBranch() {
   const qc = useQueryClient();
   return useMutation<{ success: true }, Error, string>({
+    mutationKey: ['git', 'publishBranch'],
     mutationFn: async (branch) => {
       const result = await publishBranch(branch);
       if (!result.success) throw new Error(result.error);

@@ -4,10 +4,15 @@
 'use client';
 
 import * as React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { Bot, FileText, GitBranch, Plus, Search } from 'lucide-react';
 
+import { getEntryList } from '../../admin/actions/entries';
+import { getFile } from '../../admin/actions/files';
 import { listCMSBranches, searchEntries, type CMSBranch, type SearchResult } from '../../admin/actions';
+import { queryKeys } from '../../admin/query/keys';
+import { useConfig } from '../../hooks/useConfig';
 import { entryAdminHref } from '../../lib/searchIndex';
 import { Kbd } from '../ui';
 import { RowItem, Section } from './parts';
@@ -54,6 +59,8 @@ type Row =
 
 export function CommandK({ open, onOpenChange }: CommandKProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const config = useConfig();
   const [query, setQuery] = React.useState('');
   const [entries, setEntries] = React.useState<SearchResult[]>([]);
   const [branches, setBranches] = React.useState<CMSBranch[]>([]);
@@ -110,9 +117,32 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
     [entries, matchingBranches, matchingActions],
   );
 
+  const prefetchEntryHit = React.useCallback(
+    (r: SearchResult) => {
+      const [type, ...rest] = r.id.split('/');
+      const stem = rest.join('/');
+      if (!type || !stem) return;
+      const filePath = `${config.contentFolder}/${type}/${stem}.json`;
+      void queryClient.prefetchQuery({
+        queryKey: queryKeys.entries.detail(filePath),
+        queryFn: () => getFile(filePath),
+      });
+      void queryClient.prefetchQuery({
+        queryKey: queryKeys.entries.list(type),
+        queryFn: () => getEntryList(type),
+      });
+    },
+    [config.contentFolder, queryClient],
+  );
+
   React.useEffect(() => {
     if (activeIndex >= rows.length) setActiveIndex(0);
   }, [rows.length, activeIndex]);
+
+  React.useEffect(() => {
+    const row = rows[activeIndex];
+    if (row?.kind === 'entry') prefetchEntryHit(row.result);
+  }, [activeIndex, rows, prefetchEntryHit]);
 
   const runRow = React.useCallback(
     (row: Row, modifier?: boolean) => {
@@ -196,7 +226,10 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
                     badge={r.typeLabel}
                     active={idx === activeIndex}
                     href={adminHref}
-                    onMouseEnter={() => setActiveIndex(idx)}
+                    onMouseEnter={() => {
+                      setActiveIndex(idx);
+                      prefetchEntryHit(r);
+                    }}
                     onClick={() => onOpenChange(false)}
                   />
                 );

@@ -1,13 +1,21 @@
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import React from 'react';
 
 import EditPost from '../../components/EditPost/EditPost';
 import { FileContextProvider } from '../../hooks/useFileState';
-import { parseFileName } from '../../utils/parseFileName';
-import { getContentFiles, getFile } from '../actions';
+import { getConfig } from '../../lib/configStore';
 import { authOptions } from '../auth';
 
+/**
+ * Auth-gated thin shell. `EditPost` resolves the entry's file path from
+ * `type + id`, fetches it via `useEntry`, and renders block-level skeletons
+ * (form + sidebar) while pending. Not-found is handled in-component so
+ * navigation between entries stays inside the cached SPA.
+ *
+ * `FileContextProvider` is preserved as a UI-state bus (selectedFile bag)
+ * — it no longer carries pre-fetched data.
+ */
 export async function EntryPage({ params }: { params: Promise<{ type: string; id: string }> }) {
   const { type, id } = await params;
 
@@ -16,9 +24,6 @@ export async function EntryPage({ params }: { params: Promise<{ type: string; id
   }
 
   // Media entries have a dedicated full-page editor at /cms/media/[id].
-  // Mounting them through `EditPost` would render an empty form because there
-  // is no `media` collection in the user's schema. The destination runs its
-  // own auth check, so this redirect is safe to do before authenticating.
   if (type === 'media') {
     redirect(`/cms/media/${id}`);
   }
@@ -29,21 +34,16 @@ export async function EntryPage({ params }: { params: Promise<{ type: string; id
     return null;
   }
 
-  const files = await getContentFiles();
-  const file = files.find((f) => f.includes(id));
-  const parsedFileName = file ? parseFileName(file) : undefined;
-
-  if (!parsedFileName) {
-    // Unknown id — surface a clear 404 so broken links don't silently bounce
-    // the user back to a list page.
-    notFound();
+  // Validate type is a known collection — surfaces invalid URLs as a redirect
+  // rather than confusing client-side empty state.
+  const collections = Object.keys(getConfig().collections);
+  if (!collections.includes(type)) {
+    redirect('/cms/content');
   }
 
-  const post = await getFile(parsedFileName.path);
-
   return (
-    <FileContextProvider defaultType={type} defaultFile={parsedFileName}>
-      <EditPost post={post} />
+    <FileContextProvider defaultType={type}>
+      <EditPost type={type} id={id} />
     </FileContextProvider>
   );
 }

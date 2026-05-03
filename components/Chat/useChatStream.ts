@@ -1,6 +1,9 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useReducer, useRef } from 'react';
+
+import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 
 import type { AttachmentDiagnostic } from '../../agent/attachments';
 import type { ChatEvent } from '../../agent/chat';
@@ -276,6 +279,7 @@ export type UseChatStreamReturn = {
 };
 
 export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamReturn {
+  const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initial);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -489,13 +493,15 @@ export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamRet
         status: { kind: 'accepted', entryPath: body.entryPath },
       });
 
+      await invalidateAfterMutationAsync(queryClient, ['entries']);
+
       // Auto-followup so the model sees the result and can continue naturally.
       await submitSystemMessage(
         `Accepted: ${ps.proposal.summary} → saved at ${body.entryPath}.`,
         `[System notification] The user ACCEPTED proposal ${ps.proposal.id} (${ps.proposal.summary}). The entry was saved at ${body.entryPath}. Continue the conversation — do NOT propose the same change again.`,
       );
     },
-    [submitSystemMessage],
+    [queryClient, submitSystemMessage],
   );
 
   const rejectProposal = useCallback(

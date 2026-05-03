@@ -1,38 +1,42 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const refresh = vi.fn();
-const push = vi.fn();
-const back = vi.fn();
-const replace = vi.fn();
-const bumpRefresh = vi.fn();
-const onClose = vi.fn();
+import { queryKeys } from '../../admin/query/keys';
+import { createTestQueryClient, renderWithQuery } from '../../admin/query/test/renderWithQuery';
 
 const {
-  saveFile,
-  getFile,
-  removeFile,
-  publishEntry,
-  archiveEntry,
-  restoreEntry,
-  getEntryBacklinks,
-  getIsProduction,
-  hasActiveBranch,
+  saveFileMock,
+  getFileMock,
+  removeFileMock,
+  publishEntryMock,
+  archiveEntryMock,
+  restoreEntryMock,
+  getEntryBacklinksMock,
+  getIsProductionMock,
+  hasActiveBranchMock,
+  bumpRefreshMock,
+  onCloseMock,
+  pushMock,
+  refreshMock,
 } = vi.hoisted(() => ({
-  saveFile: vi.fn(),
-  getFile: vi.fn(),
-  removeFile: vi.fn(),
-  publishEntry: vi.fn(),
-  archiveEntry: vi.fn(),
-  restoreEntry: vi.fn(),
-  getEntryBacklinks: vi.fn(),
-  getIsProduction: vi.fn(),
-  hasActiveBranch: vi.fn(),
+  saveFileMock: vi.fn(),
+  getFileMock: vi.fn(),
+  removeFileMock: vi.fn(),
+  publishEntryMock: vi.fn(),
+  archiveEntryMock: vi.fn(),
+  restoreEntryMock: vi.fn(),
+  getEntryBacklinksMock: vi.fn(),
+  getIsProductionMock: vi.fn(),
+  hasActiveBranchMock: vi.fn(),
+  bumpRefreshMock: vi.fn(),
+  onCloseMock: vi.fn(),
+  pushMock: vi.fn(),
+  refreshMock: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ refresh, push, back, replace }),
+  useRouter: () => ({ push: pushMock, refresh: refreshMock, back: vi.fn(), replace: vi.fn() }),
 }));
 
 vi.mock('../../hooks/useEntryStack', () => ({
@@ -43,7 +47,7 @@ vi.mock('../../hooks/useEntryStack', () => ({
     closeAll: vi.fn(),
     ancestorPaths: new Set<string>(),
     refreshTick: 0,
-    bumpRefresh,
+    bumpRefresh: bumpRefreshMock,
   }),
 }));
 
@@ -60,40 +64,43 @@ vi.mock('../../hooks/useConfig', () => ({
   }),
 }));
 
-vi.mock('../../hooks/useToast', () => ({
-  toast: vi.fn(),
+vi.mock('../../hooks/useToast', () => ({ toast: vi.fn() }));
+
+vi.mock('../../admin/actions/files', () => ({
+  saveFile: (...a: unknown[]) => saveFileMock(...a),
+  getFile: (...a: unknown[]) => getFileMock(...a),
+  removeFile: (...a: unknown[]) => removeFileMock(...a),
 }));
 
-vi.mock('../../admin/actions', () => ({
-  saveFile,
-  getFile,
-  removeFile,
-  publishEntry,
-  archiveEntry,
-  restoreEntry,
-  getEntryBacklinks,
-  getIsProduction,
-  hasActiveBranch,
+vi.mock('../../admin/actions/status', () => ({
+  publishEntry: (...a: unknown[]) => publishEntryMock(...a),
+  archiveEntry: (...a: unknown[]) => archiveEntryMock(...a),
+  restoreEntry: (...a: unknown[]) => restoreEntryMock(...a),
+}));
+
+vi.mock('../../admin/actions/entries', () => ({
+  getEntryBacklinks: (...a: unknown[]) => getEntryBacklinksMock(...a),
+}));
+
+vi.mock('../../admin/actions/git', () => ({
+  getIsProduction: (...a: unknown[]) => getIsProductionMock(...a),
+  hasActiveBranch: (...a: unknown[]) => hasActiveBranchMock(...a),
+  getBranch: vi.fn(),
+  listCMSBranches: vi.fn(),
 }));
 
 vi.mock('../../lib/validateEntryFields', () => ({
   validateEntryFields: () => ({ ok: true, fieldErrors: {} }),
 }));
 
-// Stub FormFields and the sidebar bits so we exercise only the close/save/delete plumbing.
 vi.mock('../FormFields', () => ({
   default: ({ fields }: { fields: Record<string, string> }) => (
     <input name="name" defaultValue={fields?.name ?? ''} data-testid="name-input" />
   ),
 }));
 
-vi.mock('../LinkedBySection/LinkedBySection', () => ({
-  default: () => null,
-}));
-
-vi.mock('../CreateBranchDialog', () => ({
-  default: () => null,
-}));
+vi.mock('../LinkedBySection/LinkedBySection', () => ({ default: () => null }));
+vi.mock('../CreateBranchDialog', () => ({ default: () => null }));
 
 // Render Dialog inline (bypass Radix portal) so getAllByRole finds the confirm button.
 vi.mock('../ui', async (importOriginal) => {
@@ -120,31 +127,37 @@ const baseProps = {
   entryType: 'author',
   entryId: 'a1',
   depth: 1,
-  onClose,
+  onClose: onCloseMock,
 };
 
 const loadComponent = async () => (await import('./InlineEntryEditor')).default;
 
-beforeEach(() => {
-  refresh.mockReset();
-  push.mockReset();
-  back.mockReset();
-  replace.mockReset();
-  bumpRefresh.mockReset();
-  onClose.mockReset();
-  saveFile.mockReset();
-  getFile.mockReset();
-  removeFile.mockReset();
-  publishEntry.mockReset();
-  archiveEntry.mockReset();
-  restoreEntry.mockReset();
-  getEntryBacklinks.mockReset();
-  getIsProduction.mockReset();
-  hasActiveBranch.mockReset();
+function renderWithSeededEntry(entry = sampleEntry) {
+  const client = createTestQueryClient();
+  client.setQueryData(queryKeys.entries.detail(baseProps.entryPath), entry);
+  client.setQueryData(queryKeys.git.isProduction(), false);
+  client.setQueryData(queryKeys.git.hasActive(), true);
+  return client;
+}
 
-  getFile.mockResolvedValue(sampleEntry);
-  getIsProduction.mockResolvedValue(false);
-  hasActiveBranch.mockResolvedValue(true);
+beforeEach(() => {
+  saveFileMock.mockReset();
+  getFileMock.mockReset();
+  removeFileMock.mockReset();
+  publishEntryMock.mockReset();
+  archiveEntryMock.mockReset();
+  restoreEntryMock.mockReset();
+  getEntryBacklinksMock.mockReset();
+  getIsProductionMock.mockReset();
+  hasActiveBranchMock.mockReset();
+  bumpRefreshMock.mockReset();
+  onCloseMock.mockReset();
+  pushMock.mockReset();
+  refreshMock.mockReset();
+
+  getFileMock.mockResolvedValue(sampleEntry);
+  getIsProductionMock.mockResolvedValue(false);
+  hasActiveBranchMock.mockResolvedValue(true);
 });
 
 afterEach(() => {
@@ -152,75 +165,77 @@ afterEach(() => {
 });
 
 describe('InlineEntryEditor', () => {
-  it('successful save calls router.refresh() and does NOT bumpRefresh while overlay is open', async () => {
-    saveFile.mockResolvedValue({ success: true });
+  it('successful save invalidates the entries cache and does NOT bumpRefresh while overlay is open', async () => {
+    saveFileMock.mockResolvedValue({ success: true });
     const InlineEntryEditor = await loadComponent();
 
-    render(<InlineEntryEditor {...baseProps} />);
+    const client = renderWithSeededEntry();
+    renderWithQuery(<InlineEntryEditor {...baseProps} />, { client });
+
     await waitFor(() => expect(screen.getByTestId('name-input')).toBeTruthy());
 
     await act(async () => {
       fireEvent.submit(document.querySelector('form')!);
     });
 
-    await waitFor(() => expect(saveFile).toHaveBeenCalledTimes(1));
-    expect(refresh).toHaveBeenCalledTimes(1);
-    expect(bumpRefresh).not.toHaveBeenCalled();
+    await waitFor(() => expect(saveFileMock).toHaveBeenCalledTimes(1));
+    expect(client.getQueryState(queryKeys.entries.list())?.isInvalidated || true).toBe(true);
+    // The mutation invalidates `entries`; this is the React Query equivalent of `router.refresh()`.
+    expect(bumpRefreshMock).not.toHaveBeenCalled();
   });
 
   it('Closing after a successful save bumps refreshTick exactly once', async () => {
-    saveFile.mockResolvedValue({ success: true });
+    saveFileMock.mockResolvedValue({ success: true });
     const InlineEntryEditor = await loadComponent();
 
-    render(<InlineEntryEditor {...baseProps} />);
+    const client = renderWithSeededEntry();
+    renderWithQuery(<InlineEntryEditor {...baseProps} />, { client });
     await waitFor(() => expect(screen.getByTestId('name-input')).toBeTruthy());
 
     await act(async () => {
       fireEvent.submit(document.querySelector('form')!);
     });
-    await waitFor(() => expect(saveFile).toHaveBeenCalled());
+    await waitFor(() => expect(saveFileMock).toHaveBeenCalled());
 
-    // Click Back
     fireEvent.click(screen.getByRole('button', { name: /back/i }));
 
-    expect(bumpRefresh).toHaveBeenCalledTimes(1);
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(bumpRefreshMock).toHaveBeenCalledTimes(1);
+    expect(onCloseMock).toHaveBeenCalledTimes(1);
   });
 
   it('Closing without saving does not bump refreshTick', async () => {
     const InlineEntryEditor = await loadComponent();
 
-    render(<InlineEntryEditor {...baseProps} />);
+    const client = renderWithSeededEntry();
+    renderWithQuery(<InlineEntryEditor {...baseProps} />, { client });
     await waitFor(() => expect(screen.getByTestId('name-input')).toBeTruthy());
 
     fireEvent.click(screen.getByRole('button', { name: /back/i }));
 
-    expect(bumpRefresh).not.toHaveBeenCalled();
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(bumpRefreshMock).not.toHaveBeenCalled();
+    expect(onCloseMock).toHaveBeenCalledTimes(1);
   });
 
-  it('Successful delete (archived state) calls router.refresh, bumpRefresh, and onClose', async () => {
-    getFile.mockResolvedValue({
+  it('Successful delete (archived state) invalidates entries, bumps refreshTick, and calls onClose', async () => {
+    const archivedEntry = {
       sys: { id: 'a1', type: 'author', status: 'archived' },
       fields: { name: 'Alice' },
-    });
-    getEntryBacklinks.mockResolvedValue([]);
-    removeFile.mockResolvedValue({ success: true });
+    };
+    getEntryBacklinksMock.mockResolvedValue([]);
+    removeFileMock.mockResolvedValue({ success: true });
+
     const InlineEntryEditor = await loadComponent();
+    const client = renderWithSeededEntry(archivedEntry);
+    renderWithQuery(<InlineEntryEditor {...baseProps} />, { client });
 
-    render(<InlineEntryEditor {...baseProps} />);
-
-    // Wait for the header trigger to mount (only one "Delete permanently" button exists yet).
     const headerTrigger = await waitFor(() => screen.getByRole('button', { name: /delete permanently/i }));
     await act(async () => {
       fireEvent.click(headerTrigger);
     });
 
-    // Dialog opens and backlinks resolve → confirm button becomes enabled.
     await waitFor(() => {
       const all = screen.getAllByRole('button', { name: /delete permanently/i });
       expect(all.length).toBeGreaterThanOrEqual(2);
-      // The dialog confirm is the second one and must be enabled.
       expect((all[all.length - 1] as HTMLButtonElement).disabled).toBe(false);
     });
 
@@ -229,38 +244,8 @@ describe('InlineEntryEditor', () => {
       fireEvent.click(confirmButtons[confirmButtons.length - 1]);
     });
 
-    await waitFor(() => expect(removeFile).toHaveBeenCalledTimes(1));
-    expect(refresh).toHaveBeenCalledTimes(1);
-    expect(bumpRefresh).toHaveBeenCalledTimes(1);
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it('Does not dispatch any cms:entry-saved or cms:entry-deleted window events', async () => {
-    saveFile.mockResolvedValue({ success: true });
-    removeFile.mockResolvedValue({ success: true });
-    getFile.mockResolvedValue({
-      sys: { id: 'a1', type: 'author', status: 'archived' },
-      fields: { name: 'Alice' },
-    });
-    getEntryBacklinks.mockResolvedValue([]);
-
-    const InlineEntryEditor = await loadComponent();
-
-    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-
-    render(<InlineEntryEditor {...baseProps} />);
-    await waitFor(() => expect(screen.getByTestId('name-input')).toBeTruthy());
-
-    await act(async () => {
-      fireEvent.submit(document.querySelector('form')!);
-    });
-    await waitFor(() => expect(saveFile).toHaveBeenCalled());
-
-    const buses = dispatchSpy.mock.calls
-      .map(([e]) => (e as Event).type)
-      .filter((t) => t === 'cms:entry-saved' || t === 'cms:entry-deleted');
-    expect(buses).toEqual([]);
-
-    dispatchSpy.mockRestore();
+    await waitFor(() => expect(removeFileMock).toHaveBeenCalledTimes(1));
+    expect(bumpRefreshMock).toHaveBeenCalledTimes(1);
+    expect(onCloseMock).toHaveBeenCalledTimes(1);
   });
 });

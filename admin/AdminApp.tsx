@@ -1,12 +1,4 @@
-import React, { Suspense } from 'react';
-
-import { ChatPageSkeleton } from '../components/Chat/ChatPage.skeleton';
-import { ContentModelListSkeleton } from '../components/ContentModel/ContentModelList.skeleton';
-import { ContentTypeDetailSkeleton } from '../components/ContentModel/ContentTypeDetail.skeleton';
-import { DashboardCollectionSkeleton } from '../components/Dashboard/DashboardContent.collection.skeleton';
 import { DashboardContentSkeleton } from '../components/Dashboard/DashboardContent.skeleton';
-import { EditPostSkeleton } from '../components/EditPost/EditPost.skeleton';
-import { AdminGenericSkeleton } from '../components/skeletons/AdminGenericSkeleton';
 
 import { ChatPage } from './pages/ChatPage';
 import { CollectionPage } from './pages/CollectionPage';
@@ -37,20 +29,12 @@ type AdminAppProps = {
  *   /cms/model               → ContentModelPage
  *   /cms/model/<type>        → ContentTypePage
  *
- * Streaming model: `params` is awaited inside `<AdminAppDispatcher>`, which is
- * wrapped in an outer `<Suspense>` so Next.js can start streaming the shell
- * immediately. Each dispatched branch adds its own inner `<Suspense>` with the
- * matching per-page skeleton.
+ * **No `Suspense` in the dispatcher** — `await params` runs in this async RSC; Next.js
+ * keeps the previous segment visible during navigation. Thin server shells (`*Page`)
+ * hand off to client components that load via TanStack Query and render their own
+ * block-level skeletons (`LeftPanelSkeleton`, `ContentTableSkeleton`, etc.).
  */
-export function AdminApp({ params }: AdminAppProps) {
-  return (
-    <Suspense fallback={<AdminGenericSkeleton />}>
-      <AdminAppDispatcher params={params} />
-    </Suspense>
-  );
-}
-
-async function AdminAppDispatcher({ params }: AdminAppProps) {
+export async function AdminApp({ params }: AdminAppProps) {
   const { path } = await params;
   const segments = path ?? [];
 
@@ -59,40 +43,23 @@ async function AdminAppDispatcher({ params }: AdminAppProps) {
   }
 
   if (segments[0] === 'chat') {
-    return (
-      <Suspense fallback={<ChatPageSkeleton />}>
-        <ChatPage />
-      </Suspense>
-    );
+    return <ChatPage />;
   }
 
   if (segments[0] === 'media') {
     if (segments.length === 1) {
-      // No Suspense fallback: `MediaManager` fetches via `useMediaList` and
-      // renders block-level skeletons (`MediaLeftPanelSkeleton` +
-      // `MediaGridSkeleton` / `MediaListTableSkeleton`).
       return <MediaPage />;
     }
     const id = segments[1];
-    // Same: `MediaAsset` renders `MediaPreviewSkeleton` +
-    // `MediaMetadataFormSkeleton` while `useMediaAsset(id)` resolves.
     return <MediaAssetPage id={id} key={id} />;
   }
 
   if (segments[0] === 'model') {
     if (segments.length === 1) {
-      return (
-        <Suspense fallback={<ContentModelListSkeleton />}>
-          <ContentModelPage />
-        </Suspense>
-      );
+      return <ContentModelPage />;
     }
     const [, type] = segments;
-    return (
-      <Suspense fallback={<ContentTypeDetailSkeleton />} key={type}>
-        <ContentTypePage type={type} />
-      </Suspense>
-    );
+    return <ContentTypePage type={type} key={type} />;
   }
 
   if (segments[0] === 'content') {
@@ -101,18 +68,10 @@ async function AdminAppDispatcher({ params }: AdminAppProps) {
     }
     if (segments.length === 2) {
       const [, type] = segments;
-      return (
-        <Suspense fallback={<DashboardCollectionSkeleton />} key={type}>
-          <CollectionPage params={Promise.resolve({ type })} />
-        </Suspense>
-      );
+      return <CollectionPage params={Promise.resolve({ type })} key={type} />;
     }
     const [, type, id] = segments;
-    return (
-      <Suspense fallback={<EditPostSkeleton />} key={`${type}/${id}`}>
-        <EntryPage params={Promise.resolve({ type, id })} />
-      </Suspense>
-    );
+    return <EntryPage params={Promise.resolve({ type, id })} key={`${type}/${id}`} />;
   }
 
   return <DashboardContentSkeleton />;

@@ -18,10 +18,10 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { ArrowLeft, Star, Star as StarFilled } from 'lucide-react';
 
-import { previewSchemaChange, saveSchema } from '../../admin/actions';
+import { previewSchemaChange } from '../../admin/actions';
+import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import type { PreviewSchemaResult } from '../../admin/actions/schema';
 import { FIELD_FORMAT_META, FIELD_FORMATS } from '../../schema/fieldFormats';
 import { toast } from '../../hooks/useToast';
@@ -61,7 +61,7 @@ const KEY_LIMIT = 64;
 
 export default function FieldDialog(props: Props) {
   const { open, onOpenChange, schema, type, nested } = props;
-  const router = useRouter();
+  const saveSchemaMutation = useSaveSchema();
 
   const collection: Collection | undefined = schema.collections[type];
 
@@ -224,18 +224,22 @@ export default function FieldDialog(props: Props) {
           message:
             initialField === null ? `CMS: add field ${type}.${trimmedKey}` : `CMS: update field ${type}.${trimmedKey}`,
         };
-    const result = await saveSchema(buildNextSchema(), opts);
-    setBusy(false);
-    if (result.success) {
+    try {
+      await saveSchemaMutation.mutateAsync({ next: buildNextSchema(), options: opts });
       toast({
         title: initialField === null ? 'Field added' : 'Field updated',
         description: `${trimmedLabel} (${trimmedKey})`,
         variant: 'success',
       });
       onOpenChange(false);
-      router.refresh();
-    } else {
-      toast({ title: "Couldn't save field", description: result.error, variant: 'destructive' });
+    } catch (e) {
+      toast({
+        title: "Couldn't save field",
+        description: e instanceof Error ? e.message : 'Save failed',
+        variant: 'destructive',
+      });
+    } finally {
+      setBusy(false);
     }
   };
 

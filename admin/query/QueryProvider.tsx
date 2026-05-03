@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 
+import { attachCrossTabInvalidationListener } from './invalidate';
 import { getQueryClient } from './queryClient';
 
 /**
@@ -14,6 +15,10 @@ import { getQueryClient } from './queryClient';
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [client] = useState(() => getQueryClient());
   const [Devtools, setDevtools] = useState<React.ComponentType<{ initialIsOpen?: boolean }> | null>(null);
+
+  useEffect(() => {
+    return attachCrossTabInvalidationListener(client);
+  }, [client]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
