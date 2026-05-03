@@ -12,7 +12,17 @@ import { EditPostSkeleton } from '../EditPost/EditPost.skeleton';
 import { MediaAssetSkeleton } from '../MediaAsset/MediaAsset.skeleton';
 import { MediaManagerSkeleton } from '../MediaManager/MediaManager.skeleton';
 
-import { AdminGenericSkeleton, HeaderShimmer, SectionSkeleton, ShimmerBlock, ShimmerRow } from './index';
+import {
+  AdminGenericSkeleton,
+  BreadcrumbSkeleton,
+  CardSkeleton,
+  FormFieldSkeleton,
+  HeaderShimmer,
+  SectionSkeleton,
+  ShimmerBlock,
+  ShimmerRow,
+  TabBarSkeleton,
+} from './index';
 
 afterEach(() => {
   cleanup();
@@ -35,6 +45,34 @@ describe('skeleton primitives', () => {
     const { container } = render(<HeaderShimmer />);
     const root = container.firstChild as HTMLElement;
     expect(root.className).toContain('h-14');
+  });
+});
+
+describe('shared block skeletons', () => {
+  const cases: { name: string; render: () => React.ReactNode }[] = [
+    { name: 'FormFieldSkeleton', render: () => <FormFieldSkeleton /> },
+    { name: 'CardSkeleton', render: () => <CardSkeleton /> },
+    { name: 'BreadcrumbSkeleton', render: () => <BreadcrumbSkeleton /> },
+    { name: 'TabBarSkeleton', render: () => <TabBarSkeleton /> },
+  ];
+
+  for (const c of cases) {
+    it(`${c.name} exposes role=status and shimmer`, () => {
+      const { container } = render(<>{c.render()}</>);
+      expect(container.querySelector('[role="status"]')).not.toBeNull();
+      expect(container.querySelector('.animate-pulse')).not.toBeNull();
+    });
+  }
+
+  it('CardSkeleton honours `lines` prop', () => {
+    const { container } = render(<CardSkeleton lines={5} />);
+    // Header shimmer + 5 body lines = 6 shimmer blocks.
+    expect(container.querySelectorAll('.animate-pulse').length).toBe(6);
+  });
+
+  it('BreadcrumbSkeleton renders the requested segment count', () => {
+    const { container } = render(<BreadcrumbSkeleton segments={4} />);
+    expect(container.querySelectorAll('.animate-pulse').length).toBe(4);
   });
 });
 

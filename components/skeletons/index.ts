@@ -8,3 +8,4 @@
 export { ShimmerBlock, ShimmerRow, HeaderShimmer } from './primitives';
 export { AdminGenericSkeleton } from './AdminGenericSkeleton';
 export { SectionSkeleton } from './SectionSkeleton';
+export { BreadcrumbSkeleton, CardSkeleton, FormFieldSkeleton, TabBarSkeleton } from './blocks';

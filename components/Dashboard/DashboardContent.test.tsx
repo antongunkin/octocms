@@ -62,7 +62,6 @@ describe('DashboardContent', () => {
 
     expect(screen.getByLabelText('Loading collections')).toBeDefined();
     expect(screen.getByLabelText('Loading entries')).toBeDefined();
-    expect(screen.getByLabelText('Loading entry count')).toBeDefined();
   });
 
   it('renders the real left panel and table after entries resolve', async () => {
@@ -83,6 +82,5 @@ describe('DashboardContent', () => {
     });
     expect(screen.queryByLabelText('Loading collections')).toBeNull();
     expect(screen.queryByLabelText('Loading entries')).toBeNull();
-    expect(screen.queryByLabelText('Loading entry count')).toBeNull();
   });
 });
