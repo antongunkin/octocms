@@ -3,9 +3,10 @@
 import React from 'react';
 
 import { storedDatetimeToFormInput, toDateInputValue, toDatetimeLocalValue } from '../lib/datetimeField';
-import { cn } from '../lib/utils';
 
 import { FieldHintAndError } from './FieldHintAndError';
+import { FieldLabel } from './FieldLabel';
+import { FieldShell, FIELD_INPUT_CLASS } from './FieldShell';
 
 type FormDatetimeFieldProps = {
   label: string;
@@ -39,21 +40,18 @@ const FormDatetimeField = ({
   const defaultValue = fromStored || fallbackNow || '';
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
-        {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
-      </div>
-      <input
-        className={cn(
-          'w-full text-sm bg-background text-foreground px-3 py-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors',
-          error && 'border-destructive focus:ring-destructive/30',
-        )}
-        type={isDateOnly ? 'date' : 'datetime-local'}
-        name={name}
-        defaultValue={defaultValue}
-        aria-invalid={error ? true : undefined}
-      />
+    <div className="mb-5">
+      <FieldLabel label={label} htmlFor={name} type={isDateOnly ? 'date' : 'datetime'} required={required} />
+      <FieldShell error={!!error} className="max-w-md">
+        <input
+          id={name}
+          className={FIELD_INPUT_CLASS}
+          type={isDateOnly ? 'date' : 'datetime-local'}
+          name={name}
+          defaultValue={defaultValue}
+          aria-invalid={error ? true : undefined}
+        />
+      </FieldShell>
       <FieldHintAndError hint={hint} error={error} />
     </div>
   );

@@ -6,6 +6,7 @@ import type { SelectOption } from '../admin/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 import { FieldHintAndError } from './FieldHintAndError';
+import { FieldLabel } from './FieldLabel';
 
 const EMPTY_VALUE = '__cms_select_none__';
 
@@ -65,11 +66,8 @@ const FormSelectField = ({
     };
 
     return (
-      <div className="mb-6">
-        <div className="block text-xs font-medium text-muted-foreground mb-1.5">
-          {label}
-          {required ? <span className="text-destructive ml-1">*</span> : null}
-        </div>
+      <div className="mb-5">
+        <FieldLabel label={label} type="select" required={required} />
         <input type="hidden" name={name} value={JSON.stringify(multi)} />
         <ul className="mt-1 space-y-2 list-none p-0">
           {options.map((o) => (
@@ -101,11 +99,8 @@ const FormSelectField = ({
       : single;
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
-        {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
-      </div>
+    <div className="mb-5">
+      <FieldLabel label={label} type="select" required={required} />
       <input type="hidden" name={name} value={single} />
       <Select
         value={radixValue}
@@ -114,7 +109,10 @@ const FormSelectField = ({
           setSingle(v === EMPTY_VALUE ? '' : v);
         }}
       >
-        <SelectTrigger className="w-full max-w-md" aria-invalid={error ? true : undefined}>
+        <SelectTrigger
+          className="field-shell h-10 w-full max-w-md rounded-full border-border bg-card px-4"
+          aria-invalid={error ? true : undefined}
+        >
           <SelectValue placeholder={allowEmpty ? '—' : 'Choose…'} />
         </SelectTrigger>
         <SelectContent>

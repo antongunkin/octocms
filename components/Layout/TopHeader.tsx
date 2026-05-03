@@ -33,21 +33,22 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import CreateBranchDialog from '../CreateBranchDialog';
-import { ThemeToggle } from '../Header/ThemeToggle';
+import { ThemeToggle, type Theme } from '../../admin/theme';
 
-const NAV: { id: string; label: string; href: string; matchPrefix?: string; badge?: string }[] = [
+const NAV: { id: string; label: string; href: string; matchPrefix?: string }[] = [
   { id: 'dashboard', label: 'Dashboard', href: '/cms', matchPrefix: '/cms' },
   { id: 'content', label: 'Content', href: '/cms/content', matchPrefix: '/cms/content' },
   { id: 'media', label: 'Media', href: '/cms/media', matchPrefix: '/cms/media' },
   { id: 'model', label: 'Model', href: '/cms/model', matchPrefix: '/cms/model' },
-  { id: 'chat', label: 'Chat', href: '/cms/chat', matchPrefix: '/cms/chat', badge: 'AI' },
+  { id: 'chat', label: 'Chat', href: '/cms/chat', matchPrefix: '/cms/chat' },
 ];
 
 type TopHeaderProps = {
   onCommandK?: () => void;
+  initialTheme?: Theme;
 };
 
-export function TopHeader({ onCommandK }: TopHeaderProps) {
+export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps) {
   const { data } = useSession();
   const config = useConfig();
   const pathname = usePathname() ?? '/cms';
@@ -189,16 +190,6 @@ export function TopHeader({ onCommandK }: TopHeaderProps) {
               )}
             >
               {n.label}
-              {n.badge && (
-                <span
-                  className={cn(
-                    'rounded-[4px] px-1.5 py-px text-[10px] font-bold leading-none tracking-[0.06em]',
-                    isActive ? 'bg-black/[0.06] text-[var(--text)]' : 'bg-[var(--brand-bg)] text-[var(--brand-strong)]',
-                  )}
-                >
-                  {n.badge}
-                </span>
-              )}
             </Link>
           );
         })}
@@ -211,11 +202,11 @@ export function TopHeader({ onCommandK }: TopHeaderProps) {
         type="button"
         onClick={onCommandK}
         className="focus-ring inline-flex h-8 min-w-[140px] cursor-pointer items-center justify-between gap-2 overflow-hidden whitespace-nowrap rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-3 text-[12px] text-[var(--muted)]"
-        style={{ flex: '0 1 240px' }}
+        style={{ flex: '0 1 150px' }}
       >
         <span className="inline-flex items-center gap-2 overflow-hidden">
           <Search size={13} className="shrink-0" />
-          <span className="overflow-hidden text-ellipsis">Jump to anything…</span>
+          <span className="overflow-hidden text-ellipsis">Search…</span>
         </span>
         <span className="flex shrink-0 gap-1">
           <Kbd>⌘</Kbd>
@@ -319,13 +310,8 @@ export function TopHeader({ onCommandK }: TopHeaderProps) {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-[180px]" sideOffset={8} align="end">
-          {data?.user?.name && (
-            <>
-              <div className="px-3 py-2 text-sm font-medium text-foreground">{data.user.name}</div>
-              <DropdownMenuSeparator />
-            </>
-          )}
-          <ThemeToggle />
+          {data?.user?.name && <div className="px-3 py-2 text-sm font-medium text-foreground">{data.user.name}</div>}
+          <ThemeToggle initialTheme={initialTheme} />
           <DropdownMenuSeparator />
           <DropdownMenuItem className="cursor-pointer" onSelect={() => signOut()}>
             Sign out

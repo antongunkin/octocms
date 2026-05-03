@@ -9,6 +9,7 @@ function configOf(collections: Config['collections']): Config {
   return {
     projectName: 'Test',
     contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png'],
     git: baseGit,

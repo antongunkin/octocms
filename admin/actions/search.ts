@@ -46,11 +46,8 @@ async function searchFromFilesystem(query: string): Promise<SearchResult[]> {
 
   for (const file of files) {
     const normalized = file.replace(/\\/g, '/');
-    // Skip media entries
-    if (normalized.includes('/media/')) continue;
-
     try {
-      const filePath = path.join(process.cwd(), normalized);
+      const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), normalized);
       const data = await fsPromises.readFile(filePath, { encoding: 'utf8' });
       const content = JSON.parse(data) as Record<string, unknown>;
       const sys = content.sys as { type?: string } | undefined;
@@ -62,7 +59,7 @@ async function searchFromFilesystem(query: string): Promise<SearchResult[]> {
         const mdPaths = companionMarkdownPathsForEntry(normalized, type, config.collections);
         for (const [fieldName, mdPath] of Object.entries(mdPaths)) {
           try {
-            const mdFilePath = path.join(process.cwd(), mdPath);
+            const mdFilePath = path.join(/*turbopackIgnore: true*/ process.cwd(), mdPath);
             companions[fieldName] = await fsPromises.readFile(mdFilePath, { encoding: 'utf8' });
           } catch {
             companions[fieldName] = '';
@@ -71,7 +68,7 @@ async function searchFromFilesystem(query: string): Promise<SearchResult[]> {
         const rtPaths = companionRichTextPathsForEntry(normalized, type, config.collections);
         for (const [fieldName, rtPath] of Object.entries(rtPaths)) {
           try {
-            const rtFilePath = path.join(process.cwd(), rtPath);
+            const rtFilePath = path.join(/*turbopackIgnore: true*/ process.cwd(), rtPath);
             companions[fieldName] = await fsPromises.readFile(rtFilePath, { encoding: 'utf8' });
           } catch {
             companions[fieldName] = '';

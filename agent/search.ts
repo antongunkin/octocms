@@ -99,7 +99,7 @@ async function readEntryPayload(filePath: string, branch: string | undefined): P
     /* fall through to FS */
   }
   try {
-    const abs = path.join(process.cwd(), filePath);
+    const abs = path.join(process.cwd(), 'cms', filePath.replace(/^cms[\\/]/, ''));
     const raw = await fsPromises.readFile(abs, { encoding: 'utf8' });
     return JSON.parse(raw);
   } catch {

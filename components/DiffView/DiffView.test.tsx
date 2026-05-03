@@ -120,8 +120,8 @@ describe('DiffView', () => {
 
     await waitFor(() => expect(screen.getAllByText('No changes').length).toBeGreaterThanOrEqual(2));
     // The changed title field renders red and emerald hunk rows.
-    expect(container.querySelector('.bg-red-50')).toBeTruthy();
-    expect(container.querySelector('.bg-emerald-50')).toBeTruthy();
+    expect(container.querySelector('[class*="bg-red"]')).toBeTruthy();
+    expect(container.querySelector('[class*="bg-emerald"]')).toBeTruthy();
   });
 
   it('renders a side-by-side image diff with resolved URLs', async () => {

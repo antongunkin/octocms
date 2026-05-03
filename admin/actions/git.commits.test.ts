@@ -50,6 +50,7 @@ vi.mock('../../lib/configStore', () => ({
   getConfig: () => ({
     projectName: 'Test',
     contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png'],
     git: { baseBranch: 'main' },

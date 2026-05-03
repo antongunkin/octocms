@@ -19,6 +19,7 @@ import type { BranchStoreData, StoredEntry } from './contentStoreTypes';
 
 const mockConfig = {
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   git: { baseBranch: 'main' },
 } as any;
@@ -53,7 +54,7 @@ function makeBranchStore(branch: string, overrides?: Partial<BranchStoreData>): 
   };
 
   const mediaEntry: StoredEntry = {
-    path: 'cms/content/media/media-uuid.json',
+    path: 'cms/media/media-uuid.json',
     content: {
       sys: { id: 'uuid', type: 'media' },
       fields: { title: 'Photo', extension: 'jpg' },
@@ -65,14 +66,10 @@ function makeBranchStore(branch: string, overrides?: Partial<BranchStoreData>): 
   return {
     branch,
     treeSha: 'tree-sha-000',
-    entries: new Map([
-      [entry.path, entry],
-      [mediaEntry.path, mediaEntry],
-    ]),
-    byCollection: new Map([
-      ['post', [entry.path]],
-      ['media', [mediaEntry.path]],
-    ]),
+    // After the media-folder split: editorial entries live in `entries`,
+    // media entries live in `mediaEntries`. They never share a map.
+    entries: new Map([[entry.path, entry]]),
+    byCollection: new Map([['post', [entry.path]]]),
     mediaEntries: new Map([[mediaEntry.path, mediaEntry]]),
     populatedAt: Date.now(),
     version: 0,
@@ -136,14 +133,14 @@ describe('getStoredContentFiles', () => {
     expect(files).toEqual(['cms/content/post/post-1.json']);
   });
 
-  it('returns all JSON files when collection is "**"', async () => {
+  it('returns all editorial JSON files when collection is "**" (excludes media)', async () => {
     const store = makeBranchStore('feat');
     mockFetchBranchContent.mockResolvedValueOnce(store);
 
     const files = await getStoredContentFiles('**', 'feat');
-    expect(files).toHaveLength(2);
-    expect(files).toContain('cms/content/post/post-1.json');
-    expect(files).toContain('cms/content/media/media-uuid.json');
+    // Only editorial entries — media is in `mediaEntries`, not `entries`.
+    expect(files).toEqual(['cms/content/post/post-1.json']);
+    expect(files).not.toContain('cms/media/media-uuid.json');
   });
 
   it('returns empty array for unknown collection', async () => {
@@ -169,7 +166,18 @@ describe('getStoredMediaEntries', () => {
     const media = await getStoredMediaEntries('feat');
     expect(media).not.toBeNull();
     expect(media!.size).toBe(1);
-    expect(media!.has('cms/content/media/media-uuid.json')).toBe(true);
+    expect(media!.has('cms/media/media-uuid.json')).toBe(true);
+  });
+});
+
+describe('getStoredFile (media path)', () => {
+  it('finds media entries via getStoredFile', async () => {
+    const store = makeBranchStore('feat');
+    mockFetchBranchContent.mockResolvedValueOnce(store);
+
+    const result = await getStoredFile('cms/media/media-uuid.json', 'feat');
+    expect(result).not.toBeNull();
+    expect(result!.sha).toBe('media-sha');
   });
 });
 
@@ -248,19 +256,20 @@ describe('applyMutation', () => {
     expect(snapshot!.version).toBe(1);
   });
 
-  it('deletes a media entry from both indexes', async () => {
+  it('deletes a media entry from the media index', async () => {
     const store = makeBranchStore('feat');
     mockFetchBranchContent.mockResolvedValueOnce(store);
-    await getStoredFile('cms/content/media/media-uuid.json', 'feat');
+    await getStoredFile('cms/media/media-uuid.json', 'feat');
 
     applyMutation('feat', {
       type: 'delete',
-      path: 'cms/content/media/media-uuid.json',
+      path: 'cms/media/media-uuid.json',
     });
 
     const snapshot = getStoreSnapshot('feat');
-    expect(snapshot!.entries.has('cms/content/media/media-uuid.json')).toBe(false);
-    expect(snapshot!.mediaEntries.has('cms/content/media/media-uuid.json')).toBe(false);
+    expect(snapshot!.mediaEntries.has('cms/media/media-uuid.json')).toBe(false);
+    // Editorial `entries` map is not touched by media deletes.
+    expect(snapshot!.entries.has('cms/content/post/post-1.json')).toBe(true);
   });
 
   it('is a no-op when the store is not yet populated', () => {

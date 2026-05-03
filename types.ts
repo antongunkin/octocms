@@ -251,6 +251,9 @@ export type SearchConfig = {
 export type Config = {
   projectName: string;
   contentFolder: string;
+  /** Folder where media entry JSONs live (e.g. `cms/media`). Kept separate from
+   * `contentFolder` so editorial collections never collide with the media library. */
+  mediaContentFolder: string;
   mediaFolder: string;
   mediaAllowedFormats: string[];
   git: GitIntegrationConfig;
@@ -285,9 +288,10 @@ export type EntryListItem = {
   /** ISO 8601 last-modified timestamp. Populated from fs.stat in dev mode; undefined in production. */
   updatedAt?: string;
   /**
-   * Public URL for a small preview image, when one is available.
-   * - For media entries: their own `/media/<id>.<ext>`.
-   * - For other entries: the first `image`-format field resolved through the media library.
+   * Public URL for a small preview image, when one is available — the entry's
+   * first `image`-format field resolved through the media library. Media
+   * entries are not in this list (they live under `mediaContentFolder`); see
+   * `getMediaEntries()` for the media library.
    * Undefined when no image can be resolved.
    */
   thumbnailUrl?: string;
@@ -399,4 +403,10 @@ export type MediaFile = {
   height: number | null;
   /** True when the entry stores a blur placeholder (data URL omitted from list payloads). */
   hasBlurPlaceholder: boolean;
+  /**
+   * ISO 8601 last-modified timestamp of the entry JSON file. Populated from
+   * `fs.stat` mtime in dev mode; undefined in production. Used for the
+   * default "newest first" sort on `/cms/media`.
+   */
+  updatedAt?: string;
 };

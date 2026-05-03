@@ -47,6 +47,7 @@ vi.mock('../github', () => ({
 
 vi.mock('./files', () => ({
   getContentFiles: vi.fn().mockResolvedValue([]),
+  getMediaContentFiles: vi.fn().mockResolvedValue([]),
   getFile: vi.fn(),
   assertFeatureBranchForWritesIfRequired: vi.fn().mockResolvedValue(undefined),
 }));
@@ -61,6 +62,7 @@ vi.mock('octocms/lib/extractImageMetadata', () => ({
 
 const mockConfig = {
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: ['jpg', 'jpeg', 'webp', 'png', 'avif', 'gif'],
   git: { baseBranch: 'main' },
@@ -93,13 +95,13 @@ const createMockFile = (name: string, content: string = 'binary-content', type: 
 
 describe('getMediaEntries', () => {
   it('returns empty array when no media files exist', async () => {
-    vi.mocked(filesModule.getContentFiles).mockResolvedValue([]);
+    vi.mocked(filesModule.getMediaContentFiles).mockResolvedValue([]);
     const result = await getMediaEntries();
     expect(result).toEqual([]);
   });
 
   it('reads media entries and returns structured MediaFile objects', async () => {
-    vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/media/abc-123.json']);
+    vi.mocked(filesModule.getMediaContentFiles).mockResolvedValue(['cms/media/media-abc-123.json']);
     vi.mocked(filesModule.getFile).mockResolvedValue({
       sys: { id: 'abc-123', type: 'media' },
       fields: {
@@ -132,11 +134,27 @@ describe('getMediaEntries', () => {
   });
 
   it('skips entries that fail to load', async () => {
-    vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/media/bad.json']);
+    vi.mocked(filesModule.getMediaContentFiles).mockResolvedValue(['cms/media/media-bad.json']);
     vi.mocked(filesModule.getFile).mockRejectedValue(new Error('corrupt'));
 
     const result = await getMediaEntries();
     expect(result).toEqual([]);
+  });
+
+  it('returns entries already sorted (deterministic order, no caller sort needed)', async () => {
+    // The sort is a stable deterministic ordering — entries without `updatedAt`
+    // (the dev-mode fs.stat is mocked away in this test file) keep insertion order.
+    vi.mocked(filesModule.getMediaContentFiles).mockResolvedValue([
+      'cms/media/media-aaa.json',
+      'cms/media/media-bbb.json',
+    ]);
+    vi.mocked(filesModule.getFile).mockImplementation(async (p) => ({
+      sys: { id: p.includes('aaa') ? 'aaa' : 'bbb', type: 'media' },
+      fields: { title: 'X', extension: 'png' },
+    }));
+
+    const result = await getMediaEntries();
+    expect(result).toHaveLength(2);
   });
 });
 
@@ -156,7 +174,7 @@ describe('uploadMedia', () => {
       expect(result.id).toMatch(/^[0-9a-f-]{36}$/);
     }
     expect(fsPromises.mkdir).toHaveBeenCalledWith(path.join(process.cwd(), 'public/media'), { recursive: true });
-    expect(fsPromises.mkdir).toHaveBeenCalledWith(path.join(process.cwd(), 'cms/content/media'), { recursive: true });
+    expect(fsPromises.mkdir).toHaveBeenCalledWith(path.join(process.cwd(), 'cms/media'), { recursive: true });
     expect(fsPromises.writeFile).toHaveBeenCalledTimes(2); // physical file + entry JSON
   });
 
@@ -171,6 +189,47 @@ describe('uploadMedia', () => {
     if (result.success) {
       expect(result.id).toMatch(/^[0-9a-f-]{36}$/);
     }
+  });
+
+  it('stores originalName as the UUID-based filename, not the upload name', async () => {
+    const formData = new FormData();
+    formData.set('file', createMockFile('Long file name.jpg', 'data', 'image/jpeg'));
+    formData.set('title', 'Hero');
+
+    const result = await uploadMedia(formData);
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    const entryWriteCall = vi.mocked(fsPromises.writeFile).mock.calls.find(([p]) => String(p).includes('cms/media/'));
+    expect(entryWriteCall).toBeDefined();
+    const entry = JSON.parse(entryWriteCall![1] as string);
+    // No spaces, no original name — just <uuid>.<ext>.
+    expect(entry.fields.originalName).toBe(`${result.id}.jpg`);
+    expect(entry.fields.originalName).not.toContain(' ');
+  });
+
+  it('forwards generateBlur=0 to extractImageMetadata so blur work is skipped', async () => {
+    const { extractImageMetadata } = await import('octocms/lib/extractImageMetadata');
+    const formData = new FormData();
+    formData.set('file', createMockFile('photo.png'));
+    formData.set('title', 'No blur');
+    formData.set('generateBlur', '0');
+
+    const result = await uploadMedia(formData);
+    expect(result.success).toBe(true);
+
+    expect(extractImageMetadata).toHaveBeenCalledWith(expect.any(Buffer), { generateBlur: false });
+  });
+
+  it('defaults generateBlur to true when the flag is absent', async () => {
+    const { extractImageMetadata } = await import('octocms/lib/extractImageMetadata');
+    const formData = new FormData();
+    formData.set('file', createMockFile('photo.png'));
+    formData.set('title', 'With blur');
+
+    await uploadMedia(formData);
+
+    expect(extractImageMetadata).toHaveBeenCalledWith(expect.any(Buffer), { generateBlur: true });
   });
 
   it('uses GitHub API in production mode', async () => {
@@ -193,7 +252,7 @@ describe('uploadMedia', () => {
       undefined,
     );
     expect(github.saveGitHubFile).toHaveBeenCalledWith(
-      expect.stringMatching(/^cms\/content\/media\/media-[0-9a-f-]+\.json$/),
+      expect.stringMatching(/^cms\/media\/media-[0-9a-f-]+\.json$/),
       expect.any(String),
       expect.stringContaining('Add media entry'),
       undefined,
@@ -276,13 +335,13 @@ describe('uploadMedia', () => {
 
     await uploadMedia(formData);
 
-    const entryWriteCall = vi
-      .mocked(fsPromises.writeFile)
-      .mock.calls.find(([p]) => String(p).includes('cms/content/media/'));
+    const entryWriteCall = vi.mocked(fsPromises.writeFile).mock.calls.find(([p]) => String(p).includes('cms/media/'));
     expect(entryWriteCall).toBeDefined();
     const entry = JSON.parse(entryWriteCall![1] as string);
     expect(entry.fields.folder).toBe('blog');
-    expect(entry.fields.originalName).toBe('photo.png');
+    // originalName stores the on-disk UUID-based filename (not the user's
+    // upload name) so messy names like "Long file name.jpg" stay out of the UI.
+    expect(entry.fields.originalName).toMatch(/^[0-9a-f-]{36}\.png$/);
     expect(entry.fields.extension).toBe('png');
     expect(entry.fields.title).toBe('Blog photo');
     expect(entry.fields.width).toBe(100);
@@ -333,7 +392,7 @@ describe('deleteMedia', () => {
     expect(out).toEqual({ success: true });
 
     expect(fsPromises.unlink).toHaveBeenCalledWith(path.join(process.cwd(), 'public/media/abc.png'));
-    expect(fsPromises.unlink).toHaveBeenCalledWith(path.join(process.cwd(), 'cms/content/media/media-abc.json'));
+    expect(fsPromises.unlink).toHaveBeenCalledWith(path.join(process.cwd(), 'cms/media/media-abc.json'));
   });
 
   it('blocks deletion when image is referenced by content entries', async () => {
@@ -363,7 +422,7 @@ describe('deleteMedia', () => {
 
     expect(github.deleteGitHubFile).toHaveBeenCalledWith('public/media/abc.jpg', 'Delete media file abc', undefined);
     expect(github.deleteGitHubFile).toHaveBeenCalledWith(
-      'cms/content/media/media-abc.json',
+      'cms/media/media-abc.json',
       'Delete media entry abc',
       undefined,
     );
@@ -407,7 +466,7 @@ describe('moveMedia', () => {
     expect(out).toEqual({ success: true });
 
     const writeCall = vi.mocked(fsPromises.writeFile).mock.calls[0];
-    expect(String(writeCall[0])).toContain('cms/content/media/media-abc.json');
+    expect(String(writeCall[0])).toContain('cms/media/media-abc.json');
     const written = JSON.parse(writeCall[1] as string);
     expect(written.fields.folder).toBe('blog');
   });
@@ -423,7 +482,7 @@ describe('moveMedia', () => {
     expect(out).toEqual({ success: true });
 
     expect(github.saveGitHubFile).toHaveBeenCalledWith(
-      'cms/content/media/media-abc.json',
+      'cms/media/media-abc.json',
       expect.any(String),
       'Move media abc to news',
       undefined,
@@ -502,17 +561,6 @@ describe('checkMediaReferences', () => {
 
     const result = await checkMediaReferences('target-id');
     expect(result).toEqual(['cms/content/post/p1.json']);
-  });
-
-  it('skips media entries in the content folder', async () => {
-    vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/media/media-abc.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({
-      sys: { id: 'abc', type: 'media' },
-      fields: { originalName: 'photo.png' },
-    });
-
-    const result = await checkMediaReferences('abc');
-    expect(result).toEqual([]);
   });
 
   it('skips collections without image fields', async () => {

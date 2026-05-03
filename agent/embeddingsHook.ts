@@ -48,7 +48,7 @@ async function persistStore(
     await saveGitHubFile(EMBEDDINGS_STORE_PATH, serialized, message, branch);
     return;
   }
-  const abs = path.join(process.cwd(), EMBEDDINGS_STORE_PATH);
+  const abs = path.join(process.cwd(), 'cms', '__generated__', 'embeddings.json');
   await fsPromises.mkdir(path.dirname(abs), { recursive: true });
   await fsPromises.writeFile(abs, serialized, 'utf8');
 }

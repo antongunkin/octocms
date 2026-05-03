@@ -6,7 +6,7 @@ import React, { Suspense } from 'react';
 import Provider from '../provider';
 import { Toaster } from '../../components/ui/toaster';
 import Layout from '../../components/Layout/Layout';
-import { getThemeCookie } from '../actions/getThemeCookie';
+import { getThemeCookie } from '../theme/cookie';
 import { getConfig } from '../../lib/configStore';
 
 export const metadata: Metadata = {
@@ -33,8 +33,8 @@ async function AdminLayoutInner({ children }: Readonly<{ children: React.ReactNo
   // `{children}` so the chrome stays mounted and the generic admin skeleton
   // fills the main slot.
   return (
-    <Provider initialTheme={initialTheme} config={config}>
-      <Layout>{children}</Layout>
+    <Provider config={config}>
+      <Layout initialTheme={initialTheme}>{children}</Layout>
       <Toaster />
     </Provider>
   );

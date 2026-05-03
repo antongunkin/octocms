@@ -36,11 +36,8 @@ async function getEntriesForPublicSearch(): Promise<EntryForSearch[]> {
 
   for (const file of files) {
     const normalized = file.replace(/\\/g, '/');
-    // Skip media entries
-    if (normalized.includes('/media/')) continue;
-
     try {
-      const filePath = path.join(process.cwd(), normalized);
+      const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), normalized);
       const data = await fsPromises.readFile(filePath, { encoding: 'utf8' });
       const content = JSON.parse(data) as Record<string, unknown>;
       const sys = content.sys as { type?: string } | undefined;
@@ -55,7 +52,7 @@ async function getEntriesForPublicSearch(): Promise<EntryForSearch[]> {
         const mdPaths = companionMarkdownPathsForEntry(normalized, type, config.collections);
         for (const [fieldName, mdPath] of Object.entries(mdPaths)) {
           try {
-            const mdFilePath = path.join(process.cwd(), mdPath);
+            const mdFilePath = path.join(/*turbopackIgnore: true*/ process.cwd(), mdPath);
             companions[fieldName] = await fsPromises.readFile(mdFilePath, { encoding: 'utf8' });
           } catch {
             companions[fieldName] = '';
@@ -64,7 +61,7 @@ async function getEntriesForPublicSearch(): Promise<EntryForSearch[]> {
         const rtPaths = companionRichTextPathsForEntry(normalized, type, config.collections);
         for (const [fieldName, rtPath] of Object.entries(rtPaths)) {
           try {
-            const rtFilePath = path.join(process.cwd(), rtPath);
+            const rtFilePath = path.join(/*turbopackIgnore: true*/ process.cwd(), rtPath);
             companions[fieldName] = await fsPromises.readFile(rtFilePath, { encoding: 'utf8' });
           } catch {
             companions[fieldName] = '';
@@ -102,7 +99,7 @@ async function buildAndWriteSearchIndex(): Promise<void> {
       await saveGitHubFile(SEARCH_INDEX_FILE_PATH, indexJson, 'CMS: update search index');
     } else {
       // Write to local filesystem
-      const filePath = path.join(process.cwd(), SEARCH_INDEX_FILE_PATH);
+      const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), SEARCH_INDEX_FILE_PATH);
       await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
       await fsPromises.writeFile(filePath, indexJson, 'utf8');
     }

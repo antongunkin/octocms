@@ -4,12 +4,31 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { EntryCommit } from '../../types';
 
-const { mockGetEntryCommits } = vi.hoisted(() => ({
-  mockGetEntryCommits: vi.fn<(path: string) => Promise<{ commits: EntryCommit[]; seeAllUrl: string }>>(),
-}));
+const { mockGetEntryCommits, getRefreshTick, setRefreshTick } = vi.hoisted(() => {
+  let tick = 0;
+  return {
+    mockGetEntryCommits: vi.fn<(path: string) => Promise<{ commits: EntryCommit[]; seeAllUrl: string }>>(),
+    getRefreshTick: () => tick,
+    setRefreshTick: (n: number) => {
+      tick = n;
+    },
+  };
+});
 
 vi.mock('../../admin/actions', () => ({
   getEntryCommits: mockGetEntryCommits,
+}));
+
+vi.mock('../../hooks/useEntryStack', () => ({
+  useEntryStack: () => ({
+    stack: [],
+    pushEntry: () => {},
+    popEntry: () => {},
+    closeAll: () => {},
+    ancestorPaths: new Set<string>(),
+    refreshTick: getRefreshTick(),
+    bumpRefresh: () => {},
+  }),
 }));
 
 type IOCallback = (entries: IntersectionObserverEntry[]) => void;
@@ -63,6 +82,7 @@ beforeEach(() => {
   ioInstances = [];
   vi.stubGlobal('IntersectionObserver', MockIntersectionObserver as unknown as typeof IntersectionObserver);
   mockGetEntryCommits.mockReset();
+  setRefreshTick(0);
 });
 
 afterEach(() => {
@@ -122,16 +142,15 @@ describe('HistorySection', () => {
     expect(screen.queryByRole('link', { name: /See all commits/ })).toBeNull();
   });
 
-  it('refetches on cms:entry-saved after intersection, and does not fetch before intersection', async () => {
+  it('refetches when refreshTick bumps after intersection, and does not fetch before intersection', async () => {
     mockGetEntryCommits.mockResolvedValue({ commits: sampleCommits, seeAllUrl: '' });
     const HistorySection = await loadComponent();
 
-    render(<HistorySection entryPath="cms/content/post/post-abc.json" />);
+    const { rerender } = render(<HistorySection entryPath="cms/content/post/post-abc.json" />);
 
-    // Fire the event before intersection: no fetch expected.
-    act(() => {
-      window.dispatchEvent(new Event('cms:entry-saved'));
-    });
+    // Tick before intersection: no fetch expected (preserves the don't-pre-fetch rule).
+    setRefreshTick(1);
+    rerender(<HistorySection entryPath="cms/content/post/post-abc.json" />);
     expect(mockGetEntryCommits).not.toHaveBeenCalled();
 
     // After intersection, fetch fires once.
@@ -140,10 +159,21 @@ describe('HistorySection', () => {
     });
     await waitFor(() => expect(mockGetEntryCommits).toHaveBeenCalledTimes(1));
 
-    // After ready, the event should trigger a refetch.
-    await act(async () => {
-      window.dispatchEvent(new Event('cms:entry-saved'));
-    });
+    // Now ready: a tick bump should trigger a refetch.
+    setRefreshTick(2);
+    rerender(<HistorySection entryPath="cms/content/post/post-abc.json" />);
     await waitFor(() => expect(mockGetEntryCommits).toHaveBeenCalledTimes(2));
+  });
+
+  it('does not register cms:entry-saved or cms:entry-deleted window listeners', async () => {
+    const addSpy = vi.spyOn(window, 'addEventListener');
+    const HistorySection = await loadComponent();
+
+    render(<HistorySection entryPath="cms/content/post/post-abc.json" />);
+
+    const types = addSpy.mock.calls.map(([t]) => t);
+    expect(types).not.toContain('cms:entry-saved');
+    expect(types).not.toContain('cms:entry-deleted');
+    addSpy.mockRestore();
   });
 });

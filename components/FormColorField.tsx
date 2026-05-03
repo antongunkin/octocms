@@ -6,6 +6,8 @@ import { normalizeHexColor } from '../lib/colorField';
 import { cn } from '../lib/utils';
 
 import { FieldHintAndError } from './FieldHintAndError';
+import { FieldLabel } from './FieldLabel';
+import { FieldShell, FIELD_INPUT_CLASS } from './FieldShell';
 
 const PICKER_FALLBACK = '#000000';
 
@@ -69,38 +71,36 @@ const FormColorField = ({
   };
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
-        {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
-      </div>
+    <div className="mb-5">
+      <FieldLabel label={label} type="color" required={required} />
       <div className="flex flex-wrap items-center gap-3">
         <input
           type="color"
-          className={cn('h-10 w-14 cursor-pointer rounded border border-border bg-layout-bg p-1')}
+          className={cn('h-10 w-12 cursor-pointer rounded-full border border-border bg-card p-1')}
           value={hex || PICKER_FALLBACK}
           onChange={onPickerChange}
           aria-invalid={error ? true : undefined}
           aria-label={`${label} color picker`}
         />
         {allowInput ? (
-          <input
-            type="text"
-            className={cn(
-              'text-sm bg-background text-foreground px-3 py-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors max-w-[11rem] font-mono',
-              error && 'border-destructive focus:ring-destructive/30',
-            )}
-            value={hexDraft}
-            onChange={(e) => {
-              setHexDraft(e.target.value);
-              onClearError?.(name);
-            }}
-            onBlur={onHexBlur}
-            placeholder="#aabbcc"
-            spellCheck={false}
-            aria-invalid={error ? true : undefined}
-            aria-label={`${label} hex value`}
-          />
+          <div className="max-w-[12rem] flex-1">
+            <FieldShell error={!!error}>
+              <input
+                type="text"
+                className={cn(FIELD_INPUT_CLASS, 'font-mono')}
+                value={hexDraft}
+                onChange={(e) => {
+                  setHexDraft(e.target.value);
+                  onClearError?.(name);
+                }}
+                onBlur={onHexBlur}
+                placeholder="#aabbcc"
+                spellCheck={false}
+                aria-invalid={error ? true : undefined}
+                aria-label={`${label} hex value`}
+              />
+            </FieldShell>
+          </div>
         ) : null}
       </div>
       <input type="hidden" name={name} value={hex} />

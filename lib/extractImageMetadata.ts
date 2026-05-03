@@ -7,10 +7,19 @@ export type ExtractedImageMetadata = {
 };
 
 /**
- * Read dimensions and a tiny JPEG blur data URL for LQIP / next/image placeholder.
- * Soft-fails individual steps so uploads can still succeed without blur or dimensions.
+ * Read dimensions and (optionally) a tiny JPEG blur data URL for LQIP /
+ * next/image placeholders. Soft-fails individual steps so uploads can still
+ * succeed without blur or dimensions.
+ *
+ * Pass `{ generateBlur: false }` to skip blur generation — useful when the
+ * uploader unchecks "Generate blur placeholder" in the upload dialog (saves
+ * a few KB per entry and a bit of upload-time CPU).
  */
-export async function extractImageMetadata(buffer: Buffer): Promise<ExtractedImageMetadata> {
+export async function extractImageMetadata(
+  buffer: Buffer,
+  options: { generateBlur?: boolean } = {},
+): Promise<ExtractedImageMetadata> {
+  const { generateBlur = true } = options;
   let width: number | null = null;
   let height: number | null = null;
   let blurDataURL: string | null = null;
@@ -23,11 +32,13 @@ export async function extractImageMetadata(buffer: Buffer): Promise<ExtractedIma
     /* unreadable as image — leave nulls */
   }
 
-  try {
-    const blurred = await sharp(buffer).resize(10, 10, { fit: 'inside' }).jpeg({ quality: 60 }).toBuffer();
-    blurDataURL = `data:image/jpeg;base64,${blurred.toString('base64')}`;
-  } catch {
-    /* blur optional */
+  if (generateBlur) {
+    try {
+      const blurred = await sharp(buffer).resize(10, 10, { fit: 'inside' }).jpeg({ quality: 60 }).toBuffer();
+      blurDataURL = `data:image/jpeg;base64,${blurred.toString('base64')}`;
+    } catch {
+      /* blur optional */
+    }
   }
 
   return { width, height, blurDataURL };

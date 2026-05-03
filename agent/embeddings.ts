@@ -97,7 +97,7 @@ async function readStoreRaw(branch?: string): Promise<string | null> {
     /* fall through to local FS */
   }
   try {
-    const abs = path.join(process.cwd(), EMBEDDINGS_STORE_PATH);
+    const abs = path.join(process.cwd(), 'cms', '__generated__', 'embeddings.json');
     return await fsPromises.readFile(abs, { encoding: 'utf8' });
   } catch {
     return null;
@@ -147,7 +147,7 @@ async function readEntryAndCompanionsLocal(
   entry: { sys?: { type?: string }; fields?: Record<string, unknown> };
   companions: Record<string, string>;
 } | null> {
-  const abs = path.join(process.cwd(), filePath);
+  const abs = path.join(process.cwd(), 'cms', filePath.replace(/^cms[\\/]/, ''));
   let raw: string;
   try {
     raw = await fsPromises.readFile(abs, { encoding: 'utf8' });
@@ -166,7 +166,9 @@ async function readEntryAndCompanionsLocal(
     const paths = companionFilePathsForEntry(filePath, collectionType, collections);
     for (const [field, p] of Object.entries(paths)) {
       try {
-        companions[field] = await fsPromises.readFile(path.join(process.cwd(), p), { encoding: 'utf8' });
+        companions[field] = await fsPromises.readFile(path.join(process.cwd(), 'cms', p.replace(/^cms[\\/]/, '')), {
+          encoding: 'utf8',
+        });
       } catch {
         companions[field] = '';
       }

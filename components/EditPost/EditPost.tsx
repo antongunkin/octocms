@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import React, { Suspense, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 
 import {
   saveFile,
@@ -29,7 +29,6 @@ import LinkedBySection from '../LinkedBySection/LinkedBySection';
 import { DiffView } from '../DiffView';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui';
 import { toast } from '../../hooks/useToast';
 import CreateBranchDialog from '../CreateBranchDialog';
@@ -200,11 +199,6 @@ const EditPostInner = ({ post }: { post: any }) => {
     return config.collections[post?.sys?.type as keyof typeof config.collections]?.label ?? post?.sys?.type ?? '';
   }, [config, post?.sys?.type]);
 
-  const fieldCount = useMemo(() => {
-    const fields = config.collections[post?.sys?.type as keyof Config['collections']]?.fields;
-    return fields ? Object.keys(fields).length : 0;
-  }, [config, post?.sys?.type]);
-
   const entryTitle = useMemo(() => {
     const fields = config.collections[post?.sys?.type as keyof Config['collections']]?.fields;
     if (!fields || !post?.fields) return '';
@@ -233,39 +227,40 @@ const EditPostInner = ({ post }: { post: any }) => {
   }
 
   return (
-    <div className="relative flex-1 w-full flex flex-col bg-background">
-      {/* Subheader: back + breadcrumb + title + actions */}
-      <div className="flex-none border-b border-border bg-background">
-        <div className="max-w-[1320px] mx-auto w-full flex items-start gap-4 px-8 py-5">
-          <Button asChild variant="outline" size="sm" className="gap-1.5 mt-0.5">
-            <Link href={`/cms/content/${post?.sys?.type}`}>
-              <ChevronLeft className="h-4 w-4" />
-              Back
+    <div className="flex flex-1 flex-col overflow-hidden">
+      {/* Page header — same chrome as MediaAsset / DashboardContent */}
+      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
+            <Link href={`/cms/content/${post?.sys?.type}`} aria-label="Back to collection">
+              <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
-          <div className="flex flex-col gap-1.5 min-w-0 flex-[0_1_auto]">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
-              <span>Content</span>
-              <ChevronRight className="h-3 w-3" />
+          <div className="min-w-0 flex-1">
+            <div className="mb-px flex items-center gap-1.5 text-[12px]" style={{ color: 'var(--text-2)' }}>
+              <Link
+                href="/cms/content"
+                className="hover:text-foreground transition-colors"
+                style={{ color: 'var(--text-2)' }}
+              >
+                Content
+              </Link>
+              <ChevronRight className="h-3 w-3 opacity-60" />
               <span>{collectionLabel}</span>
-              {entryTitle && (
-                <>
-                  <ChevronRight className="h-3 w-3" />
-                  <span className="truncate">{entryTitle}</span>
-                </>
-              )}
-              <StatusBadge status={currentStatus} className="ml-1" />
             </div>
-            <h1 className="text-[26px] font-semibold tracking-[-0.015em] leading-[1.2] text-foreground">
-              {entryTitle || collectionLabel}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="m-0 text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
+                {entryTitle || collectionLabel}
+              </h1>
+            </div>
           </div>
-          <div className="flex-1" />
+        </div>
+        <div className="flex flex-none items-center gap-2">
           {diffToggleVisible && (
             <div
               role="tablist"
               aria-label="Edit or Diff view"
-              className="inline-flex mt-0.5 rounded-md border border-border bg-muted/40 p-0.5"
+              className="inline-flex rounded-md border border-border bg-muted/40 p-0.5"
             >
               <button
                 type="button"
@@ -297,27 +292,48 @@ const EditPostInner = ({ post }: { post: any }) => {
               </button>
             </div>
           )}
-          <div className="flex items-center gap-2 mt-0.5">
-            {currentStatus === 'archived' ? (
-              <>
-                <Button variant="outline" size="sm" onClick={handleRestore} disabled={isSaving}>
-                  Restore
+          {currentStatus === 'archived' ? (
+            <>
+              <Button variant="outline" size="sm" onClick={handleRestore} disabled={isSaving}>
+                Restore
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
+                Delete permanently
+              </Button>
+            </>
+          ) : (
+            <>
+              {(currentStatus === 'draft' || currentStatus === 'changed') && (
+                <Button
+                  type="button"
+                  size="sm"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white"
+                  onClick={handlePublish}
+                  disabled={isSaving}
+                >
+                  Publish
                 </Button>
-                <Button variant="destructive" size="sm" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
-                  Delete permanently
-                </Button>
-              </>
-            ) : (
+              )}
               <Button variant="outline" size="sm" onClick={handleArchive} disabled={isSaving}>
                 Archive
               </Button>
-            )}
-          </div>
+            </>
+          )}
+          <Button
+            type="submit"
+            form="entry-form"
+            variant="default"
+            size="sm"
+            disabled={isSaving || Object.keys(fieldErrors).length > 0}
+          >
+            {isSaving ? 'Saving...' : 'Save'}
+          </Button>
         </div>
       </div>
 
       <form
-        className="flex-1 min-h-0 overflow-y-auto"
+        id="entry-form"
+        className="flex-1 min-h-0 overflow-hidden flex"
         onSubmit={handleSubmit}
         onInput={(e) => {
           const t = e.target;
@@ -332,82 +348,53 @@ const EditPostInner = ({ post }: { post: any }) => {
           }
         }}
       >
-        <div className="max-w-[1320px] mx-auto w-full px-8 py-7 pb-32 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-8">
-          {/* Form / Diff column */}
-          {viewMode === 'diff' && selectedFile ? (
-            <div className="min-w-0">
+        {/* Main content column — independently scrollable */}
+        <div className="flex-1 min-w-0 overflow-y-auto bg-bg">
+          <div className="max-w-[960px] mx-auto px-6 py-6 pb-32">
+            {viewMode === 'diff' && selectedFile ? (
               <DiffView collectionType={selectedType as string} entryPath={selectedFile.path} />
-            </div>
-          ) : (
-            <section className="rounded-lg border border-border bg-card overflow-hidden">
-              <header className="flex items-center gap-2.5 px-5 py-4 border-b border-border bg-muted/40">
-                <h2 className="text-[15px] font-semibold text-foreground">{collectionLabel}</h2>
-                <span className="text-[13px] text-muted-foreground">· {fieldCount} fields</span>
-              </header>
-              <div className="px-5 py-6">
+            ) : (
+              <section className="rounded-2xl border border-border bg-bg px-7 py-7 shadow-1">
                 <FormFields
                   selectedFile={selectedFile}
                   fields={post?.fields}
                   fieldErrors={fieldErrors}
                   onClearFieldError={clearFieldError}
                 />
-              </div>
-            </section>
-          )}
-
-          {/* Sidebar column */}
-          <aside className="flex flex-col gap-4 lg:sticky lg:top-4 lg:self-start">
-            <Card>
-              <CardContent>
-                <Button
-                  type="submit"
-                  variant="default"
-                  size="sm"
-                  className="w-full"
-                  disabled={isSaving || Object.keys(fieldErrors).length > 0}
-                >
-                  {isSaving ? 'Saving...' : 'Save'}
-                </Button>
-                {(currentStatus === 'draft' || currentStatus === 'changed') && (
-                  <Button
-                    type="button"
-                    variant="default"
-                    size="sm"
-                    className="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white"
-                    onClick={handlePublish}
-                    disabled={isSaving}
-                  >
-                    Publish
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Entry details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-[64px_1fr] gap-y-2.5 gap-x-3 text-[13px]">
-                  <div className="text-muted-foreground">ID</div>
-                  <div className="text-foreground font-mono text-xs truncate" title={post?.sys?.id}>
-                    {post?.sys?.id}
-                  </div>
-                  <div className="text-muted-foreground">Type</div>
-                  <div className="text-foreground">{collectionLabel}</div>
-                  <div className="text-muted-foreground">Status</div>
-                  <div>
-                    <StatusBadge status={currentStatus} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {selectedFile && <HistorySection entryPath={selectedFile.path} />}
-
-            {selectedFile && <LinkedBySection entryPath={selectedFile.path} />}
-          </aside>
+              </section>
+            )}
+          </div>
         </div>
+
+        {/* Sidebar — fixed width, independently scrollable, surface-2 panel */}
+        <aside className="w-[280px] shrink-0 overflow-y-auto border-l border-border bg-surface-2 px-4 py-5 flex flex-col gap-5">
+          {/* Entry details */}
+          <div>
+            <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              Entry details
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <div className="flex items-center gap-3 text-[12px]">
+                <span className="w-16 shrink-0 text-muted-foreground">ID</span>
+                <span className="flex-1 min-w-0 font-mono text-[11px] text-foreground truncate" title={post?.sys?.id}>
+                  {post?.sys?.id}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-[12px]">
+                <span className="w-16 shrink-0 text-muted-foreground">Type</span>
+                <span className="flex-1 text-foreground">{collectionLabel}</span>
+              </div>
+              <div className="flex items-center gap-3 text-[12px]">
+                <span className="w-16 shrink-0 text-muted-foreground">Status</span>
+                <StatusBadge status={currentStatus} />
+              </div>
+            </div>
+          </div>
+
+          {selectedFile && <HistorySection entryPath={selectedFile.path} flat />}
+
+          {selectedFile && <LinkedBySection entryPath={selectedFile.path} />}
+        </aside>
       </form>
 
       {/* Inline entry editor overlays (rendered outside the form to avoid nested forms) */}

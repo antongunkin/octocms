@@ -181,7 +181,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
                   'Renaming will move every entry file. References from other collections will need to be updated manually.')}
             </p>
             {keyChanged && entryCount > 0 && !keyError && !duplicateKey ? (
-              <div className="mt-2 flex gap-2 rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+              <div className="mt-2 flex gap-2 rounded-md border border-amber-900 bg-amber-950 p-2 text-xs text-amber-200 light:border-amber-200 light:bg-amber-50 light:text-amber-900">
                 <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>
                   {entryCount} {entryCount === 1 ? 'entry' : 'entries'} will be renamed from{' '}

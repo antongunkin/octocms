@@ -181,8 +181,8 @@ function ImageSide({ label, uuid, url, tone }: { label: string; uuid: string; ur
       className={cn(
         'rounded-md border p-2',
         tone === 'add'
-          ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/30'
-          : 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30',
+          ? 'border-emerald-900 bg-emerald-950/30 light:border-emerald-200 light:bg-emerald-50'
+          : 'border-red-900 bg-red-950/30 light:border-red-200 light:bg-red-50',
       )}
     >
       <div className="mb-2 flex items-center gap-2">
@@ -190,8 +190,8 @@ function ImageSide({ label, uuid, url, tone }: { label: string; uuid: string; ur
           className={cn(
             'inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-semibold',
             tone === 'add'
-              ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-200'
-              : 'bg-red-100 text-red-900 dark:bg-red-900/50 dark:text-red-200',
+              ? 'bg-emerald-900/50 text-emerald-200 light:bg-emerald-100 light:text-emerald-900'
+              : 'bg-red-900/50 text-red-200 light:bg-red-100 light:text-red-900',
           )}
         >
           {label}

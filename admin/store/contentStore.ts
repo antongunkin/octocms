@@ -11,6 +11,7 @@
 
 import { getConfig } from '../../lib/configStore';
 import { logCmsServerError } from '../../lib/cmsServerLog';
+import { isMediaEntryPath } from '../../lib/mediaPath';
 import { buildSearchIndex, type EntryForSearch } from '../../lib/searchIndex';
 
 import { assertGitHubConfig, getPublicOctokits } from '../github';
@@ -141,12 +142,15 @@ function collectionFromPath(filePath: string): string | null {
 /**
  * Get a single file from the store. Returns the StoredEntry with pre-parsed
  * content and companion markdown already merged, or null if not found.
+ *
+ * Looks in both editorial entries and media entries (the store keeps them in
+ * separate maps; consumers shouldn't have to know which).
  */
 export async function getStoredFile(filePath: string, branch?: string): Promise<StoredEntry | null> {
   const resolved = resolveBranch(branch);
   const store = await ensureStore(resolved);
   if (!store) return null;
-  return store.entries.get(filePath) ?? null;
+  return store.entries.get(filePath) ?? store.mediaEntries.get(filePath) ?? null;
 }
 
 /**
@@ -159,7 +163,8 @@ export async function getStoredContentFiles(collection: string, branch?: string)
   if (!store) return null;
 
   if (collection === '**') {
-    // Return all non-media JSON file paths
+    // Return all editorial entry paths. Media lives in `mediaEntries` and is
+    // not included by `getContentFiles('**')` callers.
     const all: string[] = [];
     for (const [path] of store.entries) {
       if (path.endsWith('.json')) {
@@ -190,7 +195,7 @@ export async function getStoredFileSha(filePath: string, branch?: string): Promi
   const resolved = resolveBranch(branch);
   const store = await ensureStore(resolved);
   if (!store) return null;
-  return store.entries.get(filePath)?.sha ?? null;
+  return (store.entries.get(filePath) ?? store.mediaEntries.get(filePath))?.sha ?? null;
 }
 
 // ---------------------------------------------------------------------------
@@ -211,10 +216,10 @@ export async function getOrBuildSearchIndex(branch?: string): Promise<string | n
     return store.searchIndex;
   }
 
-  // Build from current entries (exclude media)
+  // Build from current entries — `store.entries` is editorial-only (media
+  // lives in `store.mediaEntries`), so no per-path filter is needed.
   const entries: EntryForSearch[] = [];
   for (const [path, stored] of store.entries) {
-    if (path.includes('/media/')) continue;
     entries.push({
       path: path.replace(`${config.contentFolder}/`, ''),
       content: stored.content,
@@ -241,7 +246,8 @@ export function applyMutation(branch: string, mutation: StoreMutation): void {
   if (!store) return; // Store not populated yet — next read will fetch fresh data
 
   if (mutation.type === 'upsert') {
-    const existing = store.entries.get(mutation.path);
+    const isMedia = isMediaEntryPath(mutation.path);
+    const existing = isMedia ? store.mediaEntries.get(mutation.path) : store.entries.get(mutation.path);
     const entry: StoredEntry = {
       path: mutation.path,
       content: mutation.content,
@@ -249,39 +255,38 @@ export function applyMutation(branch: string, mutation: StoreMutation): void {
       companionMarkdown: mutation.companions ? { ...mutation.companions } : (existing?.companionMarkdown ?? {}),
     };
 
-    store.entries.set(mutation.path, entry);
+    if (isMedia) {
+      store.mediaEntries.set(mutation.path, entry);
+    } else {
+      store.entries.set(mutation.path, entry);
 
-    // Update collection index
-    const collection = collectionFromPath(mutation.path);
-    if (collection) {
-      const list = store.byCollection.get(collection);
-      if (list) {
-        if (!list.includes(mutation.path)) {
-          list.push(mutation.path);
+      // Update collection index
+      const collection = collectionFromPath(mutation.path);
+      if (collection) {
+        const list = store.byCollection.get(collection);
+        if (list) {
+          if (!list.includes(mutation.path)) {
+            list.push(mutation.path);
+          }
+        } else {
+          store.byCollection.set(collection, [mutation.path]);
         }
-      } else {
-        store.byCollection.set(collection, [mutation.path]);
-      }
-
-      // Update media index
-      if (collection === 'media') {
-        store.mediaEntries.set(mutation.path, entry);
       }
     }
   } else {
     // delete
-    store.entries.delete(mutation.path);
+    if (isMediaEntryPath(mutation.path)) {
+      store.mediaEntries.delete(mutation.path);
+    } else {
+      store.entries.delete(mutation.path);
 
-    const collection = collectionFromPath(mutation.path);
-    if (collection) {
-      const list = store.byCollection.get(collection);
-      if (list) {
-        const idx = list.indexOf(mutation.path);
-        if (idx >= 0) list.splice(idx, 1);
-      }
-
-      if (collection === 'media') {
-        store.mediaEntries.delete(mutation.path);
+      const collection = collectionFromPath(mutation.path);
+      if (collection) {
+        const list = store.byCollection.get(collection);
+        if (list) {
+          const idx = list.indexOf(mutation.path);
+          if (idx >= 0) list.splice(idx, 1);
+        }
       }
     }
   }

@@ -3,8 +3,10 @@
 /* Scan compiled octocms dist for Tailwind class names used by admin components */
 @source "../dist";
 
-/* Scope dark: variants to descendants of any .dark element (admin-only, not <html>) */
-@custom-variant dark (&:is(.dark *));
+/* Dark is the default — no class needed. dark: variants apply everywhere except inside .light */
+@custom-variant dark (&:not(:is(.light *)));
+/* Light is explicit opt-in — light: variants apply only inside .light */
+@custom-variant light (&:is(.light *));
 
 /* ============================================================
    Design tokens.
@@ -85,7 +87,7 @@
 }
 
 /* ============================================================
-   Light theme (default)
+   Dark theme (default — no class needed)
    ============================================================ */
 :root {
   /* Layout */
@@ -99,106 +101,6 @@
   --ft-mono:
     ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
-  /* v2 surfaces */
-  --bg: #fafaf9;
-  --surface-1: #ffffff;
-  --surface-2: #f4f2ee;
-  --surface-3: #ebe8e2;
-  --border: #d8d4cc;
-  --border-strong: #b8b1a5;
-
-  /* v2 text */
-  --text: #110d06;
-  --text-2: #3a342b;
-  --muted: #5d564b;
-
-  /* v2 brand (teal-green) */
-  --brand: #04cd8c;
-  --brand-fg: #002b1c;
-  --brand-bg: #d8f5e8;
-  --brand-strong: #006e4a;
-
-  /* v2 primary (near-black) */
-  --primary: #110d06;
-  --primary-fg: #fafaf9;
-
-  /* v2 accent (indigo) */
-  --accent: #4f46e5;
-  --accent-bg: #e6e8fc;
-  --accent-fg: #2c2483;
-
-  /* v2 ring */
-  --ring: var(--accent);
-
-  /* v2 tones */
-  --danger: #8c1810;
-  --danger-bg: #fde9e7;
-  --danger-bd: #f5a8a2;
-  --warn: #8c3500;
-  --warn-bg: #fff3d6;
-  --warn-bd: #f0bf6a;
-  --ok: #0f6332;
-  --ok-bg: #def9e6;
-  --ok-bd: #8eddae;
-
-  /* v2 status (matches sys.status enum 1:1) */
-  --st-draft: #4a4339;
-  --st-draft-bg: #efece8;
-  --st-draft-bd: #c5bfb4;
-  --st-changed: #8c3500;
-  --st-changed-bg: #fff3d6;
-  --st-changed-bd: #f0bf6a;
-  --st-published: #044e30;
-  --st-published-bg: #def9e6;
-  --st-published-bd: #8eddae;
-  --st-merged: #432eaa;
-  --st-merged-bg: #e7defc;
-  --st-merged-bd: #b69dff;
-  --st-archived: #3f3a33;
-  --st-archived-bg: #e3dfd7;
-  --st-archived-bd: #b8b1a5;
-
-  /* v2 diff */
-  --add-bg: #def9e6;
-  --add-fg: #033f23;
-  --del-bg: #fde9e7;
-  --del-fg: #5e1810;
-
-  /* v2 shadows */
-  --shadow-1: 0 1px 2px rgba(20, 15, 5, 0.04);
-  --shadow-2: 0 4px 12px rgba(20, 15, 5, 0.06), 0 1px 3px rgba(20, 15, 5, 0.04);
-  --shadow-3: 0 16px 40px rgba(20, 15, 5, 0.1), 0 4px 10px rgba(20, 15, 5, 0.05);
-
-  /* ─── Legacy shadcn aliases ─── */
-  --background: var(--bg);
-  --foreground: var(--text);
-  --card: var(--surface-1);
-  --card-foreground: var(--text);
-  --popover: var(--surface-1);
-  --popover-foreground: var(--text);
-  --primary-foreground: var(--primary-fg);
-  --secondary: var(--surface-2);
-  --secondary-foreground: var(--text);
-  --destructive: var(--danger);
-  --destructive-foreground: #ffffff;
-  --muted-bg: var(--surface-2); /* shadcn `--muted` is a background — distinct from v2 `--muted` (text) */
-  --input: var(--surface-1);
-  --radius: 0.5rem;
-
-  /* CMS layout aliases (used by legacy CSS Module classes) */
-  --color-layout-bg: var(--bg);
-  --color-text: var(--text);
-  --color-header-bg: var(--surface-1);
-  --color-header-text: var(--text);
-  --color-sidebar-bg: var(--surface-2);
-  --color-border: var(--border);
-}
-
-/* ============================================================
-   Dark theme — applied when an ancestor has class="dark"
-   Warm dark — charcoal with a slight warm tint, not pure black.
-   ============================================================ */
-.dark {
   /* v2 surfaces */
   --bg: #1a1816;
   --surface-1: #25221f;
@@ -218,7 +120,7 @@
   --brand-bg: #0e3326;
   --brand-strong: #2dec90;
 
-  /* v2 primary (light-on-dark) */
+  /* v2 primary */
   --primary: #faf7f3;
   --primary-fg: #1a1816;
 
@@ -281,8 +183,108 @@
   --secondary-foreground: var(--text);
   --destructive: var(--danger);
   --destructive-foreground: #ffffff;
+  --muted-bg: var(--surface-2); /* shadcn `--muted` is a background — distinct from v2 `--muted` (text) */
+  --input: var(--surface-1);
+  --radius: 0.5rem;
+
+  /* CMS layout aliases (used by legacy CSS Module classes) */
+  --color-layout-bg: var(--bg);
+  --color-text: var(--text);
+  --color-header-bg: var(--surface-1);
+  --color-header-text: var(--text);
+  --color-sidebar-bg: var(--surface-2);
+  --color-border: var(--border);
+}
+
+/* ============================================================
+   Light theme — applied when an ancestor has class="light"
+   ============================================================ */
+.light {
+  /* v2 surfaces */
+  --bg: #fafaf9;
+  --surface-1: #ffffff;
+  --surface-2: #f4f2ee;
+  --surface-3: #ebe8e2;
+  --border: #d8d4cc;
+  --border-strong: #b8b1a5;
+
+  /* v2 text */
+  --text: #110d06;
+  --text-2: #3a342b;
+  --muted: #5d564b;
+
+  /* v2 brand */
+  --brand: #04cd8c;
+  --brand-fg: #002b1c;
+  --brand-bg: #d8f5e8;
+  --brand-strong: #006e4a;
+
+  /* v2 primary */
+  --primary: #110d06;
+  --primary-fg: #fafaf9;
+
+  /* v2 accent */
+  --accent: #4f46e5;
+  --accent-bg: #e6e8fc;
+  --accent-fg: #2c2483;
+
+  /* v2 ring */
+  --ring: var(--accent);
+
+  /* v2 tones */
+  --danger: #8c1810;
+  --danger-bg: #fde9e7;
+  --danger-bd: #f5a8a2;
+  --warn: #8c3500;
+  --warn-bg: #fff3d6;
+  --warn-bd: #f0bf6a;
+  --ok: #0f6332;
+  --ok-bg: #def9e6;
+  --ok-bd: #8eddae;
+
+  /* v2 status */
+  --st-draft: #4a4339;
+  --st-draft-bg: #efece8;
+  --st-draft-bd: #c5bfb4;
+  --st-changed: #8c3500;
+  --st-changed-bg: #fff3d6;
+  --st-changed-bd: #f0bf6a;
+  --st-published: #044e30;
+  --st-published-bg: #def9e6;
+  --st-published-bd: #8eddae;
+  --st-merged: #432eaa;
+  --st-merged-bg: #e7defc;
+  --st-merged-bd: #b69dff;
+  --st-archived: #3f3a33;
+  --st-archived-bg: #e3dfd7;
+  --st-archived-bd: #b8b1a5;
+
+  /* v2 diff */
+  --add-bg: #def9e6;
+  --add-fg: #033f23;
+  --del-bg: #fde9e7;
+  --del-fg: #5e1810;
+
+  /* v2 shadows */
+  --shadow-1: 0 1px 2px rgba(20, 15, 5, 0.04);
+  --shadow-2: 0 4px 12px rgba(20, 15, 5, 0.06), 0 1px 3px rgba(20, 15, 5, 0.04);
+  --shadow-3: 0 16px 40px rgba(20, 15, 5, 0.1), 0 4px 10px rgba(20, 15, 5, 0.05);
+
+  /* shadcn aliases — must re-declare here so var() refs resolve in .light context
+     (CSS custom props inherit the :root-resolved value, not the token string) */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface-1);
+  --card-foreground: var(--text);
+  --popover: var(--surface-1);
+  --popover-foreground: var(--text);
+  --primary-foreground: var(--primary-fg);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--text);
+  --destructive: var(--danger);
   --muted-bg: var(--surface-2);
   --input: var(--surface-1);
+  --color-layout-bg: var(--bg);
 }
 
 /* ============================================================
@@ -338,6 +340,10 @@
 .field-shell input::placeholder,
 .field-textarea::placeholder {
   color: var(--muted);
+}
+
+@utility shadow-1 {
+  box-shadow: var(--shadow-1);
 }
 
 /* ============================================================
@@ -436,11 +442,55 @@
   }
 }
 
+.editor-markdown.mdxeditor,
+.editor-markdown.mdxeditor-popup-container {
+  /* Map MDXEditor's proprietary CSS vars to our design tokens.
+     Both selectors use .editor-markdown for specificity (0,2,0) — needed because
+     MDXEditor's own ._editorRoot_* rule loads later and would otherwise win. */
+  --baseBase: var(--bg);
+  --baseBgSubtle: var(--surface-1);
+  --baseBg: var(--surface-1);
+  --baseBgHover: var(--surface-2);
+  --baseBgActive: var(--surface-2);
+  --baseBorder: var(--border);
+  --baseBorderHover: var(--border-strong);
+  --baseText: var(--muted);
+  --baseTextContrast: var(--text-2);
+  --basePageBg: var(--surface-1);
+}
+
 .editor-markdown.mdxeditor {
-  background-color: var(--background);
-  padding: 5px;
+  background-color: var(--surface-1);
+  padding: 0;
   border-radius: 8px;
   border: 1px solid var(--border);
+  font-family: var(--ft-ui);
+  color: var(--text-2);
+}
+
+/* BlockTypeSelect trigger inside the toolbar */
+.editor-markdown.mdxeditor [class*='selectTrigger'] {
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+
+/* Highlighted item in the (portaled) dropdown menu — needs to stand out from
+   the panel which uses --basePageBg = --surface-1 */
+.editor-markdown.mdxeditor-popup-container [class*='selectItem'][data-highlighted],
+.editor-markdown.mdxeditor-popup-container [class*='selectItem'][data-state='checked'] {
+  background-color: var(--surface-2);
+  color: var(--text);
+}
+
+.editor-markdown.mdxeditor .mdxeditor-toolbar {
+  padding: 6px 8px;
+  gap: 4px;
+  border-radius: 8px 8px 0 0;
+}
+
+.editor-markdown.mdxeditor [contenteditable] {
+  padding: 12px;
+  font-family: var(--ft-ui);
 }
 
 .editor-markdown--invalid.mdxeditor {

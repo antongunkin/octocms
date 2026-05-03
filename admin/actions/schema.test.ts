@@ -53,6 +53,7 @@ vi.mock('fs/promises', () => ({
 const baseConfig: Config = {
   projectName: 'Test',
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: ['png'],
   git: { baseBranch: 'main' },
@@ -283,6 +284,7 @@ describe('previewSchemaChange — Phase 6', () => {
   const refConfig = (): Config => ({
     projectName: 'Test',
     contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png'],
     git: { baseBranch: 'main' },
@@ -439,6 +441,7 @@ describe('saveSchema — Phase 6 cross-collection writes', () => {
     const prev: Config = {
       projectName: 'Test',
       contentFolder: 'cms/content',
+      mediaContentFolder: 'cms/media',
       mediaFolder: 'public/media',
       mediaAllowedFormats: ['png'],
       git: { baseBranch: 'main' },
@@ -500,6 +503,7 @@ describe('saveSchema — Phase 6 cross-collection writes', () => {
     const prev: Config = {
       projectName: 'Test',
       contentFolder: 'cms/content',
+      mediaContentFolder: 'cms/media',
       mediaFolder: 'public/media',
       mediaAllowedFormats: ['png'],
       git: { baseBranch: 'main' },

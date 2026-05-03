@@ -2,30 +2,27 @@
 
 import { ImageIcon, ChevronRight, LayoutGrid, List, Search, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getMediaEntries, uploadMedia } from '../../admin/actions';
+import { getMediaEntries } from '../../admin/actions';
 import { useConfig } from '../../hooks/useConfig';
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { toast } from '../../hooks/useToast';
-import { suggestedTitleFromFileName } from '../../lib/suggestedMediaTitle';
 import { cn } from '../../lib/utils';
 import type { MediaFile } from '../../types';
 import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Label } from '../ui/label';
 
 import { CreateFolderDialog } from './CreateFolderDialog';
 import { DeleteFolderDialog } from './DeleteFolderDialog';
 import { MediaLeftPanel } from './MediaLeftPanel';
 import { MediaListTable } from './MediaListTable';
 import { MediaUploadBar } from './MediaUploadBar';
+import { MediaUploadDialog } from './MediaUploadDialog';
 
 type MediaManagerProps = {
   files: MediaFile[];
 };
 
-type UploadRow = { file: File; title: string };
 type ViewMode = 'grid' | 'list';
 
 const VIEW_MODE_KEY = 'octocms:media-view-mode';
@@ -36,11 +33,10 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
   const [files, setFiles] = useState(initialFiles);
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [uploadQueue, setUploadQueue] = useState<UploadRow[] | null>(null);
+  const [pendingUpload, setPendingUpload] = useState<File[] | null>(null);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [pendingFolderDelete, setPendingFolderDelete] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [isPending, startTransition] = useTransition();
   const { folders: customFolders, add: addCustomFolder, remove: removeCustomFolder } = useMediaCustomFolders();
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -104,52 +100,32 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
 
   const openUploadQueue = useCallback(
     (fileList: FileList) => {
-      const rows: UploadRow[] = [];
+      const accepted: File[] = [];
       for (const file of Array.from(fileList)) {
         const ext = file.name.split('.').pop()?.toLowerCase() || '';
         if (!config.mediaAllowedFormats.includes(ext)) {
           toast({ title: `Skipped "${file.name}" — format .${ext} not allowed`, variant: 'destructive' });
           continue;
         }
-        rows.push({ file, title: suggestedTitleFromFileName(file.name) });
+        accepted.push(file);
       }
-      if (rows.length > 0) setUploadQueue(rows);
+      if (accepted.length > 0) setPendingUpload(accepted);
     },
     [config.mediaAllowedFormats],
   );
 
-  const confirmUploadQueue = useCallback(() => {
-    if (!uploadQueue?.length) return;
-    for (const row of uploadQueue) {
-      if (!row.title.trim()) {
-        toast({ title: 'Each file needs a Title', variant: 'destructive' });
-        return;
-      }
-    }
-
-    const folder = selectedFolder && selectedFolder !== '/' ? selectedFolder : '/';
-    const queue = uploadQueue;
-
-    startTransition(async () => {
-      for (const row of queue) {
-        const formData = new FormData();
-        formData.set('file', row.file);
-        formData.set('folder', folder);
-        formData.set('title', row.title.trim());
-
-        const uploadResult = await uploadMedia(formData);
-        if (!uploadResult.success) {
-          toast({ title: uploadResult.error, variant: 'destructive' });
-          return;
-        }
-      }
-
+  const handleUploadComplete = useCallback(
+    async (uploadedIds: string[]) => {
       const fresh = await getMediaEntries();
       setFiles(fresh);
-      setUploadQueue(null);
-      toast({ title: `Uploaded ${queue.length} file(s)`, variant: 'success' });
-    });
-  }, [uploadQueue, selectedFolder]);
+      setPendingUpload(null);
+      // Open the asset editor for the first upload — others are still in the list.
+      if (uploadedIds.length > 0) {
+        router.push(`/cms/media/${uploadedIds[0]}`);
+      }
+    },
+    [router],
+  );
 
   const handleCreateFolder = useCallback(
     (name: string) => {
@@ -198,7 +174,7 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
             size="sm"
             className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
             onClick={() => document.getElementById('media-upload-bar-input')?.click()}
-            disabled={isPending}
+            disabled={pendingUpload !== null}
           >
             <Upload className="h-4 w-4" />
             Upload
@@ -220,7 +196,11 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
         />
 
         <div className="flex flex-1 flex-col overflow-hidden">
-          <MediaUploadBar allowedFormats={config.mediaAllowedFormats} onFiles={openUploadQueue} disabled={isPending} />
+          <MediaUploadBar
+            allowedFormats={config.mediaAllowedFormats}
+            onFiles={openUploadQueue}
+            disabled={pendingUpload !== null}
+          />
 
           {/* Search bar — same shape and tokens as /cms/content */}
           <div className="px-6 pb-3 pt-3">
@@ -306,45 +286,12 @@ const MediaManager = ({ files: initialFiles }: MediaManagerProps) => {
         onCancel={() => setPendingFolderDelete(null)}
       />
 
-      <Dialog open={uploadQueue !== null} onOpenChange={(open) => !open && setUploadQueue(null)}>
-        <DialogContent className="flex max-h-[85vh] max-w-lg flex-col">
-          <DialogHeader>
-            <DialogTitle>Set title for each image</DialogTitle>
-            <DialogDescription>
-              Titles are required and used as default alt text when this image is referenced in content.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 overflow-y-auto py-2 pr-1">
-            {uploadQueue?.map((row, i) => (
-              <div key={`${row.file.name}-${i}`} className="space-y-1.5">
-                <p className="break-all text-xs text-muted-foreground">{row.file.name}</p>
-                <Label className="sr-only text-xs" htmlFor={`upload-title-${i}`}>
-                  Title
-                </Label>
-                <input
-                  id={`upload-title-${i}`}
-                  type="text"
-                  value={row.title}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setUploadQueue((prev) => (prev ? prev.map((r, j) => (j === i ? { ...r, title: v } : r)) : prev));
-                  }}
-                  className="w-full rounded border border-border bg-background px-2 py-1.5 text-sm text-foreground"
-                  disabled={isPending}
-                />
-              </div>
-            ))}
-          </div>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="outline" onClick={() => setUploadQueue(null)} disabled={isPending}>
-              Cancel
-            </Button>
-            <Button type="button" onClick={confirmUploadQueue} disabled={isPending}>
-              Upload
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <MediaUploadDialog
+        files={pendingUpload}
+        defaultFolder={selectedFolder && selectedFolder !== '/' ? selectedFolder : '/'}
+        onComplete={handleUploadComplete}
+        onCancel={() => setPendingUpload(null)}
+      />
     </div>
   );
 };

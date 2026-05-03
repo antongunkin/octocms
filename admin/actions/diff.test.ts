@@ -175,10 +175,10 @@ describe('getEntryDiff', () => {
           sha: 'x',
         };
       }
-      if (path === 'cms/content/media/media-old-uuid.json') {
+      if (path === 'cms/media/media-old-uuid.json') {
         return { content: makeMedia('png'), sha: 'x' };
       }
-      if (path === 'cms/content/media/media-new-uuid.json') {
+      if (path === 'cms/media/media-new-uuid.json') {
         return { content: makeMedia('jpg'), sha: 'x' };
       }
       return null;

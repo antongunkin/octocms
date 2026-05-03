@@ -24,8 +24,11 @@ export function defaultEntryId(config: Config, filePath: string): string {
   return parts[parts.length - 1] ?? stripped;
 }
 
-/** Return the collection name (= `sys.type` segment) for a given content file path. */
+/** Return the collection name (= `sys.type` segment) for a given content file path.
+ *  Recognises media-entry paths under `mediaContentFolder` and returns `'media'`. */
 export function collectionFromPath(config: Config, filePath: string): string {
+  const mediaFolder = (config as Config & { mediaContentFolder?: string }).mediaContentFolder ?? 'cms/media';
+  if (filePath.startsWith(`${mediaFolder}/`)) return 'media';
   const stripped = filePath.replace(`${config.contentFolder}/`, '').replace('.json', '');
   const parts = stripped.split('/');
   return parts[0] ?? '';

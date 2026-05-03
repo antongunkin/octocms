@@ -62,6 +62,7 @@ export const readGitHubFilePublic = async (filePath: string, branch?: string): P
   const ref = branch ?? configBranch;
   const clients = getPublicOctokits();
 
+  let sawAuthError = false;
   for (const octokit of clients) {
     try {
       const { data } = await octokit.rest.repos.getContent({
@@ -82,61 +83,90 @@ export const readGitHubFilePublic = async (filePath: string, branch?: string): P
       }
 
       if (error.status === 401 || error.status === 403) {
-        // Try next client (e.g. unauthenticated) before giving up.
+        sawAuthError = true;
         continue;
       }
 
       if (error.status === 404) {
-        // 404 can mean missing file, missing ref, or no repo access.
-        // Try next client if available before deciding.
-        continue;
+        // 404 from a client that authenticated successfully = file genuinely missing.
+        // 404 only after auth failures = "no access" — keep trying / fall through.
+        if (sawAuthError) continue;
+        return null;
       }
 
       throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref });
     }
   }
 
-  // All clients failed — typical for private repos or invalid token permissions.
+  // All clients failed and at least one rejected auth — typical for private repos with bad token.
+  const tokenPresent = !!process.env.CMS_GITHUB_TOKEN?.trim();
   throw new ContentSourceError(
     'github_auth',
-    `Cannot read ${owner}/${repo} (ref: ${ref}) from GitHub. For private repositories, set CMS_GITHUB_TOKEN with Contents: Read access on this repository.`,
+    tokenPresent
+      ? `Cannot read ${owner}/${repo} (ref: ${ref}) from GitHub. CMS_GITHUB_TOKEN is set but was rejected — verify it has Contents: Read access on this repository.`
+      : `Cannot read ${owner}/${repo} (ref: ${ref}) from GitHub. Set CMS_GITHUB_TOKEN with Contents: Read access on this repository.`,
   );
 };
 
 /**
  * List files in a directory from the GitHub repo.
  * Returns an array of file paths.
+ *
+ * Tries all available Octokit clients in order (authenticated first, then
+ * unauthenticated) so that a bad/expired CMS_GITHUB_TOKEN automatically
+ * falls back to unauthenticated reads on public repos.
  */
 export const listGitHubFiles = async (dirPath: string, extension?: string, branch?: string): Promise<string[]> => {
-  const [octokit] = getPublicOctokits();
+  const clients = getPublicOctokits();
   const { owner, repo, branch: configBranch } = assertGitHubConfig();
   const ref = branch ?? configBranch;
 
-  try {
-    const { data } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
-      path: dirPath,
-      ref,
-    });
+  let sawAuthError = false;
+  for (const octokit of clients) {
+    try {
+      const { data } = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path: dirPath,
+        ref,
+      });
 
-    if (!Array.isArray(data)) {
-      return [];
+      if (!Array.isArray(data)) {
+        return [];
+      }
+
+      let files = data.filter((item) => item.type === 'file').map((item) => item.path);
+
+      if (extension) {
+        files = files.filter((f) => f.endsWith(extension));
+      }
+
+      return files;
+    } catch (error: any) {
+      if (error.status === 429) {
+        throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref });
+      }
+      if (error.status === 401 || error.status === 403) {
+        sawAuthError = true;
+        continue;
+      }
+      if (error.status === 404) {
+        // 404 from a client that authenticated = directory genuinely missing.
+        // 404 after auth failures = "no access" — keep trying / fall through.
+        if (sawAuthError) continue;
+        return [];
+      }
+      throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref });
     }
-
-    let files = data.filter((item) => item.type === 'file').map((item) => item.path);
-
-    if (extension) {
-      files = files.filter((f) => f.endsWith(extension));
-    }
-
-    return files;
-  } catch (error: any) {
-    if (error.status === 404) {
-      return [];
-    }
-    throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref });
   }
+
+  const tokenPresent = !!process.env.CMS_GITHUB_TOKEN?.trim();
+  throw new ContentSourceError(
+    'github_auth',
+    tokenPresent
+      ? `Cannot list ${owner}/${repo}/${dirPath} (ref: ${ref}) from GitHub. CMS_GITHUB_TOKEN is set but was rejected — verify it has Contents: Read access on this repository.`
+      : `Cannot list ${owner}/${repo}/${dirPath} (ref: ${ref}) from GitHub. Set CMS_GITHUB_TOKEN with Contents: Read access on this repository.`,
+  );
 };
 
 /**
@@ -148,13 +178,22 @@ export const getPublishedBranch = async (): Promise<string> => {
   const { branch: configBranch } = assertGitHubConfig();
   const pointerRef = getPublishedPointerRef();
 
+  let content: string | null;
   try {
-    const content = await readGitHubFilePublic('cms/published.json', pointerRef);
-    if (!content) return configBranch;
+    content = await readGitHubFilePublic('cms/published.json', pointerRef);
+  } catch (e) {
+    // Auth / network / rate-limit signals a real prod problem — let it bubble.
+    // The pointer file itself is optional, but if we can't even reach GitHub
+    // to check, downstream content reads will fail too; surface the cause.
+    if (isContentSourceError(e)) throw e;
+    return configBranch;
+  }
+
+  if (!content) return configBranch;
+  try {
     const parsed = JSON.parse(content);
     return typeof parsed.branch === 'string' ? parsed.branch : configBranch;
-  } catch (e) {
-    if (isContentSourceError(e)) throw e;
+  } catch {
     return configBranch;
   }
 };

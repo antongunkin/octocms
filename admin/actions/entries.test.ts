@@ -89,17 +89,16 @@ describe('getEntryList', () => {
     expect(entry.title).toBe('My Post');
   });
 
-  it('uses fields.title for media entries under cms/content/media/', async () => {
-    vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/media/media-abc.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({
-      sys: { id: 'abc', type: 'media' },
-      fields: { title: 'Hero photo', extension: 'png' },
-    });
+  it('does not pull media files into the list (media lives in its own folder)', async () => {
+    // getContentFiles('**') globs `${contentFolder}/**` only — media entries
+    // live under `mediaContentFolder` (e.g. `cms/media/`) and never appear
+    // here. Verify the function handles the "no media in input" contract.
+    vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/p1.json']);
+    vi.mocked(filesModule.getFile).mockResolvedValue({ fields: { title: 'Post' } });
 
-    const [entry] = await getEntryList();
-    expect(entry.type).toBe('media');
-    expect(entry.id).toBe('abc');
-    expect(entry.title).toBe('Hero photo');
+    const result = await getEntryList();
+    expect(result).toHaveLength(1);
+    expect(result[0].type).toBe('post');
   });
 
   it('defaults status to merged when sys.status is absent', async () => {
@@ -189,18 +188,6 @@ describe('getEntryBacklinks', () => {
 
     const result = await getEntryBacklinks('author-a1.json');
     expect(result).toEqual([]);
-  });
-
-  it('skips files under cms/content/media/', async () => {
-    vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/media/uuid-1.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({
-      sys: { type: 'media', id: 'uuid-1' },
-      fields: {},
-    });
-
-    const result = await getEntryBacklinks('anything.json');
-    expect(result).toEqual([]);
-    expect(filesModule.getFile).not.toHaveBeenCalled();
   });
 
   it('detects backlinks when a reference field stores a JSON array string', async () => {

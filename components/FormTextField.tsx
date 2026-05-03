@@ -5,6 +5,8 @@ import React from 'react';
 import { cn } from '../lib/utils';
 
 import { FieldHintAndError } from './FieldHintAndError';
+import { FieldLabel } from './FieldLabel';
+import { FIELD_TEXTAREA_CLASS } from './FieldShell';
 
 const DEFAULT_ROWS = 4;
 
@@ -30,16 +32,11 @@ const FormTextField = ({
   onClearError,
 }: FormTextFieldProps) => {
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
-        {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
-      </div>
+    <div className="mb-5">
+      <FieldLabel label={label} htmlFor={name} type="text" required={required} />
       <textarea
-        className={cn(
-          'w-full text-sm bg-background text-foreground px-3 py-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors',
-          error && 'border-destructive focus:ring-destructive/30',
-        )}
+        id={name}
+        className={cn(FIELD_TEXTAREA_CLASS, error && 'border-destructive')}
         name={name}
         rows={rows}
         defaultValue={value}

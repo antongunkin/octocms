@@ -4,10 +4,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  ChevronLeft,
+  ArrowLeft,
+  ChevronRight,
   FileText,
   GripVertical,
-  Key,
   Layers,
   MoreHorizontal,
   Pencil,
@@ -19,7 +19,7 @@ import {
 import { saveSchema } from '../../admin/actions';
 import { toast } from '../../hooks/useToast';
 import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card } from '../ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -77,7 +77,7 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
 
   if (!collection) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 bg-muted/20 p-6 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 bg-[var(--bg)] p-6 text-center">
         <p className="text-sm font-medium text-foreground">Content type not found</p>
         <p className="max-w-sm text-sm text-muted-foreground">
           No collection with key <code className="rounded bg-muted px-1 py-0.5 font-mono">{type}</code> exists in the
@@ -157,42 +157,51 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
   // ---------------------------------------------------------------------
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-muted/20">
-      <div className="flex items-start justify-between border-b border-border bg-background px-6 py-4">
-        <div className="flex items-start gap-3">
-          <Button asChild variant="ghost" size="icon" className="mt-0.5 h-8 w-8">
+    <div className="flex flex-1 flex-col overflow-hidden">
+      {/* Page header — same chrome as DashboardContent / EditPost */}
+      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
             <Link href="/cms/model" aria-label="Back to Content Model">
-              <ChevronLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
-          <div>
+          <div className="min-w-0 flex-1">
+            <div className="mb-px flex items-center gap-1.5 text-[12px]" style={{ color: 'var(--text-2)' }}>
+              <Link
+                href="/cms/model"
+                className="transition-colors hover:text-foreground"
+                style={{ color: 'var(--text-2)' }}
+              >
+                Model
+              </Link>
+              <ChevronRight className="h-3 w-3 opacity-60" />
+              <span className="font-mono text-[11px] text-[var(--muted)]">{type}</span>
+            </div>
             <div className="flex items-center gap-2">
               {collection.hasMany ? (
-                <Layers className="h-5 w-5 text-muted-foreground" />
+                <Layers className="h-4 w-4 shrink-0 text-muted-foreground" />
               ) : (
-                <FileText className="h-5 w-5 text-muted-foreground" />
+                <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
               )}
-              <h1 className="text-xl font-semibold text-foreground">{collection.label}</h1>
+              <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
+                {collection.label}
+              </h1>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">
-              <span className="font-mono text-xs">{type}</span> · {collection.hasMany ? 'Many entries' : 'Singleton'} ·{' '}
-              {fields.length} {fields.length === 1 ? 'field' : 'fields'} · {entryCount}{' '}
-              {entryCount === 1 ? 'entry' : 'entries'}
-            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" onClick={() => setAddFieldOpen(true)}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
+        <div className="flex flex-none items-center gap-2">
+          <Button
+            size="sm"
+            className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
+            onClick={() => setAddFieldOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
             Add field
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
-            <Pencil className="mr-1.5 h-3.5 w-3.5" />
-            Edit
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="outline" aria-label="More actions" className="h-8 w-8">
+              <Button size="icon" variant="outline" aria-label="More actions" className="h-9 w-9">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -246,15 +255,16 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
         />
       ) : null}
 
-      <div className="flex flex-1 flex-col overflow-auto p-6">
-        <Tabs defaultValue="fields" className="flex flex-1 flex-col">
-          <TabsList className="self-start">
-            <TabsTrigger value="fields">Fields</TabsTrigger>
-            <TabsTrigger value="json">JSON</TabsTrigger>
-          </TabsList>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Main content column — independently scrollable */}
+        <div className="flex flex-1 flex-col overflow-y-auto bg-[var(--bg)] px-6 pb-12 pt-5">
+          <Tabs defaultValue="fields" className="flex flex-1 flex-col">
+            <TabsList className="self-start">
+              <TabsTrigger value="fields">Fields</TabsTrigger>
+              <TabsTrigger value="json">JSON</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="fields" className="flex-1">
-            <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
+            <TabsContent value="fields" className="mt-4 flex-1">
               <Card className="p-0">
                 <Table>
                   <TableHeader>
@@ -348,7 +358,7 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
                                 className={cn(
                                   'inline-flex h-7 w-7 items-center justify-center rounded-full transition',
                                   field.entryTitle
-                                    ? 'bg-amber-50 text-amber-500 dark:bg-amber-950'
+                                    ? 'bg-amber-950 text-amber-400 light:bg-amber-50 light:text-amber-500'
                                     : titleAllowed
                                       ? 'text-muted-foreground hover:bg-muted hover:text-amber-500'
                                       : 'cursor-not-allowed text-muted-foreground/30',
@@ -396,66 +406,56 @@ export default function ContentTypeDetail({ schema, type, entryCount }: Props) {
                   </TableBody>
                 </Table>
               </Card>
+            </TabsContent>
 
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3 text-sm">
-                    <SummaryRow icon={<Key className="h-3.5 w-3.5" />} label="Key">
-                      <code className="font-mono text-xs">{type}</code>
-                    </SummaryRow>
-                    <SummaryRow
-                      icon={
-                        collection.hasMany ? <Layers className="h-3.5 w-3.5" /> : <FileText className="h-3.5 w-3.5" />
-                      }
-                      label="Cardinality"
-                    >
-                      {collection.hasMany ? 'Many entries' : 'Singleton'}
-                    </SummaryRow>
-                    <SummaryRow icon={<Star className="h-3.5 w-3.5" />} label="Entry title">
-                      {entryTitleKey ? (
-                        <code className="font-mono text-xs">{entryTitleKey}</code>
-                      ) : (
-                        <span className="text-muted-foreground">— not set —</span>
-                      )}
-                    </SummaryRow>
-                    <SummaryRow label="Fields">{fields.length}</SummaryRow>
-                    <SummaryRow label="Entries">{entryCount}</SummaryRow>
-                  </CardContent>
-                </Card>
+            <TabsContent value="json" className="mt-4 flex-1">
+              <Card className="overflow-hidden p-0">
+                <pre className="m-0 max-h-[70vh] overflow-auto bg-[var(--surface-2)] p-4 font-mono text-xs leading-5 text-foreground">
+                  <code>{collectionJson}</code>
+                </pre>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
 
-                <Card className="p-0">
-                  <CardHeader>
-                    <CardTitle>Tips</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2 pb-4 text-xs text-muted-foreground">
-                    <p>
-                      Drag fields by the grip handle to reorder them. The order is reflected in generated types and the
-                      editor UI.
-                    </p>
-                    <p>
-                      The starred field is the <strong>entry title</strong> — it appears in entry lists and is the
-                      default slug source.
-                    </p>
-                  </CardContent>
-                </Card>
+        {/* Sidebar — same chrome as EditPost */}
+        <aside className="flex w-[280px] shrink-0 flex-col gap-5 overflow-y-auto border-l border-border bg-[var(--surface-2)] px-4 py-5">
+          <div>
+            <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              Type details
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <div className="flex items-center gap-3 text-[12px]">
+                <span className="w-20 shrink-0 text-muted-foreground">Key</span>
+                <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-foreground" title={type}>
+                  {type}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-[12px]">
+                <span className="w-20 shrink-0 text-muted-foreground">Cardinality</span>
+                <span className="flex-1 text-foreground">{collection.hasMany ? 'Many entries' : 'Singleton'}</span>
+              </div>
+              <div className="flex items-center gap-3 text-[12px]">
+                <span className="w-20 shrink-0 text-muted-foreground">Entry title</span>
+                <span className="min-w-0 flex-1 truncate text-foreground">
+                  {entryTitleKey ? (
+                    <code className="font-mono text-[11px]">{entryTitleKey}</code>
+                  ) : (
+                    <span className="text-muted-foreground">— not set —</span>
+                  )}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-[12px]">
+                <span className="w-20 shrink-0 text-muted-foreground">Fields</span>
+                <span className="flex-1 text-foreground">{fields.length}</span>
+              </div>
+              <div className="flex items-center gap-3 text-[12px]">
+                <span className="w-20 shrink-0 text-muted-foreground">Entries</span>
+                <span className="flex-1 text-foreground">{entryCount}</span>
               </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="json" className="flex-1">
-            <Card className="overflow-hidden p-0">
-              <CardHeader>
-                <CardTitle>Generated JSON</CardTitle>
-              </CardHeader>
-              <pre className="m-0 max-h-[60vh] overflow-auto bg-muted/30 p-4 font-mono text-xs leading-5 text-foreground">
-                <code>{collectionJson}</code>
-              </pre>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </aside>
       </div>
     </div>
   );
@@ -541,18 +541,6 @@ function FieldFlags({ field }: { field: CollectionField }) {
           {flag}
         </span>
       ))}
-    </div>
-  );
-}
-
-function SummaryRow({ icon, label, children }: { icon?: React.ReactNode; label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-        {icon}
-        {label}
-      </span>
-      <span className="text-sm">{children}</span>
     </div>
   );
 }

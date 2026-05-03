@@ -3,9 +3,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { sanitizeSlugFieldInputValue, slugifyForUrl } from '../lib/slugField';
-import { cn } from '../lib/utils';
 
 import { FieldHintAndError } from './FieldHintAndError';
+import { FieldLabel } from './FieldLabel';
+import { FieldShell, FIELD_INPUT_CLASS } from './FieldShell';
 import { Button } from './ui/button';
 
 type FormSlugFieldProps = {
@@ -89,26 +90,25 @@ const FormSlugField = ({
   };
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
-        {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
-      </div>
+    <div className="mb-5">
+      <FieldLabel label={label} htmlFor={name} type="slug" required={required} />
       <div className="flex flex-wrap items-center gap-2">
-        <input
-          ref={inputRef}
-          className={cn(
-            'text-sm bg-background text-foreground px-3 py-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors min-w-[200px] flex-1',
-            error && 'border-destructive focus:ring-destructive/30',
-          )}
-          type="text"
-          name={name}
-          defaultValue={value}
-          aria-invalid={error ? true : undefined}
-          onInput={onSlugInput}
-          onChange={onSlugInput}
-        />
-        <Button type="button" variant="outline" size="sm" onClick={onRegenerate}>
+        <div className="min-w-[200px] flex-1">
+          <FieldShell error={!!error}>
+            <input
+              ref={inputRef}
+              id={name}
+              className={FIELD_INPUT_CLASS}
+              type="text"
+              name={name}
+              defaultValue={value}
+              aria-invalid={error ? true : undefined}
+              onInput={onSlugInput}
+              onChange={onSlugInput}
+            />
+          </FieldShell>
+        </div>
+        <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={onRegenerate}>
           Regenerate from title
         </Button>
       </div>

@@ -8,6 +8,7 @@ import { fetchBranchContent } from './contentStoreFetch';
 
 const mockConfig = {
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   collections: {
     post: {
@@ -16,10 +17,6 @@ const mockConfig = {
         body: { label: 'Body', format: 'markdown' },
         title: { label: 'Title', format: 'string' },
       },
-    },
-    media: {
-      label: 'Media',
-      fields: {},
     },
   },
 } as any;
@@ -107,7 +104,7 @@ describe('fetchBranchContent', () => {
     expect(result!.mediaEntries.size).toBe(0);
   });
 
-  it('indexes media entries separately', async () => {
+  it('indexes media entries from cms/media/ separately', async () => {
     const mediaJson = JSON.stringify({
       sys: { id: 'uuid', type: 'media' },
       fields: { title: 'Photo', extension: 'jpg' },
@@ -116,7 +113,7 @@ describe('fetchBranchContent', () => {
     const octokit = makeOctokit(
       [
         {
-          path: 'cms/content/media/media-uuid.json',
+          path: 'cms/media/media-uuid.json',
           type: 'blob',
           sha: 'sha-m',
         },
@@ -128,7 +125,11 @@ describe('fetchBranchContent', () => {
 
     const result = await fetchBranchContent(octokit, 'owner', 'repo', 'main');
     expect(result!.mediaEntries.size).toBe(1);
-    expect(result!.mediaEntries.has('cms/content/media/media-uuid.json')).toBe(true);
+    expect(result!.mediaEntries.has('cms/media/media-uuid.json')).toBe(true);
+    // Media entries do not appear in the editorial `entries` map.
+    expect(result!.entries.size).toBe(0);
+    // And not under any byCollection list either.
+    expect(result!.byCollection.size).toBe(0);
   });
 
   it('skips malformed JSON gracefully', async () => {

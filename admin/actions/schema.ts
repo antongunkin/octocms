@@ -28,7 +28,7 @@ const SCHEMA_PATH = 'cms/schema.json';
  * filesystem (dev). Returns the parsed `Config`.
  */
 export const getSchema = async (): Promise<Config> => {
-  if (isProductionMode()) {
+  if (process.env.NODE_ENV === 'production' || isProductionMode()) {
     const activeBranch = (await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
     const file = await getGitHubFile(SCHEMA_PATH, activeBranch);
     if (!file) {
@@ -158,7 +158,6 @@ export const previewSchemaChange = async (next: Config, options: DiffOptions = {
   if (referenceTargets.size > 0) {
     const allFiles = await getContentFiles('**');
     for (const filePath of allFiles) {
-      if (filePath.includes('/media/')) continue;
       if (handledPaths.has(filePath)) continue;
 
       let raw: unknown;
@@ -411,7 +410,6 @@ export const saveSchema = async (next: Config, options: SaveSchemaOptions = {}):
     if (referenceTargets.size > 0) {
       const allFiles = await getContentFiles('**');
       for (const filePath of allFiles) {
-        if (filePath.includes('/media/')) continue;
         if (handledPaths.has(filePath)) continue;
 
         let raw: unknown;
@@ -438,7 +436,7 @@ export const saveSchema = async (next: Config, options: SaveSchemaOptions = {}):
     const message =
       options.message ?? `CMS: update schema (${changes.length} change${changes.length === 1 ? '' : 's'})`;
 
-    if (isProductionMode()) {
+    if (process.env.NODE_ENV === 'production' || isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
 

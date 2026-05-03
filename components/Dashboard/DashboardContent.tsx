@@ -19,13 +19,12 @@ import { useConfig } from '../../hooks/useConfig';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { StatusBadge } from '../StatusBadge';
 import { LeftNavItem } from '../Layout/LeftNavItem';
 import { toast } from '../../hooks/useToast';
 import { entryEditUrl } from '../../lib/entryEditUrl';
 import { cn } from '../../lib/utils';
 import type { EntryListItem, EntryStatus } from '../../types';
-import { formatUpdatedAt } from '../../utils/formatUpdatedAt';
+import { formatUpdatedAt, formatUpdatedAtFull } from '../../utils/formatUpdatedAt';
 
 const PAGE_SIZE = 20;
 const ALL_STATUSES: EntryStatus[] = ['draft', 'changed', 'published', 'merged', 'archived'];
@@ -387,9 +386,6 @@ function ContentTable({
                       Type
                     </th>
                     <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                      Status
-                    </th>
-                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                       Branch
                     </th>
                     <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
@@ -400,7 +396,7 @@ function ContentTable({
                 <tbody>
                   {pageItems.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="h-32 text-center text-sm text-muted-foreground">
+                      <td colSpan={4} className="h-32 text-center text-sm text-muted-foreground">
                         No entries found.
                       </td>
                     </tr>
@@ -555,15 +551,18 @@ function EntryRow({
         {config.collections[entry.type as keyof typeof config.collections]?.label ?? entry.type}
       </td>
       <td className="px-4 py-3">
-        <StatusBadge status={entry.status} />
-      </td>
-      <td className="px-4 py-3">
-        <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+        <span
+          className="inline-flex items-center gap-1.5 text-sm"
+          style={{ color: `var(--st-${entry.status})` }}
+          title={entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+        >
           <GitBranch className="h-3.5 w-3.5 shrink-0" />
           <span className="font-mono text-xs">{branchLabel}</span>
         </span>
       </td>
-      <td className="px-4 py-3 text-sm text-muted-foreground">{formatUpdatedAt(entry.updatedAt)}</td>
+      <td className="px-4 py-3 text-sm text-muted-foreground" title={formatUpdatedAtFull(entry.updatedAt)}>
+        {formatUpdatedAt(entry.updatedAt)}
+      </td>
     </tr>
   );
 }

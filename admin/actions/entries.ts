@@ -42,7 +42,7 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
     const nameWithoutFolder = file.replace(`${config.contentFolder}/`, '').replace('.json', '');
     const parts = nameWithoutFolder.split('/');
     const type = parts[0];
-    let id = parts[parts.length - 1];
+    const id = parts[parts.length - 1];
     const titleField = getEntryTitleField(type);
 
     let title = id;
@@ -53,28 +53,15 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
     try {
       const content = await getFile(file);
 
-      if (type === 'media') {
-        const sysId = content?.sys && typeof content.sys === 'object' && 'id' in content.sys ? content.sys.id : null;
-        if (typeof sysId === 'string' && sysId !== '') {
-          id = sysId;
-        }
-        const mediaTitle = content?.fields?.title;
-        if (typeof mediaTitle === 'string' && mediaTitle.trim() !== '') {
-          title = mediaTitle.trim();
-        }
-        const ext = typeof content?.fields?.extension === 'string' ? content.fields.extension : '';
-        if (ext) thumbnailUrl = `/media/${id}.${ext}`;
-      } else {
-        if (titleField && content?.fields?.[titleField]) {
-          title = content.fields[titleField];
-        }
-        const imgKey = firstImageFieldKey(type);
-        if (imgKey) {
-          const value = content?.fields?.[imgKey];
-          if (typeof value === 'string' && value.trim()) {
-            const hit = mediaById.get(value.trim());
-            if (hit) thumbnailUrl = hit.publicUrl;
-          }
+      if (titleField && content?.fields?.[titleField]) {
+        title = content.fields[titleField];
+      }
+      const imgKey = firstImageFieldKey(type);
+      if (imgKey) {
+        const value = content?.fields?.[imgKey];
+        if (typeof value === 'string' && value.trim()) {
+          const hit = mediaById.get(value.trim());
+          if (hit) thumbnailUrl = hit.publicUrl;
         }
       }
       if (content?.sys?.status) {
@@ -86,7 +73,7 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
 
     if (!isProductionMode()) {
       try {
-        const stat = await fsPromises.stat(path.join(process.cwd(), file));
+        const stat = await fsPromises.stat(path.join(/*turbopackIgnore: true*/ process.cwd(), file));
         updatedAt = stat.mtime.toISOString();
       } catch {
         // ignore
@@ -110,9 +97,6 @@ export const getEntryBacklinks = async (targetReferenceKey: string): Promise<Ent
   const backlinks: EntryListItem[] = [];
 
   for (const file of allFiles) {
-    // Skip media entries
-    if (file.includes('/media/')) continue;
-
     try {
       const content = await getFile(file);
       const type = content?.sys?.type;

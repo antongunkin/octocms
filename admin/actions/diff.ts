@@ -7,6 +7,7 @@ import { getConfig } from '../../lib/configStore';
 import { companionFilePathsForEntry } from '../../lib/companionMarkdown';
 import { diffEntryFields, safeParseEntry, type FieldDiff } from '../../lib/entryDiff';
 import { logCmsServerError } from '../../lib/cmsServerLog';
+import { mediaContentFolder, mediaEntryPath } from '../../lib/mediaPath';
 import { parseFileName } from '../../utils/parseFileName';
 import { getGitHubFile, isProductionMode } from '../github';
 import { getBranch } from './git';
@@ -143,16 +144,16 @@ export const getEntryDiff = async (filePath: string): Promise<EntryDiff> => {
 
     const imageUrls: Record<string, string> = {};
     if (imageUuids.size > 0) {
-      const mediaDir = `${config.contentFolder}/media`;
+      const mediaDir = mediaContentFolder();
       const resolvePairs = await Promise.all(
         Array.from(imageUuids).map(async (uuid) => {
           if (!uuid || uuid.startsWith('/')) return [uuid, uuid] as const;
           // Prefer the active-branch media entry; fall back to base branch.
           let raw =
-            (await readFileAtRef(`${mediaDir}/media-${uuid}.json`, activeBranch, isProd)) ??
-            (await readFileAtRef(`${mediaDir}/media-${uuid}.json`, baseBranch, isProd));
+            (await readFileAtRef(mediaEntryPath(uuid), activeBranch, isProd)) ??
+            (await readFileAtRef(mediaEntryPath(uuid), baseBranch, isProd));
           if (!raw) {
-            // Legacy path: {uuid}.json
+            // Legacy path: {uuid}.json (pre-`media-` prefix)
             raw =
               (await readFileAtRef(`${mediaDir}/${uuid}.json`, activeBranch, isProd)) ??
               (await readFileAtRef(`${mediaDir}/${uuid}.json`, baseBranch, isProd));

@@ -136,6 +136,7 @@ describe('generateTypes', () => {
   const cfg: Config = {
     projectName: 'Test',
     contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png'],
     git: { baseBranch: 'main' },
@@ -187,6 +188,7 @@ describe('generateEnums', () => {
   const cfg: Config = {
     projectName: 'Test',
     contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png'],
     git: { baseBranch: 'main' },
@@ -237,6 +239,7 @@ describe('generateContentDecls', () => {
   const cfg: Config = {
     projectName: 'Test',
     contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png'],
     git: { baseBranch: 'main' },

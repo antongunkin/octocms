@@ -44,8 +44,8 @@ const ComponentEmbedEditor: React.FC<
     // Inline: compact pill with a popover-style edit on click
     return (
       <span
-        className="inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-800 text-xs font-medium px-2
-            py-0.5 mx-0.5 align-baseline dark:bg-amber-900 dark:text-amber-200"
+        className="inline-flex items-center gap-1 rounded-full bg-amber-900 text-amber-200 text-xs font-medium px-2
+            py-0.5 mx-0.5 align-baseline light:bg-amber-100 light:text-amber-800"
         contentEditable={false}
       >
         <Puzzle className="w-3 h-3 shrink-0" />
@@ -54,7 +54,7 @@ const ComponentEmbedEditor: React.FC<
           const value = getAttrValue(prop.name);
           if (!value) return null;
           return (
-            <span key={prop.name} className="text-amber-600 dark:text-amber-400">
+            <span key={prop.name} className="text-amber-400 light:text-amber-600">
               {prop.name}=&quot;{value}&quot;
             </span>
           );
@@ -68,10 +68,10 @@ const ComponentEmbedEditor: React.FC<
     <div className="my-2 rounded-lg border border-border bg-muted/30 p-3" contentEditable={false}>
       <div className="flex items-center gap-2 mb-3">
         <div
-          className="w-8 h-8 rounded-lg border border-border bg-amber-100 dark:bg-amber-900 flex items-center
+          className="w-8 h-8 rounded-lg border border-border bg-amber-900 light:bg-amber-100 flex items-center
               justify-center flex-none"
         >
-          <Puzzle className="w-4 h-4 text-amber-700 dark:text-amber-300" />
+          <Puzzle className="w-4 h-4 text-amber-300 light:text-amber-700" />
         </div>
         <div className="flex-1 min-w-0">
           <span className="text-xs font-medium text-muted-foreground">Component</span>

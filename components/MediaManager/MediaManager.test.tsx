@@ -26,6 +26,7 @@ vi.mock('../../hooks/useConfig', () => ({
   useConfig: () => ({
     projectName: 'Test',
     contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png', 'jpg'],
     git: { baseBranch: 'main' },

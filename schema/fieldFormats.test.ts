@@ -118,6 +118,7 @@ function configWithField(format: FieldFormat): Config {
   return {
     projectName: 'Test',
     contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png'],
     git: { baseBranch: 'main' },

@@ -6,6 +6,7 @@ import { FIELD_FORMATS, regenerateAll } from './codegen';
 const minimalConfig: Config = {
   projectName: 'Test',
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: ['png'],
   git: { baseBranch: 'main' },

@@ -4,7 +4,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import FormReferenceField from './FormReferenceField';
 
-const { mockPushEntry } = vi.hoisted(() => ({ mockPushEntry: vi.fn() }));
+const { mockPushEntry, getRefreshTick, setRefreshTick } = vi.hoisted(() => {
+  let tick = 0;
+  return {
+    mockPushEntry: vi.fn(),
+    getRefreshTick: () => tick,
+    setRefreshTick: (n: number) => {
+      tick = n;
+    },
+  };
+});
 
 vi.mock('octocms/hooks/useEntryStack', () => ({
   EntryStackProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -13,7 +22,9 @@ vi.mock('octocms/hooks/useEntryStack', () => ({
     pushEntry: mockPushEntry,
     popEntry: vi.fn(),
     closeAll: vi.fn(),
-    ancestorIds: new Set<string>(),
+    ancestorPaths: new Set<string>(),
+    refreshTick: getRefreshTick(),
+    bumpRefresh: vi.fn(),
   }),
 }));
 
@@ -96,6 +107,7 @@ vi.mock('../hooks/useToast', () => ({
 beforeEach(() => {
   vi.clearAllMocks();
   mockPushEntry.mockClear();
+  setRefreshTick(0);
   cleanup();
 });
 
@@ -283,8 +295,16 @@ describe('FormReferenceField', () => {
     });
   });
 
-  it('updates displayed titles when cms:entry-saved fires for a listed entry', async () => {
-    render(
+  it('refreshTick bump re-resolves titles for currently-listed items', async () => {
+    const { getEntryList } = await import('octocms/admin/actions');
+    const mocked = vi.mocked(getEntryList);
+
+    // First load: Alice. After bump: Alicia.
+    mocked.mockImplementationOnce(async () => [
+      { type: 'author', id: 'a1', path: 'cms/content/author/author-a1.json', title: 'Alice', status: 'merged' },
+    ]);
+
+    const { rerender } = render(
       <FormReferenceField
         label="Authors"
         name="authors"
@@ -295,19 +315,36 @@ describe('FormReferenceField', () => {
 
     await waitFor(() => expect(screen.getByText('Alice')).toBeDefined());
 
-    window.dispatchEvent(
-      new CustomEvent('cms:entry-saved', {
-        detail: { id: 'a1', type: 'author', fields: { name: 'Alicia' } },
-      }),
+    mocked.mockImplementationOnce(async () => [
+      { type: 'author', id: 'a1', path: 'cms/content/author/author-a1.json', title: 'Alicia', status: 'merged' },
+    ]);
+
+    setRefreshTick(1);
+    rerender(
+      <FormReferenceField
+        label="Authors"
+        name="authors"
+        value={JSON.stringify(['author-a1.json'])}
+        reference={{ collections: ['author'], cardinality: 'many' }}
+      />,
     );
 
     await waitFor(() => {
       expect(screen.getByText('Alicia')).toBeDefined();
+      expect(screen.queryByText('Alice')).toBeNull();
     });
   });
 
-  it('removes an item when cms:entry-deleted fires for that entry', async () => {
-    render(
+  it('refreshTick bump drops items whose entries no longer exist (deleted)', async () => {
+    const { getEntryList } = await import('octocms/admin/actions');
+    const mocked = vi.mocked(getEntryList);
+
+    mocked.mockImplementationOnce(async () => [
+      { type: 'author', id: 'a1', path: 'cms/content/author/author-a1.json', title: 'Alice', status: 'merged' },
+      { type: 'author', id: 'a2', path: 'cms/content/author/author-a2.json', title: 'Bob', status: 'merged' },
+    ]);
+
+    const { rerender } = render(
       <FormReferenceField
         label="Authors"
         name="authors"
@@ -321,15 +358,41 @@ describe('FormReferenceField', () => {
       expect(screen.getByText('Bob')).toBeDefined();
     });
 
-    window.dispatchEvent(
-      new CustomEvent('cms:entry-deleted', {
-        detail: { id: 'a1', path: 'cms/content/author/author-a1.json' },
-      }),
+    // After delete: a1 is gone from the listing.
+    mocked.mockImplementationOnce(async () => [
+      { type: 'author', id: 'a2', path: 'cms/content/author/author-a2.json', title: 'Bob', status: 'merged' },
+    ]);
+
+    setRefreshTick(1);
+    rerender(
+      <FormReferenceField
+        label="Authors"
+        name="authors"
+        value={JSON.stringify(['author-a1.json', 'author-a2.json'])}
+        reference={{ collections: ['author'], cardinality: 'many' }}
+      />,
     );
 
     await waitFor(() => {
       expect(screen.queryByText('Alice')).toBeNull();
       expect(screen.getByText('Bob')).toBeDefined();
     });
+  });
+
+  it('does not register cms:entry-saved or cms:entry-deleted window listeners', async () => {
+    const addSpy = vi.spyOn(window, 'addEventListener');
+    render(
+      <FormReferenceField
+        label="Authors"
+        name="authors"
+        value="[]"
+        reference={{ collections: ['author'], cardinality: 'many' }}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText('No items selected')).toBeDefined());
+    const types = addSpy.mock.calls.map(([t]) => t);
+    expect(types).not.toContain('cms:entry-saved');
+    expect(types).not.toContain('cms:entry-deleted');
+    addSpy.mockRestore();
   });
 });

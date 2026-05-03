@@ -9,14 +9,23 @@ import type { MediaFile } from '../../types';
 
 export type MediaListTableProps = {
   files: MediaFile[];
+  /** Optional row-pick callback. When set, rows fire this instead of routing
+   *  to `/cms/media/<id>` — used by the "Select existing image" dialog. */
+  onPickFile?: (file: MediaFile) => void;
+  /** Highlights the matching row when supplied. */
+  selectedId?: string;
 };
 
 function rowActivateKey(e: React.KeyboardEvent): boolean {
   return e.key === 'Enter' || e.key === ' ';
 }
 
-export function MediaListTable({ files }: MediaListTableProps) {
+export function MediaListTable({ files, onPickFile, selectedId }: MediaListTableProps) {
   const router = useRouter();
+  const activate = (file: MediaFile) => {
+    if (onPickFile) onPickFile(file);
+    else router.push(`/cms/media/${file.id}`);
+  };
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-[var(--surface-1)] shadow-[var(--shadow-1)]">
@@ -53,13 +62,16 @@ export function MediaListTable({ files }: MediaListTableProps) {
                 <tr
                   key={file.id}
                   tabIndex={0}
-                  onClick={() => router.push(`/cms/media/${file.id}`)}
+                  onClick={() => activate(file)}
                   onKeyDown={(e) => {
                     if (!rowActivateKey(e)) return;
                     e.preventDefault();
-                    router.push(`/cms/media/${file.id}`);
+                    activate(file);
                   }}
-                  className={cn('cursor-pointer border-b border-border transition-colors hover:bg-[var(--surface-2)]')}
+                  className={cn(
+                    'cursor-pointer border-b border-border transition-colors hover:bg-[var(--surface-2)]',
+                    selectedId === file.id && 'bg-[var(--surface-2)]',
+                  )}
                 >
                   <td className="px-4 py-2.5 text-sm font-medium text-foreground">
                     <span className="inline-flex items-center gap-2.5">

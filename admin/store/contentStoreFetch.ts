@@ -13,6 +13,7 @@ import { Octokit } from 'octokit';
 import { getConfig } from '../../lib/configStore';
 import { companionMarkdownPathsForEntry, companionRichTextPathsForEntry } from '../../lib/companionMarkdown';
 import { logCmsServerError } from '../../lib/cmsServerLog';
+import { isMediaEntryPath, mediaContentFolder } from '../../lib/mediaPath';
 
 import type { BranchStoreData, StoredEntry } from './contentStoreTypes';
 
@@ -27,18 +28,24 @@ type TreeItem = {
   size?: number;
 };
 
-/** Returns true for paths under `cms/content/` that are `.json`, `.md`, or `.mdx` files. */
+/** Returns true for CMS-managed files: editorial content under `contentFolder` (`.json`/`.md`/`.mdx`)
+ *  or media-entry JSONs under `mediaContentFolder`. */
 function isCmsContentFile(filePath: string): boolean {
   const config = getConfig();
-  return (
+  if (
     filePath.startsWith(`${config.contentFolder}/`) &&
     (filePath.endsWith('.json') || filePath.endsWith('.md') || filePath.endsWith('.mdx'))
-  );
+  ) {
+    return true;
+  }
+  return filePath.startsWith(`${mediaContentFolder()}/`) && filePath.endsWith('.json');
 }
 
-/** Extract collection name from a content path like "cms/content/post/post-123.json". */
+/** Extract collection name from a content path like "cms/content/post/post-123.json".
+ *  Returns null for media-entry paths (they have no collection). */
 function collectionFromPath(filePath: string): string | null {
   const config = getConfig();
+  if (!filePath.startsWith(`${config.contentFolder}/`)) return null;
   const relative = filePath.slice(config.contentFolder.length + 1); // "post/post-123.json"
   const slashIdx = relative.indexOf('/');
   return slashIdx > 0 ? relative.slice(0, slashIdx) : null;
@@ -207,6 +214,11 @@ export async function fetchBranchContent(
       companionMarkdown: companions,
     };
 
+    if (isMediaEntryPath(item.path)) {
+      mediaEntries.set(item.path, stored);
+      continue;
+    }
+
     entries.set(item.path, stored);
 
     // Index by collection
@@ -218,11 +230,6 @@ export async function fetchBranchContent(
       } else {
         byCollection.set(collection, [item.path]);
       }
-    }
-
-    // Separate media entries
-    if (collection === 'media') {
-      mediaEntries.set(item.path, stored);
     }
   }
 

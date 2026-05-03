@@ -1,7 +1,7 @@
 'use client';
 
 import { Link2 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { getEntryBacklinks } from '../../admin/actions';
 import type { Config } from '../../admin/types';
@@ -18,12 +18,17 @@ const LinkedBySection = ({ entryPath }: LinkedBySectionProps) => {
   const config = useConfig();
   const [backlinks, setBacklinks] = useState<EntryListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { pushEntry } = useEntryStack();
+  const { pushEntry, refreshTick } = useEntryStack();
+  const hasLoadedRef = useRef(false);
 
   // Derive the reference key for this entry (e.g. 'author-abc.json')
   const referenceKey = toReferenceKey(entryPath);
 
   useEffect(() => {
+    // Skip refresh-driven runs until the initial load has completed at least once,
+    // so a tick bump fired before the section ever rendered does not pre-fetch.
+    if (refreshTick > 0 && !hasLoadedRef.current) return;
+
     const load = async () => {
       try {
         const links = await getEntryBacklinks(referenceKey);
@@ -32,30 +37,16 @@ const LinkedBySection = ({ entryPath }: LinkedBySectionProps) => {
         // Silently fail
       } finally {
         setIsLoading(false);
+        hasLoadedRef.current = true;
       }
     };
     load();
-  }, [referenceKey]);
-
-  // Refresh backlinks when entries are saved or deleted
-  useEffect(() => {
-    const handler = () => {
-      getEntryBacklinks(referenceKey)
-        .then(setBacklinks)
-        .catch(() => {});
-    };
-    window.addEventListener('cms:entry-saved', handler);
-    window.addEventListener('cms:entry-deleted', handler);
-    return () => {
-      window.removeEventListener('cms:entry-saved', handler);
-      window.removeEventListener('cms:entry-deleted', handler);
-    };
-  }, [referenceKey]);
+  }, [referenceKey, refreshTick]);
 
   if (isLoading) {
     return (
-      <div className="border-t border-[rgb(231,235,238)] pt-4 mt-2">
-        <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Links</div>
+      <div>
+        <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Links</div>
         <div className="text-sm text-muted-foreground">Loading...</div>
       </div>
     );
@@ -64,11 +55,10 @@ const LinkedBySection = ({ entryPath }: LinkedBySectionProps) => {
   if (backlinks.length === 0) return null;
 
   return (
-    <div className="border-t border-[rgb(231,235,238)] pt-4 mt-2">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Links</div>
+    <div>
+      <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Links</div>
       <p className="text-sm text-muted-foreground mb-2">
-        There {backlinks.length === 1 ? 'is' : 'are'} {backlinks.length} other{' '}
-        {backlinks.length === 1 ? 'entry' : 'entries'} that link to this entry:
+        {backlinks.length === 1 ? '1 entry links' : `${backlinks.length} entries link`} to this entry:
       </p>
       <ul className="space-y-1">
         {backlinks.map((link) => {

@@ -10,5 +10,13 @@
     "order": "asc",
     "ignoreCase": true
   },
-  "ignorePatterns": ["dist/**", "build/**", "node_modules/**", "coverage/**", "public/**", "out/**", "scripts/fixtures/**"]
+  "ignorePatterns": [
+    "dist/**",
+    "build/**",
+    "node_modules/**",
+    "coverage/**",
+    "public/**",
+    "out/**",
+    "scripts/fixtures/**"
+  ]
 }

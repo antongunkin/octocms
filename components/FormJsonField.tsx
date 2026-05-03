@@ -5,6 +5,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { cn } from '../lib/utils';
 
 import { FieldHintAndError } from './FieldHintAndError';
+import { FieldLabel } from './FieldLabel';
+import { FIELD_TEXTAREA_CLASS } from './FieldShell';
 
 type FormJsonFieldProps = {
   label: string;
@@ -48,22 +50,17 @@ const FormJsonField = ({ label, name, value, required, hint, error, onClearError
         {required ? 'Enter JSON…' : 'Optional — leave empty for no value'}
       </span>
     ) : status === 'valid' ? (
-      <span className="text-sm text-green-700 dark:text-green-600">Valid JSON</span>
+      <span className="text-sm text-green-600 light:text-green-700">Valid JSON</span>
     ) : (
       <span className="text-destructive text-sm">Invalid JSON</span>
     );
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
-        {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
-      </div>
+    <div className="mb-5">
+      <FieldLabel label={label} htmlFor={name} type="json" required={required} />
       <textarea
-        className={cn(
-          'w-full bg-background text-foreground px-3 py-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors min-h-[160px] resize-y font-mono text-sm leading-relaxed',
-          error && 'border-destructive focus:ring-destructive/30',
-        )}
+        id={name}
+        className={cn(FIELD_TEXTAREA_CLASS, 'min-h-[160px] font-mono leading-relaxed', error && 'border-destructive')}
         name={name}
         value={text}
         onChange={handleChange}

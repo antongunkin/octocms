@@ -34,6 +34,7 @@ vi.mock('../hooks/useConfig', () => ({
   useConfig: () => ({
     projectName: 'Test',
     contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico'],
     git: { baseBranch: 'main' },
@@ -49,17 +50,21 @@ beforeEach(() => {
 });
 
 describe('FormImageField', () => {
-  it('renders label and select button when no value', () => {
+  it('renders label + both action buttons when no value', () => {
     render(<FormImageField label="Cover Image" name="coverImage" value="" />);
 
     expect(screen.getByText('Cover Image')).toBeDefined();
-    expect(screen.getByText('Select image')).toBeDefined();
+    expect(screen.getByText('Upload new image')).toBeDefined();
+    expect(screen.getByText('Select existing image')).toBeDefined();
   });
 
-  it('renders change button when value is set and entry is found', async () => {
+  it('keeps both action buttons visible when a value is already set', async () => {
     render(<FormImageField label="Cover" name="cover" value="uuid-123" />);
 
-    expect(screen.getByText('Change image')).toBeDefined();
+    // No more "Change image" — the two action buttons are always present.
+    expect(screen.queryByText('Change image')).toBeNull();
+    expect(screen.getByText('Upload new image')).toBeDefined();
+    expect(screen.getByText('Select existing image')).toBeDefined();
   });
 
   it('renders hidden input with the UUID value', () => {
@@ -78,21 +83,38 @@ describe('FormImageField', () => {
     expect(hidden.value).toBe('');
   });
 
-  it('shows destructive toast when uploadMedia returns failure', async () => {
+  it('rejects unsupported formats with a destructive toast', async () => {
+    render(<FormImageField label="Cover" name="coverImage" value="" />);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['x'], 'document.pdf', { type: 'application/pdf' });
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(vi.mocked(toast)).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: expect.stringContaining('document.pdf'),
+          variant: 'destructive',
+        }),
+      );
+    });
+  });
+
+  it('shows destructive toast when uploadMedia fails', async () => {
     vi.mocked(cmsActions.uploadMedia).mockResolvedValue({
       success: false,
       error: 'upload failed',
     });
 
     render(<FormImageField label="Cover" name="coverImage" value="" />);
-    fireEvent.click(screen.getByText('Select image'));
 
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(['x'], 'photo.png', { type: 'image/png' });
     fireEvent.change(fileInput, { target: { files: [file] } });
 
+    // The MediaUploadDialog opens with a "Upload" button in its footer.
     await waitFor(() => {
-      expect(screen.getByText('Upload')).toBeDefined();
+      expect(screen.getByText('Set title for each image')).toBeDefined();
     });
     fireEvent.click(screen.getByText('Upload'));
 
@@ -106,7 +128,7 @@ describe('FormImageField', () => {
     });
   });
 
-  it('shows success toast when uploadMedia returns success', async () => {
+  it('shows success toast when uploadMedia succeeds', async () => {
     vi.mocked(cmsActions.uploadMedia).mockResolvedValue({
       success: true,
       id: 'new-media-id',
@@ -117,7 +139,7 @@ describe('FormImageField', () => {
         {
           id: 'new-media-id',
           title: 'hero',
-          originalName: 'hero.png',
+          originalName: 'new-media-id.png',
           extension: 'png',
           folder: '/',
           path: 'public/media/new-media-id.png',
@@ -130,24 +152,31 @@ describe('FormImageField', () => {
     );
 
     render(<FormImageField label="Cover" name="coverImage" value="" />);
-    fireEvent.click(screen.getByText('Select image'));
 
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(['x'], 'hero.png', { type: 'image/png' });
     fireEvent.change(fileInput, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByText('Upload')).toBeDefined();
+      expect(screen.getByText('Set title for each image')).toBeDefined();
     });
     fireEvent.click(screen.getByText('Upload'));
 
     await waitFor(() => {
       expect(vi.mocked(toast)).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: expect.stringContaining('hero.png'),
+          title: expect.stringContaining('Uploaded'),
           variant: 'success',
         }),
       );
     });
+  });
+
+  it('opens the MediaSelectDialog when "Select existing image" is clicked', () => {
+    render(<FormImageField label="Cover" name="coverImage" value="" />);
+
+    fireEvent.click(screen.getByText('Select existing image'));
+
+    expect(screen.getByText('Select an image')).toBeDefined();
   });
 });

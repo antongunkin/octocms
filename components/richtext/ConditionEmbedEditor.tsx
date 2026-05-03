@@ -142,10 +142,10 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <div
-          className="w-8 h-8 rounded-lg border border-border bg-teal-100 dark:bg-teal-900 flex items-center
+          className="w-8 h-8 rounded-lg border border-border bg-teal-900 light:bg-teal-100 flex items-center
               justify-center flex-none"
         >
-          <GitBranch className="w-4 h-4 text-teal-700 dark:text-teal-300" />
+          <GitBranch className="w-4 h-4 text-teal-300 light:text-teal-700" />
         </div>
         <div className="flex-1 min-w-0">
           <span className="text-xs font-medium text-muted-foreground">Condition embed</span>

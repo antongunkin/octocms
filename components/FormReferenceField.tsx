@@ -376,7 +376,10 @@ const FormReferenceField = ({
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { pushEntry } = useEntryStack();
+  const { pushEntry, refreshTick } = useEntryStack();
+  // True after the first parse-from-`value` pass; subsequent runs (driven by refreshTick)
+  // patch titles on the live items list and drop deleted entries instead of re-parsing `value`.
+  const loadedRef = useRef(false);
 
   // Resolve allowed collections from new or legacy config
   const allowedCollections = useMemo(() => {
@@ -394,9 +397,20 @@ const FormReferenceField = ({
   const maxItems = cardinality === 'one' ? 1 : reference?.max;
   const minItems = cardinality === 'one' ? (required ? 1 : 0) : Math.max(reference?.min ?? 0, required ? 1 : 0);
 
-  // Load initial items with titles from saved paths
+  // Initial load (parse `value`) and subsequent refresh ticks (patch titles, drop deleted).
   useEffect(() => {
-    const load = async () => {
+    let cancelled = false;
+
+    const fetchEntryMap = async () => {
+      const allEntries: EntryListItem[] = [];
+      for (const col of allowedCollections) {
+        const list = await getEntryList(col);
+        allEntries.push(...list);
+      }
+      return new Map(allEntries.map((e) => [toReferenceKey(e.path), e]));
+    };
+
+    const initialLoad = async () => {
       let parsedPaths: string[] = [];
       try {
         const parsed = JSON.parse(value);
@@ -406,26 +420,21 @@ const FormReferenceField = ({
           parsedPaths = Array.isArray(parsed) ? parsed : [];
         }
       } catch (_e) {
-        // For cardinality 'one', value might be a plain path string
         if (cardinality === 'one' && value && value !== '[]') {
           parsedPaths = [value];
         }
       }
 
       if (parsedPaths.length === 0) {
+        if (cancelled) return;
         setItems([]);
         setIsLoading(false);
+        loadedRef.current = true;
         return;
       }
 
-      // Load all entries from allowed collections to resolve titles
-      const allEntries: EntryListItem[] = [];
-      for (const col of allowedCollections) {
-        const list = await getEntryList(col);
-        allEntries.push(...list);
-      }
-
-      const entryMap = new Map(allEntries.map((e) => [toReferenceKey(e.path), e]));
+      const entryMap = await fetchEntryMap();
+      if (cancelled) return;
 
       const resolved: ReferenceItem[] = parsedPaths.map((p) => {
         const rawValue = String(p ?? '');
@@ -439,7 +448,6 @@ const FormReferenceField = ({
           return { type: entry.type, id: entry.id, path: normalizedKey, title: entry.title };
         }
 
-        // Entry not found — keep normalized key so the user can still see/edit the value.
         const fallbackContentPath = toContentPath(normalizedKey);
         const parts = fallbackContentPath
           ? fallbackContentPath.replace('cms/content/', '').replace('.json', '').split('/')
@@ -451,11 +459,35 @@ const FormReferenceField = ({
 
       setItems(resolved);
       setIsLoading(false);
+      loadedRef.current = true;
     };
 
-    load();
+    const refreshTitles = async () => {
+      const entryMap = await fetchEntryMap();
+      if (cancelled) return;
+      setItems((prev) =>
+        prev
+          .map((item): ReferenceItem | null => {
+            const entry = entryMap.get(item.path);
+            if (entry) return { ...item, title: entry.title, type: entry.type, id: entry.id };
+            // Item references a path that's no longer in the allowed collections — treat as deleted.
+            return null;
+          })
+          .filter((x): x is ReferenceItem => x !== null),
+      );
+    };
+
+    if (loadedRef.current) {
+      refreshTitles();
+    } else {
+      initialLoad();
+    }
+
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refreshTick]);
 
   const selectedKeys = useMemo(() => new Set(items.map((i) => i.path)), [items]);
 
@@ -504,39 +536,6 @@ const FormReferenceField = ({
     },
     [pushEntry],
   );
-
-  // Listen for entry-saved events to update titles in the reference list
-  useEffect(() => {
-    const handleEntrySaved = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (!detail?.id) return;
-      setItems((prev) =>
-        prev.map((item) => {
-          if (item.id !== detail.id) return item;
-          // Try to resolve the updated title from the saved fields
-          const type = detail.type || item.type;
-          const collectionDef = config.collections[type as keyof Config['collections']];
-          if (!collectionDef) return item;
-          const titleFieldKey = Object.keys(collectionDef.fields).find((k) => collectionDef.fields[k].entryTitle);
-          const newTitle = titleFieldKey && detail.fields?.[titleFieldKey] ? detail.fields[titleFieldKey] : item.title;
-          return { ...item, title: newTitle };
-        }),
-      );
-    };
-
-    const handleEntryDeleted = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (!detail?.id) return;
-      setItems((prev) => prev.filter((item) => item.id !== detail.id));
-    };
-
-    window.addEventListener('cms:entry-saved', handleEntrySaved);
-    window.addEventListener('cms:entry-deleted', handleEntryDeleted);
-    return () => {
-      window.removeEventListener('cms:entry-saved', handleEntrySaved);
-      window.removeEventListener('cms:entry-deleted', handleEntryDeleted);
-    };
-  }, [config.collections]);
 
   // Drag and drop handlers
   const handleDragStart = useCallback((index: number) => {

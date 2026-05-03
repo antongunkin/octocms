@@ -50,8 +50,8 @@ export function DiffHunk({ before, after, showLineNumbers = false, className }: 
           key={i}
           className={cn(
             'flex whitespace-pre-wrap',
-            ln.kind === 'add' && 'bg-emerald-50 text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200',
-            ln.kind === 'del' && 'bg-red-50 text-red-900 dark:bg-red-950/40 dark:text-red-200',
+            ln.kind === 'add' && 'bg-emerald-950/40 text-emerald-200 light:bg-emerald-50 light:text-emerald-900',
+            ln.kind === 'del' && 'bg-red-950/40 text-red-200 light:bg-red-50 light:text-red-900',
             ln.kind === 'ctx' && 'text-muted-foreground',
           )}
         >

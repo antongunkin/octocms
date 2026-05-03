@@ -9,6 +9,7 @@ const pointerState = vi.hoisted(() => ({
 const mockConfig = {
   projectName: 'Test',
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: ['png'],
   git: {

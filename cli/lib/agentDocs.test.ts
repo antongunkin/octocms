@@ -9,6 +9,7 @@ import { generateAgentIndex, generateAgentOverview, generateAgentSchema, placeho
 const minimalConfig: Config = {
   projectName: 'Test',
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: ['png'],
   git: { baseBranch: 'main' },
@@ -28,6 +29,7 @@ const minimalConfig: Config = {
 const richConfig: Config = {
   projectName: 'Full',
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: ['png', 'jpg'],
   git: { baseBranch: 'main' },

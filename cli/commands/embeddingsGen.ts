@@ -34,14 +34,22 @@ export async function embeddingsGenCommand(projectRoot: string): Promise<void> {
   }
   log.success(`${collections.length} collections validated`);
 
-  // Walk content folder for entry JSONs across all collections.
+  // Walk both the editorial content folder AND the media-entry folder.
+  // Media entries are searchable too (chat agent's `searchContent` returns
+  // them like any other hit) and live outside `contentFolder` since the move
+  // to a top-level `cms/media/`.
   log.blank();
   log.info('Discovering entries...');
   const cwdBefore = process.cwd();
   process.chdir(projectRoot);
+  const mediaFolder = (config as typeof config & { mediaContentFolder?: string }).mediaContentFolder ?? 'cms/media';
   let paths: string[] = [];
   try {
-    paths = await glob(`${config.contentFolder}/**/*.json`);
+    const [contentPaths, mediaPaths] = await Promise.all([
+      glob(`${config.contentFolder}/**/*.json`),
+      glob(`${mediaFolder}/*.json`),
+    ]);
+    paths = [...contentPaths, ...mediaPaths];
   } finally {
     process.chdir(cwdBefore);
   }

@@ -34,7 +34,7 @@ interface Props {
 
 const TONE_CLASSES: Record<Tone, string> = {
   amber:
-    'rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200',
+    'rounded-md border border-amber-900 bg-amber-950 p-3 text-xs text-amber-200 light:border-amber-200 light:bg-amber-50 light:text-amber-900',
   destructive: 'rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive',
   muted: 'rounded-md border border-border bg-muted/30 p-3 text-xs text-foreground',
 };
@@ -123,7 +123,7 @@ function DataLossBadge({ dataLoss }: { dataLoss: boolean }) {
     );
   }
   return (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded border border-emerald-300 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">
+    <span className="inline-flex shrink-0 items-center gap-1 rounded border border-emerald-900 bg-emerald-950 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-300 light:border-emerald-300 light:bg-emerald-50 light:text-emerald-700">
       <ShieldCheck className="h-3 w-3" />
       Preserved
     </span>

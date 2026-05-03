@@ -454,7 +454,7 @@ export default function FieldDialog(props: Props) {
               ) : null}
 
               {formatChanged ? (
-                <div className="rounded-md border border-amber-200 bg-amber-50 p-2.5 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                <div className="rounded-md border border-amber-900 bg-amber-950 p-2.5 text-xs text-amber-200 light:border-amber-200 light:bg-amber-50 light:text-amber-900">
                   <strong>Heads up:</strong> changing format from <code>{initialField?.format}</code> to{' '}
                   <code>{draft.format}</code> may discard existing values that cannot be safely coerced. Click{' '}
                   <em>Preview</em> to see which entries will lose data.
@@ -667,7 +667,7 @@ function EntryTitleToggle({
       className={cn(
         'flex cursor-pointer items-start gap-2 rounded-md border p-2.5 text-xs transition',
         checked
-          ? 'border-amber-300 bg-amber-50 dark:border-amber-900 dark:bg-amber-950'
+          ? 'border-amber-900 bg-amber-950 light:border-amber-300 light:bg-amber-50'
           : 'border-border bg-background',
         (disabled || !allowed) && 'cursor-not-allowed opacity-50',
       )}

@@ -13,6 +13,7 @@ import {
 const config = {
   projectName: 'test',
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: [],
   git: { baseBranch: 'main' },
@@ -92,7 +93,7 @@ describe('resolveEntryTitle', () => {
 
   it('uses media fields.title for media entries regardless of schema', () => {
     expect(
-      resolveEntryTitle(config, 'cms/content/media/media-xyz.json', {
+      resolveEntryTitle(config, 'cms/media/media-xyz.json', {
         sys: { type: 'media' },
         fields: { title: 'Sunset photo' },
       }),
@@ -115,7 +116,7 @@ describe('resolveEntryTitle', () => {
 describe('resolveEntryId', () => {
   it('returns sys.id for media entries', () => {
     expect(
-      resolveEntryId(config, 'cms/content/media/media-xyz.json', {
+      resolveEntryId(config, 'cms/media/media-xyz.json', {
         sys: { type: 'media', id: 'real-uuid' },
         fields: {},
       }),

@@ -11,6 +11,7 @@ function makeConfig(): Config {
   return {
     projectName: 'Test',
     contentFolder: 'content',
+    mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png'],
     git: { baseBranch: 'main' },

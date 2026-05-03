@@ -2,7 +2,10 @@
 
 import React, { useState } from 'react';
 
+import { cn } from '../lib/utils';
+
 import { FieldHintAndError } from './FieldHintAndError';
+import { FieldLabel } from './FieldLabel';
 
 const DEFAULT_TRUE = 'Yes';
 const DEFAULT_FALSE = 'No';
@@ -30,19 +33,29 @@ const FormBooleanField = ({
 }: FormBooleanFieldProps) => {
   const [checked, setChecked] = useState(value === 'true');
 
+  const segBase =
+    'h-8 px-4 text-[13px] font-medium rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/40';
+
   return (
-    <div className="mb-6">
-      <fieldset className="border-0 p-0 m-0">
-        <legend className="block text-xs font-medium text-muted-foreground mb-1.5">
-          {label}
-          {required ? <span className="text-destructive ml-1">*</span> : null}
-        </legend>
-        <input type="hidden" name={name} value={checked ? 'true' : 'false'} />
-        <input type="radio" id={`${name}_true`} value="true" checked={checked} onChange={() => setChecked(true)} />
-        <label htmlFor={`${name}_true`}>{trueLabel}</label>{' '}
-        <input type="radio" id={`${name}_false`} value="false" checked={!checked} onChange={() => setChecked(false)} />
-        <label htmlFor={`${name}_false`}>{falseLabel}</label>
-      </fieldset>
+    <div className="mb-5">
+      <FieldLabel label={label} type="boolean" required={required} />
+      <input type="hidden" name={name} value={checked ? 'true' : 'false'} />
+      <div className="inline-flex items-center gap-1 rounded-full border border-border bg-card p-1">
+        <button
+          type="button"
+          onClick={() => setChecked(true)}
+          className={cn(segBase, checked ? 'bg-foreground text-background' : 'text-foreground hover:bg-muted/40')}
+        >
+          {trueLabel}
+        </button>
+        <button
+          type="button"
+          onClick={() => setChecked(false)}
+          className={cn(segBase, !checked ? 'bg-foreground text-background' : 'text-foreground hover:bg-muted/40')}
+        >
+          {falseLabel}
+        </button>
+      </div>
       <FieldHintAndError hint={hint} error={error} />
     </div>
   );

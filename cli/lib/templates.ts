@@ -259,6 +259,7 @@ const _typedConfigOctoCMS = defineConfig({
   projectName: '${opts.projectName}',
 ${gitBlock}
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif'],
   collections: {

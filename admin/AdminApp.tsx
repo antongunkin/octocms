@@ -9,6 +9,7 @@ import { DashboardListSkeleton } from '../components/Dashboard/DashboardContent.
 import { EditPostSkeleton } from '../components/EditPost/EditPost.skeleton';
 import { MediaAssetSkeleton } from '../components/MediaAsset/MediaAsset.skeleton';
 import { MediaManagerSkeleton } from '../components/MediaManager/MediaManager.skeleton';
+import { AdminGenericSkeleton } from '../components/skeletons/AdminGenericSkeleton';
 
 import { ChatPage } from './pages/ChatPage';
 import { CollectionPage } from './pages/CollectionPage';
@@ -39,13 +40,20 @@ type AdminAppProps = {
  *   /cms/model               → ContentModelPage
  *   /cms/model/<type>        → ContentTypePage
  *
- * Streaming model: each branch wraps its page in `<Suspense fallback={<MatchingSkeleton/>}>`.
- * There is **no outer Suspense** around AdminApp itself — Next.js's
- * navigation hold-over keeps the previous page rendered until the new one's
- * `await params` resolves, so the user never sees a generic-shimmer flash
- * between sub-routes. Only the inner per-page skeleton is ever visible.
+ * Streaming model: `params` is awaited inside `<AdminAppDispatcher>`, which is
+ * wrapped in an outer `<Suspense>` so Next.js can start streaming the shell
+ * immediately. Each dispatched branch adds its own inner `<Suspense>` with the
+ * matching per-page skeleton.
  */
-export async function AdminApp({ params }: AdminAppProps) {
+export function AdminApp({ params }: AdminAppProps) {
+  return (
+    <Suspense fallback={<AdminGenericSkeleton />}>
+      <AdminAppDispatcher params={params} />
+    </Suspense>
+  );
+}
+
+async function AdminAppDispatcher({ params }: AdminAppProps) {
   const { path } = await params;
   const segments = path ?? [];
 

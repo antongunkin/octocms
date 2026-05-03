@@ -17,7 +17,7 @@ describe('DiffHunk', () => {
 
   it('renders added lines with a + gutter and emerald background classes', () => {
     const { container } = render(<DiffHunk before={'a\nb\n'} after={'a\nb\nc\n'} />);
-    const added = container.querySelector('.bg-emerald-50');
+    const added = container.querySelector('[class*="bg-emerald"]');
     expect(added).toBeTruthy();
     expect(added!.textContent).toContain('+');
     expect(added!.textContent).toContain('c');
@@ -25,7 +25,7 @@ describe('DiffHunk', () => {
 
   it('renders removed lines with a − gutter and red background classes', () => {
     const { container } = render(<DiffHunk before={'a\nb\nc\n'} after={'a\nb\n'} />);
-    const removed = container.querySelector('.bg-red-50');
+    const removed = container.querySelector('[class*="bg-red"]');
     expect(removed).toBeTruthy();
     expect(removed!.textContent).toContain('−');
     expect(removed!.textContent).toContain('c');
@@ -33,8 +33,8 @@ describe('DiffHunk', () => {
 
   it('shows both a − and a + line when a line is changed', () => {
     const { container } = render(<DiffHunk before={'hello world'} after={'hello there'} />);
-    expect(container.querySelector('.bg-red-50')).toBeTruthy();
-    expect(container.querySelector('.bg-emerald-50')).toBeTruthy();
+    expect(container.querySelector('[class*="bg-red"]')).toBeTruthy();
+    expect(container.querySelector('[class*="bg-emerald"]')).toBeTruthy();
   });
 
   it('omits line-number gutters by default', () => {

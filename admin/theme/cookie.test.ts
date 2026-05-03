@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getThemeCookie } from './getThemeCookie';
+import { getThemeCookie } from './cookie';
 
 const mockGet = vi.fn();
 
@@ -16,10 +16,9 @@ beforeEach(() => {
 });
 
 describe('getThemeCookie', () => {
-  it('returns "system" when no cookie is set', async () => {
-    mockGet.mockReturnValue(undefined);
+  it('returns "dark" when no cookie is set', async () => {
     const result = await getThemeCookie();
-    expect(result).toBe('system');
+    expect(result).toBe('dark');
   });
 
   it('returns "dark" when cookie value is "dark"', async () => {
@@ -34,21 +33,15 @@ describe('getThemeCookie', () => {
     expect(result).toBe('light');
   });
 
-  it('returns "system" when cookie value is "system"', async () => {
-    mockGet.mockReturnValue({ value: 'system' });
-    const result = await getThemeCookie();
-    expect(result).toBe('system');
-  });
-
-  it('returns "system" for an unknown cookie value', async () => {
+  it('returns "dark" for an unknown cookie value', async () => {
     mockGet.mockReturnValue({ value: 'midnight' });
     const result = await getThemeCookie();
-    expect(result).toBe('system');
+    expect(result).toBe('dark');
   });
 
-  it('returns "system" for an empty cookie value', async () => {
+  it('returns "dark" for an empty cookie value', async () => {
     mockGet.mockReturnValue({ value: '' });
     const result = await getThemeCookie();
-    expect(result).toBe('system');
+    expect(result).toBe('dark');
   });
 });

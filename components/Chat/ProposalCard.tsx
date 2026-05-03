@@ -143,7 +143,7 @@ function StatusBadge({ status }: { status: ProposalUiState['status'] }) {
       return <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />;
     case 'accepted':
       return (
-        <span className="flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-400">
+        <span className="flex items-center gap-1 text-[11px] text-emerald-400 light:text-emerald-700">
           <CheckCircle2 className="h-3.5 w-3.5" />
           Accepted
         </span>
@@ -227,10 +227,10 @@ function EditProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 'e
               <DiffHunk before={beforeStr} after={afterStr} showLineNumbers={showLineNumbers} />
             ) : (
               <div className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-2">
-                <div className="rounded border border-red-200 bg-red-50 px-2 py-1 font-mono text-red-900 dark:border-red-900/40 dark:bg-red-950/40 dark:text-red-200">
+                <div className="rounded border border-red-900/40 bg-red-950/40 px-2 py-1 font-mono text-red-200 light:border-red-200 light:bg-red-50 light:text-red-900">
                   − {beforeStr || <span className="italic text-muted-foreground/70">empty</span>}
                 </div>
-                <div className="rounded border border-emerald-200 bg-emerald-50 px-2 py-1 font-mono text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-200">
+                <div className="rounded border border-emerald-900/40 bg-emerald-950/40 px-2 py-1 font-mono text-emerald-200 light:border-emerald-200 light:bg-emerald-50 light:text-emerald-900">
                   + {afterStr || <span className="italic text-muted-foreground/70">empty</span>}
                 </div>
               </div>

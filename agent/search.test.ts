@@ -15,6 +15,7 @@ import { clearSearchCache, searchContent } from './search';
 const config = {
   projectName: 'test',
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: [],
   git: { baseBranch: 'main' },

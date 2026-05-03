@@ -1,7 +1,8 @@
 'use client';
 
 import { ArrowLeft, Trash2 } from 'lucide-react';
-import React, { useCallback, useEffect, useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 
 import {
   getEntryBacklinks,
@@ -16,6 +17,7 @@ import {
 } from '../../admin/actions';
 import type { Config } from '../../admin/types';
 import { useConfig } from '../../hooks/useConfig';
+import { useEntryStack } from '../../hooks/useEntryStack';
 import { toast } from '../../hooks/useToast';
 import { toReferenceKey } from '../../lib/referenceKeys';
 import { validateEntryFields } from '../../lib/validateEntryFields';
@@ -38,6 +40,8 @@ type InlineEntryEditorProps = {
 
 const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: InlineEntryEditorProps) => {
   const config = useConfig();
+  const router = useRouter();
+  const { bumpRefresh } = useEntryStack();
   const [entry, setEntry] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -49,6 +53,8 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
   const [activeBranchSet, setActiveBranchSet] = useState(true);
   const [createBranchOpen, setCreateBranchOpen] = useState(false);
   const [pendingSaveArgs, setPendingSaveArgs] = useState<{ sys: any; fields: any } | null>(null);
+  // True once any save/delete inside this overlay has succeeded; consumed on close to bump refreshTick.
+  const dirtyRef = useRef(false);
 
   const collectionLabel = config.collections[entryType as keyof Config['collections']]?.label || entryType;
 
@@ -66,6 +72,17 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
     };
     load();
   }, [entryPath, entryId]);
+
+  // If the overlay unmounts while dirty (e.g. browser back, parent closeAll),
+  // notify subscribers. The Back button calls handleClose directly and resets the flag.
+  useEffect(() => {
+    return () => {
+      if (dirtyRef.current) {
+        bumpRefresh();
+        dirtyRef.current = false;
+      }
+    };
+  }, [bumpRefresh]);
 
   // Check production/branch status
   useEffect(() => {
@@ -92,17 +109,25 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
     });
   }, []);
 
+  const handleClose = useCallback(() => {
+    if (dirtyRef.current) {
+      // Notify subscribers (parent FormReferenceField, LinkedBySection, HistorySection)
+      // that entries beneath them changed while this overlay was open.
+      bumpRefresh();
+      dirtyRef.current = false;
+    }
+    onClose();
+  }, [bumpRefresh, onClose]);
+
   const executeSave = useCallback(
     (sys: any, fields: any) => {
       startSaving(async () => {
         const result = await saveFile({ sys, fields }, entryPath);
         if (result.success) {
           toast({ title: 'Saved successfully', variant: 'success' });
-          // Dispatch event so parent reference fields can update titles
-          window.dispatchEvent(
-            new CustomEvent('cms:entry-saved', { detail: { id: entryId, type: entryType, path: entryPath, fields } }),
-          );
-          // Reload entry to get updated data
+          dirtyRef.current = true;
+          // Re-run server components in case any data flow elsewhere depends on this entry.
+          router.refresh();
           const updated = await getFile(entryPath);
           setEntry(updated);
         } else {
@@ -113,7 +138,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
         }
       });
     },
-    [entryPath, entryId, entryType],
+    [entryPath, router],
   );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -174,8 +199,9 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
     const result = await removeFile(entryPath);
     if (result.success) {
       toast({ title: 'Entry removed', variant: 'success' });
-      window.dispatchEvent(new CustomEvent('cms:entry-deleted', { detail: { id: entryId, path: entryPath } }));
-      onClose();
+      dirtyRef.current = true;
+      router.refresh();
+      handleClose();
     } else {
       toast({ title: result.error, variant: 'destructive' });
     }
@@ -188,13 +214,10 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
       const result = await publishEntry(entryPath);
       if (result.success) {
         toast({ title: 'Published successfully', variant: 'success' });
+        dirtyRef.current = true;
+        router.refresh();
         const updated = await getFile(entryPath);
         setEntry(updated);
-        window.dispatchEvent(
-          new CustomEvent('cms:entry-saved', {
-            detail: { id: entryId, type: entryType, path: entryPath, fields: updated?.fields },
-          }),
-        );
       } else {
         toast({ title: result.error, variant: 'destructive' });
       }
@@ -206,6 +229,8 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
       const result = await archiveEntry(entryPath);
       if (result.success) {
         toast({ title: 'Entry archived', variant: 'success' });
+        dirtyRef.current = true;
+        router.refresh();
         const updated = await getFile(entryPath);
         setEntry(updated);
       } else {
@@ -219,6 +244,8 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
       const result = await restoreEntry(entryPath);
       if (result.success) {
         toast({ title: 'Entry restored', variant: 'success' });
+        dirtyRef.current = true;
+        router.refresh();
         const updated = await getFile(entryPath);
         setEntry(updated);
       } else {
@@ -241,7 +268,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
         {/* Top bar */}
         <div className="flex-none flex h-[var(--header-height)] items-center bg-background border-b border-border">
           <div className="flex-none px-5 py-2.5">
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            <Button variant="ghost" size="sm" onClick={handleClose}>
               <ArrowLeft className="mr-1 h-4 w-4" />
               Back
             </Button>

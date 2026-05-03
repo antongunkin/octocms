@@ -10,12 +10,48 @@ import type { Config } from '../types';
 import { extractImageMetadata } from '../../lib/extractImageMetadata';
 import type { MediaFile } from '../../types';
 
+import { mediaContentFolder, mediaEntryPath } from '../../lib/mediaPath';
+import { getAgentConfig } from '../../agent/configStore';
+import { syncEmbeddingsAfterRemove, syncEmbeddingsAfterUpsert } from '../../agent/embeddingsHook';
+
 import { deleteGitHubFile, isProductionMode, saveGitHubBinaryFile, saveGitHubFile } from '../github';
 import { applyMutation, getStoredMediaEntries } from '../store/contentStore';
-import { assertFeatureBranchForWritesIfRequired, getContentFiles, getFile } from './files';
+import { assertFeatureBranchForWritesIfRequired, getContentFiles, getFile, getMediaContentFiles } from './files';
 import { actionErr, actionOk, getErrorMessage, type ActionResult, type UploadMediaResult } from './utils';
 
 const MAX_UPLOAD_SIZE = 10 * 1024 * 1024; // 10 MB
+
+/** Best-effort embedding sync after a media write — same shape as the hook used by content writes. */
+async function syncMediaEmbeddingUpsert(
+  entryPath: string,
+  payload: { sys?: { type?: string }; fields?: Record<string, unknown> },
+): Promise<void> {
+  const agentConfig = getAgentConfig();
+  if (!agentConfig) return;
+  const cfg = getConfig();
+  const activeBranch = isProductionMode() ? (await cookies()).get('cms-active-branch')?.value : undefined;
+  await syncEmbeddingsAfterUpsert({
+    agentConfig,
+    config: cfg,
+    entryPath,
+    payload,
+    companions: {},
+    branch: activeBranch,
+    isProduction: isProductionMode(),
+  });
+}
+
+async function syncMediaEmbeddingRemove(entryPath: string): Promise<void> {
+  const agentConfig = getAgentConfig();
+  if (!agentConfig) return;
+  const activeBranch = isProductionMode() ? (await cookies()).get('cms-active-branch')?.value : undefined;
+  await syncEmbeddingsAfterRemove({
+    agentConfig,
+    entryPath,
+    branch: activeBranch,
+    isProduction: isProductionMode(),
+  });
+}
 
 /** Convert parsed entry content to a MediaFile object. Returns null if the entry is invalid. */
 function contentToMediaFile(content: Record<string, unknown>): MediaFile | null {
@@ -47,7 +83,8 @@ function contentToMediaFile(content: Record<string, unknown>): MediaFile | null 
 }
 
 /**
- * Get all media entries from cms/content/media/.
+ * Get all media entries from the configured media-content folder
+ * (`config.mediaContentFolder`, default `cms/media/`).
  */
 export const getMediaEntries = async (): Promise<MediaFile[]> => {
   // Try in-memory store first (instant, all media entries pre-indexed)
@@ -69,25 +106,50 @@ export const getMediaEntries = async (): Promise<MediaFile[]> => {
     }
   }
 
-  const files = await getContentFiles('media');
+  const files = await getMediaContentFiles();
   const entries: MediaFile[] = [];
 
   for (const file of files) {
     try {
       const content = await getFile(file);
       const mf = contentToMediaFile(content);
-      if (mf) entries.push(mf);
+      if (!mf) continue;
+      // Stamp the dev-mode mtime so the list can sort by "newest first".
+      // Production reads from GitHub which doesn't expose stat — `updatedAt`
+      // stays undefined and the list falls back to insertion order. The
+      // The `process.env.NODE_ENV !== 'production'` guard is replaced with a
+      // string literal at build time, so this block is dead code in production
+      // bundles. The bundler DCEs it, removing the path.join(process.cwd(), …)
+      // call that would otherwise trip NFT into over-tracing.
+      if (process.env.NODE_ENV !== 'production') {
+        try {
+          const stat = await fsPromises.stat(path.join(process.cwd(), file));
+          mf.updatedAt = stat.mtime.toISOString();
+        } catch {
+          // ignore — stat unavailable, sort will treat as oldest
+        }
+      }
+      entries.push(mf);
     } catch (_e) {
       // Skip invalid entries
     }
   }
 
+  // Default sort: newest first. Entries without `updatedAt` (e.g. production
+  // reads) sort to the end so dev mode and prod stay visually consistent.
+  entries.sort((a, b) => {
+    if (!a.updatedAt && !b.updatedAt) return 0;
+    if (!a.updatedAt) return 1;
+    if (!b.updatedAt) return -1;
+    return b.updatedAt.localeCompare(a.updatedAt);
+  });
+
   return entries;
 };
 
 /**
- * Upload a media file. Creates a physical file at public/media/[uuid].[ext]
- * and a media entry at cms/content/media/media-[uuid].json.
+ * Upload a media file. Creates a physical file at `<mediaFolder>/[uuid].[ext]`
+ * and a media entry at `<mediaContentFolder>/media-[uuid].json`.
  *
  * @returns The media entry UUID
  */
@@ -124,15 +186,22 @@ export const uploadMedia = async (formData: FormData): Promise<UploadMediaResult
 
   const id = crypto.randomUUID();
   const physicalPath = `${config.mediaFolder}/${id}.${ext}`;
-  const entryPath = `${`${getConfig().contentFolder}/media`}/media-${id}.json`;
+  const entryPath = mediaEntryPath(id);
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
-    const { width, height, blurDataURL } = await extractImageMetadata(buffer);
+    const generateBlurRaw = formData.get('generateBlur');
+    // Default ON — only the explicit string '0' or 'false' opts out.
+    const generateBlur = !(generateBlurRaw === '0' || generateBlurRaw === 'false');
+    const { width, height, blurDataURL } = await extractImageMetadata(buffer, { generateBlur });
 
     const fields: Record<string, unknown> = {
       title,
-      originalName: file.name,
+      // Stored filename = the actual on-disk filename (UUID-based), not the
+      // user's upload name. Avoids leaking messy filenames like
+      // "Long file name.jpg" into the UI; the physical file already lives at
+      // `<mediaFolder>/<uuid>.<ext>` so this stays consistent.
+      originalName: `${id}.${ext}`,
       extension: ext,
       folder,
     };
@@ -145,7 +214,7 @@ export const uploadMedia = async (formData: FormData): Promise<UploadMediaResult
       fields,
     };
 
-    if (isProductionMode()) {
+    if (process.env.NODE_ENV === 'production' || isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get('cms-active-branch')?.value;
       await saveGitHubBinaryFile(physicalPath, buffer, `Upload media ${file.name}`, activeBranch);
@@ -159,9 +228,12 @@ export const uploadMedia = async (formData: FormData): Promise<UploadMediaResult
       await fsPromises.mkdir(path.join(process.cwd(), config.mediaFolder), { recursive: true });
       await fsPromises.writeFile(path.join(process.cwd(), physicalPath), buffer);
 
-      await fsPromises.mkdir(path.join(process.cwd(), `${getConfig().contentFolder}/media`), { recursive: true });
+      await fsPromises.mkdir(path.join(process.cwd(), mediaContentFolder()), { recursive: true });
       await fsPromises.writeFile(path.join(process.cwd(), entryPath), `${JSON.stringify(entry, null, 2)}\n`, 'utf8');
     }
+
+    // Best-effort: index the new media entry so it appears in chat-agent search.
+    await syncMediaEmbeddingUpsert(entryPath, entry);
 
     return { success: true, id };
   } catch (e) {
@@ -184,7 +256,7 @@ export const deleteMedia = async (mediaId: string): Promise<ActionResult> => {
     };
   }
 
-  const entryPath = `${`${getConfig().contentFolder}/media`}/media-${mediaId}.json`;
+  const entryPath = mediaEntryPath(mediaId);
   let entry;
 
   try {
@@ -197,7 +269,7 @@ export const deleteMedia = async (mediaId: string): Promise<ActionResult> => {
   const physicalPath = `${config.mediaFolder}/${mediaId}.${ext}`;
 
   try {
-    if (isProductionMode()) {
+    if (process.env.NODE_ENV === 'production' || isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get('cms-active-branch')?.value;
       await deleteGitHubFile(physicalPath, `Delete media file ${mediaId}`, activeBranch);
@@ -212,6 +284,9 @@ export const deleteMedia = async (mediaId: string): Promise<ActionResult> => {
       await fsPromises.unlink(path.join(process.cwd(), entryPath));
     }
 
+    // Drop from the chat-agent search index.
+    await syncMediaEmbeddingRemove(entryPath);
+
     return actionOk();
   } catch (e) {
     return actionErr(new Error(`Failed to delete media: ${getErrorMessage(e)}`));
@@ -222,7 +297,7 @@ export const deleteMedia = async (mediaId: string): Promise<ActionResult> => {
  * Move a media entry to a different virtual folder.
  */
 export const moveMedia = async (mediaId: string, newFolder: string): Promise<ActionResult> => {
-  const entryPath = `${`${getConfig().contentFolder}/media`}/media-${mediaId}.json`;
+  const entryPath = mediaEntryPath(mediaId);
 
   try {
     const entry = await getFile(entryPath);
@@ -230,7 +305,7 @@ export const moveMedia = async (mediaId: string, newFolder: string): Promise<Act
 
     const data = `${JSON.stringify(entry, null, 2)}\n`;
 
-    if (isProductionMode()) {
+    if (process.env.NODE_ENV === 'production' || isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get('cms-active-branch')?.value;
       await saveGitHubFile(entryPath, data, `Move media ${mediaId} to ${newFolder}`, activeBranch);
@@ -241,6 +316,8 @@ export const moveMedia = async (mediaId: string, newFolder: string): Promise<Act
     } else {
       await fsPromises.writeFile(path.join(process.cwd(), entryPath), data, 'utf8');
     }
+
+    await syncMediaEmbeddingUpsert(entryPath, entry);
 
     return actionOk();
   } catch (e) {
@@ -257,7 +334,7 @@ export const updateMediaMetadata = async (mediaId: string, title: string): Promi
     return { success: false, error: 'Title is required' };
   }
 
-  const entryPath = `${`${getConfig().contentFolder}/media`}/media-${mediaId}.json`;
+  const entryPath = mediaEntryPath(mediaId);
 
   try {
     const entry = await getFile(entryPath);
@@ -268,7 +345,7 @@ export const updateMediaMetadata = async (mediaId: string, title: string): Promi
 
     const data = `${JSON.stringify(entry, null, 2)}\n`;
 
-    if (isProductionMode()) {
+    if (process.env.NODE_ENV === 'production' || isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get('cms-active-branch')?.value;
       await saveGitHubFile(entryPath, data, `Update media title ${mediaId}`, activeBranch);
@@ -279,6 +356,8 @@ export const updateMediaMetadata = async (mediaId: string, title: string): Promi
     } else {
       await fsPromises.writeFile(path.join(process.cwd(), entryPath), data, 'utf8');
     }
+
+    await syncMediaEmbeddingUpsert(entryPath, entry);
 
     return actionOk();
   } catch (e) {
@@ -296,8 +375,6 @@ export const checkMediaReferences = async (mediaId: string): Promise<string[]> =
   const references: string[] = [];
 
   for (const file of allFiles) {
-    if (file.includes('/media/')) continue;
-
     try {
       const content = await getFile(file);
       const type = content?.sys?.type;

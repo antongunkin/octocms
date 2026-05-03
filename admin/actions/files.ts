@@ -28,6 +28,7 @@ import {
   saveGitHubFile,
 } from '../github';
 import { applyMutation, getStoredContentFiles, getStoredFile, getStoredFileSha } from '../store/contentStore';
+import { mediaContentFolder, mediaEntryPath } from '../../lib/mediaPath';
 import { buildJsons } from './build';
 import {
   actionErr,
@@ -95,7 +96,7 @@ async function persistBranchHistoryEntryIfNeeded(activeBranch: string | undefine
   }
 
   try {
-    const abs = path.join(process.cwd(), BRANCH_HISTORY_FILE_PATH);
+    const abs = path.join(/*turbopackIgnore: true*/ process.cwd(), BRANCH_HISTORY_FILE_PATH);
     let raw = '';
     try {
       raw = await fsPromises.readFile(abs, { encoding: 'utf8' });
@@ -202,7 +203,7 @@ async function assertImageFieldsReferenceMediaWithTitle(
       continue;
     }
 
-    const mediaPath = `${config.contentFolder}/media/media-${raw}.json`;
+    const mediaPath = mediaEntryPath(raw);
     let media: unknown;
     try {
       media = await getFile(mediaPath);
@@ -299,6 +300,33 @@ export const getContentFiles = async (collection: string = '**') => {
   }
 };
 
+/**
+ * List media-entry JSON files (e.g. `cms/media/media-<uuid>.json`).
+ *
+ * Distinct from `getContentFiles`, which lists editorial content under
+ * `config.contentFolder`, and from `getMediaFiles`, which lists physical image
+ * binaries under `config.mediaFolder`. This is the JSON-entry layer.
+ */
+export const getMediaContentFiles = async (): Promise<string[]> => {
+  const folder = mediaContentFolder();
+  try {
+    if (isProductionMode()) {
+      const activeBranch = (await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
+
+      try {
+        return await listGitHubFiles(folder, '.json', activeBranch);
+      } catch (_e) {
+        // Fall back to local files if GitHub API access is not available.
+      }
+    }
+
+    const files = await glob(`${folder}/*.json`);
+    return files || [];
+  } catch (_e) {
+    return [];
+  }
+};
+
 export const getMediaFiles = async (folder: string = '**') => {
   const config = getConfig();
   try {
@@ -360,7 +388,7 @@ export const getFile = async (fileName: string) => {
     }
 
     if (!entry) {
-      const filePath = path.join(process.cwd(), fileName);
+      const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), fileName);
       const data = await fsPromises.readFile(filePath, { encoding: 'utf8' });
       entry = JSON.parse(data);
     }
@@ -401,7 +429,9 @@ async function readCompanionMarkdownContent(filePath: string): Promise<string> {
   }
 
   try {
-    return await fsPromises.readFile(path.join(process.cwd(), filePath), { encoding: 'utf8' });
+    return await fsPromises.readFile(path.join(/*turbopackIgnore: true*/ process.cwd(), filePath), {
+      encoding: 'utf8',
+    });
   } catch {
     return '';
   }
@@ -544,20 +574,20 @@ export const saveFile = async (
 
     const cookieStore = await cookies();
     const activeBranchDev = cookieStore.get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
-    const filePath = path.join(process.cwd(), fileName);
+    const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), fileName);
     await fsPromises.writeFile(filePath, normalizedData, 'utf8');
     // Write companion markdown and richtext files
     const mdPaths =
       typeof entryType === 'string' ? companionMarkdownPathsForEntry(fileName, entryType, config.collections) : {};
     for (const [fieldName, mdPath] of Object.entries(mdPaths)) {
       const mdContent = markdownContents[fieldName] ?? '';
-      await fsPromises.writeFile(path.join(process.cwd(), mdPath), mdContent, 'utf8');
+      await fsPromises.writeFile(path.join(/*turbopackIgnore: true*/ process.cwd(), mdPath), mdContent, 'utf8');
     }
     const rtPathsDev =
       typeof entryType === 'string' ? companionRichTextPathsForEntry(fileName, entryType, config.collections) : {};
     for (const [fieldName, rtPath] of Object.entries(rtPathsDev)) {
       const rtContent = markdownContents[fieldName] ?? '';
-      await fsPromises.writeFile(path.join(process.cwd(), rtPath), rtContent, 'utf8');
+      await fsPromises.writeFile(path.join(/*turbopackIgnore: true*/ process.cwd(), rtPath), rtContent, 'utf8');
     }
     await persistBranchHistoryEntryIfNeeded(activeBranchDev, fileName);
     await syncEmbeddingsForUpsertIfEnabled(fileName, payload, markdownContents, activeBranchDev, false);
@@ -610,7 +640,7 @@ export const newFile = async (type: string): Promise<NewFileResult> => {
 
     const cookieStore = await cookies();
     const activeBranchDev = cookieStore.get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
-    const filePath = path.join(process.cwd(), file);
+    const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), file);
     await fsPromises.writeFile(filePath, normalizedData, 'utf8');
     await persistBranchHistoryEntryIfNeeded(activeBranchDev, file);
     await syncEmbeddingsForUpsertIfEnabled(file, values, {}, activeBranchDev, false);
@@ -670,11 +700,11 @@ export const removeFile = async (fileName: string): Promise<ActionResult> => {
       return built.success ? actionOk() : built;
     }
 
-    const filePath = path.join(process.cwd(), fileName);
+    const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), fileName);
     await fsPromises.unlink(filePath);
     for (const mdPath of companionPaths) {
       try {
-        await fsPromises.unlink(path.join(process.cwd(), mdPath));
+        await fsPromises.unlink(path.join(/*turbopackIgnore: true*/ process.cwd(), mdPath));
       } catch {
         /* best-effort — companion may not exist */
       }

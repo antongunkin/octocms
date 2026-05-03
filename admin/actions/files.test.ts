@@ -68,6 +68,7 @@ vi.mock('./build', () => ({
 
 const mockConfig = {
   contentFolder: 'cms/content',
+  mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   mediaAllowedFormats: ['jpg', 'png', 'webp'],
   git: { baseBranch: 'main' },
