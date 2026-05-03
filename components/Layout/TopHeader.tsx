@@ -1,6 +1,7 @@
 // Real admin TopHeader — replaces the legacy
 // `octocms/components/Header/Header.tsx`. Sticky 56px tall on every admin
-// page; wired to real auth + branch + agent state.
+// page; wired to real auth + branch + agent state via TanStack Query hooks
+// (see `octocms/admin/query/hooks/`).
 'use client';
 
 import * as React from 'react';
@@ -9,18 +10,13 @@ import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { ExternalLink, Plus, RefreshCw, Search, X } from 'lucide-react';
 
+import { useAgentStatus } from '../../admin/query/hooks/useAgentStatus';
+import { useBranch } from '../../admin/query/hooks/useBranch';
+import { useBranchList } from '../../admin/query/hooks/useBranchList';
+import { useClearBranch, usePublishBranch, useSetActiveBranch } from '../../admin/query/hooks/useBranchMutations';
+import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
+import { useIsProduction } from '../../admin/query/hooks/useIsProduction';
 import { useConfig } from '../../hooks/useConfig';
-import {
-  clearBranch,
-  getAgentClientStatus,
-  getBranch,
-  getIsProduction,
-  hasActiveBranch,
-  listCMSBranches,
-  publishBranch,
-  setActiveBranch,
-  type CMSBranch,
-} from '../../admin/actions';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -35,6 +31,9 @@ import {
 import CreateBranchDialog from '../CreateBranchDialog';
 import { ThemeToggle, type Theme } from '../../admin/theme';
 
+import { AgentNavSkeleton } from './skeletons/AgentNavSkeleton';
+import { BranchChipSkeleton } from './skeletons/BranchChipSkeleton';
+
 const NAV: { id: string; label: string; href: string; matchPrefix?: string }[] = [
   { id: 'dashboard', label: 'Dashboard', href: '/cms', matchPrefix: '/cms' },
   { id: 'content', label: 'Content', href: '/cms/content', matchPrefix: '/cms/content' },
@@ -48,76 +47,74 @@ type TopHeaderProps = {
   initialTheme?: Theme;
 };
 
+/**
+ * Other components (`EditPost`, `InlineEntryEditor`) still listen for the
+ * `cms:branch-changed` window event to refresh their own state. Until those
+ * migrate to React Query (Phase 4), branch mutations dispatch the event on
+ * success so legacy listeners stay in sync.
+ */
+function notifyBranchChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('cms:branch-changed'));
+  }
+}
+
 export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps) {
   const { data } = useSession();
   const config = useConfig();
   const pathname = usePathname() ?? '/cms';
 
-  const [isProduction, setIsProduction] = React.useState(false);
-  const [agentEnabled, setAgentEnabled] = React.useState(false);
-  const [activeBranch, setActiveBranchState] = React.useState<string>('');
-  const [isFeatureBranch, setIsFeatureBranch] = React.useState(false);
-  const [cmsBranches, setCmsBranches] = React.useState<CMSBranch[]>([]);
+  const isProductionQuery = useIsProduction();
+  const agentStatusQuery = useAgentStatus();
+  const branchQuery = useBranch();
+  const hasActiveBranchQuery = useHasActiveBranch();
+
   const [branchOpen, setBranchOpen] = React.useState(false);
   const [createBranchOpen, setCreateBranchOpen] = React.useState(false);
-  const [branchLoading, setBranchLoading] = React.useState(false);
+  const branchListQuery = useBranchList({ enabled: branchOpen });
 
-  React.useEffect(() => {
-    getIsProduction().then(setIsProduction);
-    getBranch().then(setActiveBranchState);
-    hasActiveBranch().then(setIsFeatureBranch);
-    getAgentClientStatus().then((s) => setAgentEnabled(s.enabled));
+  const setActiveBranchMutation = useSetActiveBranch();
+  const clearBranchMutation = useClearBranch();
+  const publishBranchMutation = usePublishBranch();
 
-    const handler = () => {
-      getBranch().then(setActiveBranchState);
-      hasActiveBranch().then(setIsFeatureBranch);
-    };
-    window.addEventListener('cms:branch-changed', handler);
-    return () => window.removeEventListener('cms:branch-changed', handler);
-  }, []);
+  const isProduction = isProductionQuery.data ?? false;
+  const agentEnabled = agentStatusQuery.data?.enabled ?? false;
+  const agentStatusLoading = agentStatusQuery.isPending;
+  const activeBranch = branchQuery.data ?? '';
+  const isFeatureBranch = hasActiveBranchQuery.data ?? false;
+  const branchChipLoading = branchQuery.isPending || hasActiveBranchQuery.isPending;
+  const cmsBranches = branchListQuery.data ?? [];
+  const branchListLoading = branchListQuery.isPending && branchListQuery.fetchStatus !== 'idle';
 
   const active: string =
     NAV.slice()
       .reverse()
       .find((n) => n.matchPrefix && pathname.startsWith(n.matchPrefix))?.id ?? 'dashboard';
 
-  const onBranchOpenChange = async (open: boolean) => {
-    setBranchOpen(open);
-    if (open) {
-      setBranchLoading(true);
-      const branches = await listCMSBranches();
-      setCmsBranches(branches);
-      setBranchLoading(false);
-    }
-  };
-
   const handleSwitchBranch = async (branch: string, isBaseRow: boolean) => {
     if (isBaseRow) {
-      await clearBranch();
-      getBranch().then(setActiveBranchState);
-      setIsFeatureBranch(false);
+      await clearBranchMutation.mutateAsync();
       toast({ title: `Viewing ${branch} (read-only)`, variant: 'success' });
-      window.dispatchEvent(new Event('cms:branch-changed'));
+      notifyBranchChanged();
       return;
     }
-    await setActiveBranch(branch);
-    setActiveBranchState(branch);
-    setIsFeatureBranch(true);
+    await setActiveBranchMutation.mutateAsync(branch);
     toast({ title: `Switched to ${branch}`, variant: 'success' });
-    window.dispatchEvent(new Event('cms:branch-changed'));
+    notifyBranchChanged();
   };
 
   const handleClearBranch = async () => {
-    await clearBranch();
-    getBranch().then(setActiveBranchState);
-    setIsFeatureBranch(false);
+    await clearBranchMutation.mutateAsync();
     toast({ title: 'Back to main branch', variant: 'success' });
-    window.dispatchEvent(new Event('cms:branch-changed'));
+    notifyBranchChanged();
   };
 
   const handleBranchCreated = (branchName: string, prUrl: string, prWarning?: string) => {
-    setActiveBranchState(branchName);
-    setIsFeatureBranch(true);
+    // CreateBranchDialog already wrote the cookie via `createBranch`; just
+    // re-read it (and the branch list) via React Query.
+    branchQuery.refetch();
+    hasActiveBranchQuery.refetch();
+    branchListQuery.refetch();
     if (prWarning) {
       toast({
         title: 'Branch created',
@@ -128,18 +125,16 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       toast({ title: 'Branch created', variant: 'success' });
     }
     if (prUrl) window.open(prUrl, '_blank');
-    window.dispatchEvent(new Event('cms:branch-changed'));
+    notifyBranchChanged();
   };
 
   const handlePublish = async (branchName: string) => {
     setBranchOpen(false);
-    const result = await publishBranch(branchName);
-    if (result.success) {
-      const branches = await listCMSBranches();
-      setCmsBranches(branches);
+    try {
+      await publishBranchMutation.mutateAsync(branchName);
       toast({ title: `Published: ${branchName}`, variant: 'success' });
-    } else {
-      toast({ title: result.error, variant: 'destructive' });
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : 'Publish failed', variant: 'destructive' });
     }
   };
 
@@ -176,7 +171,10 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       {/* Nav */}
       <nav className="flex flex-none items-center gap-0.5">
         {NAV.map((n) => {
-          if (n.id === 'chat' && !agentEnabled) return null;
+          if (n.id === 'chat') {
+            if (agentStatusLoading) return <AgentNavSkeleton key={n.id} />;
+            if (!agentEnabled) return null;
+          }
           const isActive = active === n.id;
           return (
             <Link
@@ -217,8 +215,10 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       <span className="mx-1 h-[22px] w-px bg-[var(--border)]" />
 
       {/* Branch chip — always visible; interactive only on a feature branch in production */}
-      {isFeatureBranch && isProduction ? (
-        <DropdownMenu open={branchOpen} onOpenChange={onBranchOpenChange}>
+      {branchChipLoading ? (
+        <BranchChipSkeleton />
+      ) : isFeatureBranch && isProduction ? (
+        <DropdownMenu open={branchOpen} onOpenChange={setBranchOpen}>
           <DropdownMenuTrigger asChild>
             <BranchChip name={branchLabel} ahead={ahead} />
           </DropdownMenuTrigger>
@@ -234,16 +234,16 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
               New branch
             </DropdownMenuItem>
 
-            {(branchLoading || cmsBranches.length > 0) && <DropdownMenuSeparator />}
+            {(branchListLoading || cmsBranches.length > 0) && <DropdownMenuSeparator />}
 
-            {branchLoading && (
+            {branchListLoading && (
               <div className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--muted)]">
                 <RefreshCw className="h-3 w-3 animate-spin" />
                 Loading…
               </div>
             )}
 
-            {!branchLoading &&
+            {!branchListLoading &&
               cmsBranches.map((b) => (
                 <div key={b.branch} className="flex items-center gap-2 rounded px-3 py-1.5 text-sm">
                   <span className="w-3 shrink-0 text-xs text-[var(--brand-strong)]">

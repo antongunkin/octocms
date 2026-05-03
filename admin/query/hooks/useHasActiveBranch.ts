@@ -1,13 +1,17 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-
 import { hasActiveBranch } from '../../actions/git';
 import { queryKeys } from '../keys';
+import { useAdminQuery } from '../useAdminQuery';
 
+/**
+ * Whether a feature branch cookie is currently set. Tier `realtime`: same
+ * cookie that drives `useBranch`.
+ */
 export function useHasActiveBranch() {
-  return useQuery({
+  return useAdminQuery({
     queryKey: queryKeys.git.hasActive(),
     queryFn: () => hasActiveBranch(),
+    tier: 'realtime',
   });
 }
