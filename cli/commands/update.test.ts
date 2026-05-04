@@ -3,8 +3,6 @@ import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { updateCommand } from './update';
 import {
-  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
-  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
   adminErrorTemplate,
   buildAdminLayoutTemplate,
   buildAdminPageTemplate,
@@ -13,8 +11,8 @@ import {
   nextAuthRouteTemplate,
 } from '../lib/templates';
 
-const expectedAdminPage = buildAdminPageTemplate(ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromSrcAppCmsCatchAll);
-const expectedAdminLayout = buildAdminLayoutTemplate(ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromSrcAppCms);
+const expectedAdminPage = buildAdminPageTemplate();
+const expectedAdminLayout = buildAdminLayoutTemplate();
 
 const TMP_DIR = join(process.cwd(), '.tmp-update-test');
 

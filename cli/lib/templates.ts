@@ -109,11 +109,26 @@ setConfig(configOctoCMS);
 `;
 
 /**
+ * All scaffolded files import the generated config initialiser via the bare
+ * specifier `cms/__generated__/configInit`. Resolution works in two layers:
+ *
+ *   - TypeScript IntelliSense: the consumer's `tsconfig.json` `paths` (added
+ *     by `octocms init`).
+ *   - Bundler: an alias registered by `withOctoCMS()` so Webpack and Turbopack
+ *     resolve the bare specifier from anywhere — including `app/layout.tsx`,
+ *     route handlers at any depth, and files inside `node_modules/octocms/`.
+ *
+ * This eliminates the previous depth-counting (`'../../../cms/...'`) that was
+ * a recurring source of off-by-one bugs across templates and routes.
+ */
+const CONFIG_INIT_IMPORT = "import 'cms/__generated__/configInit';";
+
+/**
  * Minimal root layout written when `app/layout.tsx` does not already exist.
  * The configInit import is the critical side-effect; the rest is a Next.js
  * boilerplate shell.
  */
-export const rootLayoutTemplate = `import '../cms/__generated__/configInit';
+export const rootLayoutTemplate = `${CONFIG_INIT_IMPORT}
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -130,21 +145,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 `;
 
 /** The one-liner prepended to an existing root layout to register the config. */
-export const rootLayoutConfigInitImport = `import '../cms/__generated__/configInit';\n`;
+export const rootLayoutConfigInitImport = `${CONFIG_INIT_IMPORT}\n`;
 
-/**
- * `../` count from `…/cms/layout.tsx` to project root (`cms/__generated__/configInit`).
- */
-export const ADMIN_LAYOUT_CONFIG_INIT_DEPTH = {
-  /** `app/cms/layout.tsx` */
-  fromAppCms: 2,
-  /** `src/app/cms/layout.tsx` */
-  fromSrcAppCms: 3,
-} as const;
-
-export function buildAdminLayoutTemplate(configInitUpSegments: number): string {
-  const up = '../'.repeat(configInitUpSegments);
-  return `import '${up}cms/__generated__/configInit';
+export function buildAdminLayoutTemplate(): string {
+  return `${CONFIG_INIT_IMPORT}
 import 'octocms/globals.css';
 import '@mdxeditor/editor/style.css';
 
@@ -153,26 +157,14 @@ export { AdminLayout as default, metadata } from 'octocms/admin';
 }
 
 /**
- * Number of `../` segments from `…/cms/[[...path]]/` up to the project root
- * (so `cms/__generated__/configInit` resolves).
- */
-export const ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH = {
-  /** `app/cms/[[...path]]/page.tsx` */
-  fromAppCmsCatchAll: 3,
-  /** `src/app/cms/[[...path]]/page.tsx` */
-  fromSrcAppCmsCatchAll: 4,
-} as const;
-
-/**
  * Catch-all admin route — every \`/cms/*\` URL renders the package's
  * \`AdminApp\` async server component (awaits \`params\`, no outer Suspense).
  * Side-effect-imports \`configInit\` so server-action bundles register
  * \`setConfig()\` even when Next.js does not load \`layout.tsx\` for the POST.
  */
-export function buildAdminPageTemplate(configInitUpSegments: number): string {
-  const up = '../'.repeat(configInitUpSegments);
+export function buildAdminPageTemplate(): string {
   return `// Registers setConfig() for server actions — some POST bundles skip layout.tsx.
-import '${up}cms/__generated__/configInit';
+${CONFIG_INIT_IMPORT}
 
 export { AdminApp as default } from 'octocms/admin';
 `;
@@ -204,6 +196,13 @@ import '@mdxeditor/editor/style.css';
 
 export { AdminLayout as default, metadata } from 'octocms/admin/pages/AdminLayout';
 `,
+  // 0.5.x — barrel re-export with depth-counted relative configInit import.
+  `import '../../cms/__generated__/configInit';
+import 'octocms/globals.css';
+import '@mdxeditor/editor/style.css';
+
+export { AdminLayout as default, metadata } from 'octocms/admin';
+`,
 ];
 
 export const LEGACY_ADMIN_CATCH_ALL_TEMPLATES: ReadonlyArray<string> = [
@@ -212,6 +211,12 @@ export const LEGACY_ADMIN_CATCH_ALL_TEMPLATES: ReadonlyArray<string> = [
 `,
   // 0.5.x — barrel re-export without configInit on the page (server actions could miss setConfig).
   `export { AdminApp as default } from 'octocms/admin';
+`,
+  // 0.5.x with depth-counted configInit (replaced by bare-specifier alias).
+  `// Registers setConfig() for server actions — some POST bundles skip layout.tsx.
+import '../../../cms/__generated__/configInit';
+
+export { AdminApp as default } from 'octocms/admin';
 `,
 ];
 
@@ -233,16 +238,15 @@ export { handler as GET, handler as POST };
  *      `app/layout.tsx`); and
  *   2. re-exports `chatRoute` as `POST` and `chatStatusRoute` as `GET`.
  *
- * `depth` is the number of `..` segments needed to reach the project root
- * from the route file's directory. For `app/api/agent/route.ts` that is 4;
- * for `src/app/api/agent/route.ts` it is 5.
+ * The configInit import uses the bare specifier (resolved by the bundler
+ * alias from `withOctoCMS()`), so the route file is depth-agnostic and can be
+ * placed under `app/` or `src/app/` without code changes.
  */
-export function agentChatRouteTemplate(opts: { depth: number }): string {
-  const upDirs = '../'.repeat(opts.depth);
+export function agentChatRouteTemplate(): string {
   return `// Side-effect import: registers \`configOctoCMS\` + \`agentConfig\` into the
 // runtime stores so \`getAgentConfig()\` resolves on cold start. Route Handlers
 // don't run \`app/layout.tsx\`, so this import has to live here.
-import '${upDirs}cms/__generated__/configInit';
+${CONFIG_INIT_IMPORT}
 
 export { chatRoute as POST, chatStatusRoute as GET } from 'octocms/agent';
 `;
@@ -257,16 +261,14 @@ export { chatRoute as POST, chatStatusRoute as GET } from 'octocms/agent';
  *      resolves on cold start (Route Handlers don't run `app/layout.tsx`); and
  *   2. re-exports `mediaRoute` as `GET`.
  *
- * `depth` is the number of `..` segments needed to reach the project root
- * from the route file's directory. For `app/media/[...slug]/route.ts`
- * that is 3; for the same file under `src/app/...` it is 4.
+ * The configInit import uses the bare specifier (resolved by the bundler
+ * alias from `withOctoCMS()`), so the route file is depth-agnostic.
  */
-export function mediaRouteTemplate(opts: { depth: number }): string {
-  const upDirs = '../'.repeat(opts.depth);
+export function mediaRouteTemplate(): string {
   return `// Side-effect import: registers \`configOctoCMS\` into the runtime store so
 // \`getConfig()\` resolves on cold start. Route Handlers don't run
 // \`app/layout.tsx\`, so this import has to live here.
-import '${upDirs}cms/__generated__/configInit';
+${CONFIG_INIT_IMPORT}
 
 export { mediaRoute as GET } from 'octocms/admin/mediaRoute';
 `;
@@ -283,16 +285,14 @@ export { mediaRoute as GET } from 'octocms/admin/mediaRoute';
  *      resolves on cold start (Route Handlers don't run `app/layout.tsx`); and
  *   2. re-exports `searchRoute` as `GET`.
  *
- * `depth` is the number of `..` segments needed to reach the project root
- * from the route file's directory. For `app/api/search/route.ts` that is 3;
- * for the same file under `src/app/...` it is 4.
+ * The configInit import uses the bare specifier (resolved by the bundler
+ * alias from `withOctoCMS()`), so the route file is depth-agnostic.
  */
-export function searchRouteTemplate(opts: { depth: number }): string {
-  const upDirs = '../'.repeat(opts.depth);
+export function searchRouteTemplate(): string {
   return `// Side-effect import: registers \`configOctoCMS\` into the runtime store so
 // \`getConfig()\` resolves on cold start. Route Handlers don't run
 // \`app/layout.tsx\`, so this import has to live here.
-import '${upDirs}cms/__generated__/configInit';
+${CONFIG_INIT_IMPORT}
 
 export { searchRoute as GET } from 'octocms/admin/searchRoute';
 `;

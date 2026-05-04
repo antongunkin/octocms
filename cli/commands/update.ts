@@ -17,8 +17,6 @@ import { dirname, join } from 'path';
 import { log } from '../lib/logger';
 import {
   adminErrorTemplate,
-  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
-  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
   buildAdminLayoutTemplate,
   buildAdminPageTemplate,
   agentChatRouteTemplate,
@@ -77,9 +75,7 @@ export async function updateCommand(projectRoot: string): Promise<void> {
   // 1. layout.tsx
   {
     const path = join(absRoot, 'cms', 'layout.tsx');
-    const layoutTemplate = buildAdminLayoutTemplate(
-      rel === 'src/app' ? ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromSrcAppCms : ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromAppCms,
-    );
+    const layoutTemplate = buildAdminLayoutTemplate();
     const result = writeOrMigrate(path, layoutTemplate, LEGACY_ADMIN_LAYOUT_TEMPLATES);
     const display = `${rel}/cms/layout.tsx`;
     if (result === 'created') {
@@ -98,11 +94,7 @@ export async function updateCommand(projectRoot: string): Promise<void> {
   // 2. [[...path]]/page.tsx
   {
     const path = join(absRoot, 'cms', '[[...path]]', 'page.tsx');
-    const pageTemplate = buildAdminPageTemplate(
-      rel === 'src/app'
-        ? ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromSrcAppCmsCatchAll
-        : ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromAppCmsCatchAll,
-    );
+    const pageTemplate = buildAdminPageTemplate();
     const result = writeOrMigrate(path, pageTemplate, LEGACY_ADMIN_CATCH_ALL_TEMPLATES);
     const display = `${rel}/cms/[[...path]]/page.tsx`;
     if (result === 'created') {
@@ -135,15 +127,11 @@ export async function updateCommand(projectRoot: string): Promise<void> {
 
   // 4. Root layout — ensure configInit is imported so public-page serverless functions
   //    initialise the OctoCMS config on cold start (not just admin routes).
+  // Bare-specifier import resolves identically from `app/layout.tsx` and
+  // `src/app/layout.tsx` thanks to the `withOctoCMS()` bundler alias.
   const rootLayoutCandidates: Array<{ path: string; importLine: string }> = [
-    {
-      path: join(projectRoot, 'src', 'app', 'layout.tsx'),
-      importLine: `import '../../cms/__generated__/configInit';\n`,
-    },
-    {
-      path: join(projectRoot, 'app', 'layout.tsx'),
-      importLine: rootLayoutConfigInitImport,
-    },
+    { path: join(projectRoot, 'src', 'app', 'layout.tsx'), importLine: rootLayoutConfigInitImport },
+    { path: join(projectRoot, 'app', 'layout.tsx'), importLine: rootLayoutConfigInitImport },
   ];
   for (const { path, importLine } of rootLayoutCandidates) {
     if (existsSync(path)) {
@@ -174,22 +162,15 @@ export async function updateCommand(projectRoot: string): Promise<void> {
     log.success(`${authRel} — present`);
   }
 
-  // 6. Chat-agent SSE route.
-  const chatRouteRoots: Array<{ file: string; depth: number; rel: string }> = [
-    {
-      file: join(projectRoot, 'src', 'app', 'api', 'agent', 'route.ts'),
-      depth: 5,
-      rel: 'src/app/api/agent/route.ts',
-    },
-    {
-      file: join(projectRoot, 'app', 'api', 'agent', 'route.ts'),
-      depth: 4,
-      rel: 'app/api/agent/route.ts',
-    },
+  // 6. Chat-agent SSE route. Depth-agnostic — bare-specifier configInit
+  //    resolves via the `withOctoCMS()` bundler alias from any depth.
+  const chatRouteRoots: Array<{ file: string; rel: string }> = [
+    { file: join(projectRoot, 'src', 'app', 'api', 'agent', 'route.ts'), rel: 'src/app/api/agent/route.ts' },
+    { file: join(projectRoot, 'app', 'api', 'agent', 'route.ts'), rel: 'app/api/agent/route.ts' },
   ];
   const chatRoot = chatRouteRoots.find((r) => existsSync(join(r.file, '..', '..', '..', '..'))) ?? chatRouteRoots[1];
   {
-    const expected = agentChatRouteTemplate({ depth: chatRoot.depth });
+    const expected = agentChatRouteTemplate();
     if (!existsSync(chatRoot.file)) {
       mkdirSync(join(chatRoot.file, '..'), { recursive: true });
       writeFileSync(chatRoot.file, expected, 'utf8');
@@ -209,23 +190,18 @@ export async function updateCommand(projectRoot: string): Promise<void> {
   //    (`acceptProposalAction` / `rejectProposalAction` in
   //    `octocms/admin/actions/agent.ts`), no route files to manage.
 
-  // 8. Media proxy route — `app/media/[...slug]/route.ts`.
-  const mediaRouteRoots: Array<{ file: string; depth: number; rel: string }> = [
+  // 8. Media proxy route — `app/media/[...slug]/route.ts`. Depth-agnostic.
+  const mediaRouteRoots: Array<{ file: string; rel: string }> = [
     {
       file: join(projectRoot, 'src', 'app', 'media', '[...slug]', 'route.ts'),
-      depth: 4,
       rel: 'src/app/media/[...slug]/route.ts',
     },
-    {
-      file: join(projectRoot, 'app', 'media', '[...slug]', 'route.ts'),
-      depth: 3,
-      rel: 'app/media/[...slug]/route.ts',
-    },
+    { file: join(projectRoot, 'app', 'media', '[...slug]', 'route.ts'), rel: 'app/media/[...slug]/route.ts' },
   ];
   // Pick the existing tree (`src/app` vs `app`); fall back to top-level `app/`.
   const mediaRoot = mediaRouteRoots.find((r) => existsSync(join(r.file, '..', '..', '..', '..'))) ?? mediaRouteRoots[1];
   {
-    const expected = mediaRouteTemplate({ depth: mediaRoot.depth });
+    const expected = mediaRouteTemplate();
     if (!existsSync(mediaRoot.file)) {
       mkdirSync(join(mediaRoot.file, '..'), { recursive: true });
       writeFileSync(mediaRoot.file, expected, 'utf8');

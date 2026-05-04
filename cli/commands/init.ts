@@ -15,8 +15,6 @@ import { fmt, log } from '../lib/logger';
 
 import {
   adminErrorTemplate,
-  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
-  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
   buildAdminLayoutTemplate,
   buildAdminPageTemplate,
   agentChatRouteTemplate,
@@ -178,18 +176,10 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   const cmsRouteDir = join(projectRoot, 'app', 'cms');
   mkdirSync(join(cmsRouteDir, '[[...path]]'), { recursive: true });
 
-  writeFileSync(
-    join(cmsRouteDir, 'layout.tsx'),
-    buildAdminLayoutTemplate(ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromAppCms),
-    'utf8',
-  );
+  writeFileSync(join(cmsRouteDir, 'layout.tsx'), buildAdminLayoutTemplate(), 'utf8');
   log.success('app/cms/layout.tsx');
 
-  writeFileSync(
-    join(cmsRouteDir, '[[...path]]', 'page.tsx'),
-    buildAdminPageTemplate(ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromAppCmsCatchAll),
-    'utf8',
-  );
+  writeFileSync(join(cmsRouteDir, '[[...path]]', 'page.tsx'), buildAdminPageTemplate(), 'utf8');
   log.success('app/cms/[[...path]]/page.tsx');
 
   writeFileSync(join(cmsRouteDir, 'error.tsx'), adminErrorTemplate, 'utf8');
@@ -221,10 +211,9 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   // The handlers are opt-in (the agent feature is gated by config + provider
   // key at runtime); shipping the routes by default costs nothing when the
   // agent is disabled — every endpoint 404s in that case.
-  // Depth from `app/api/agent/route.ts` to project root = 4.
   const chatRouteDir = join(projectRoot, 'app', 'api', 'agent');
   mkdirSync(chatRouteDir, { recursive: true });
-  writeFileSync(join(chatRouteDir, 'route.ts'), agentChatRouteTemplate({ depth: 4 }), 'utf8');
+  writeFileSync(join(chatRouteDir, 'route.ts'), agentChatRouteTemplate(), 'utf8');
   log.success('app/api/agent/route.ts');
 
   // Note: chat-agent proposal accept/reject are server actions
@@ -236,10 +225,9 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   // Vercel's filesystem is immutable after build, so images committed from the
   // CMS UI never land in `public/media/` on the running instance — routing
   // them through a Route Handler lets the GitHub-API path serve them.
-  // Depth from `app/media/[...slug]/route.ts` to project root = 3.
   const mediaRouteDir = join(projectRoot, 'app', 'media', '[...slug]');
   mkdirSync(mediaRouteDir, { recursive: true });
-  writeFileSync(join(mediaRouteDir, 'route.ts'), mediaRouteTemplate({ depth: 3 }), 'utf8');
+  writeFileSync(join(mediaRouteDir, 'route.ts'), mediaRouteTemplate(), 'utf8');
   log.success('app/media/[...slug]/route.ts');
 
   // Hello page demo route

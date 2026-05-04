@@ -20,7 +20,6 @@ const external = [
   '@mdxeditor/editor/*',
   /^@radix-ui\//,
   '@tanstack/react-query',
-  '@tanstack/react-query-devtools',
   'octokit',
   'sonner',
   'zod',
@@ -52,7 +51,11 @@ const cliExternal = [...external, 'jiti'];
 const esmOutExtension = () => ({ js: '.js', dts: '.d.ts' });
 const cjsOutExtension = () => ({ js: '.cjs', dts: '.d.cts' });
 
-// All non-CLI source files — each becomes a separate entry point preserving directory structure
+// All non-CLI source files — each becomes a separate entry point preserving directory structure.
+// `cli/lib/**` IS shipped as runtime ESM (separate from the bundled CLI entry) because admin
+// server actions like `admin/actions/schema.ts` import `regenerateAll` / `validateConfig` from
+// `../../cli/lib/*` at request time. `cli/index.ts` and `cli/commands/**` stay out — those are
+// the CLI entry point bundled separately below.
 const allEntry = Object.fromEntries(
   globSync(
     [
@@ -70,8 +73,12 @@ const allEntry = Object.fromEntries(
       'lib/**/*.{ts,tsx}',
       'schema/**/*.{ts,tsx}',
       'utils/**/*.{ts,tsx}',
+      'cli/lib/**/*.{ts,tsx}',
     ],
-    { ignore: ['**/*.test.{ts,tsx}', '**/*.d.ts', 'cli/**'], cwd: import.meta.dirname },
+    {
+      ignore: ['**/*.test.{ts,tsx}', '**/*.d.ts', 'cli/index.ts', 'cli/commands/**'],
+      cwd: import.meta.dirname,
+    },
   ).map((f) => [f.replace(/\.(ts|tsx)$/, ''), f]),
 );
 

@@ -1,16 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
-  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
   adminErrorTemplate,
+  agentChatRouteTemplate,
   buildAdminLayoutTemplate,
   buildAdminPageTemplate,
   demoHelloPageJson,
   helloPageTemplate,
   LEGACY_ADMIN_CATCH_ALL_TEMPLATES,
   LEGACY_ADMIN_LAYOUT_TEMPLATES,
+  mediaRouteTemplate,
   nextConfigTemplate,
   octoConfigTemplate,
+  rootLayoutConfigInitImport,
+  rootLayoutTemplate,
+  searchRouteTemplate,
   tsconfigPaths,
 } from './templates';
 
@@ -64,23 +67,21 @@ describe('tsconfigPaths', () => {
 });
 
 describe('admin route templates (3-file model)', () => {
-  it('layout re-exports from the octocms/admin barrel with depth-scoped configInit', () => {
-    const layoutApp = buildAdminLayoutTemplate(ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromAppCms);
-    expect(layoutApp).toContain("from 'octocms/admin'");
-    expect(layoutApp).toContain('export { AdminLayout as default, metadata }');
-    expect(layoutApp).toContain("import 'octocms/globals.css'");
-    expect(layoutApp).toContain("import '../../cms/__generated__/configInit'");
-    const layoutSrc = buildAdminLayoutTemplate(ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromSrcAppCms);
-    expect(layoutSrc).toContain("import '../../../cms/__generated__/configInit'");
+  it('layout re-exports from the octocms/admin barrel and bare-imports configInit', () => {
+    const layout = buildAdminLayoutTemplate();
+    expect(layout).toContain("from 'octocms/admin'");
+    expect(layout).toContain('export { AdminLayout as default, metadata }');
+    expect(layout).toContain("import 'octocms/globals.css'");
+    expect(layout).toContain("import 'cms/__generated__/configInit'");
+    expect(layout).not.toMatch(/'\.\.\/.*cms\/__generated__/);
   });
 
-  it('catch-all page re-exports AdminApp and side-effect-imports configInit', () => {
-    const page = buildAdminPageTemplate(ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromAppCmsCatchAll);
+  it('catch-all page re-exports AdminApp and side-effect-imports configInit (bare specifier)', () => {
+    const page = buildAdminPageTemplate();
     expect(page).toContain("from 'octocms/admin'");
     expect(page).toContain('export { AdminApp as default }');
-    expect(page).toContain("import '../../../cms/__generated__/configInit'");
-    const pageSrc = buildAdminPageTemplate(ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromSrcAppCmsCatchAll);
-    expect(pageSrc).toContain("import '../../../../cms/__generated__/configInit'");
+    expect(page).toContain("import 'cms/__generated__/configInit'");
+    expect(page).not.toMatch(/'\.\.\/.*cms\/__generated__/);
   });
 
   it('error.tsx is a client component re-exporting AdminError from the barrel', () => {
@@ -90,16 +91,51 @@ describe('admin route templates (3-file model)', () => {
   });
 });
 
+describe('route handler templates (depth-agnostic via withOctoCMS alias)', () => {
+  it('agent chat route side-effect-imports configInit via bare specifier', () => {
+    const out = agentChatRouteTemplate();
+    expect(out).toContain("import 'cms/__generated__/configInit'");
+    expect(out).not.toMatch(/'\.\.\/.*cms\/__generated__/);
+    expect(out).toContain("from 'octocms/agent'");
+  });
+
+  it('media route side-effect-imports configInit via bare specifier', () => {
+    const out = mediaRouteTemplate();
+    expect(out).toContain("import 'cms/__generated__/configInit'");
+    expect(out).not.toMatch(/'\.\.\/.*cms\/__generated__/);
+    expect(out).toContain("from 'octocms/admin/mediaRoute'");
+  });
+
+  it('search route side-effect-imports configInit via bare specifier', () => {
+    const out = searchRouteTemplate();
+    expect(out).toContain("import 'cms/__generated__/configInit'");
+    expect(out).not.toMatch(/'\.\.\/.*cms\/__generated__/);
+    expect(out).toContain("from 'octocms/admin/searchRoute'");
+  });
+});
+
+describe('root layout templates (depth-agnostic via withOctoCMS alias)', () => {
+  it('rootLayoutTemplate uses bare-specifier configInit', () => {
+    expect(rootLayoutTemplate).toContain("import 'cms/__generated__/configInit'");
+    expect(rootLayoutTemplate).not.toMatch(/'\.\.\/.*cms\/__generated__/);
+  });
+
+  it('rootLayoutConfigInitImport one-liner is also a bare-specifier import', () => {
+    expect(rootLayoutConfigInitImport).toBe("import 'cms/__generated__/configInit';\n");
+  });
+});
+
 describe('legacy template registries (used by `octocms update` for migration)', () => {
   it('records the deep-import layout shape', () => {
     expect(LEGACY_ADMIN_LAYOUT_TEMPLATES.length).toBeGreaterThan(0);
     expect(LEGACY_ADMIN_LAYOUT_TEMPLATES[0]).toContain("from 'octocms/admin/pages/AdminLayout'");
   });
 
-  it('records legacy catch-all shapes (deep import + barrel without page configInit)', () => {
-    expect(LEGACY_ADMIN_CATCH_ALL_TEMPLATES.length).toBe(2);
+  it('records legacy catch-all shapes (deep import + barrel without page configInit + depth-counted)', () => {
+    expect(LEGACY_ADMIN_CATCH_ALL_TEMPLATES.length).toBe(3);
     expect(LEGACY_ADMIN_CATCH_ALL_TEMPLATES[0]).toContain("from 'octocms/admin/AdminApp'");
     expect(LEGACY_ADMIN_CATCH_ALL_TEMPLATES[1]).toContain("from 'octocms/admin'");
+    expect(LEGACY_ADMIN_CATCH_ALL_TEMPLATES[2]).toContain("import '../../../cms/__generated__/configInit'");
   });
 });
 
