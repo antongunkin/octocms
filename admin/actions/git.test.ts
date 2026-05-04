@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as github from '../github';
 import * as files from './files';
-import { createBranch, publishBranch } from './git';
+import { createBranch, listCMSBranches, publishBranch } from './git';
 
 const { mockCookieSet } = vi.hoisted(() => ({
   mockCookieSet: vi.fn(),
@@ -28,6 +28,8 @@ vi.mock('../github', () => ({
   createGitHubBranch: vi.fn(),
   createGitHubCMSPullRequest: vi.fn(),
   getGitHubFile: vi.fn(),
+  resolveContentBranch: vi.fn(),
+  listGitHubCMSPullRequests: vi.fn(),
 }));
 
 vi.mock('./files', () => ({
@@ -45,12 +47,13 @@ vi.mock('../../lib/configStore', () => ({
     mediaContentFolder: 'cms/media',
     mediaFolder: 'public/media',
     mediaAllowedFormats: ['png'],
-    git: { baseBranch: 'main' },
+    git: { baseBranch: 'main', publishedPointerBranch: 'cms/publish-pointer' },
     collections: {},
   }),
 }));
 
 beforeEach(() => {
+  process.env.BUILD_ID = 'test-build';
   vi.clearAllMocks();
   mockCookieSet.mockReset();
   vi.mocked(github.createGitHubBranch).mockResolvedValue(undefined as any);
@@ -60,10 +63,12 @@ beforeEach(() => {
     url: 'https://example.com/pr/1',
     number: 1,
   });
+  vi.mocked(github.resolveContentBranch).mockResolvedValue('main');
+  vi.mocked(github.listGitHubCMSPullRequests).mockResolvedValue([]);
 });
 
 describe('publishBranch', () => {
-  it('writes published.json to base branch when pointer ref is unset', async () => {
+  it('writes per-build pointer to base branch when pointer ref is unset', async () => {
     vi.mocked(github.getPublishedPointerRef).mockReturnValue(undefined);
     vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
     vi.mocked(files.waitForPublicReadConsistency).mockResolvedValue(undefined);
@@ -71,19 +76,19 @@ describe('publishBranch', () => {
     await publishBranch('feature-a');
 
     expect(github.saveGitHubFile).toHaveBeenCalledWith(
-      'cms/published.json',
-      `${JSON.stringify({ branch: 'feature-a' }, null, 2)}\n`,
-      'Publish branch feature-a',
+      'cms/pointers/test-build.json',
+      `${JSON.stringify({ branch: 'feature-a', buildId: 'test-build' }, null, 2)}\n`,
+      'Publish branch feature-a (cms/pointers/test-build.json)',
       'main',
     );
     expect(files.waitForPublicReadConsistency).toHaveBeenCalledWith(
-      'cms/published.json',
-      `${JSON.stringify({ branch: 'feature-a' }, null, 2)}\n`,
+      'cms/pointers/test-build.json',
+      `${JSON.stringify({ branch: 'feature-a', buildId: 'test-build' }, null, 2)}\n`,
       'main',
     );
   });
 
-  it('writes published.json to pointer branch when getPublishedPointerRef returns a branch', async () => {
+  it('writes per-build pointer to pointer branch when getPublishedPointerRef returns a branch', async () => {
     vi.mocked(github.getPublishedPointerRef).mockReturnValue('cms/publish-pointer');
     vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
     vi.mocked(files.waitForPublicReadConsistency).mockResolvedValue(undefined);
@@ -91,16 +96,48 @@ describe('publishBranch', () => {
     await publishBranch('feature-b');
 
     expect(github.saveGitHubFile).toHaveBeenCalledWith(
-      'cms/published.json',
-      `${JSON.stringify({ branch: 'feature-b' }, null, 2)}\n`,
-      'Publish branch feature-b',
+      'cms/pointers/test-build.json',
+      `${JSON.stringify({ branch: 'feature-b', buildId: 'test-build' }, null, 2)}\n`,
+      'Publish branch feature-b (cms/pointers/test-build.json)',
       'cms/publish-pointer',
     );
     expect(files.waitForPublicReadConsistency).toHaveBeenCalledWith(
-      'cms/published.json',
-      `${JSON.stringify({ branch: 'feature-b' }, null, 2)}\n`,
+      'cms/pointers/test-build.json',
+      `${JSON.stringify({ branch: 'feature-b', buildId: 'test-build' }, null, 2)}\n`,
       'cms/publish-pointer',
     );
+  });
+});
+
+describe('listCMSBranches', () => {
+  it('lists base plus open cms-update PR heads only, sorted by PR number desc', async () => {
+    vi.mocked(github.resolveContentBranch).mockResolvedValue('cms/edit-a');
+    vi.mocked(github.listGitHubCMSPullRequests).mockResolvedValue([
+      { branch: 'cms/edit-a', prUrl: 'https://gh/pr/1', prNumber: 1, title: 'Workspace A' },
+      { branch: 'cms/edit-z', prUrl: 'https://gh/pr/9', prNumber: 9, title: 'Zed' },
+    ]);
+
+    const rows = await listCMSBranches();
+
+    expect(rows.map((r) => r.branch)).toEqual(['main', 'cms/edit-z', 'cms/edit-a']);
+    const editA = rows.find((r) => r.branch === 'cms/edit-a');
+    expect(editA?.prNumber).toBe(1);
+    expect(editA?.title).toBe('Workspace A');
+    expect(editA?.isPublished).toBe(true);
+    expect(rows.find((r) => r.branch === 'cms/publish-pointer')).toBeUndefined();
+  });
+
+  it('excludes pointer branch and duplicate base from PR list', async () => {
+    vi.mocked(github.resolveContentBranch).mockResolvedValue('main');
+    vi.mocked(github.listGitHubCMSPullRequests).mockResolvedValue([
+      { branch: 'main', prUrl: '', prNumber: 0, title: 'x' },
+      { branch: 'cms/publish-pointer', prUrl: '', prNumber: 3, title: 'pointer' },
+      { branch: 'cms/edit-b', prUrl: 'https://gh/pr/2', prNumber: 2, title: 'B' },
+    ]);
+
+    const rows = await listCMSBranches();
+
+    expect(rows.map((r) => r.branch)).toEqual(['main', 'cms/edit-b']);
   });
 });
 

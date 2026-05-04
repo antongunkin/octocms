@@ -8,6 +8,7 @@ export { createQuery } from './query';
 export { defineConfig } from './defineConfig';
 export type { CollectionNames, InferEntry, InferFields, InferConditions, FieldFormatToType } from './defineConfig';
 export { withOctoCMS } from './withOctoCMS';
+export { OCTOCMS_PUBLIC_CONTENT_CACHE_TAG } from './lib/publicContentCacheTag';
 export type {
   Config,
   Collection,

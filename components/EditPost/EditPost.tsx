@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 
 import { useEntry } from '../../admin/query/hooks/useEntry';
@@ -12,7 +13,6 @@ import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
 import { useIsProduction } from '../../admin/query/hooks/useIsProduction';
 import {
   useArchiveEntry,
-  usePublishEntry,
   useRemoveFile,
   useRestoreEntry,
   useSaveFile,
@@ -24,6 +24,7 @@ import { EntryStackProvider, useEntryStack } from '../../hooks/useEntryStack';
 import { validateEntryFields } from '../../lib/validateEntryFields';
 import { rebuildConditionalFields } from '../../lib/conditionalField';
 import type { Config } from '../../admin/types';
+import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 import { useConfig } from '../../hooks/useConfig';
 import FormFields from '../FormFields';
 import InlineEntryEditor from '../InlineEntryEditor/InlineEntryEditor';
@@ -55,6 +56,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
   const { onFileClick } = useFileState();
   const { stack, popEntry } = useEntryStack();
   const router = useRouter();
+  const qc = useQueryClient();
 
   const isProductionQuery = useIsProduction();
   const hasActiveBranchQuery = useHasActiveBranch();
@@ -90,11 +92,9 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
 
   const saveMutation = useSaveFile();
   const removeMutation = useRemoveFile();
-  const publishMutation = usePublishEntry();
   const archiveMutation = useArchiveEntry();
   const restoreMutation = useRestoreEntry();
-  const isSaving =
-    saveMutation.isPending || publishMutation.isPending || archiveMutation.isPending || restoreMutation.isPending;
+  const isSaving = saveMutation.isPending || archiveMutation.isPending || restoreMutation.isPending;
 
   const clearFieldError = useCallback((name: string) => {
     setFieldErrors((prev) => {
@@ -155,10 +155,10 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
     void executeSave(sys, fields);
   };
 
-  const handleBranchCreated = (_branchName: string, _prUrl: string, _prWarning?: string) => {
+  const handleBranchCreated = async (_branchName: string, _prUrl: string, _prWarning?: string) => {
     setCreateBranchOpen(false);
-    // The branch mutation invalidates `git.hasActive` so this hook re-renders
-    // with `activeBranchSet === true` automatically.
+    await invalidateAfterMutationAsync(qc, ['git']);
+    router.refresh();
     if (pendingSaveArgs) {
       void executeSave(pendingSaveArgs.sys, pendingSaveArgs.fields);
       setPendingSaveArgs(null);
@@ -177,16 +177,6 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
   };
 
   const currentStatus: EntryStatus = post?.sys?.status || 'merged';
-
-  const handlePublish = async () => {
-    if (!filePath) return;
-    try {
-      await publishMutation.mutateAsync(filePath);
-      toast({ title: 'Published successfully', variant: 'success' });
-    } catch (e) {
-      toast({ title: e instanceof Error ? e.message : 'Publish failed', variant: 'destructive' });
-    }
-  };
 
   const handleArchive = async () => {
     if (!filePath) return;
@@ -375,22 +365,9 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
               </Button>
             </>
           ) : (
-            <>
-              {(currentStatus === 'draft' || currentStatus === 'changed') && (
-                <Button
-                  type="button"
-                  size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white"
-                  onClick={handlePublish}
-                  disabled={isSaving}
-                >
-                  Publish
-                </Button>
-              )}
-              <Button variant="outline" size="sm" onClick={handleArchive} disabled={isSaving}>
-                Archive
-              </Button>
-            </>
+            <Button variant="outline" size="sm" onClick={handleArchive} disabled={isSaving}>
+              Archive
+            </Button>
           )}
           <Button
             type="submit"

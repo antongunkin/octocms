@@ -17,10 +17,13 @@ import { dirname, join } from 'path';
 import { log } from '../lib/logger';
 import {
   adminErrorTemplate,
-  adminLayoutTemplate,
-  adminPageTemplate,
+  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
+  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
+  buildAdminLayoutTemplate,
+  buildAdminPageTemplate,
   agentChatRouteTemplate,
-  agentProposalRouteTemplate,
+  mediaRouteTemplate,
+  nextAuthRouteTemplate,
   LEGACY_ADMIN_CATCH_ALL_TEMPLATES,
   LEGACY_ADMIN_LAYOUT_TEMPLATES,
   rootLayoutConfigInitImport,
@@ -74,7 +77,10 @@ export async function updateCommand(projectRoot: string): Promise<void> {
   // 1. layout.tsx
   {
     const path = join(absRoot, 'cms', 'layout.tsx');
-    const result = writeOrMigrate(path, adminLayoutTemplate, LEGACY_ADMIN_LAYOUT_TEMPLATES);
+    const layoutTemplate = buildAdminLayoutTemplate(
+      rel === 'src/app' ? ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromSrcAppCms : ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromAppCms,
+    );
+    const result = writeOrMigrate(path, layoutTemplate, LEGACY_ADMIN_LAYOUT_TEMPLATES);
     const display = `${rel}/cms/layout.tsx`;
     if (result === 'created') {
       log.step(`${display} — created`);
@@ -92,7 +98,12 @@ export async function updateCommand(projectRoot: string): Promise<void> {
   // 2. [[...path]]/page.tsx
   {
     const path = join(absRoot, 'cms', '[[...path]]', 'page.tsx');
-    const result = writeOrMigrate(path, adminPageTemplate, LEGACY_ADMIN_CATCH_ALL_TEMPLATES);
+    const pageTemplate = buildAdminPageTemplate(
+      rel === 'src/app'
+        ? ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromSrcAppCmsCatchAll
+        : ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromAppCmsCatchAll,
+    );
+    const result = writeOrMigrate(path, pageTemplate, LEGACY_ADMIN_CATCH_ALL_TEMPLATES);
     const display = `${rel}/cms/[[...path]]/page.tsx`;
     if (result === 'created') {
       log.step(`${display} — created`);
@@ -147,7 +158,23 @@ export async function updateCommand(projectRoot: string): Promise<void> {
     }
   }
 
-  // 5. Chat-agent SSE route.
+  // 5. NextAuth route. Stable boilerplate; only created when missing — never
+  //    overwritten, since user apps may customise (e.g. dev-bypass provider).
+  const authRouteFile =
+    rel === 'src/app'
+      ? join(projectRoot, 'src', 'app', 'api', 'auth', '[...nextauth]', 'route.ts')
+      : join(projectRoot, 'app', 'api', 'auth', '[...nextauth]', 'route.ts');
+  const authRel = `${rel}/api/auth/[...nextauth]/route.ts`;
+  if (!existsSync(authRouteFile)) {
+    mkdirSync(dirname(authRouteFile), { recursive: true });
+    writeFileSync(authRouteFile, nextAuthRouteTemplate, 'utf8');
+    log.step(`${authRel} — created`);
+    allUpToDate = false;
+  } else {
+    log.success(`${authRel} — present`);
+  }
+
+  // 6. Chat-agent SSE route.
   const chatRouteRoots: Array<{ file: string; depth: number; rel: string }> = [
     {
       file: join(projectRoot, 'src', 'app', 'api', 'agent', 'route.ts'),
@@ -178,33 +205,38 @@ export async function updateCommand(projectRoot: string): Promise<void> {
     }
   }
 
-  // 6. Chat-agent proposal routes.
-  const proposalRouteRoots: Array<{ baseDir: string; depth: number; rel: string }> = [
+  // 7. Chat-agent proposal accept/reject — now server actions
+  //    (`acceptProposalAction` / `rejectProposalAction` in
+  //    `octocms/admin/actions/agent.ts`), no route files to manage.
+
+  // 8. Media proxy route — `app/media/[...slug]/route.ts`.
+  const mediaRouteRoots: Array<{ file: string; depth: number; rel: string }> = [
     {
-      baseDir: join(projectRoot, 'src', 'app', 'api', 'agent', 'proposals'),
-      depth: 6,
-      rel: 'src/app/api/agent/proposals',
+      file: join(projectRoot, 'src', 'app', 'media', '[...slug]', 'route.ts'),
+      depth: 4,
+      rel: 'src/app/media/[...slug]/route.ts',
     },
-    { baseDir: join(projectRoot, 'app', 'api', 'agent', 'proposals'), depth: 5, rel: 'app/api/agent/proposals' },
+    {
+      file: join(projectRoot, 'app', 'media', '[...slug]', 'route.ts'),
+      depth: 3,
+      rel: 'app/media/[...slug]/route.ts',
+    },
   ];
-  const root = proposalRouteRoots.find((r) => existsSync(join(r.baseDir, '..', '..', '..'))) ?? proposalRouteRoots[1];
-  for (const endpoint of ['accept', 'reject'] as const) {
-    const file = join(root.baseDir, endpoint, 'route.ts');
-    const expected = agentProposalRouteTemplate({
-      handlerExport: endpoint === 'accept' ? 'acceptProposalRoute' : 'rejectProposalRoute',
-      depth: root.depth,
-    });
-    if (!existsSync(file)) {
-      mkdirSync(join(file, '..'), { recursive: true });
-      writeFileSync(file, expected, 'utf8');
-      log.step(`${root.rel}/${endpoint}/route.ts — created`);
+  // Pick the existing tree (`src/app` vs `app`); fall back to top-level `app/`.
+  const mediaRoot = mediaRouteRoots.find((r) => existsSync(join(r.file, '..', '..', '..', '..'))) ?? mediaRouteRoots[1];
+  {
+    const expected = mediaRouteTemplate({ depth: mediaRoot.depth });
+    if (!existsSync(mediaRoot.file)) {
+      mkdirSync(join(mediaRoot.file, '..'), { recursive: true });
+      writeFileSync(mediaRoot.file, expected, 'utf8');
+      log.step(`${mediaRoot.rel} — created`);
       allUpToDate = false;
     } else {
-      const current = readFileSync(file, 'utf8');
+      const current = readFileSync(mediaRoot.file, 'utf8');
       if (current === expected) {
-        log.success(`${root.rel}/${endpoint}/route.ts — up to date`);
+        log.success(`${mediaRoot.rel} — up to date`);
       } else {
-        log.info(`${root.rel}/${endpoint}/route.ts — present (skipped, not auto-rewritten)`);
+        log.info(`${mediaRoot.rel} — present (skipped, not auto-rewritten)`);
       }
     }
   }

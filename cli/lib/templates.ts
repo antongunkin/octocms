@@ -132,20 +132,51 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 /** The one-liner prepended to an existing root layout to register the config. */
 export const rootLayoutConfigInitImport = `import '../cms/__generated__/configInit';\n`;
 
-export const adminLayoutTemplate = `import '../../cms/__generated__/configInit';
+/**
+ * `../` count from `…/cms/layout.tsx` to project root (`cms/__generated__/configInit`).
+ */
+export const ADMIN_LAYOUT_CONFIG_INIT_DEPTH = {
+  /** `app/cms/layout.tsx` */
+  fromAppCms: 2,
+  /** `src/app/cms/layout.tsx` */
+  fromSrcAppCms: 3,
+} as const;
+
+export function buildAdminLayoutTemplate(configInitUpSegments: number): string {
+  const up = '../'.repeat(configInitUpSegments);
+  return `import '${up}cms/__generated__/configInit';
 import 'octocms/globals.css';
 import '@mdxeditor/editor/style.css';
 
 export { AdminLayout as default, metadata } from 'octocms/admin';
 `;
+}
+
+/**
+ * Number of `../` segments from `…/cms/[[...path]]/` up to the project root
+ * (so `cms/__generated__/configInit` resolves).
+ */
+export const ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH = {
+  /** `app/cms/[[...path]]/page.tsx` */
+  fromAppCmsCatchAll: 3,
+  /** `src/app/cms/[[...path]]/page.tsx` */
+  fromSrcAppCmsCatchAll: 4,
+} as const;
 
 /**
  * Catch-all admin route — every \`/cms/*\` URL renders the package's
  * \`AdminApp\` async server component (awaits \`params\`, no outer Suspense).
- * One file in the user app; the package owns the routing and granular loading.
+ * Side-effect-imports \`configInit\` so server-action bundles register
+ * \`setConfig()\` even when Next.js does not load \`layout.tsx\` for the POST.
  */
-export const adminPageTemplate = `export { AdminApp as default } from 'octocms/admin';
+export function buildAdminPageTemplate(configInitUpSegments: number): string {
+  const up = '../'.repeat(configInitUpSegments);
+  return `// Registers setConfig() for server actions — some POST bundles skip layout.tsx.
+import '${up}cms/__generated__/configInit';
+
+export { AdminApp as default } from 'octocms/admin';
 `;
+}
 
 /**
  * Admin error boundary — rendered by Next.js when anything in the catch-all
@@ -179,6 +210,9 @@ export const LEGACY_ADMIN_CATCH_ALL_TEMPLATES: ReadonlyArray<string> = [
   // 0.4.x — re-exported from the deep path.
   `export { AdminApp as default } from 'octocms/admin/AdminApp';
 `,
+  // 0.5.x — barrel re-export without configInit on the page (server actions could miss setConfig).
+  `export { AdminApp as default } from 'octocms/admin';
+`,
 ];
 
 export const nextAuthRouteTemplate = `import NextAuth from 'next-auth';
@@ -188,38 +222,6 @@ const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
 `;
-
-/**
- * Build a thin re-export Route Handler for one of the chat-agent endpoints.
- *
- * The actual handler lives in `octocms/agent/proposalsApi.ts` (see
- * `acceptProposalRoute` / `rejectProposalRoute`). The user-app file just:
- *   1. side-effect-imports `cms/__generated__/configInit` so
- *      `getAgentConfig()` resolves on cold start (Route Handlers don't run
- *      `app/layout.tsx`); and
- *   2. re-exports the package handler as `POST`.
- *
- * `depth` is the number of `..` segments needed to reach the project root
- * from the route file's directory, so the import path resolves to
- * `cms/__generated__/configInit` regardless of where the route lives.
- * For `app/api/agent/proposals/accept/route.ts` that is 5; for the same
- * file under `src/app/...` it is 6.
- */
-export function agentProposalRouteTemplate(opts: {
-  /** Named export to pull from `octocms/agent`. */
-  handlerExport: 'acceptProposalRoute' | 'rejectProposalRoute';
-  /** Number of `..` segments from the route directory to project root. */
-  depth: number;
-}): string {
-  const upDirs = '../'.repeat(opts.depth);
-  return `// Side-effect import: registers \`configOctoCMS\` + \`agentConfig\` into the
-// runtime stores so \`getAgentConfig()\` resolves on cold start. Route Handlers
-// don't run \`app/layout.tsx\`, so this import has to live here.
-import '${upDirs}cms/__generated__/configInit';
-
-export { ${opts.handlerExport} as POST } from 'octocms/agent';
-`;
-}
 
 /**
  * Build a thin re-export Route Handler for the chat-agent SSE endpoint.
@@ -243,6 +245,56 @@ export function agentChatRouteTemplate(opts: { depth: number }): string {
 import '${upDirs}cms/__generated__/configInit';
 
 export { chatRoute as POST, chatStatusRoute as GET } from 'octocms/agent';
+`;
+}
+
+/**
+ * Build a thin re-export Route Handler for the `/media/[...slug]` proxy.
+ *
+ * The actual handler lives in `octocms/admin/mediaRoute.ts`
+ * (`mediaRoute`). The user-app file just:
+ *   1. side-effect-imports `cms/__generated__/configInit` so `getConfig()`
+ *      resolves on cold start (Route Handlers don't run `app/layout.tsx`); and
+ *   2. re-exports `mediaRoute` as `GET`.
+ *
+ * `depth` is the number of `..` segments needed to reach the project root
+ * from the route file's directory. For `app/media/[...slug]/route.ts`
+ * that is 3; for the same file under `src/app/...` it is 4.
+ */
+export function mediaRouteTemplate(opts: { depth: number }): string {
+  const upDirs = '../'.repeat(opts.depth);
+  return `// Side-effect import: registers \`configOctoCMS\` into the runtime store so
+// \`getConfig()\` resolves on cold start. Route Handlers don't run
+// \`app/layout.tsx\`, so this import has to live here.
+import '${upDirs}cms/__generated__/configInit';
+
+export { mediaRoute as GET } from 'octocms/admin/mediaRoute';
+`;
+}
+
+/**
+ * Build a thin re-export Route Handler for the public-site `/api/search`
+ * endpoint consumed by the `SearchBox` component shipped at
+ * `octocms/components/public`.
+ *
+ * The actual handler lives in `octocms/admin/searchRoute.ts`
+ * (`searchRoute`). The user-app file just:
+ *   1. side-effect-imports `cms/__generated__/configInit` so `getConfig()`
+ *      resolves on cold start (Route Handlers don't run `app/layout.tsx`); and
+ *   2. re-exports `searchRoute` as `GET`.
+ *
+ * `depth` is the number of `..` segments needed to reach the project root
+ * from the route file's directory. For `app/api/search/route.ts` that is 3;
+ * for the same file under `src/app/...` it is 4.
+ */
+export function searchRouteTemplate(opts: { depth: number }): string {
+  const upDirs = '../'.repeat(opts.depth);
+  return `// Side-effect import: registers \`configOctoCMS\` into the runtime store so
+// \`getConfig()\` resolves on cold start. Route Handlers don't run
+// \`app/layout.tsx\`, so this import has to live here.
+import '${upDirs}cms/__generated__/configInit';
+
+export { searchRoute as GET } from 'octocms/admin/searchRoute';
 `;
 }
 

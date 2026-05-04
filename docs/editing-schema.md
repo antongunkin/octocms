@@ -54,7 +54,7 @@ Top-level keys:
 | `mediaFolder` | string | Where uploaded media files live (default `public/media`) |
 | `mediaAllowedFormats` | string[] | File extensions accepted by the media uploader |
 | `git.baseBranch` | string | Production base branch (e.g. `main`) |
-| `git.publishedPointerBranch` | string? | Optional dedicated branch holding `cms/published.json`. Falls back to `baseBranch` when unset. |
+| `git.publishedPointerBranch` | string? | Optional dedicated branch holding per-build pointer files under `cms/pointers/`. Falls back to `baseBranch` when unset. |
 | `collections` | object | Map of collection key → collection definition (see below) |
 | `search.publicCollections` | object? | Optional URL-pattern map for collections that map to public pages |
 
@@ -173,7 +173,7 @@ If the migration is non-trivial, it is usually safer to make the change through 
 
 Schema edits are normal Git commits. In production, the visual editor uses the active feature branch (`cms-active-branch` cookie); hand-edits use whatever branch you have checked out. A schema commit triggers a Vercel rebuild because the generated `cms/__generated__/types.ts` changes, so `query()` resumes returning fully-typed results once the build completes.
 
-The published-branch pointer (`cms/published.json`) controls which branch is served on the public site. It is independent of the schema — schema and content edits ride together on a feature branch and go live when you publish that branch.
+The per-build pointer files under `cms/pointers/` (and optional `CMS_BRANCH`) control which branch is served on the public site. See [`docs/multi-deploy.md`](../../docs/multi-deploy.md). It is independent of the schema — schema and content edits ride together on a feature branch and go live when you publish that branch.
 
 ## Field-format reference
 

@@ -134,13 +134,11 @@ export async function invalidateAfterMutationAsync(qc: QueryClient, domains: Inv
  * in `['entries']`) doesn't fire `invalidateQueries` twice. Also notifies other
  * admin tabs via `BroadcastChannel` (same payload shape as local fan-out).
  *
- * Use from a mutation `onSuccess`:
- *
- * ```ts
- * onSuccess: () => invalidateAfterMutation(qc, ['entries', 'git'])
- * ```
+ * Fire-and-forget wrapper around {@link invalidateAfterMutationAsync}. From a
+ * mutation `onSuccess`, **return** `invalidateAfterMutationAsync(...)` so
+ * `mutateAsync` waits for invalidation (avoids async teardown races in tests
+ * and keeps callers aligned with fresh cache state).
  */
 export function invalidateAfterMutation(qc: QueryClient, domains: InvalidationDomain[]): void {
-  applyDomainInvalidation(qc, domains);
-  postCrossTabInvalidation(domains);
+  void invalidateAfterMutationAsync(qc, domains);
 }

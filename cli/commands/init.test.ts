@@ -61,6 +61,7 @@ describe('initCommand', () => {
     const error = readFileSync(join(TMP_DIR, 'app', 'cms', 'error.tsx'), 'utf8');
     expect(layout).toContain("from 'octocms/admin'");
     expect(page).toContain("from 'octocms/admin'");
+    expect(page).toContain('configInit');
     expect(error).toContain("from 'octocms/admin'");
     expect(error).toContain("'use client'");
   });

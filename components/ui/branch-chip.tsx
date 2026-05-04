@@ -6,11 +6,16 @@ type BranchChipProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   name: string;
   ahead?: number;
   dirty?: number;
+  /**
+   * When true, show the dropdown chevron and full emphasis even on the base branch
+   * (e.g. `main`) so the chip reads as an openable menu trigger.
+   */
+  menuTrigger?: boolean;
 };
 
 export const BranchChip = React.forwardRef<HTMLButtonElement, BranchChipProps>(
-  ({ className, name, ahead = 0, dirty = 0, disabled, ...props }, ref) => {
-    const isFeature = !disabled && name !== 'main';
+  ({ className, name, ahead = 0, dirty = 0, disabled, menuTrigger, ...props }, ref) => {
+    const isFeature = !disabled && (menuTrigger || name !== 'main');
     return (
       <button
         ref={ref}

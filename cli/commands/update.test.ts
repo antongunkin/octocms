@@ -3,12 +3,18 @@ import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { updateCommand } from './update';
 import {
+  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
+  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
   adminErrorTemplate,
-  adminLayoutTemplate,
-  adminPageTemplate,
+  buildAdminLayoutTemplate,
+  buildAdminPageTemplate,
   LEGACY_ADMIN_CATCH_ALL_TEMPLATES,
   LEGACY_ADMIN_LAYOUT_TEMPLATES,
+  nextAuthRouteTemplate,
 } from '../lib/templates';
+
+const expectedAdminPage = buildAdminPageTemplate(ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromSrcAppCmsCatchAll);
+const expectedAdminLayout = buildAdminLayoutTemplate(ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromSrcAppCms);
 
 const TMP_DIR = join(process.cwd(), '.tmp-update-test');
 
@@ -25,22 +31,22 @@ describe('updateCommand — 3-file model', () => {
     mkdirSync(join(TMP_DIR, 'src', 'app'), { recursive: true });
     await updateCommand(TMP_DIR);
     const cmsDir = join(TMP_DIR, 'src', 'app', 'cms');
-    expect(readFileSync(join(cmsDir, 'layout.tsx'), 'utf8')).toBe(adminLayoutTemplate);
-    expect(readFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), 'utf8')).toBe(adminPageTemplate);
+    expect(readFileSync(join(cmsDir, 'layout.tsx'), 'utf8')).toBe(expectedAdminLayout);
+    expect(readFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), 'utf8')).toBe(expectedAdminPage);
     expect(readFileSync(join(cmsDir, 'error.tsx'), 'utf8')).toBe(adminErrorTemplate);
   });
 
   it('does not modify up-to-date files', async () => {
     const cmsDir = join(TMP_DIR, 'src', 'app', 'cms');
     mkdirSync(join(cmsDir, '[[...path]]'), { recursive: true });
-    writeFileSync(join(cmsDir, 'layout.tsx'), adminLayoutTemplate, 'utf8');
-    writeFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), adminPageTemplate, 'utf8');
+    writeFileSync(join(cmsDir, 'layout.tsx'), expectedAdminLayout, 'utf8');
+    writeFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), expectedAdminPage, 'utf8');
     writeFileSync(join(cmsDir, 'error.tsx'), adminErrorTemplate, 'utf8');
 
     await updateCommand(TMP_DIR);
 
-    expect(readFileSync(join(cmsDir, 'layout.tsx'), 'utf8')).toBe(adminLayoutTemplate);
-    expect(readFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), 'utf8')).toBe(adminPageTemplate);
+    expect(readFileSync(join(cmsDir, 'layout.tsx'), 'utf8')).toBe(expectedAdminLayout);
+    expect(readFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), 'utf8')).toBe(expectedAdminPage);
     expect(readFileSync(join(cmsDir, 'error.tsx'), 'utf8')).toBe(adminErrorTemplate);
   });
 
@@ -66,8 +72,37 @@ describe('updateCommand — legacy catch-all migration (deep import → barrel)'
 
     await updateCommand(TMP_DIR);
 
-    expect(readFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), 'utf8')).toBe(adminPageTemplate);
-    expect(readFileSync(join(cmsDir, 'layout.tsx'), 'utf8')).toBe(adminLayoutTemplate);
+    expect(readFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), 'utf8')).toBe(expectedAdminPage);
+    expect(readFileSync(join(cmsDir, 'layout.tsx'), 'utf8')).toBe(expectedAdminLayout);
+  });
+
+  it('migrates barrel catch-all without page configInit to the current template', async () => {
+    const cmsDir = join(TMP_DIR, 'src', 'app', 'cms');
+    mkdirSync(join(cmsDir, '[[...path]]'), { recursive: true });
+    writeFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), LEGACY_ADMIN_CATCH_ALL_TEMPLATES[1], 'utf8');
+
+    await updateCommand(TMP_DIR);
+
+    expect(readFileSync(join(cmsDir, '[[...path]]', 'page.tsx'), 'utf8')).toBe(expectedAdminPage);
+  });
+});
+
+describe('updateCommand — nextauth route', () => {
+  it('creates app/api/auth/[...nextauth]/route.ts when missing', async () => {
+    mkdirSync(join(TMP_DIR, 'src', 'app'), { recursive: true });
+    await updateCommand(TMP_DIR);
+    const authFile = join(TMP_DIR, 'src', 'app', 'api', 'auth', '[...nextauth]', 'route.ts');
+    expect(existsSync(authFile)).toBe(true);
+    expect(readFileSync(authFile, 'utf8')).toBe(nextAuthRouteTemplate);
+  });
+
+  it('preserves a customised nextauth route instead of overwriting', async () => {
+    const authDir = join(TMP_DIR, 'src', 'app', 'api', 'auth', '[...nextauth]');
+    mkdirSync(authDir, { recursive: true });
+    const customised = '// custom auth setup with extra providers\nexport {};\n';
+    writeFileSync(join(authDir, 'route.ts'), customised, 'utf8');
+    await updateCommand(TMP_DIR);
+    expect(readFileSync(join(authDir, 'route.ts'), 'utf8')).toBe(customised);
   });
 });
 

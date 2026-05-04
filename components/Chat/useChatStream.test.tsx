@@ -1,10 +1,19 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { acceptProposalAction, rejectProposalAction } from '../../admin/actions/agent';
 import { queryKeys } from '../../admin/query/keys';
 import { withQuery } from '../../admin/query/test/renderWithQuery';
 
 import { useChatStream } from './useChatStream';
+
+// Stub the chat-agent server actions — they're now called directly from
+// useChatStream (no public /api/agent/proposals/* endpoint to intercept via
+// fetch mock). Tests can replace the mocks via `vi.mocked(...)` per case.
+vi.mock('../../admin/actions/agent', () => ({
+  acceptProposalAction: vi.fn(),
+  rejectProposalAction: vi.fn(),
+}));
 
 /**
  * Build an SSE-style ReadableStream from a list of body chunks (strings) and
@@ -170,20 +179,15 @@ describe('useChatStream — proposal accept', () => {
     const doneLine = `data: ${JSON.stringify({ type: 'done' })}\n\n`;
 
     let agentCalls = 0;
-    globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
-      const u = String(url);
-      if (u.includes('proposals/accept')) {
-        return new Response(JSON.stringify({ ok: true, entryPath: 'cms/content/post/p.json' }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
+    globalThis.fetch = vi.fn(async () => {
       agentCalls += 1;
       return new Response(makeSseStream([proposalLine, doneLine]), {
         status: 200,
         headers: { 'Content-Type': 'text/event-stream' },
       });
     }) as typeof globalThis.fetch;
+    vi.mocked(acceptProposalAction).mockResolvedValue({ ok: true, entryPath: 'cms/content/post/p.json' });
+    vi.mocked(rejectProposalAction).mockResolvedValue({ ok: true });
 
     const { Wrapper, client } = withQuery();
     client.setQueryData(queryKeys.entries.list('post'), []);

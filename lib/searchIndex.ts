@@ -1,6 +1,6 @@
 import MiniSearch, { type Options } from 'minisearch';
 
-import type { CollectionField, Config, PublicCollectionSearchConfig } from '../admin/types';
+import type { CollectionField, Config, PublicCollectionSearchConfig } from '../types';
 
 // --- Types ---
 

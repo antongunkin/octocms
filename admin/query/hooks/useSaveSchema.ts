@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { saveSchema, type SaveSchemaOptions } from '../../actions/schema';
 import type { Config } from '../../types';
-import { invalidateAfterMutation } from '../invalidate';
+import { invalidateAfterMutationAsync } from '../invalidate';
 import { queryKeys } from '../keys';
 
 /**
@@ -40,6 +40,6 @@ export function useSaveSchema() {
         qc.setQueryData(queryKeys.schema.current(), ctx.previous);
       }
     },
-    onSuccess: () => invalidateAfterMutation(qc, ['schema']),
+    onSuccess: () => invalidateAfterMutationAsync(qc, ['schema']),
   });
 }

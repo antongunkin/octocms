@@ -20,8 +20,10 @@ export function setConfig(config: Config): void {
 export function getConfig(): Config {
   if (!_config) {
     throw new Error(
-      'OctoCMS config not initialized. Make sure withOctoCMS(nextConfig, config) is called in next.config.ts ' +
-        'and cms/__generated__/configInit.ts is imported in your admin layout.',
+      'OctoCMS config not initialized. Import `cms/__generated__/configInit` in your root `app/layout.tsx`, ' +
+        'in `src/instrumentation.ts`, and on the admin catch-all `cms/[[...path]]/page.tsx` (server actions may skip layout). ' +
+        'Also ensure `tsconfig.json` maps `cms/__generated__/*` to `./cms/__generated__/*` so admin server actions can load `configInit`. ' +
+        'See docs/deployment-errors.md.',
     );
   }
   return _config;

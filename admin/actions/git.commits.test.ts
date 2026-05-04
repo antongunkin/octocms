@@ -31,7 +31,6 @@ vi.mock('../github', () => ({
   createGitHubPullRequest: vi.fn(),
   listGitHubCMSPullRequests: vi.fn(),
   getGitHubFile: vi.fn(),
-  getPublishedBranch: vi.fn(),
 }));
 
 vi.mock('./files', () => ({

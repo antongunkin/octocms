@@ -3,6 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 
+import { acceptProposalAction, rejectProposalAction } from '../../admin/actions/agent';
 import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 
 import type { AttachmentDiagnostic } from '../../agent/attachments';
@@ -452,37 +453,27 @@ export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamRet
       if (!ps || ps.status.kind !== 'pending') return;
 
       dispatch({ type: 'proposal_status', proposalId, status: { kind: 'accepting' } });
-      let res: Response;
+
+      let result: Awaited<ReturnType<typeof acceptProposalAction>>;
       try {
-        res = await fetch('/api/agent/proposals/accept', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ proposal: ps.proposal }),
-        });
+        result = await acceptProposalAction(ps.proposal);
       } catch (err) {
         dispatch({
           type: 'proposal_status',
           proposalId,
-          status: { kind: 'error', message: err instanceof Error ? err.message : 'Network error' },
+          status: { kind: 'error', message: err instanceof Error ? err.message : 'Accept failed' },
         });
         return;
       }
 
-      let body: { ok?: boolean; entryPath?: string; error?: string; fieldErrors?: Record<string, string> } = {};
-      try {
-        body = await res.json();
-      } catch {
-        /* keep empty */
-      }
-
-      if (!res.ok || !body.ok || !body.entryPath) {
+      if (!result.ok) {
         dispatch({
           type: 'proposal_status',
           proposalId,
           status: {
             kind: 'error',
-            message: body.error || `Accept failed (HTTP ${res.status})`,
-            ...(body.fieldErrors ? { fieldErrors: body.fieldErrors } : {}),
+            message: result.error,
+            ...(result.fieldErrors ? { fieldErrors: result.fieldErrors } : {}),
           },
         });
         return;
@@ -490,15 +481,15 @@ export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamRet
       dispatch({
         type: 'proposal_status',
         proposalId,
-        status: { kind: 'accepted', entryPath: body.entryPath },
+        status: { kind: 'accepted', entryPath: result.entryPath },
       });
 
       await invalidateAfterMutationAsync(queryClient, ['entries']);
 
       // Auto-followup so the model sees the result and can continue naturally.
       await submitSystemMessage(
-        `Accepted: ${ps.proposal.summary} → saved at ${body.entryPath}.`,
-        `[System notification] The user ACCEPTED proposal ${ps.proposal.id} (${ps.proposal.summary}). The entry was saved at ${body.entryPath}. Continue the conversation — do NOT propose the same change again.`,
+        `Accepted: ${ps.proposal.summary} → saved at ${result.entryPath}.`,
+        `[System notification] The user ACCEPTED proposal ${ps.proposal.id} (${ps.proposal.summary}). The entry was saved at ${result.entryPath}. Continue the conversation — do NOT propose the same change again.`,
       );
     },
     [queryClient, submitSystemMessage],
@@ -511,13 +502,9 @@ export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamRet
 
       dispatch({ type: 'proposal_status', proposalId, status: { kind: 'rejecting' } });
       try {
-        await fetch('/api/agent/proposals/reject', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reason: reason ?? null }),
-        });
+        await rejectProposalAction(reason ?? null);
       } catch {
-        /* reject is informational; still mark rejected even if endpoint failed */
+        /* reject is informational; still mark rejected even if the action throws */
       }
       dispatch({
         type: 'proposal_status',

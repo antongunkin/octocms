@@ -89,8 +89,8 @@ export function generateSchemaDocs(
     '',
     `- **baseBranch:** \`${cfg.git.baseBranch}\` — default branch; feature branches are created from here; PRs target this ref.`,
     pointer
-      ? `- **publishedPointerBranch:** \`${pointer}\` — branch that holds \`cms/published.json\` so **Publish** does not commit to a protected base branch.`
-      : '- **publishedPointerBranch:** _omitted_ — `cms/published.json` is read and written on `baseBranch`.',
+      ? `- **publishedPointerBranch:** \`${pointer}\` — branch that holds per-build pointer files under \`cms/pointers/\` so **Publish** does not commit to a protected base branch.`
+      : '- **publishedPointerBranch:** _omitted_ — per-build pointer files under `cms/pointers/` are read and written on `baseBranch`.',
     '',
     '## Field formats (global)',
     '',
@@ -120,12 +120,9 @@ export function generateSchemaDocs(
   lines.push(
     '## Public site cache tags',
     '',
-    'The sample app uses `getHomePage()` / `getBlog()` / `getPublishedPosts()` in `src/app/cms/ssr/getPageContent.ts` with `cacheTag()` values:',
+    "Cache your public-page data fetchers (the ones calling `query()`) with `'use cache'` and tag them with `OCTOCMS_PUBLIC_CONTENT_CACHE_TAG` (`octocms:content`) from `octocms/lib/publicContentCacheTag.ts`. The recommended shape is one async helper per page, defined inline at the top of the page file and called from both `generateMetadata` and the default export — co-located with what consumes it. A single tag covers every reader so they refresh together.",
     '',
-    '- `homePage` — home singleton content',
-    '- `blog` — blog singleton (`getBlog()`) and published post listings (`getPublishedPosts()`)',
-    '',
-    'After **`saveFile`**, **`newFile`** (create entry), and **`removeFile`**, `buildJsons()` calls `updateTag()` for both tags. External hooks can expire them via `GET /api/revalidate/<tag>`.',
+    "After **`saveFile`**, **`newFile`** (create entry), and **`removeFile`**, `buildJsons()` calls `updateTag` for that tag and `revalidatePath('/', 'layout')`. External cache invalidation can be wired up via a Route Handler that calls `revalidateTag(tag, { expire: 0 })`.",
     '',
   );
 

@@ -1,5 +1,6 @@
 import { Octokit } from 'octokit';
 
+import { getCmsBranchEnv, getPointerFilePath } from './lib/contentBranch';
 import { getConfig } from './lib/configStore';
 import { ContentSourceError, isContentSourceError, mapGitHubApiErrorToContentSource } from './lib/contentSourceError';
 
@@ -45,8 +46,8 @@ export const getPublicOctokits = (): Octokit[] => {
 };
 
 /**
- * When `config.git.publishedPointerBranch` is set, `cms/published.json` is read and written on
- * that branch — use an unprotected branch so Publish avoids a protected base branch.
+ * When `config.git.publishedPointerBranch` is set, per-build pointer files under `cms/pointers/`
+ * are read and written on that branch — use an unprotected branch so Publish avoids a protected base branch.
  */
 export const getPublishedPointerRef = (): string | undefined => {
   const v = getConfig().git.publishedPointerBranch?.trim();
@@ -170,30 +171,192 @@ export const listGitHubFiles = async (dirPath: string, extension?: string, branc
 };
 
 /**
- * Read cms/published.json to determine which branch public pages read content from.
- * Uses {@link getPublishedPointerRef} when set; otherwise reads from `config.git.baseBranch`.
- * Falls back to base branch on missing file or invalid JSON.
+ * List files recursively across subdirectories (public read — same token/session
+ * strategy as {@link listGitHubFiles}).
  */
-export const getPublishedBranch = async (): Promise<string> => {
+export const listGitHubFilesRecursive = async (
+  dirPath: string,
+  extension?: string,
+  branch?: string,
+): Promise<string[]> => {
+  const [octokit] = getPublicOctokits();
+  const { owner, repo, branch: configBranch } = assertGitHubConfig();
+  const ref = branch ?? configBranch;
+
+  try {
+    const { data } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: dirPath,
+      ref,
+    });
+
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+    const results: string[] = [];
+
+    for (const item of data) {
+      if (item.type === 'file') {
+        if (!extension || item.path.endsWith(extension)) {
+          results.push(item.path);
+        }
+      } else if (item.type === 'dir') {
+        const subFiles = await listGitHubFilesRecursive(item.path, extension, branch);
+        results.push(...subFiles);
+      }
+    }
+
+    return results;
+  } catch (error: any) {
+    if (error.status === 404) {
+      return [];
+    }
+    throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref });
+  }
+};
+
+/**
+ * Returns true when `heads/<branchName>` exists on the remote.
+ */
+export const branchExistsOnGitHub = async (branchName: string): Promise<boolean> => {
+  const { owner, repo } = assertGitHubConfig();
+  const clients = getPublicOctokits();
+
+  let sawAuthError = false;
+  for (const octokit of clients) {
+    try {
+      await octokit.rest.git.getRef({
+        owner,
+        repo,
+        ref: `heads/${branchName}`,
+      });
+      return true;
+    } catch (error: any) {
+      if (error.status === 404) {
+        if (sawAuthError) continue;
+        return false;
+      }
+      if (error.status === 401 || error.status === 403) {
+        sawAuthError = true;
+        continue;
+      }
+      if (error.status === 429) {
+        throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref: branchName });
+      }
+      throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref: branchName });
+    }
+  }
+
+  const tokenPresent = !!process.env.CMS_GITHUB_TOKEN?.trim();
+  throw new ContentSourceError(
+    'github_auth',
+    tokenPresent
+      ? `Cannot verify branch ${branchName} on ${owner}/${repo}. CMS_GITHUB_TOKEN is set but was rejected — verify it has Contents: Read access on this repository.`
+      : `Cannot verify branch ${branchName} on ${owner}/${repo}. Set CMS_GITHUB_TOKEN with Contents: Read access on this repository.`,
+  );
+};
+
+/**
+ * List remote branch names whose ref starts with `refs/heads/<prefix>` (prefix should look like `cms/`).
+ */
+export const listGitHubBranchRefsByPrefix = async (prefix: string): Promise<string[]> => {
+  const { owner, repo } = assertGitHubConfig();
+  const normalized = prefix.replace(/^\/+/, '');
+  const refParam = normalized.endsWith('/') ? `heads/${normalized}` : `heads/${normalized}/`;
+  const clients = getPublicOctokits();
+
+  let sawAuthError = false;
+  for (const octokit of clients) {
+    try {
+      const { data } = await octokit.rest.git.listMatchingRefs({
+        owner,
+        repo,
+        ref: refParam,
+      });
+      return data.map((r) => r.ref.replace(/^refs\/heads\//, '')).filter((name): name is string => Boolean(name));
+    } catch (error: any) {
+      if (error.status === 429) {
+        throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref: refParam });
+      }
+      if (error.status === 401 || error.status === 403) {
+        sawAuthError = true;
+        continue;
+      }
+      if (error.status === 404) {
+        if (sawAuthError) continue;
+        return [];
+      }
+      throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref: refParam });
+    }
+  }
+
+  const tokenPresent = !!process.env.CMS_GITHUB_TOKEN?.trim();
+  throw new ContentSourceError(
+    'github_auth',
+    tokenPresent
+      ? `Cannot list branch refs ${owner}/${repo} (${refParam}). CMS_GITHUB_TOKEN is set but was rejected — verify it has Contents: Read access on this repository.`
+      : `Cannot list branch refs ${owner}/${repo} (${refParam}). Set CMS_GITHUB_TOKEN with Contents: Read access on this repository.`,
+  );
+};
+
+/**
+ * Resolve which Git branch public reads use.
+ *
+ * Precedence:
+ * 1. `{ "branch": "<name>", "buildId": "<id>" }` from {@link getPointerFilePath} on the pointer ref (or base branch); only `branch` is used for resolution
+ * 2. `CMS_BRANCH` env var when the branch exists
+ * 3. `config.git.baseBranch`
+ *
+ * If the pointer file or `CMS_BRANCH` names a branch that does not exist, falls back to the next step.
+ */
+export const resolveContentBranch = async (): Promise<string> => {
   const { branch: configBranch } = assertGitHubConfig();
-  const pointerRef = getPublishedPointerRef();
+  const pointerRef = getPublishedPointerRef() ?? configBranch;
+  const pointerPath = getPointerFilePath();
+
+  /** Dedupe `git.getRef` within this resolution (pointer branch vs `CMS_BRANCH` may repeat). */
+  const existsCache = new Map<string, Promise<boolean>>();
+  const pickIfExists = async (name: string | undefined | null): Promise<string | null> => {
+    if (!name || typeof name !== 'string') return null;
+    const b = name.trim();
+    if (!b) return null;
+    if (b === configBranch) return configBranch;
+    let pending = existsCache.get(b);
+    if (!pending) {
+      pending = branchExistsOnGitHub(b);
+      existsCache.set(b, pending);
+    }
+    if (await pending) return b;
+    return null;
+  };
 
   let content: string | null;
   try {
-    content = await readGitHubFilePublic('cms/published.json', pointerRef);
+    content = await readGitHubFilePublic(pointerPath, pointerRef);
   } catch (e) {
-    // Auth / network / rate-limit signals a real prod problem — let it bubble.
-    // The pointer file itself is optional, but if we can't even reach GitHub
-    // to check, downstream content reads will fail too; surface the cause.
     if (isContentSourceError(e)) throw e;
-    return configBranch;
+    content = null;
   }
 
-  if (!content) return configBranch;
-  try {
-    const parsed = JSON.parse(content);
-    return typeof parsed.branch === 'string' ? parsed.branch : configBranch;
-  } catch {
-    return configBranch;
+  if (content) {
+    try {
+      const parsed = JSON.parse(content) as { branch?: unknown };
+      if (typeof parsed.branch === 'string') {
+        const picked = await pickIfExists(parsed.branch);
+        if (picked) return picked;
+      }
+    } catch {
+      /* fall through */
+    }
   }
+
+  const envBranch = getCmsBranchEnv();
+  if (envBranch) {
+    const picked = await pickIfExists(envBranch);
+    if (picked) return picked;
+  }
+
+  return configBranch;
 };

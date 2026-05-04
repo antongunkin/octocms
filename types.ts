@@ -230,7 +230,7 @@ export type GitIntegrationConfig = {
   /** Default branch; feature branches are created from here and PRs target this ref. */
   baseBranch: string;
   /**
-   * Branch that holds `cms/published.json` so Publish avoids committing to a protected base branch.
+   * Branch that holds per-build pointer files under `cms/pointers/` so Publish avoids committing to a protected base branch.
    * When omitted, the pointer file is read and written on `baseBranch`.
    */
   publishedPointerBranch?: string;

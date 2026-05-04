@@ -286,20 +286,32 @@ describe('getFile', () => {
     expect(github.getGitHubFile).toHaveBeenCalledWith('cms/content/post/1.json', undefined);
   });
 
-  it('falls back to local file when GitHub throws in production', async () => {
+  it('uses readGitHubFilePublic when getGitHubFile throws in production (no local FS on serverless)', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
     vi.mocked(github.getGitHubFile).mockRejectedValue(new Error('API error'));
-    vi.mocked(fsPromises.readFile).mockResolvedValue(JSON.stringify(fileContent) as any);
+    vi.mocked(github.readGitHubFilePublic).mockResolvedValue(JSON.stringify(fileContent, null, 2));
     const result = await getFile('cms/content/post/1.json');
     expect(result).toEqual(fileContent);
+    expect(github.readGitHubFilePublic).toHaveBeenCalledWith('cms/content/post/1.json', undefined);
+    expect(fsPromises.readFile).not.toHaveBeenCalled();
   });
 
-  it('falls back to local file when GitHub returns null in production', async () => {
+  it('uses readGitHubFilePublic when getGitHubFile returns null in production', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
     vi.mocked(github.getGitHubFile).mockResolvedValue(null as any);
-    vi.mocked(fsPromises.readFile).mockResolvedValue(JSON.stringify(fileContent) as any);
+    vi.mocked(github.readGitHubFilePublic).mockResolvedValue(JSON.stringify(fileContent, null, 2));
     const result = await getFile('cms/content/post/1.json');
     expect(result).toEqual(fileContent);
+    expect(fsPromises.readFile).not.toHaveBeenCalled();
+  });
+
+  it('returns empty object in production when GitHub and public read both miss', async () => {
+    vi.mocked(github.isProductionMode).mockReturnValue(true);
+    vi.mocked(github.getGitHubFile).mockResolvedValue(null as any);
+    vi.mocked(github.readGitHubFilePublic).mockResolvedValue(null);
+    const result = await getFile('cms/content/post/missing.json');
+    expect(result).toEqual({});
+    expect(fsPromises.readFile).not.toHaveBeenCalled();
   });
 
   it('throws "Failed to get file" when both sources fail', async () => {
@@ -320,6 +332,23 @@ describe('saveFile', () => {
     mockCookiesGet.mockImplementation((name: string) =>
       name === 'cms-active-branch' ? { value: 'save-feat' } : undefined,
     );
+    // Avoid falling through to real `glob` when production slug checks call `getContentFiles`
+    // (a rejected GitHub list mock would otherwise scan workspace `cms/content` and collide).
+    vi.mocked(github.listGitHubFiles).mockResolvedValue([]);
+    vi.mocked(github.listGitHubFilesRecursive).mockResolvedValue([]);
+  });
+
+  it('promotes draft to changed on save', async () => {
+    const draftForm = {
+      sys: { id: 'abc', type: 'post', status: 'draft' as const },
+      fields: { title: 'Test', slug: 'test' },
+    };
+    const out = await saveFile(draftForm, 'cms/content/post/abc.json');
+    expect(out).toEqual({ success: true });
+    const written = JSON.parse(vi.mocked(fsPromises.writeFile).mock.calls[0][1] as string) as {
+      sys: { status: string };
+    };
+    expect(written.sys.status).toBe('changed');
   });
 
   it('writes JSON to the local filesystem in dev mode', async () => {
@@ -329,9 +358,7 @@ describe('saveFile', () => {
     const expectedPayload = { sys: { id: 'abc', type: 'post' }, fields: { title: 'Test', slug: 'test' } };
     const expectedData = `${JSON.stringify(expectedPayload, null, 2)}\n`;
     expect(fsPromises.writeFile).toHaveBeenCalledWith(expectedPath, expectedData, 'utf8');
-    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json', {
-      blogPaths: ['/blog/test'],
-    });
+    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json');
     expect(github.readGitHubFilePublic).not.toHaveBeenCalled();
   });
 
@@ -352,9 +379,7 @@ describe('saveFile', () => {
       undefined,
     );
     expect(github.readGitHubFilePublic).toHaveBeenCalledWith('cms/content/post/abc.json', undefined);
-    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json', {
-      blogPaths: ['/blog/test'],
-    });
+    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json');
   });
 
   it('runs revalidation in the same save request after write consistency checks', async () => {
@@ -388,7 +413,7 @@ describe('saveFile', () => {
       undefined,
     );
     expect(github.readGitHubFilePublic).toHaveBeenCalledWith('cms/content/post/abc.json', undefined);
-    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json', { blogPaths: [] });
+    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json');
   });
 
   it('returns failure with underlying error message when write fails', async () => {
@@ -769,7 +794,7 @@ describe('removeFile', () => {
     expect(out).toEqual({ success: true });
     const expectedPath = path.join(process.cwd(), 'cms/content/post/abc.json');
     expect(fsPromises.unlink).toHaveBeenCalledWith(expectedPath);
-    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json', { blogPaths: [] });
+    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json');
   });
 
   it('calls deleteGitHubFile in production', async () => {
@@ -782,7 +807,7 @@ describe('removeFile', () => {
       'Remove cms/content/post/abc.json',
       'del-feat',
     );
-    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json', { blogPaths: [] });
+    expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json');
   });
 
   it('returns build failure when buildJsons fails after delete in dev', async () => {
@@ -817,8 +842,11 @@ describe('waitForPublicReadConsistency', () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
     vi.mocked(github.readGitHubFilePublic).mockResolvedValue('expected\n');
 
-    await waitForPublicReadConsistency('cms/published.json', 'expected\n', 'cms/publish-pointer');
+    await waitForPublicReadConsistency('cms/pointers/consistency-test.json', 'expected\n', 'cms/publish-pointer');
 
-    expect(github.readGitHubFilePublic).toHaveBeenCalledWith('cms/published.json', 'cms/publish-pointer');
+    expect(github.readGitHubFilePublic).toHaveBeenCalledWith(
+      'cms/pointers/consistency-test.json',
+      'cms/publish-pointer',
+    );
   });
 });

@@ -1,5 +1,7 @@
 'use server';
 
+import './registerConfig';
+
 import { execFile } from 'node:child_process';
 
 import { cookies } from 'next/headers';
@@ -13,11 +15,11 @@ import {
   createGitHubPullRequest,
   getGitHubFile,
   getPublicOctokits,
-  getPublishedBranch,
   getPublishedPointerRef,
   isProductionMode,
   listGitHubCMSPullRequests,
   markPRReadyForReview,
+  resolveContentBranch,
   saveGitHubFile,
 } from '../github';
 import type { EntryCommit, EntryCommitHistory } from '../../types';
@@ -37,6 +39,7 @@ import {
   type CreateBranchResult,
   type CreatePRResult,
 } from './utils';
+import { getPointerFilePath, serializePointerPayload } from '../../lib/contentBranch';
 import { warmBranch } from '../store/contentStore';
 import { buildJsons } from './build';
 import { waitForPublicReadConsistency } from './files';
@@ -232,15 +235,16 @@ export type CMSBranch = {
 };
 
 /**
- * List all CMS branches available for editing or publishing.
- * Always includes the base branch (main) at the top.
- * Each entry carries an `isPublished` flag indicating the current live branch.
+ * List CMS branches for the header: base branch plus **open** PRs labelled `cms-update`
+ * (see `listGitHubCMSPullRequests`). Remote `cms/*` refs without an open labelled PR are omitted.
  */
 export const listCMSBranches = async (): Promise<CMSBranch[]> => {
   try {
     const config = getConfig();
     const baseBranch = config.git.baseBranch;
-    const [publishedBranch, prList] = await Promise.all([getPublishedBranch(), listGitHubCMSPullRequests()]);
+    const pointerBranch = config.git.publishedPointerBranch?.trim();
+
+    const [publishedBranch, prList] = await Promise.all([resolveContentBranch(), listGitHubCMSPullRequests()]);
 
     const base: CMSBranch = {
       branch: baseBranch,
@@ -250,24 +254,35 @@ export const listCMSBranches = async (): Promise<CMSBranch[]> => {
       isPublished: publishedBranch === baseBranch,
     };
 
-    const feature: CMSBranch[] = prList.map((pr) => ({
-      branch: pr.branch,
-      prUrl: pr.prUrl,
-      prNumber: pr.prNumber,
-      title: pr.title,
-      isPublished: pr.branch === publishedBranch,
-    }));
+    const features: CMSBranch[] = [];
 
-    return [base, ...feature];
+    for (const pr of prList) {
+      const branch = pr.branch.trim();
+      if (!branch || branch === baseBranch) continue;
+      if (pointerBranch && branch === pointerBranch) continue;
+      if (!branch.startsWith('cms/')) continue;
+      features.push({
+        branch,
+        prUrl: pr.prUrl,
+        prNumber: pr.prNumber,
+        title: pr.title.trim() || branch,
+        isPublished: branch === publishedBranch,
+      });
+    }
+
+    features.sort((a, b) => b.prNumber - a.prNumber);
+
+    return [base, ...features];
   } catch (_e) {
     return [];
   }
 };
 
 /**
- * Publish a branch by writing its name into cms/published.json (on the pointer branch
- * when `config.git.publishedPointerBranch` is set, otherwise on the base branch),
- * invalidating all public caches, and marking the associated PR as ready for review.
+ * Publish a branch by writing `{ "branch": "<name>", "buildId": "<id>" }` into the per-build
+ * pointer file (see {@link getPointerFilePath}) on the pointer branch when
+ * `config.git.publishedPointerBranch` is set, otherwise on the base branch, invalidating all
+ * public caches, and marking the associated PR as ready for review.
  *
  * Public pages will serve content from the published branch on the next request.
  */
@@ -277,10 +292,11 @@ export const publishBranch = async (branchName: string): Promise<ActionResult> =
     const baseBranch = config.git.baseBranch;
     const pointerRef = getPublishedPointerRef();
     const targetBranch = pointerRef ?? baseBranch;
-    const content = `${JSON.stringify({ branch: branchName }, null, 2)}\n`;
+    const pointerPath = getPointerFilePath();
+    const content = serializePointerPayload(branchName);
 
-    await saveGitHubFile('cms/published.json', content, `Publish branch ${branchName}`, targetBranch);
-    await waitForPublicReadConsistency('cms/published.json', content, targetBranch);
+    await saveGitHubFile(pointerPath, content, `Publish branch ${branchName} (${pointerPath})`, targetBranch);
+    await waitForPublicReadConsistency(pointerPath, content, targetBranch);
     await buildJsons('');
 
     if (branchName !== baseBranch) {

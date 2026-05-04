@@ -2,16 +2,18 @@
 
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 import { useEntry } from '../../admin/query/hooks/useEntry';
 import { useEntryBacklinks } from '../../admin/query/hooks/useEntryBacklinks';
 import {
   useArchiveEntry,
-  usePublishEntry,
   useRemoveFile,
   useRestoreEntry,
   useSaveFile,
 } from '../../admin/query/hooks/useEntryMutations';
+import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
 import { useIsProduction } from '../../admin/query/hooks/useIsProduction';
 import type { Config } from '../../admin/types';
@@ -42,6 +44,8 @@ type SaveFileError = Error & { fieldErrors?: Record<string, string> };
 const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: InlineEntryEditorProps) => {
   const config = useConfig();
   const { bumpRefresh } = useEntryStack();
+  const router = useRouter();
+  const qc = useQueryClient();
 
   const entryQuery = useEntry(entryPath);
   const entry = entryQuery.data;
@@ -54,11 +58,9 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
 
   const saveMutation = useSaveFile();
   const removeMutation = useRemoveFile();
-  const publishMutation = usePublishEntry();
   const archiveMutation = useArchiveEntry();
   const restoreMutation = useRestoreEntry();
-  const isSaving =
-    saveMutation.isPending || publishMutation.isPending || archiveMutation.isPending || restoreMutation.isPending;
+  const isSaving = saveMutation.isPending || archiveMutation.isPending || restoreMutation.isPending;
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -150,9 +152,10 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
     void executeSave(sys, fields);
   };
 
-  const handleBranchCreated = (_branchName: string, _prUrl: string, _prWarning?: string) => {
+  const handleBranchCreated = async (_branchName: string, _prUrl: string, _prWarning?: string) => {
     setCreateBranchOpen(false);
-    // The branch mutation invalidates `git.hasActive`, so the gate updates automatically.
+    await invalidateAfterMutationAsync(qc, ['git']);
+    router.refresh();
     if (pendingSaveArgs) {
       void executeSave(pendingSaveArgs.sys, pendingSaveArgs.fields);
       setPendingSaveArgs(null);
@@ -176,16 +179,6 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
   };
 
   const currentStatus: EntryStatus = entry?.sys?.status || 'merged';
-
-  const handlePublish = async () => {
-    try {
-      await publishMutation.mutateAsync(entryPath);
-      toast({ title: 'Published successfully', variant: 'success' });
-      dirtyRef.current = true;
-    } catch (e) {
-      toast({ title: e instanceof Error ? e.message : 'Publish failed', variant: 'destructive' });
-    }
-  };
 
   const handleArchive = async () => {
     try {
@@ -299,22 +292,11 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
                 </div>
                 <Button
                   type="submit"
-                  className="mb-2 w-full"
+                  className="mb-6 w-full"
                   disabled={isSaving || Object.keys(fieldErrors).length > 0}
                 >
                   {isSaving ? 'Saving...' : 'Save'}
                 </Button>
-                {(currentStatus === 'draft' || currentStatus === 'changed') && (
-                  <Button
-                    type="button"
-                    className="mb-6 w-full bg-green-600 hover:bg-green-700"
-                    onClick={handlePublish}
-                    disabled={isSaving}
-                  >
-                    Publish
-                  </Button>
-                )}
-                {currentStatus !== 'draft' && currentStatus !== 'changed' && <div className="mb-4" />}
 
                 <LinkedBySection entryPath={entryPath} />
               </div>

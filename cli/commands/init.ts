@@ -13,10 +13,12 @@ import readline from 'readline';
 import { log } from '../lib/logger';
 import {
   adminErrorTemplate,
-  adminLayoutTemplate,
-  adminPageTemplate,
+  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
+  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
+  buildAdminLayoutTemplate,
+  buildAdminPageTemplate,
   agentChatRouteTemplate,
-  agentProposalRouteTemplate,
+  mediaRouteTemplate,
   demoHelloPageJson,
   envLocalTemplate,
   generatedConfigInitTemplate,
@@ -137,10 +139,18 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   const cmsRouteDir = join(projectRoot, 'app', 'cms');
   mkdirSync(join(cmsRouteDir, '[[...path]]'), { recursive: true });
 
-  writeFileSync(join(cmsRouteDir, 'layout.tsx'), adminLayoutTemplate, 'utf8');
+  writeFileSync(
+    join(cmsRouteDir, 'layout.tsx'),
+    buildAdminLayoutTemplate(ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromAppCms),
+    'utf8',
+  );
   log.success('app/cms/layout.tsx');
 
-  writeFileSync(join(cmsRouteDir, '[[...path]]', 'page.tsx'), adminPageTemplate, 'utf8');
+  writeFileSync(
+    join(cmsRouteDir, '[[...path]]', 'page.tsx'),
+    buildAdminPageTemplate(ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromAppCmsCatchAll),
+    'utf8',
+  );
   log.success('app/cms/[[...path]]/page.tsx');
 
   writeFileSync(join(cmsRouteDir, 'error.tsx'), adminErrorTemplate, 'utf8');
@@ -178,24 +188,20 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   writeFileSync(join(chatRouteDir, 'route.ts'), agentChatRouteTemplate({ depth: 4 }), 'utf8');
   log.success('app/api/agent/route.ts');
 
-  // Depth from `app/api/agent/proposals/<endpoint>/route.ts` to project root = 5.
-  const proposalsBaseDir = join(projectRoot, 'app', 'api', 'agent', 'proposals');
-  const acceptRouteDir = join(proposalsBaseDir, 'accept');
-  const rejectRouteDir = join(proposalsBaseDir, 'reject');
-  mkdirSync(acceptRouteDir, { recursive: true });
-  mkdirSync(rejectRouteDir, { recursive: true });
-  writeFileSync(
-    join(acceptRouteDir, 'route.ts'),
-    agentProposalRouteTemplate({ handlerExport: 'acceptProposalRoute', depth: 5 }),
-    'utf8',
-  );
-  log.success('app/api/agent/proposals/accept/route.ts');
-  writeFileSync(
-    join(rejectRouteDir, 'route.ts'),
-    agentProposalRouteTemplate({ handlerExport: 'rejectProposalRoute', depth: 5 }),
-    'utf8',
-  );
-  log.success('app/api/agent/proposals/reject/route.ts');
+  // Note: chat-agent proposal accept/reject are server actions
+  // (`acceptProposalAction` / `rejectProposalAction` in
+  // `octocms/admin/actions/agent.ts`), called directly from `useChatStream` —
+  // no public endpoint files are scaffolded.
+
+  // Media proxy route — thin re-export of `mediaRoute` from `octocms/admin/mediaRoute`.
+  // Vercel's filesystem is immutable after build, so images committed from the
+  // CMS UI never land in `public/media/` on the running instance — routing
+  // them through a Route Handler lets the GitHub-API path serve them.
+  // Depth from `app/media/[...slug]/route.ts` to project root = 3.
+  const mediaRouteDir = join(projectRoot, 'app', 'media', '[...slug]');
+  mkdirSync(mediaRouteDir, { recursive: true });
+  writeFileSync(join(mediaRouteDir, 'route.ts'), mediaRouteTemplate({ depth: 3 }), 'utf8');
+  log.success('app/media/[...slug]/route.ts');
 
   // Hello page demo route
   mkdirSync(join(projectRoot, 'app', 'hello'), { recursive: true });

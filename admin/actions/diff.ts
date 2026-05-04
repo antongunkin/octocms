@@ -1,5 +1,7 @@
 'use server';
 
+import './registerConfig';
+
 import { execFile } from 'node:child_process';
 import fsPromises from 'node:fs/promises';
 

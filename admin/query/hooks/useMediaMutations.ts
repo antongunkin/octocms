@@ -4,10 +4,10 @@ import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-q
 
 import { deleteMedia, moveMedia, updateMediaMetadata, uploadMedia } from '../../actions/media';
 import type { UploadMediaResult } from '../../actions/utils';
-import { invalidateAfterMutation } from '../invalidate';
+import { invalidateAfterMutationAsync } from '../invalidate';
 
 function invalidateMediaCache(qc: QueryClient) {
-  invalidateAfterMutation(qc, ['media']);
+  return invalidateAfterMutationAsync(qc, ['media']);
 }
 
 /**

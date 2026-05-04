@@ -6,7 +6,7 @@ import {
   getMarkdownFieldNames,
   getRichTextFieldNames,
 } from './lib/companionMarkdown';
-import { getPublishedBranch, isProductionMode, listGitHubFiles, readGitHubFilePublic } from './github-public';
+import { isProductionMode, listGitHubFiles, readGitHubFilePublic, resolveContentBranch } from './github-public';
 import { parseRichText } from './lib/richtext/parseRichText';
 
 // ---------------------------------------------------------------------------
@@ -54,7 +54,7 @@ function pathImageField(src: string): ResolvedImageField {
 const resolvePublishedBranch = async (): Promise<string | undefined> => {
   const hasGitHubRepoConfig = !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
   if (!isProductionMode() || !hasGitHubRepoConfig) return undefined;
-  return getPublishedBranch();
+  return resolveContentBranch();
 };
 
 const REFERENCE_KEY_REGEX = /^([^-]+)-(.+?)(?:\.json)?$/;

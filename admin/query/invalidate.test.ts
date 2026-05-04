@@ -45,38 +45,44 @@ function calls() {
 }
 
 describe('invalidateAfterMutation', () => {
-  it('entries → invalidates only entries', () => {
+  it('entries → invalidates only entries', async () => {
     invalidateAfterMutation(qc, ['entries']);
+    await vi.waitFor(() => expect(postMessageSpy).toHaveBeenCalled());
     expect(calls()).toEqual([queryKeys.entries.all]);
     expect(postMessageSpy).toHaveBeenCalledWith({ v: 1, domains: ['entries'] });
   });
 
-  it('media → invalidates only media', () => {
+  it('media → invalidates only media', async () => {
     invalidateAfterMutation(qc, ['media']);
+    await vi.waitFor(() => expect(postMessageSpy).toHaveBeenCalled());
     expect(calls()).toEqual([queryKeys.media.all]);
     expect(postMessageSpy).toHaveBeenCalledWith({ v: 1, domains: ['media'] });
   });
 
-  it('agent → invalidates only agent', () => {
+  it('agent → invalidates only agent', async () => {
     invalidateAfterMutation(qc, ['agent']);
+    await vi.waitFor(() => expect(postMessageSpy).toHaveBeenCalled());
     expect(calls()).toEqual([queryKeys.agent.all]);
     expect(postMessageSpy).toHaveBeenCalledWith({ v: 1, domains: ['agent'] });
   });
 
-  it('schema → invalidates schema AND entries (field renames bubble through)', () => {
+  it('schema → invalidates schema AND entries (field renames bubble through)', async () => {
     invalidateAfterMutation(qc, ['schema']);
+    await vi.waitFor(() => expect(postMessageSpy).toHaveBeenCalled());
     expect(calls()).toEqual([queryKeys.schema.all, queryKeys.entries.all]);
     expect(postMessageSpy).toHaveBeenCalledWith({ v: 1, domains: ['schema'] });
   });
 
-  it('git → invalidates git AND entries (branch flip changes content)', () => {
+  it('git → invalidates git AND entries (branch flip changes content)', async () => {
     invalidateAfterMutation(qc, ['git']);
+    await vi.waitFor(() => expect(postMessageSpy).toHaveBeenCalled());
     expect(calls()).toEqual([queryKeys.git.all, queryKeys.entries.all]);
     expect(postMessageSpy).toHaveBeenCalledWith({ v: 1, domains: ['git'] });
   });
 
-  it('dedupes shared keys across multiple domains', () => {
+  it('dedupes shared keys across multiple domains', async () => {
     invalidateAfterMutation(qc, ['schema', 'git']);
+    await vi.waitFor(() => expect(postMessageSpy).toHaveBeenCalled());
     const fingerprints = calls().map((k) => JSON.stringify(k));
     const uniqueCount = new Set(fingerprints).size;
     expect(fingerprints.length).toBe(uniqueCount);
@@ -88,16 +94,19 @@ describe('invalidateAfterMutation', () => {
     expect(postMessageSpy).toHaveBeenCalledWith({ v: 1, domains: ['schema', 'git'] });
   });
 
-  it('empty domain list is a no-op', () => {
+  it('empty domain list is a no-op', async () => {
     invalidateAfterMutation(qc, []);
+    await Promise.resolve();
     expect(invalidateSpy).not.toHaveBeenCalled();
     expect(postMessageSpy).not.toHaveBeenCalled();
   });
 });
 
 describe('applyDomainInvalidation', () => {
-  it('does not broadcast (listener-only path)', () => {
+  it('does not broadcast (listener-only path)', async () => {
     applyDomainInvalidation(qc, ['entries']);
+    await vi.waitFor(() => expect(invalidateSpy).toHaveBeenCalled());
+    await Promise.resolve();
     expect(calls()).toEqual([queryKeys.entries.all]);
     expect(postMessageSpy).not.toHaveBeenCalled();
   });

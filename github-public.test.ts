@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { assertGitHubConfig, getPublishedBranch, listGitHubFiles, readGitHubFilePublic } from './github-public';
+import {
+  assertGitHubConfig,
+  listGitHubBranchRefsByPrefix,
+  listGitHubFiles,
+  readGitHubFilePublic,
+  resolveContentBranch,
+} from './github-public';
 import { isContentSourceError } from './lib/contentSourceError';
 
 const pointerState = vi.hoisted(() => ({ publishedPointerBranch: undefined as string | undefined }));
@@ -33,7 +39,19 @@ vi.mock('octokit', () => ({
         repos: {
           getContent: (args: any) => {
             const fn = octokitState.queue.shift();
-            if (!fn) throw new Error('No mock response configured (queue empty)');
+            if (!fn) throw new Error('No mock response configured (queue empty repos.getContent)');
+            return fn(args);
+          },
+        },
+        git: {
+          getRef: (args: any) => {
+            const fn = octokitState.queue.shift();
+            if (!fn) throw new Error('No mock response configured (queue empty git.getRef)');
+            return fn(args);
+          },
+          listMatchingRefs: (args: any) => {
+            const fn = octokitState.queue.shift();
+            if (!fn) throw new Error('No mock response configured (queue empty git.listMatchingRefs)');
             return fn(args);
           },
         },
@@ -57,6 +75,12 @@ function makeError(status: number, message = 'mock'): never {
   err.status = status;
   err.response = { data: { message } };
   throw err;
+}
+
+function makeGetRefOk() {
+  return async () => ({
+    data: { ref: 'refs/heads/any', object: { sha: 'abc123', type: 'commit' } },
+  });
 }
 
 const ORIG_ENV = { ...process.env };
@@ -149,6 +173,27 @@ describe('readGitHubFilePublic', () => {
   });
 });
 
+describe('listGitHubBranchRefsByPrefix', () => {
+  it('returns branch names stripped of refs/heads prefix', async () => {
+    process.env.CMS_GITHUB_TOKEN = 'tok';
+    octokitState.queue = [
+      async () => ({
+        data: [
+          { ref: 'refs/heads/cms/edit-a', object: { sha: 'a', type: 'commit' } },
+          { ref: 'refs/heads/cms/edit-b', object: { sha: 'b', type: 'commit' } },
+        ],
+      }),
+    ];
+    expect(await listGitHubBranchRefsByPrefix('cms/')).toEqual(['cms/edit-a', 'cms/edit-b']);
+  });
+
+  it('throws github_auth on 401 + 404', async () => {
+    process.env.CMS_GITHUB_TOKEN = 'tok';
+    octokitState.queue = [() => makeError(401), () => makeError(404)];
+    await expect(listGitHubBranchRefsByPrefix('cms/')).rejects.toMatchObject({ code: 'github_auth' });
+  });
+});
+
 describe('listGitHubFiles', () => {
   it('returns only files filtered by extension', async () => {
     process.env.CMS_GITHUB_TOKEN = 'tok';
@@ -181,34 +226,47 @@ describe('listGitHubFiles', () => {
   });
 });
 
-describe('getPublishedBranch', () => {
-  it('returns parsed branch when pointer file is valid JSON', async () => {
+describe('resolveContentBranch', () => {
+  it('returns parsed branch when pointer file is valid JSON and branch exists', async () => {
     process.env.CMS_GITHUB_TOKEN = 'tok';
-    octokitState.queue = [makeFileResponse(JSON.stringify({ branch: 'feature/x' }))];
-    expect(await getPublishedBranch()).toBe('feature/x');
+    octokitState.queue = [makeFileResponse(JSON.stringify({ branch: 'feature/x' })), makeGetRefOk()];
+    expect(await resolveContentBranch()).toBe('feature/x');
   });
 
-  it('returns configBranch when pointer file is missing (404)', async () => {
+  it('returns configBranch when pointer file is missing (404) and CMS_BRANCH unset', async () => {
     process.env.CMS_GITHUB_TOKEN = 'tok';
     octokitState.queue = [() => makeError(404)];
-    expect(await getPublishedBranch()).toBe('main');
+    expect(await resolveContentBranch()).toBe('main');
   });
 
   it('returns configBranch when pointer JSON is invalid', async () => {
     process.env.CMS_GITHUB_TOKEN = 'tok';
     octokitState.queue = [makeFileResponse('not json {{{')];
-    expect(await getPublishedBranch()).toBe('main');
+    expect(await resolveContentBranch()).toBe('main');
+  });
+
+  it('uses CMS_BRANCH when pointer file is missing and env branch exists', async () => {
+    process.env.CMS_GITHUB_TOKEN = 'tok';
+    process.env.CMS_BRANCH = 'feature/y';
+    octokitState.queue = [() => makeError(404), makeGetRefOk()];
+    expect(await resolveContentBranch()).toBe('feature/y');
+  });
+
+  it('falls back to base when pointer branch does not exist on remote', async () => {
+    process.env.CMS_GITHUB_TOKEN = 'tok';
+    octokitState.queue = [makeFileResponse(JSON.stringify({ branch: 'gone-branch' })), () => makeError(404)];
+    expect(await resolveContentBranch()).toBe('main');
   });
 
   it('throws on auth error from underlying read', async () => {
     process.env.CMS_GITHUB_TOKEN = 'tok';
     octokitState.queue = [() => makeError(401), () => makeError(404)];
-    await expect(getPublishedBranch()).rejects.toMatchObject({ code: 'github_auth' });
+    await expect(resolveContentBranch()).rejects.toMatchObject({ code: 'github_auth' });
   });
 
   it('throws on rate limit from underlying read', async () => {
     process.env.CMS_GITHUB_TOKEN = 'tok';
     octokitState.queue = [() => makeError(429)];
-    await expect(getPublishedBranch()).rejects.toMatchObject({ code: 'github_rate_limit' });
+    await expect(resolveContentBranch()).rejects.toMatchObject({ code: 'github_rate_limit' });
   });
 });

@@ -51,6 +51,10 @@
       "require": "./dist/agent/index.cjs",
       "import": "./dist/agent/index.js"
     },
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.js"
+    },
     "./components/public": {
       "types": "./dist/components/public/index.d.ts",
       "require": "./dist/components/public/index.cjs",
@@ -63,7 +67,6 @@
     },
     "./admin": {
       "types": "./dist/admin/index.d.ts",
-      "require": "./dist/admin/index.cjs",
       "import": "./dist/admin/index.js"
     },
     "./admin/*": {
@@ -81,6 +84,10 @@
     "./lib/*": {
       "types": "./dist/lib/*.d.ts",
       "import": "./dist/lib/*.js"
+    },
+    "./schema/*": {
+      "types": "./dist/schema/*.d.ts",
+      "import": "./dist/schema/*.js"
     },
     "./utils/*": {
       "types": "./dist/utils/*.d.ts",

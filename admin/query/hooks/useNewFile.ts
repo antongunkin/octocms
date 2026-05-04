@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { newFile } from '../../actions/files';
 import type { NewFileResult } from '../../actions/utils';
-import { invalidateAfterMutation } from '../invalidate';
+import { invalidateAfterMutationAsync } from '../invalidate';
 
 /**
  * Create a new entry of `type`. On success, invalidates every `entries` query
@@ -28,8 +28,6 @@ export function useNewFile() {
       }
       return result;
     },
-    onSuccess: () => {
-      invalidateAfterMutation(qc, ['entries', 'git']);
-    },
+    onSuccess: () => invalidateAfterMutationAsync(qc, ['entries', 'git']),
   });
 }

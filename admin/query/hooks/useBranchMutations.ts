@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { clearBranch, publishBranch, setActiveBranch } from '../../actions/git';
-import { invalidateAfterMutation } from '../invalidate';
+import { invalidateAfterMutationAsync } from '../invalidate';
 
 /**
  * Branch-state mutations. All three invalidate the `git` domain (which fans
@@ -21,7 +21,7 @@ export function useSetActiveBranch() {
   return useMutation<void, Error, string>({
     mutationKey: ['git', 'setActiveBranch'],
     mutationFn: (branch) => setActiveBranch(branch),
-    onSuccess: () => invalidateAfterMutation(qc, ['git']),
+    onSuccess: () => invalidateAfterMutationAsync(qc, ['git']),
   });
 }
 
@@ -30,7 +30,7 @@ export function useClearBranch() {
   return useMutation<void, Error, void>({
     mutationKey: ['git', 'clearBranch'],
     mutationFn: () => clearBranch(),
-    onSuccess: () => invalidateAfterMutation(qc, ['git']),
+    onSuccess: () => invalidateAfterMutationAsync(qc, ['git']),
   });
 }
 
@@ -43,6 +43,6 @@ export function usePublishBranch() {
       if (!result.success) throw new Error(result.error);
       return result;
     },
-    onSuccess: () => invalidateAfterMutation(qc, ['git']),
+    onSuccess: () => invalidateAfterMutationAsync(qc, ['git']),
   });
 }

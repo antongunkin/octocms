@@ -53,6 +53,27 @@ export type AcceptResult =
   | { ok: false; error: string; fieldErrors?: Record<string, string> };
 
 /**
+ * Validate that an arbitrary deserialised body is a well-formed `Proposal`.
+ * Used at the accept boundary to reject malformed client payloads before
+ * `acceptProposal` runs schema validation.
+ */
+export function isProposal(p: unknown): p is Proposal {
+  if (!p || typeof p !== 'object') return false;
+  const obj = p as Record<string, unknown>;
+  if (obj.kind !== 'edit' && obj.kind !== 'create') return false;
+  if (typeof obj.collection !== 'string' || !obj.collection) return false;
+  if (obj.kind === 'edit') {
+    return (
+      typeof obj.entryPath === 'string' &&
+      !!obj.entryPath &&
+      typeof obj.fieldChanges === 'object' &&
+      obj.fieldChanges !== null
+    );
+  }
+  return typeof obj.fields === 'object' && obj.fields !== null;
+}
+
+/**
  * Coerce arbitrary field values to strings so that `validateEntryFields` and
  * `saveFile` (which both expect form-style strings) can consume them.
  *

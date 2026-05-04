@@ -8,11 +8,11 @@ import type { SaveFileResult } from '../../actions/utils';
 import { getConfig } from '../../../lib/configStore';
 import { resolveEntryTitle } from '../../../lib/resolveEntryTitle';
 import type { EntryListItem } from '../../../types';
-import { invalidateAfterMutation } from '../invalidate';
+import { invalidateAfterMutationAsync } from '../invalidate';
 import { queryKeys } from '../keys';
 
 function invalidateEntriesCache(qc: QueryClient) {
-  invalidateAfterMutation(qc, ['entries']);
+  return invalidateAfterMutationAsync(qc, ['entries']);
 }
 
 function mergeEntryCachePayload(
@@ -103,12 +103,12 @@ export function useSaveFile() {
         },
       });
     },
-    onSuccess: (_data, { fileName, data }) => {
+    onSuccess: async (_data, { fileName, data }) => {
       qc.setQueryData(queryKeys.entries.detail(fileName), (old) =>
         mergeEntryCachePayload(old as Record<string, unknown> | undefined, data),
       );
       patchEntryListRows(qc, fileName, data);
-      invalidateEntriesCache(qc);
+      await invalidateEntriesCache(qc);
     },
   });
 }

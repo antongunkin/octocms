@@ -1,5 +1,7 @@
 'use server';
 
+import './registerConfig';
+
 import type { EntryStatus } from '../../types';
 import { getFile, saveFile } from './files';
 import { actionErr, type ActionResult } from './utils';

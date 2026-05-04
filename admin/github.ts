@@ -12,7 +12,9 @@ import {
   getPublishedPointerRef,
   readGitHubFilePublic,
   listGitHubFiles,
-  getPublishedBranch,
+  listGitHubFilesRecursive,
+  listGitHubBranchRefsByPrefix,
+  resolveContentBranch,
   isProductionMode,
 } from '../github-public';
 
@@ -22,7 +24,9 @@ export {
   getPublishedPointerRef,
   readGitHubFilePublic,
   listGitHubFiles,
-  getPublishedBranch,
+  listGitHubFilesRecursive,
+  listGitHubBranchRefsByPrefix,
+  resolveContentBranch,
   isProductionMode,
 };
 
@@ -108,12 +112,15 @@ const getWriteOctokit = async (): Promise<Octokit> => {
 
 /**
  * Read a binary file from GitHub using a static server token (no user session required).
- * Uses {@link getPublishedBranch} so assets match the same ref as `query()` / public JSON (not only `git.baseBranch`).
+ * If `branch` is provided, reads from that branch directly (used by the media route
+ * so editors see uploads on their active feature branch before publishing).
+ * Otherwise uses {@link resolveContentBranch} so assets match the same ref as
+ * `query()` / public JSON (not only `git.baseBranch`).
  * Returns a Buffer, or null if the file does not exist.
  */
-export const readGitHubBinaryFilePublic = async (filePath: string): Promise<Buffer | null> => {
+export const readGitHubBinaryFilePublic = async (filePath: string, branch?: string): Promise<Buffer | null> => {
   const { owner, repo } = assertGitHubConfig();
-  const ref = await getPublishedBranch();
+  const ref = branch ?? (await resolveContentBranch());
   const clients = getPublicOctokits();
 
   for (const octokit of clients) {
@@ -620,51 +627,4 @@ export const markPRReadyForReview = async (branchName: string): Promise<void> =>
     }`,
     { pullRequestId: pr.node_id },
   );
-};
-
-/**
- * List files recursively across subdirectories.
- * Used for getting all content files across collections.
- */
-export const listGitHubFilesRecursive = async (
-  dirPath: string,
-  extension?: string,
-  branch?: string,
-): Promise<string[]> => {
-  const [octokit] = getPublicOctokits();
-  const { owner, repo, branch: configBranch } = assertGitHubConfig();
-  const ref = branch ?? configBranch;
-
-  try {
-    const { data } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
-      path: dirPath,
-      ref,
-    });
-
-    if (!Array.isArray(data)) {
-      return [];
-    }
-
-    const results: string[] = [];
-
-    for (const item of data) {
-      if (item.type === 'file') {
-        if (!extension || item.path.endsWith(extension)) {
-          results.push(item.path);
-        }
-      } else if (item.type === 'dir') {
-        const subFiles = await listGitHubFilesRecursive(item.path, extension, branch);
-        results.push(...subFiles);
-      }
-    }
-
-    return results;
-  } catch (error: any) {
-    if (error.status === 404) {
-      return [];
-    }
-    throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref });
-  }
 };

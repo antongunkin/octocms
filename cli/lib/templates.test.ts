@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
+  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
   adminErrorTemplate,
-  adminLayoutTemplate,
-  adminPageTemplate,
-  agentProposalRouteTemplate,
+  buildAdminLayoutTemplate,
+  buildAdminPageTemplate,
   demoHelloPageJson,
   helloPageTemplate,
   LEGACY_ADMIN_CATCH_ALL_TEMPLATES,
@@ -63,16 +64,23 @@ describe('tsconfigPaths', () => {
 });
 
 describe('admin route templates (3-file model)', () => {
-  it('layout re-exports from the octocms/admin barrel', () => {
-    expect(adminLayoutTemplate).toContain("from 'octocms/admin'");
-    expect(adminLayoutTemplate).toContain('export { AdminLayout as default, metadata }');
-    expect(adminLayoutTemplate).toContain("import 'octocms/globals.css'");
-    expect(adminLayoutTemplate).toContain("import '../../cms/__generated__/configInit'");
+  it('layout re-exports from the octocms/admin barrel with depth-scoped configInit', () => {
+    const layoutApp = buildAdminLayoutTemplate(ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromAppCms);
+    expect(layoutApp).toContain("from 'octocms/admin'");
+    expect(layoutApp).toContain('export { AdminLayout as default, metadata }');
+    expect(layoutApp).toContain("import 'octocms/globals.css'");
+    expect(layoutApp).toContain("import '../../cms/__generated__/configInit'");
+    const layoutSrc = buildAdminLayoutTemplate(ADMIN_LAYOUT_CONFIG_INIT_DEPTH.fromSrcAppCms);
+    expect(layoutSrc).toContain("import '../../../cms/__generated__/configInit'");
   });
 
-  it('catch-all page re-exports AdminApp from the barrel', () => {
-    expect(adminPageTemplate).toContain("from 'octocms/admin'");
-    expect(adminPageTemplate).toContain('export { AdminApp as default }');
+  it('catch-all page re-exports AdminApp and side-effect-imports configInit', () => {
+    const page = buildAdminPageTemplate(ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromAppCmsCatchAll);
+    expect(page).toContain("from 'octocms/admin'");
+    expect(page).toContain('export { AdminApp as default }');
+    expect(page).toContain("import '../../../cms/__generated__/configInit'");
+    const pageSrc = buildAdminPageTemplate(ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH.fromSrcAppCmsCatchAll);
+    expect(pageSrc).toContain("import '../../../../cms/__generated__/configInit'");
   });
 
   it('error.tsx is a client component re-exporting AdminError from the barrel', () => {
@@ -88,17 +96,10 @@ describe('legacy template registries (used by `octocms update` for migration)', 
     expect(LEGACY_ADMIN_LAYOUT_TEMPLATES[0]).toContain("from 'octocms/admin/pages/AdminLayout'");
   });
 
-  it('records the deep-import catch-all shape', () => {
-    expect(LEGACY_ADMIN_CATCH_ALL_TEMPLATES.length).toBeGreaterThan(0);
+  it('records legacy catch-all shapes (deep import + barrel without page configInit)', () => {
+    expect(LEGACY_ADMIN_CATCH_ALL_TEMPLATES.length).toBe(2);
     expect(LEGACY_ADMIN_CATCH_ALL_TEMPLATES[0]).toContain("from 'octocms/admin/AdminApp'");
-  });
-});
-
-describe('agentProposalRouteTemplate', () => {
-  it('builds the correct relative configInit import path for src/app/ depth 6', () => {
-    const out = agentProposalRouteTemplate({ handlerExport: 'acceptProposalRoute', depth: 6 });
-    expect(out).toContain("import '../../../../../../cms/__generated__/configInit'");
-    expect(out).toContain("export { acceptProposalRoute as POST } from 'octocms/agent'");
+    expect(LEGACY_ADMIN_CATCH_ALL_TEMPLATES[1]).toContain("from 'octocms/admin'");
   });
 });
 

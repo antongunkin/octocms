@@ -26,10 +26,42 @@ type FeatureExtractionPipeline = (
   options: { pooling: 'mean'; normalize: boolean },
 ) => Promise<{ data: Float32Array; dims: number[] }>;
 
+/**
+ * `onnxruntime-node` (a transitive dep of `@huggingface/transformers`) loads
+ * `libonnxruntime.so.1` via a synchronous `require` at module top-level. On
+ * Vercel the .so isn't bundled by default, so the require throws and — worse
+ * — the package's internal init also fires an *unhandled* rejection that
+ * crashes the lambda with exit 128 even though our own `try`/`catch` handles
+ * the import.
+ *
+ * Install a one-time process-level filter that swallows just those native-
+ * load rejections. Other unhandled rejections still crash with the default
+ * Node behaviour.
+ */
+let nativeRejectionFilterInstalled = false;
+function installNativeRejectionFilter(): void {
+  if (nativeRejectionFilterInstalled) return;
+  if (typeof process === 'undefined' || typeof process.on !== 'function') return;
+  nativeRejectionFilterInstalled = true;
+  process.on('unhandledRejection', (reason: unknown) => {
+    const msg = reason instanceof Error ? reason.message : String(reason);
+    if (/libonnxruntime|onnxruntime-node|ERR_DLOPEN_FAILED/i.test(msg)) {
+      // Already surfaced via the embedder's caller catch path. Swallow so
+      // the lambda doesn't exit 128 on a content write.
+      return;
+    }
+    // Preserve Node's default crash behaviour for unrelated rejections.
+    setImmediate(() => {
+      throw reason;
+    });
+  });
+}
+
 class LocalTransformersEmbedder implements Embedder {
   readonly modelId: string;
   readonly dim: number;
   private pipelinePromise: Promise<FeatureExtractionPipeline> | null = null;
+  private permanentFailure: Error | null = null;
 
   constructor(modelId: string = DEFAULT_MODEL_ID, dim: number = DEFAULT_DIM) {
     this.modelId = modelId;
@@ -37,12 +69,23 @@ class LocalTransformersEmbedder implements Embedder {
   }
 
   private async getPipeline(): Promise<FeatureExtractionPipeline> {
+    if (this.permanentFailure) throw this.permanentFailure;
     if (this.pipelinePromise) return this.pipelinePromise;
-    this.pipelinePromise = (async () => {
+    installNativeRejectionFilter();
+    const p = (async (): Promise<FeatureExtractionPipeline> => {
       let mod: typeof import('@huggingface/transformers');
       try {
         mod = await import('@huggingface/transformers');
       } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        if (/libonnxruntime|onnxruntime-node|ERR_DLOPEN_FAILED/i.test(msg)) {
+          throw new Error(
+            `Embeddings unavailable: '@huggingface/transformers' loaded but its native ` +
+              `dependency 'onnxruntime-node' could not load (${msg}). On Vercel, add ` +
+              `'./node_modules/onnxruntime-node/**' to 'outputFileTracingIncludes' ` +
+              `for the relevant routes, or rely on offline 'npm run embeddings:gen'.`,
+          );
+        }
         throw new Error(
           `Embeddings require the optional peer dep '@huggingface/transformers'. Install it with: npm install @huggingface/transformers`,
         );
@@ -50,7 +93,14 @@ class LocalTransformersEmbedder implements Embedder {
       const pipe = (await mod.pipeline('feature-extraction', this.modelId)) as unknown as FeatureExtractionPipeline;
       return pipe;
     })();
-    return this.pipelinePromise;
+    // Mark as handled at promise-creation time so a rejection that beats the
+    // first await (e.g. native-lib load) doesn't fire unhandledRejection.
+    p.catch((e: unknown) => {
+      this.permanentFailure = e instanceof Error ? e : new Error(String(e));
+      this.pipelinePromise = null;
+    });
+    this.pipelinePromise = p;
+    return p;
   }
 
   async embed(texts: string[]): Promise<Float32Array[]> {

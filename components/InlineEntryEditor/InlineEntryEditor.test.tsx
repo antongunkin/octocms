@@ -9,7 +9,6 @@ const {
   saveFileMock,
   getFileMock,
   removeFileMock,
-  publishEntryMock,
   archiveEntryMock,
   restoreEntryMock,
   getEntryBacklinksMock,
@@ -23,7 +22,6 @@ const {
   saveFileMock: vi.fn(),
   getFileMock: vi.fn(),
   removeFileMock: vi.fn(),
-  publishEntryMock: vi.fn(),
   archiveEntryMock: vi.fn(),
   restoreEntryMock: vi.fn(),
   getEntryBacklinksMock: vi.fn(),
@@ -73,7 +71,7 @@ vi.mock('../../admin/actions/files', () => ({
 }));
 
 vi.mock('../../admin/actions/status', () => ({
-  publishEntry: (...a: unknown[]) => publishEntryMock(...a),
+  publishEntry: vi.fn(),
   archiveEntry: (...a: unknown[]) => archiveEntryMock(...a),
   restoreEntry: (...a: unknown[]) => restoreEntryMock(...a),
 }));
@@ -144,7 +142,6 @@ beforeEach(() => {
   saveFileMock.mockReset();
   getFileMock.mockReset();
   removeFileMock.mockReset();
-  publishEntryMock.mockReset();
   archiveEntryMock.mockReset();
   restoreEntryMock.mockReset();
   getEntryBacklinksMock.mockReset();

@@ -2,6 +2,11 @@ import { defineConfig } from 'tsup';
 import { globSync } from 'glob';
 
 const external = [
+  // User-app path resolved via the consumer's tsconfig — never bundled into
+  // the package. registerConfig.ts side-imports this so admin server actions
+  // initialise the config singleton on cold start.
+  'cms/__generated__/configInit',
+  /^cms\/__generated__\//,
   'next',
   'next/*',
   'react',
@@ -63,6 +68,7 @@ const allEntry = Object.fromEntries(
       'components/**/*.{ts,tsx}',
       'hooks/**/*.{ts,tsx}',
       'lib/**/*.{ts,tsx}',
+      'schema/**/*.{ts,tsx}',
       'utils/**/*.{ts,tsx}',
     ],
     { ignore: ['**/*.test.{ts,tsx}', '**/*.d.ts', 'cli/**'], cwd: import.meta.dirname },

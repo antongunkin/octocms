@@ -5,18 +5,18 @@
 'use client';
 
 import * as React from 'react';
-import { useIsFetching, useIsMutating } from '@tanstack/react-query';
+import { useIsFetching, useIsMutating, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { ExternalLink, Loader2, Plus, RefreshCw, Search, X } from 'lucide-react';
 
+import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 import { useAgentStatus } from '../../admin/query/hooks/useAgentStatus';
 import { useBranch } from '../../admin/query/hooks/useBranch';
 import { useBranchList } from '../../admin/query/hooks/useBranchList';
 import { useClearBranch, usePublishBranch, useSetActiveBranch } from '../../admin/query/hooks/useBranchMutations';
 import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
-import { useIsProduction } from '../../admin/query/hooks/useIsProduction';
 import { useConfig } from '../../hooks/useConfig';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
@@ -52,8 +52,9 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
   const { data } = useSession();
   const config = useConfig();
   const pathname = usePathname() ?? '/cms';
+  const router = useRouter();
+  const qc = useQueryClient();
 
-  const isProductionQuery = useIsProduction();
   const agentStatusQuery = useAgentStatus();
   const branchQuery = useBranch();
   const hasActiveBranchQuery = useHasActiveBranch();
@@ -66,11 +67,9 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
   const clearBranchMutation = useClearBranch();
   const publishBranchMutation = usePublishBranch();
 
-  const isProduction = isProductionQuery.data ?? false;
   const agentEnabled = agentStatusQuery.data?.enabled ?? false;
   const agentStatusLoading = agentStatusQuery.isPending;
   const activeBranch = branchQuery.data ?? '';
-  const isFeatureBranch = hasActiveBranchQuery.data ?? false;
   const branchChipLoading = branchQuery.isPending || hasActiveBranchQuery.isPending;
   const cmsBranches = branchListQuery.data ?? [];
   const branchListLoading = branchListQuery.isPending && branchListQuery.fetchStatus !== 'idle';
@@ -95,12 +94,11 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
     toast({ title: 'Back to main branch', variant: 'success' });
   };
 
-  const handleBranchCreated = (branchName: string, prUrl: string, prWarning?: string) => {
-    // CreateBranchDialog already wrote the cookie via `createBranch`; just
-    // re-read it (and the branch list) via React Query.
-    branchQuery.refetch();
-    hasActiveBranchQuery.refetch();
-    branchListQuery.refetch();
+  const handleBranchCreated = async (branchName: string, prUrl: string, prWarning?: string) => {
+    // Cookie is set on the createBranch response; invalidate git queries and
+    // refresh RSC so the branch chip and server actions see the new branch immediately.
+    await invalidateAfterMutationAsync(qc, ['git']);
+    router.refresh();
     if (prWarning) {
       toast({
         title: 'Branch created',
@@ -210,13 +208,13 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
 
       <span className="mx-1 h-[22px] w-px bg-[var(--border)]" />
 
-      {/* Branch chip — always visible; interactive only on a feature branch in production */}
+      {/* Branch chip — always visible; menu opens in dev and prod (create branch before any edit) */}
       {branchChipLoading ? (
         <BranchChipSkeleton />
-      ) : isFeatureBranch && isProduction ? (
+      ) : (
         <DropdownMenu open={branchOpen} onOpenChange={setBranchOpen}>
           <DropdownMenuTrigger asChild>
-            <BranchChip name={branchLabel} ahead={ahead} />
+            <BranchChip name={branchLabel} ahead={ahead} menuTrigger aria-label={`Branch menu, ${branchLabel}`} />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-[300px]" sideOffset={5} align="end">
             <DropdownMenuItem
@@ -227,7 +225,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
               }}
             >
               <Plus className="h-4 w-4" />
-              New branch
+              Create new branch
             </DropdownMenuItem>
 
             {(branchListLoading || cmsBranches.length > 0) && <DropdownMenuSeparator />}
@@ -285,8 +283,6 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      ) : (
-        <BranchChip name={branchLabel} ahead={ahead} disabled />
       )}
 
       {/* User avatar dropdown — design.html omits the chevron */}

@@ -1,5 +1,7 @@
 'use server';
 
+import './registerConfig';
+
 import fsPromises from 'fs/promises';
 import path from 'path';
 
@@ -10,7 +12,6 @@ import { getConfig } from '../../lib/configStore';
 import { getAgentConfig } from '../../agent/configStore';
 import { syncEmbeddingsAfterRemove, syncEmbeddingsAfterUpsert } from '../../agent/embeddingsHook';
 import { BRANCH_HISTORY_FILE_PATH, mergeHistoryContentWithAppendedEntry } from '../../lib/branchHistory';
-import { getPostBlogPublicPath } from '../../lib/blogPublicPath';
 import { companionMarkdownPathsForEntry, companionRichTextPathsForEntry } from '../../lib/companionMarkdown';
 import { initialFieldsForNewEntry } from '../../lib/initialEntryFields';
 import { persistedFieldsFromFormStrings } from '../../lib/persistedFormFields';
@@ -134,6 +135,9 @@ async function assertSlugFieldsUnique(
 
   const selfPath = normalizeContentPath(fileName);
   const siblings = await getContentFiles(entryType);
+  if (!Array.isArray(siblings)) {
+    return { ok: true };
+  }
 
   for (const [slugKey] of slugFieldEntries) {
     const candidate = persistedFields[slugKey];
@@ -284,10 +288,12 @@ export const getContentFiles = async (collection: string = '**') => {
 
       try {
         if (collection === '**') {
-          return await listGitHubFilesRecursive(config.contentFolder, '.json', activeBranch);
+          const listed = await listGitHubFilesRecursive(config.contentFolder, '.json', activeBranch);
+          return Array.isArray(listed) ? listed : [];
         }
 
-        return await listGitHubFiles(`${config.contentFolder}/${collection}`, '.json', activeBranch);
+        const listed = await listGitHubFiles(`${config.contentFolder}/${collection}`, '.json', activeBranch);
+        return Array.isArray(listed) ? listed : [];
       } catch (e) {
         // Fall back to local files if GitHub API access is not available.
       }
@@ -385,9 +391,27 @@ export const getFile = async (fileName: string) => {
       } catch (e) {
         // Fall back to local file if GitHub API access is not available.
       }
+
+      // Cold serverless instance: content store is empty. `getGitHubFile` may return null
+      // (404 race) or throw before `readGitHubFilePublic`'s multi-client retry path runs.
+      // Never fall through to `fs.readFile` on deploy — the repo is not on disk (ENOENT → 500).
+      if (!entry) {
+        try {
+          const activeBranch = (await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
+          const raw = await readGitHubFilePublic(fileName, activeBranch);
+          if (raw) {
+            entry = JSON.parse(raw);
+          }
+        } catch {
+          /* best-effort */
+        }
+      }
     }
 
     if (!entry) {
+      if (isProductionMode()) {
+        return {};
+      }
       const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), fileName);
       const data = await fsPromises.readFile(filePath, { encoding: 'utf8' });
       entry = JSON.parse(data);
@@ -447,18 +471,7 @@ export const saveFile = async (
     let payload = formData;
     const entryType = payload?.sys?.type;
     const rawFields = payload?.fields;
-    let previousBlogPaths: string[] = [];
     if (typeof entryType === 'string' && rawFields && typeof rawFields === 'object' && !Array.isArray(rawFields)) {
-      try {
-        const existing = await getFile(fileName);
-        const prevPath = getPostBlogPublicPath(existing);
-        if (prevPath) {
-          previousBlogPaths.push(prevPath);
-        }
-      } catch {
-        /* new file path or read failure — ignore */
-      }
-
       const strFields: Record<string, string> = {};
       for (const [k, v] of Object.entries(rawFields)) {
         if (v == null) {
@@ -503,6 +516,12 @@ export const saveFile = async (
       }
     }
 
+    // New entries start as draft (hidden from `query()`). First successful save promotes to `changed`
+    // so they become eligible for public pages once the workspace branch is published from the header.
+    if (!options?.skipStatusTransition && payload?.sys?.status === 'draft') {
+      payload = { ...payload, sys: { ...payload.sys, status: 'changed' } };
+    }
+
     // Auto-transition published/merged → changed on regular save (not on explicit publish)
     if (!options?.skipStatusTransition && (payload?.sys?.status === 'published' || payload?.sys?.status === 'merged')) {
       payload = { ...payload, sys: { ...payload.sys, status: 'changed' } };
@@ -525,9 +544,6 @@ export const saveFile = async (
 
     const data = JSON.stringify(payload, null, 2);
     const normalizedData = `${data}\n`;
-
-    const nextBlogPath = getPostBlogPublicPath(payload);
-    const blogPaths = [...previousBlogPaths, ...(nextBlogPath ? [nextBlogPath] : [])];
 
     if (isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
@@ -567,7 +583,7 @@ export const saveFile = async (
 
       await persistBranchHistoryEntryIfNeeded(activeBranch, fileName);
       await syncEmbeddingsForUpsertIfEnabled(fileName, payload, markdownContents, activeBranch, true);
-      const built = await buildJsons(fileName, { blogPaths });
+      const built = await buildJsons(fileName);
 
       return built.success ? actionOk() : built;
     }
@@ -591,7 +607,7 @@ export const saveFile = async (
     }
     await persistBranchHistoryEntryIfNeeded(activeBranchDev, fileName);
     await syncEmbeddingsForUpsertIfEnabled(fileName, payload, markdownContents, activeBranchDev, false);
-    const built = await buildJsons(fileName, { blogPaths });
+    const built = await buildJsons(fileName);
 
     return built.success ? actionOk() : built;
   } catch (e) {
@@ -655,15 +671,10 @@ export const newFile = async (type: string): Promise<NewFileResult> => {
 export const removeFile = async (fileName: string): Promise<ActionResult> => {
   const config = getConfig();
   try {
-    let blogPaths: string[] = [];
     let collectionType: string | undefined;
     try {
       const existing = await getFile(fileName);
       collectionType = existing?.sys?.type;
-      const p = getPostBlogPublicPath(existing);
-      if (p) {
-        blogPaths.push(p);
-      }
     } catch {
       /* best-effort */
     }
@@ -695,7 +706,7 @@ export const removeFile = async (fileName: string): Promise<ActionResult> => {
       }
 
       await syncEmbeddingsForRemoveIfEnabled(fileName, activeBranch, true);
-      const built = await buildJsons(fileName, { blogPaths });
+      const built = await buildJsons(fileName);
 
       return built.success ? actionOk() : built;
     }
@@ -710,7 +721,7 @@ export const removeFile = async (fileName: string): Promise<ActionResult> => {
       }
     }
     await syncEmbeddingsForRemoveIfEnabled(fileName, undefined, false);
-    const built = await buildJsons(fileName, { blogPaths });
+    const built = await buildJsons(fileName);
 
     return built.success ? actionOk() : built;
   } catch (e) {

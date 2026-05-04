@@ -71,7 +71,6 @@ export {
   type NormalizedAttachmentsResult,
   type AttachmentDiagnostic,
 } from './attachments';
-export { acceptProposalRoute, rejectProposalRoute, isProposal } from './proposalsApi';
 export { chatRoute, chatStatusRoute } from './chatApi';
 export { getChatProvider } from './providers';
 export type {
