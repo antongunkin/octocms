@@ -10,7 +10,45 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import readline from 'readline';
 
-import { log } from '../lib/logger';
+import { version as CLI_VERSION } from '../../package.json';
+import { fmt, log } from '../lib/logger';
+
+/**
+ * Required (non-optional) peer dependencies of `octocms`, excluding
+ * `next` / `react` / `react-dom` which any Next.js project already has.
+ *
+ * Keep in sync with `octocms/package.json` `peerDependencies` minus the
+ * entries flagged `optional: true` in `peerDependenciesMeta`. The
+ * `init.test.ts` `keeps REQUIRED_PEER_DEPS in sync` test enforces this.
+ */
+const REQUIRED_PEER_DEPS: readonly string[] = [
+  '@mdxeditor/editor',
+  '@radix-ui/react-avatar',
+  '@radix-ui/react-dialog',
+  '@radix-ui/react-dropdown-menu',
+  '@radix-ui/react-label',
+  '@radix-ui/react-select',
+  '@radix-ui/react-slot',
+  '@radix-ui/react-tabs',
+  '@radix-ui/react-toast',
+  '@tanstack/react-query',
+  'class-variance-authority',
+  'clsx',
+  'glob',
+  'lucide-react',
+  'minisearch',
+  'next-auth',
+  'octokit',
+  'react-markdown',
+  'rehype-sanitize',
+  'remark-gfm',
+  'remark-mdx',
+  'sharp',
+  'slugify',
+  'sonner',
+  'tailwind-merge',
+  'zod',
+];
 import {
   adminErrorTemplate,
   ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
@@ -301,11 +339,14 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   }
 
   const port = detectDevPort(projectRoot);
+  log.blank();
   log.info('Next steps:');
-  log.info('  1. Fill in GitHub App credentials in .env.local (see README.md)');
-  log.info('  2. Run: npm run dev');
-  log.info(`  3. Visit demo page: http://localhost:${port}/hello`);
-  log.info(`  4. Visit CMS admin:  http://localhost:${port}/cms`);
+  log.info('  1. Install dependencies:');
+  log.info(`     ${fmt.cyan(`npm install octocms@${CLI_VERSION} ${REQUIRED_PEER_DEPS.join(' ')}`)}`);
+  log.info('  2. Fill in GitHub App credentials in .env.local (see README.md)');
+  log.info('  3. Run: npm run dev');
+  log.info(`  4. Visit demo page: http://localhost:${port}/hello`);
+  log.info(`  5. Visit CMS admin:  http://localhost:${port}/cms`);
   log.info('');
   log.info('  After editing cms/octocms.config.ts, regenerate types:');
   log.info('  npx octocms types:gen');

@@ -378,11 +378,25 @@ Built with [OctoCMS](https://octocms.com) — a file-based CMS on Next.js.
 
 ## Setup
 
-### 1. Create a GitHub App
+### 1. Install dependencies
+
+\`\`\`bash
+npm install octocms next-auth @tanstack/react-query @mdxeditor/editor \\
+  @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \\
+  @radix-ui/react-label @radix-ui/react-select @radix-ui/react-slot \\
+  @radix-ui/react-tabs @radix-ui/react-toast \\
+  class-variance-authority clsx glob lucide-react minisearch octokit \\
+  react-markdown rehype-sanitize remark-gfm remark-mdx \\
+  sharp slugify sonner tailwind-merge zod
+\`\`\`
+
+> The exact list (with the right \`octocms\` version pin) is also printed by \`npx octocms init\` — copy it from there.
+
+### 2. Create a GitHub App
 
 Follow the [OctoCMS GitHub App setup guide](https://octocms.com/docs/github-app) to create a GitHub App for authentication.
 
-### 2. Configure environment variables
+### 3. Configure environment variables
 
 Copy the values from your GitHub App into \`.env.local\`:
 
@@ -403,7 +417,7 @@ GITHUB_REPO_NAME=your_repo_name
 # CMS_GITHUB_TOKEN=your_github_pat
 \`\`\`
 
-### 3. Run the dev server
+### 4. Run the dev server
 
 \`\`\`bash
 npm run dev

@@ -182,4 +182,23 @@ describe('initCommand', () => {
     // If port detection worked, init should complete successfully
     expect(existsSync(join(TMP_DIR, 'next.config.ts'))).toBe(true);
   });
+
+  it('keeps REQUIRED_PEER_DEPS in sync with package.json peerDependencies (minus optional + react/next)', async () => {
+    // Guard test — adding a new required peer dep to package.json fails CI
+    // until the printed `npm install` line in init.ts is updated. We re-read
+    // the source to avoid exporting an internal constant.
+    const initSrc = readFileSync(join(__dirname, 'init.ts'), 'utf8');
+    const block = /const REQUIRED_PEER_DEPS:[^=]*=\s*\[([\s\S]*?)\];/m.exec(initSrc);
+    expect(block, 'REQUIRED_PEER_DEPS array not found in init.ts').toBeTruthy();
+    const declared = (block![1].match(/'([^']+)'/g) ?? []).map((s) => s.slice(1, -1));
+
+    const pkgPath = join(__dirname, '..', '..', 'package.json');
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+    const optional = new Set(Object.keys(pkg.peerDependenciesMeta ?? {}));
+    const expected = Object.keys(pkg.peerDependencies ?? {})
+      .filter((k) => !optional.has(k))
+      .filter((k) => k !== 'next' && k !== 'react' && k !== 'react-dom')
+      .sort();
+    expect(declared.slice().sort()).toEqual(expected);
+  });
 });
