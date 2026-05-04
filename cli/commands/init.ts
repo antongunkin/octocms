@@ -22,6 +22,7 @@ import {
   demoHelloPageJson,
   envLocalTemplate,
   generatedConfigInitTemplate,
+  generatedSchemaShimTemplate,
   generatedContentDeclsTemplate,
   generatedEnumsTemplate,
   generatedIndexTemplate,
@@ -31,6 +32,7 @@ import {
   nextAuthRouteTemplate,
   nextConfigTemplate,
   octoConfigTemplate,
+  schemaJsonTemplate,
   readmeTemplate,
   rootLayoutConfigInitImport,
   rootLayoutTemplate,
@@ -150,10 +152,14 @@ function detectDevPort(projectRoot: string): number {
 export async function initCommand(projectRoot: string, options: InitOptions = {}): Promise<void> {
   log.header('Initialize a new project');
 
-  // Already initialized if cms/octocms.config.ts already contains defineConfig
+  // Already initialized if cms/octocms.config.ts already exports configOctoCMS,
+  // OR if the schema source-of-truth file already exists. Either is enough.
   const octoConfigPath = join(projectRoot, 'cms', 'octocms.config.ts');
-  if (existsSync(octoConfigPath) && readFileSync(octoConfigPath, 'utf8').includes('defineConfig')) {
-    log.error('cms/octocms.config.ts already contains defineConfig — this project is already initialized.');
+  const schemaJsonPath = join(projectRoot, 'cms', 'schema.json');
+  const octoConfigInitialized =
+    existsSync(octoConfigPath) && /export\s+const\s+configOctoCMS/.test(readFileSync(octoConfigPath, 'utf8'));
+  if (octoConfigInitialized || existsSync(schemaJsonPath)) {
+    log.error('cms/ already contains an OctoCMS install — this project is already initialized.');
     log.info('Use `octocms update` to regenerate admin route files.');
     process.exitCode = 1;
     return;
@@ -261,20 +267,24 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
   // Media directory
   mkdirSync(join(projectRoot, 'public', 'media'), { recursive: true });
 
-  // cms/octocms.config.ts — write the OctoCMS schema
+  // Schema source of truth + literal-typed shim + thin TS binding.
   log.blank();
   log.info('Updating configuration...');
   mkdirSync(join(projectRoot, 'cms'), { recursive: true });
-  writeFileSync(
-    octoConfigPath,
-    octoConfigTemplate({
-      projectName: answers.projectName,
-      baseBranch: answers.baseBranch,
-      pointerBranch: answers.usePointerBranch ? answers.pointerBranch : undefined,
-    }),
-    'utf8',
-  );
-  log.success('cms/octocms.config.ts — OctoCMS schema');
+  const schemaOpts = {
+    projectName: answers.projectName,
+    baseBranch: answers.baseBranch,
+    pointerBranch: answers.usePointerBranch ? answers.pointerBranch : undefined,
+  };
+  // cms/schema.json — source of truth (Content Model UI reads/writes here).
+  writeFileSync(join(projectRoot, 'cms', 'schema.json'), schemaJsonTemplate(schemaOpts), 'utf8');
+  log.success('cms/schema.json — source of truth');
+  // cms/__generated__/schema.ts — literal-typed mirror used by `query()`.
+  writeFileSync(join(generatedDir, 'schema.ts'), generatedSchemaShimTemplate(schemaOpts), 'utf8');
+  log.success('cms/__generated__/schema.ts');
+  // cms/octocms.config.ts — thin TS binding that re-exports the generated shim.
+  writeFileSync(octoConfigPath, octoConfigTemplate(schemaOpts), 'utf8');
+  log.success('cms/octocms.config.ts — schema binding');
 
   // next.config.ts — write the thin Next.js wrapper
   writeFileSync(nextConfigPath, nextConfigTemplate(), 'utf8');

@@ -298,15 +298,67 @@ export { searchRoute as GET } from 'octocms/admin/searchRoute';
 `;
 }
 
-export function octoConfigTemplate(opts: { projectName: string; baseBranch: string; pointerBranch?: string }): string {
+type SchemaInitOpts = { projectName: string; baseBranch: string; pointerBranch?: string };
+
+/**
+ * The starter schema used by `octocms init`. The data lives in `cms/schema.json`
+ * (source of truth — hand-editable + edited by the Content Model UI). The other
+ * two scaffolded files (`cms/__generated__/schema.ts` and `cms/octocms.config.ts`)
+ * mirror this same shape — keep them aligned by editing here only and letting
+ * `npx octocms types:gen` regenerate the rest in the user's project.
+ */
+function buildStarterSchema(opts: SchemaInitOpts): Record<string, unknown> {
+  const git: Record<string, string> = { baseBranch: opts.baseBranch };
+  if (opts.pointerBranch) git.publishedPointerBranch = opts.pointerBranch;
+  return {
+    projectName: opts.projectName,
+    git,
+    contentFolder: 'cms/content',
+    mediaContentFolder: 'cms/media',
+    mediaFolder: 'public/media',
+    mediaAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif'],
+    collections: {
+      helloPage: {
+        label: 'Hello Page',
+        fields: {
+          title: { label: 'Title', format: 'string', entryTitle: true, required: true },
+          description: { label: 'Description', format: 'text' },
+        },
+      },
+    },
+  };
+}
+
+/**
+ * `cms/schema.json` — the source of truth. The Content Model UI (`/cms/model`)
+ * reads and writes this file via `getSchema()` / `saveSchema()` server actions.
+ */
+export function schemaJsonTemplate(opts: SchemaInitOpts): string {
+  return JSON.stringify(buildStarterSchema(opts), null, 2) + '\n';
+}
+
+/**
+ * `cms/__generated__/schema.ts` — auto-generated literal-typed mirror of
+ * `cms/schema.json`. Required because `query()` infers narrow collection /
+ * field / format types from the literal `defineConfig()` call — a plain JSON
+ * import cannot preserve those literals.
+ *
+ * `npx octocms types:gen` regenerates this from `cms/schema.json` after every
+ * schema edit (and `npm run types:check` fails on drift).
+ */
+export function generatedSchemaShimTemplate(opts: SchemaInitOpts): string {
   const gitBlock = opts.pointerBranch
     ? `  git: {\n    baseBranch: '${opts.baseBranch}',\n    publishedPointerBranch: '${opts.pointerBranch}',\n  },`
     : `  git: { baseBranch: '${opts.baseBranch}' },`;
+  return `/*
+ * AUTO-GENERATED — DO NOT EDIT.
+ * Generated from cms/schema.json.
+ * Run \`npx octocms types:gen\` to regenerate.
+ */
 
-  return `import type { Config } from 'octocms/types';
-import { defineConfig } from 'octocms/config';
+import { defineConfig } from 'octocms/defineConfig';
 
-const _typedConfigOctoCMS = defineConfig({
+export const schema = defineConfig({
   projectName: '${opts.projectName}',
 ${gitBlock}
   contentFolder: 'cms/content',
@@ -323,8 +375,39 @@ ${gitBlock}
     },
   },
 });
+`;
+}
 
-export const configOctoCMS: Config = _typedConfigOctoCMS;
+/**
+ * `cms/octocms.config.ts` — thin TS binding. Imports the literal-typed
+ * `schema` from the generated shim and re-exports it as `configOctoCMS` (the
+ * runtime `Config`) and `OctoConfig` (the literal type used by `query()`).
+ *
+ * Hand-edits should go to `cms/schema.json`. After editing the JSON, run
+ * `npx octocms types:gen` to refresh `cms/__generated__/schema.ts`.
+ */
+export function octoConfigTemplate(_opts: SchemaInitOpts): string {
+  return `import type { Config } from 'octocms/types';
+import { schema } from './__generated__/schema';
+
+/**
+ * The schema is defined in \`cms/schema.json\` (source of truth — hand-editable
+ * and editable through the Content Model UI). \`npx octocms types:gen\` mirrors
+ * it into \`cms/__generated__/schema.ts\` as a literal-typed \`defineConfig()\`
+ * call so the downstream \`query()\` API can infer narrow collection / field /
+ * format types (which a plain JSON import cannot preserve).
+ *
+ * \`npm run types:check\` fails if the JSON and the generated shim drift.
+ */
+const _typedConfigOctoCMS = schema;
+
+/** Runtime config — widened to \`Config\` for dynamic indexing in CMS internals. */
+export const configOctoCMS: Config = _typedConfigOctoCMS as Config;
+
+/**
+ * Exact literal type of the config — use this for type-level inference only
+ * (e.g. the \`query()\` API derives collection/field names from it).
+ */
 export type OctoConfig = typeof _typedConfigOctoCMS;
 `;
 }

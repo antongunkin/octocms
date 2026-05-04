@@ -17,18 +17,29 @@ afterEach(() => {
 });
 
 describe('initCommand', () => {
-  it('creates cms/octocms.config.ts with schema and next.config.ts as thin wrapper in --yes mode', async () => {
+  it('scaffolds the schema-source-of-truth trio (JSON + generated shim + thin TS binding) in --yes mode', async () => {
     await initCommand(TMP_DIR, { yes: true });
 
-    // Schema file has the config
-    const octoConfig = readFileSync(join(TMP_DIR, 'cms', 'octocms.config.ts'), 'utf8');
-    expect(octoConfig).toContain("projectName: 'My CMS'");
-    expect(octoConfig).toContain("baseBranch: 'main'");
-    expect(octoConfig).toContain('defineConfig');
-    expect(octoConfig).toContain('export const configOctoCMS');
-    expect(octoConfig).toContain('export type OctoConfig');
+    // 1. cms/schema.json — source of truth (Content Model UI reads/writes here).
+    const schemaJson = JSON.parse(readFileSync(join(TMP_DIR, 'cms', 'schema.json'), 'utf8'));
+    expect(schemaJson.projectName).toBe('My CMS');
+    expect(schemaJson.git.baseBranch).toBe('main');
+    expect(schemaJson.collections.helloPage).toBeDefined();
 
-    // Wrapper file is thin
+    // 2. cms/__generated__/schema.ts — literal-typed defineConfig shim.
+    const schemaShim = readFileSync(join(TMP_DIR, 'cms', '__generated__', 'schema.ts'), 'utf8');
+    expect(schemaShim).toContain("import { defineConfig } from 'octocms/defineConfig'");
+    expect(schemaShim).toContain('export const schema = defineConfig({');
+    expect(schemaShim).toContain("projectName: 'My CMS'");
+
+    // 3. cms/octocms.config.ts — thin TS binding (no inline defineConfig).
+    const octoConfig = readFileSync(join(TMP_DIR, 'cms', 'octocms.config.ts'), 'utf8');
+    expect(octoConfig).toContain("import { schema } from './__generated__/schema'");
+    expect(octoConfig).toContain('export const configOctoCMS: Config = _typedConfigOctoCMS as Config');
+    expect(octoConfig).toContain('export type OctoConfig = typeof _typedConfigOctoCMS');
+    expect(octoConfig).not.toMatch(/defineConfig\s*\(\s*\{/);
+
+    // Wrapper file is still thin.
     const nextConfig = readFileSync(join(TMP_DIR, 'next.config.ts'), 'utf8');
     expect(nextConfig).toContain('withOctoCMS');
     expect(nextConfig).not.toContain('defineConfig');
@@ -93,9 +104,16 @@ describe('initCommand', () => {
     expect(nextConfig).toContain('withOctoCMS');
   });
 
-  it('refuses if cms/octocms.config.ts already contains defineConfig', async () => {
+  it('refuses if cms/octocms.config.ts already exports configOctoCMS', async () => {
     mkdirSync(join(TMP_DIR, 'cms'), { recursive: true });
-    writeFileSync(join(TMP_DIR, 'cms', 'octocms.config.ts'), 'const x = defineConfig({})', 'utf8');
+    writeFileSync(join(TMP_DIR, 'cms', 'octocms.config.ts'), 'export const configOctoCMS: any = {};\n', 'utf8');
+    await initCommand(TMP_DIR, { yes: true });
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('refuses if cms/schema.json already exists (project initialized via the JSON source)', async () => {
+    mkdirSync(join(TMP_DIR, 'cms'), { recursive: true });
+    writeFileSync(join(TMP_DIR, 'cms', 'schema.json'), '{}', 'utf8');
     await initCommand(TMP_DIR, { yes: true });
     expect(process.exitCode).toBe(1);
   });

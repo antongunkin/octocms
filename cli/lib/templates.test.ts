@@ -5,6 +5,7 @@ import {
   buildAdminLayoutTemplate,
   buildAdminPageTemplate,
   demoHelloPageJson,
+  generatedSchemaShimTemplate,
   helloPageTemplate,
   LEGACY_ADMIN_CATCH_ALL_TEMPLATES,
   LEGACY_ADMIN_LAYOUT_TEMPLATES,
@@ -13,31 +14,68 @@ import {
   octoConfigTemplate,
   rootLayoutConfigInitImport,
   rootLayoutTemplate,
+  schemaJsonTemplate,
   searchRouteTemplate,
   tsconfigPaths,
 } from './templates';
 
-describe('octoConfigTemplate', () => {
-  it('imports defineConfig from octocms/config and Config from octocms/types', () => {
+describe('octoConfigTemplate (thin TS binding to the generated shim)', () => {
+  it('imports schema from the generated shim and Config from octocms/types', () => {
     const out = octoConfigTemplate({ projectName: 'Test', baseBranch: 'main' });
-    expect(out).toContain("import { defineConfig } from 'octocms/config'");
     expect(out).toContain("import type { Config } from 'octocms/types'");
+    expect(out).toContain("import { schema } from './__generated__/schema'");
   });
 
-  it('uses _typedConfigOctoCMS and configOctoCMS variable names', () => {
+  it('re-exports configOctoCMS (Config) and OctoConfig (literal type)', () => {
     const out = octoConfigTemplate({ projectName: 'Test', baseBranch: 'main' });
-    expect(out).toContain('const _typedConfigOctoCMS = defineConfig(');
-    expect(out).toContain('export const configOctoCMS: Config = _typedConfigOctoCMS');
+    expect(out).toContain('const _typedConfigOctoCMS = schema');
+    expect(out).toContain('export const configOctoCMS: Config = _typedConfigOctoCMS as Config');
     expect(out).toContain('export type OctoConfig = typeof _typedConfigOctoCMS');
   });
 
-  it('generates config with project name', () => {
-    const out = octoConfigTemplate({
-      projectName: 'My Site',
-      baseBranch: 'main',
-    });
+  it('does NOT inline a defineConfig() call (schema lives in cms/schema.json)', () => {
+    const out = octoConfigTemplate({ projectName: 'My Site', baseBranch: 'main' });
+    expect(out).not.toContain("from 'octocms/config'");
+    // The literal call form `defineConfig({` would inline the schema. The
+    // docstring may still mention `defineConfig()` as prose — that's fine.
+    expect(out).not.toMatch(/defineConfig\s*\(\s*\{/);
+  });
+});
+
+describe('schemaJsonTemplate (cms/schema.json — source of truth)', () => {
+  it('emits valid JSON with the user-supplied projectName and baseBranch', () => {
+    const json = JSON.parse(schemaJsonTemplate({ projectName: 'My Site', baseBranch: 'main' }));
+    expect(json.projectName).toBe('My Site');
+    expect(json.git.baseBranch).toBe('main');
+    expect(json.git.publishedPointerBranch).toBeUndefined();
+    expect(json.collections.helloPage.fields.title.entryTitle).toBe(true);
+  });
+
+  it('includes publishedPointerBranch when supplied', () => {
+    const json = JSON.parse(
+      schemaJsonTemplate({ projectName: 'X', baseBranch: 'main', pointerBranch: 'cms/publish-pointer' }),
+    );
+    expect(json.git.publishedPointerBranch).toBe('cms/publish-pointer');
+  });
+});
+
+describe('generatedSchemaShimTemplate (cms/__generated__/schema.ts — literal-typed mirror)', () => {
+  it('mirrors the user-supplied projectName/baseBranch via defineConfig (preserves literal types)', () => {
+    const out = generatedSchemaShimTemplate({ projectName: 'My Site', baseBranch: 'develop' });
+    expect(out).toContain("import { defineConfig } from 'octocms/defineConfig'");
+    expect(out).toContain('export const schema = defineConfig({');
     expect(out).toContain("projectName: 'My Site'");
-    expect(out).toContain("baseBranch: 'main'");
+    expect(out).toContain("baseBranch: 'develop'");
+    expect(out).toContain('AUTO-GENERATED');
+  });
+
+  it('inlines publishedPointerBranch in the git block when supplied', () => {
+    const out = generatedSchemaShimTemplate({
+      projectName: 'X',
+      baseBranch: 'main',
+      pointerBranch: 'cms/publish-pointer',
+    });
+    expect(out).toMatch(/git:\s*\{[\s\S]*publishedPointerBranch:\s*'cms\/publish-pointer'/);
   });
 });
 
