@@ -13,6 +13,32 @@ import readline from 'readline';
 import { version as CLI_VERSION } from '../../package.json';
 import { fmt, log } from '../lib/logger';
 
+import {
+  adminErrorTemplate,
+  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
+  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
+  buildAdminLayoutTemplate,
+  buildAdminPageTemplate,
+  agentChatRouteTemplate,
+  mediaRouteTemplate,
+  demoHelloPageJson,
+  envLocalTemplate,
+  generatedConfigInitTemplate,
+  generatedContentDeclsTemplate,
+  generatedEnumsTemplate,
+  generatedIndexTemplate,
+  generatedQueryTemplate,
+  generatedTypesTemplate,
+  helloPageTemplate,
+  nextAuthRouteTemplate,
+  nextConfigTemplate,
+  octoConfigTemplate,
+  readmeTemplate,
+  rootLayoutConfigInitImport,
+  rootLayoutTemplate,
+  tsconfigPaths,
+} from '../lib/templates';
+
 /**
  * Required (non-optional) peer dependencies of `octocms`, excluding
  * `next` / `react` / `react-dom` which any Next.js project already has.
@@ -49,31 +75,6 @@ const REQUIRED_PEER_DEPS: readonly string[] = [
   'tailwind-merge',
   'zod',
 ];
-import {
-  adminErrorTemplate,
-  ADMIN_LAYOUT_CONFIG_INIT_DEPTH,
-  ADMIN_CATCH_ALL_CONFIG_INIT_DEPTH,
-  buildAdminLayoutTemplate,
-  buildAdminPageTemplate,
-  agentChatRouteTemplate,
-  mediaRouteTemplate,
-  demoHelloPageJson,
-  envLocalTemplate,
-  generatedConfigInitTemplate,
-  generatedContentDeclsTemplate,
-  generatedEnumsTemplate,
-  generatedIndexTemplate,
-  generatedQueryTemplate,
-  generatedTypesTemplate,
-  helloPageTemplate,
-  nextAuthRouteTemplate,
-  nextConfigTemplate,
-  octoConfigTemplate,
-  readmeTemplate,
-  rootLayoutConfigInitImport,
-  rootLayoutTemplate,
-  tsconfigPaths,
-} from '../lib/templates';
 
 export type InitOptions = {
   /** Accept all defaults without prompting. */
