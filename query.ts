@@ -68,7 +68,7 @@ function toContentPathLocal(value: string, contentFolder: string): string {
 
 async function resolveImageFieldValue(
   raw: string,
-  contentFolder: string,
+  mediaContentFolder: string,
   branch?: string,
 ): Promise<ResolvedImageField | null> {
   if (!raw) return null;
@@ -76,7 +76,7 @@ async function resolveImageFieldValue(
     return pathImageField(raw);
   }
 
-  const mediaDir = `${contentFolder}/media`;
+  const mediaDir = mediaContentFolder;
   let mediaEntry = await readContentFile(`${mediaDir}/media-${raw}.json`, branch);
   if (!mediaEntry) {
     // Legacy uploads may use `{uuid}.json` instead of `media-{uuid}.json`.
@@ -110,6 +110,7 @@ async function resolveImageFieldValue(
 async function resolveReferenceEmbedValue(
   refKey: string,
   contentFolder: string,
+  mediaContentFolder: string,
   collections: Config['collections'],
   branch?: string,
 ): Promise<unknown | null> {
@@ -118,7 +119,7 @@ async function resolveReferenceEmbedValue(
   if (!contentPath) return null;
   const raw = await readContentFile(contentPath, branch);
   if (!raw) return null;
-  return processEntry(raw, contentFolder, collections, branch);
+  return processEntry(raw, contentFolder, mediaContentFolder, collections, branch);
 }
 
 /**
@@ -128,6 +129,7 @@ async function resolveConditionalFieldValue(
   fieldConfig: any,
   storedValue: any,
   contentFolder: string,
+  mediaContentFolder: string,
   collections: Config['collections'],
   branch?: string,
   conditions?: Record<string, string>,
@@ -154,7 +156,14 @@ async function resolveConditionalFieldValue(
         const refPath = toContentPathLocal(branchValue, contentFolder);
         if (refPath) {
           const raw = await readContentFile(refPath, branch);
-          result[branchDef.key] = await processEntry(raw, contentFolder, collections, branch, conditions);
+          result[branchDef.key] = await processEntry(
+            raw,
+            contentFolder,
+            mediaContentFolder,
+            collections,
+            branch,
+            conditions,
+          );
         } else {
           result[branchDef.key] = null;
         }
@@ -163,6 +172,7 @@ async function resolveConditionalFieldValue(
           branchDef.fields,
           branchValue,
           contentFolder,
+          mediaContentFolder,
           collections,
           branch,
           conditions,
@@ -183,13 +193,21 @@ async function resolveConditionalFieldValue(
     const refPath = toContentPathLocal(branchValue, contentFolder);
     if (refPath) {
       const raw = await readContentFile(refPath, branch);
-      return processEntry(raw, contentFolder, collections, branch, conditions);
+      return processEntry(raw, contentFolder, mediaContentFolder, collections, branch, conditions);
     }
     return null;
   }
 
   if (branchDef.fields && typeof branchValue === 'object' && branchValue) {
-    return resolveInlineBranchFields(branchDef.fields, branchValue, contentFolder, collections, branch, conditions);
+    return resolveInlineBranchFields(
+      branchDef.fields,
+      branchValue,
+      contentFolder,
+      mediaContentFolder,
+      collections,
+      branch,
+      conditions,
+    );
   }
 
   return branchValue ?? null;
@@ -202,6 +220,7 @@ async function resolveInlineBranchFields(
   branchFieldDefs: Record<string, any>,
   branchValues: Record<string, any>,
   contentFolder: string,
+  mediaContentFolder: string,
   collections: Config['collections'],
   branch?: string,
   conditions?: Record<string, string>,
@@ -213,7 +232,7 @@ async function resolveInlineBranchFields(
 
     if (subDef.format === 'image') {
       if (value != null && String(value).trim()) {
-        const resolved = await resolveImageFieldValue(String(value).trim(), contentFolder, branch);
+        const resolved = await resolveImageFieldValue(String(value).trim(), mediaContentFolder, branch);
         value = resolved ?? null;
       } else {
         value = null;
@@ -239,12 +258,21 @@ async function resolveInlineBranchFields(
       const references: any[] = [];
       for (const refPath of parsedPaths) {
         const raw = await readContentFile(refPath, branch);
-        const resolved = await processEntry(raw, contentFolder, collections, branch, conditions);
+        const resolved = await processEntry(raw, contentFolder, mediaContentFolder, collections, branch, conditions);
         if (resolved) references.push(resolved);
       }
       value = isSingle ? references[0] || null : references;
     } else if (subDef.format === 'conditional') {
-      value = await resolveConditionalFieldValue(subDef, value, contentFolder, collections, branch, conditions, subKey);
+      value = await resolveConditionalFieldValue(
+        subDef,
+        value,
+        contentFolder,
+        mediaContentFolder,
+        collections,
+        branch,
+        conditions,
+        subKey,
+      );
     }
 
     result[subKey] = value;
@@ -260,6 +288,7 @@ async function resolveInlineBranchFields(
 const processEntry = async (
   json: any,
   contentFolder: string,
+  mediaContentFolder: string,
   collections: Config['collections'],
   branch?: string,
   conditions?: Record<string, string>,
@@ -289,6 +318,7 @@ const processEntry = async (
         configFields[key],
         value,
         contentFolder,
+        mediaContentFolder,
         collections,
         branch,
         conditions,
@@ -322,7 +352,7 @@ const processEntry = async (
       const references: any[] = [];
       for (const refPath of parsedPaths) {
         const raw = await readContentFile(refPath, branch);
-        const resolved = await processEntry(raw, contentFolder, collections, branch);
+        const resolved = await processEntry(raw, contentFolder, mediaContentFolder, collections, branch);
         if (resolved) references.push(resolved);
       }
 
@@ -333,7 +363,7 @@ const processEntry = async (
       if (value == null || !String(value).trim()) {
         value = null;
       } else {
-        const resolved = await resolveImageFieldValue(String(value).trim(), contentFolder, branch);
+        const resolved = await resolveImageFieldValue(String(value).trim(), mediaContentFolder, branch);
         value = resolved ?? null;
       }
     }
@@ -356,8 +386,9 @@ const processEntry = async (
     const rawMdx = await readRawFile(mdxPath, branch);
     if (rawMdx) {
       formattedFields[fieldName] = await parseRichText(rawMdx, {
-        resolveImage: (mediaId) => resolveImageFieldValue(mediaId, contentFolder, branch),
-        resolveReference: (refKey) => resolveReferenceEmbedValue(refKey, contentFolder, collections, branch),
+        resolveImage: (mediaId) => resolveImageFieldValue(mediaId, mediaContentFolder, branch),
+        resolveReference: (refKey) =>
+          resolveReferenceEmbedValue(refKey, contentFolder, mediaContentFolder, collections, branch),
       });
     } else {
       formattedFields[fieldName] = { type: 'doc', content: [] };
@@ -516,6 +547,7 @@ export class QueryBuilder<
   /** Execute the query and return all matching entries as an array. */
   async toArray(): Promise<TEntryMap[C][]> {
     const contentFolder = this._octoConfig.contentFolder;
+    const mediaContentFolder = this._octoConfig.mediaContentFolder;
     const collections = this._octoConfig.collections;
     const branch = await resolvePublishedBranch();
     const files = await listCollectionFiles(this._collection, contentFolder, branch);
@@ -525,7 +557,7 @@ export class QueryBuilder<
 
     for (const raw of rawEntries) {
       if (!raw) continue;
-      const entry = await processEntry(raw, contentFolder, collections, branch, this._conditions);
+      const entry = await processEntry(raw, contentFolder, mediaContentFolder, collections, branch, this._conditions);
       if (entry) processed.push(entry as TEntryMap[C]);
     }
 
@@ -584,6 +616,7 @@ export class QueryBuilder<
     hasMore: boolean;
   }> {
     const contentFolder = this._octoConfig.contentFolder;
+    const mediaContentFolder = this._octoConfig.mediaContentFolder;
     const collections = this._octoConfig.collections;
     const branch = await resolvePublishedBranch();
     const files = await listCollectionFiles(this._collection, contentFolder, branch);
@@ -592,7 +625,7 @@ export class QueryBuilder<
 
     for (const raw of rawEntries) {
       if (!raw) continue;
-      const entry = await processEntry(raw, contentFolder, collections, branch, this._conditions);
+      const entry = await processEntry(raw, contentFolder, mediaContentFolder, collections, branch, this._conditions);
       if (entry) processed.push(entry as TEntryMap[C]);
     }
 

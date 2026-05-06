@@ -558,6 +558,57 @@ export const listGitHubCMSPullRequests = async (): Promise<
     }));
 };
 
+export type RecentCMSPullRequestState = 'open' | 'merged' | 'closed';
+
+/**
+ * List the most-recently-updated PRs tagged with the `cms-update` label,
+ * across all states (open / merged / closed). Used by the dashboard
+ * "Recent pull requests" card.
+ */
+export const listGitHubRecentCMSPullRequests = async (
+  limit = 5,
+): Promise<
+  {
+    branch: string;
+    prUrl: string;
+    prNumber: number;
+    title: string;
+    state: RecentCMSPullRequestState;
+    updatedAt: string;
+    authorLogin: string | null;
+    authorAvatarUrl: string | null;
+  }[]
+> => {
+  const octokit = await getWriteOctokit();
+  const { owner, repo } = assertGitHubConfig();
+
+  const { data: prs } = await octokit.rest.pulls.list({
+    owner,
+    repo,
+    state: 'all',
+    sort: 'updated',
+    direction: 'desc',
+    per_page: 50,
+  });
+
+  return prs
+    .filter((pr) => pr.labels.some((l) => l.name === 'cms-update'))
+    .slice(0, Math.max(1, limit))
+    .map((pr) => {
+      const state: RecentCMSPullRequestState = pr.merged_at ? 'merged' : pr.state === 'open' ? 'open' : 'closed';
+      return {
+        branch: pr.head.ref,
+        prUrl: pr.html_url,
+        prNumber: pr.number,
+        title: pr.title,
+        state,
+        updatedAt: pr.updated_at,
+        authorLogin: pr.user?.login ?? null,
+        authorAvatarUrl: pr.user?.avatar_url ?? null,
+      };
+    });
+};
+
 /**
  * Create a pull request from the configured branch to the target branch.
  */

@@ -98,8 +98,7 @@
   --ft-ui:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol';
-  --ft-mono:
-    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --ft-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
   /* v2 surfaces */
   --bg: #1a1816;
@@ -308,6 +307,9 @@
 .scroll::-webkit-scrollbar-track {
   background: transparent;
 }
+html {
+  scrollbar-color: hsl(0, 0%, 67%) transparent;
+}
 
 /* ============================================================
    Focus + field shell helpers
@@ -319,7 +321,9 @@
 }
 
 .field-shell {
-  transition: border-color 120ms, box-shadow 120ms;
+  transition:
+    border-color 120ms,
+    box-shadow 120ms;
 }
 .field-shell:hover {
   border-color: var(--border-strong) !important;
@@ -340,6 +344,24 @@
 .field-shell input::placeholder,
 .field-textarea::placeholder {
   color: var(--muted);
+}
+
+/* Native date/time inputs: sync color-scheme so the browser renders the
+   calendar icon and picker popup in the right theme (dark by default,
+   light inside .light). Without this the icon and dropdown use OS default. */
+.field-shell input[type='date'],
+.field-shell input[type='datetime-local'],
+.field-shell input[type='time'],
+.field-shell input[type='month'],
+.field-shell input[type='week'] {
+  color-scheme: dark;
+}
+.light .field-shell input[type='date'],
+.light .field-shell input[type='datetime-local'],
+.light .field-shell input[type='time'],
+.light .field-shell input[type='month'],
+.light .field-shell input[type='week'] {
+  color-scheme: light;
 }
 
 @utility shadow-1 {

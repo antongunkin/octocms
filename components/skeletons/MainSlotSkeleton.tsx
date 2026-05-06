@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DashboardPageChromeSkeleton } from '../Dashboard/skeletons/DashboardPageChromeSkeleton';
+import { ContentPageChromeSkeleton } from '../Dashboard/skeletons/ContentPageChromeSkeleton';
 import { TopHeaderSkeleton } from '../Layout/skeletons/TopHeaderSkeleton';
 
 import { cn } from '../../lib/utils';
@@ -16,7 +16,7 @@ export function MainSlotSkeleton({ className }: { className?: string }) {
       role="status"
       aria-label="Loading page"
     >
-      <DashboardPageChromeSkeleton />
+      <ContentPageChromeSkeleton />
     </div>
   );
 }
@@ -30,7 +30,7 @@ export function AdminBootstrapSkeleton() {
     <div className="flex h-screen flex-col bg-background" role="status" aria-label="Loading CMS">
       <TopHeaderSkeleton />
       <div className="flex min-h-0 flex-1 flex-col">
-        <DashboardPageChromeSkeleton />
+        <ContentPageChromeSkeleton />
       </div>
     </div>
   );

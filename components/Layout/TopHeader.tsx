@@ -35,9 +35,12 @@ import { ThemeToggle, type Theme } from '../../admin/theme';
 import { AgentNavSkeleton } from './skeletons/AgentNavSkeleton';
 import { BranchChipSkeleton } from './skeletons/BranchChipSkeleton';
 
+// `content` is the admin index — both `/cms` (canonical) and `/cms/content`
+// (legacy alias) render `ContentPage`. The `matchPrefix` of `/cms` is checked
+// last (in reverse) so deeper sections (`/cms/media`, `/cms/model`, `/cms/chat`)
+// still highlight their own nav item even though they also start with `/cms`.
 const NAV: { id: string; label: string; href: string; matchPrefix?: string }[] = [
-  { id: 'dashboard', label: 'Dashboard', href: '/cms', matchPrefix: '/cms' },
-  { id: 'content', label: 'Content', href: '/cms/content', matchPrefix: '/cms/content' },
+  { id: 'content', label: 'Content', href: '/cms', matchPrefix: '/cms' },
   { id: 'media', label: 'Media', href: '/cms/media', matchPrefix: '/cms/media' },
   { id: 'model', label: 'Model', href: '/cms/model', matchPrefix: '/cms/model' },
   { id: 'chat', label: 'Chat', href: '/cms/chat', matchPrefix: '/cms/chat' },
@@ -77,7 +80,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
   const active: string =
     NAV.slice()
       .reverse()
-      .find((n) => n.matchPrefix && pathname.startsWith(n.matchPrefix))?.id ?? 'dashboard';
+      .find((n) => n.matchPrefix && pathname.startsWith(n.matchPrefix))?.id ?? 'content';
 
   const handleSwitchBranch = async (branch: string, isBaseRow: boolean) => {
     if (isBaseRow) {

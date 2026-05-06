@@ -31,6 +31,7 @@ export const queryKeys = {
     hasActive: () => ['git', 'hasActive'] as const,
     branches: () => ['git', 'branches'] as const,
     isProduction: () => ['git', 'isProduction'] as const,
+    recentCMSPRs: (limit?: number) => ['git', 'recentCMSPRs', limit ?? 5] as const,
   },
   agent: {
     all: ['agent'] as const,

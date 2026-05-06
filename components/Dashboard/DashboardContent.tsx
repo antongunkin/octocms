@@ -9,6 +9,7 @@ import {
   ChevronRight,
   FileText,
   GitBranch,
+  GitPullRequest,
   Image as ImageIcon,
   LayoutList,
   Plus,
@@ -32,6 +33,8 @@ import { formatUpdatedAt, formatUpdatedAtFull } from '../../utils/formatUpdatedA
 
 import { ContentTableSkeleton } from './skeletons/ContentTableSkeleton';
 import { LeftPanelSkeleton } from './skeletons/LeftPanelSkeleton';
+import { RecentPullRequestsView } from './RecentPullRequests';
+import { useRecentCMSPullRequests } from '../../admin/query/hooks/useRecentCMSPullRequests';
 
 const PAGE_SIZE = 20;
 const ALL_STATUSES: EntryStatus[] = ['draft', 'changed', 'published', 'merged', 'archived'];
@@ -43,11 +46,17 @@ type Props = {
 export default function DashboardContent({ selectedType }: Props) {
   const config = useConfig();
   const searchParams = useSearchParams();
-  const isBranched = !selectedType && searchParams.get('tab') === 'branched';
+  const tabParam = searchParams.get('tab');
+  const isBranched = !selectedType && tabParam === 'branched';
+  const isRecent = !selectedType && tabParam === 'recent';
 
   const entriesQuery = useEntryList(selectedType, { placeholderData: keepPreviousData });
   const branchQuery = useBranch();
   const hasActiveBranchQuery = useHasActiveBranch();
+  // Always fetched so the LeftPanel can show the count badge; the hook is
+  // shared with `RecentPullRequestsView` via the same query key (5 s staleTime).
+  const recentPRsQuery = useRecentCMSPullRequests(5);
+  const recentPRsCount = recentPRsQuery.data?.length ?? 0;
 
   const entriesData = entriesQuery.data;
   const isLoadingEntries = entriesQuery.isPending && !entriesData;
@@ -108,15 +117,19 @@ export default function DashboardContent({ selectedType }: Props) {
           <LeftPanel
             entries={entries}
             branchedCount={branchedEntries.length}
+            recentPRsCount={recentPRsCount}
             countByType={countByType}
             collections={collections}
             isBranched={isBranched}
+            isRecent={isRecent}
             selectedType={selectedType}
           />
         )}
 
         {isLoadingEntries ? (
           <ContentTableSkeleton />
+        ) : isRecent ? (
+          <RecentPullRequestsView />
         ) : isBranched ? (
           <BranchedView
             entries={branchedEntries}
@@ -187,16 +200,20 @@ function AddEntryButton({ collections }: { collections: string[] }) {
 function LeftPanel({
   entries,
   branchedCount,
+  recentPRsCount,
   countByType,
   collections,
   isBranched,
+  isRecent,
   selectedType,
 }: {
   entries: EntryListItem[];
   branchedCount: number;
+  recentPRsCount: number;
   countByType: Record<string, number>;
   collections: string[];
   isBranched: boolean;
+  isRecent: boolean;
   selectedType?: string;
 }) {
   const config = useConfig();
@@ -205,18 +222,25 @@ function LeftPanel({
     <aside className="flex w-[248px] shrink-0 flex-col overflow-y-auto border-r border-border bg-[var(--surface-2)]">
       <nav className="space-y-0.5 px-3 py-4">
         <LeftNavItem
-          href="/cms/content"
+          href="/cms"
           icon={<LayoutList className="h-4 w-4" />}
           label="All content"
           count={entries.length}
-          active={!isBranched && !selectedType}
+          active={!isBranched && !isRecent && !selectedType}
         />
         <LeftNavItem
-          href="/cms/content?tab=branched"
+          href="/cms?tab=branched"
           icon={<GitBranch className="h-4 w-4" />}
           label="Branched content"
           count={branchedCount}
           active={isBranched}
+        />
+        <LeftNavItem
+          href="/cms?tab=recent"
+          icon={<GitPullRequest className="h-4 w-4" />}
+          label="Recent PRs"
+          count={recentPRsCount}
+          active={isRecent}
         />
       </nav>
 

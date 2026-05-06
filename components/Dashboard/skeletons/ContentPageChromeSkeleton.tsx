@@ -9,9 +9,9 @@ import { LeftPanelSkeleton } from './LeftPanelSkeleton';
  * In-page chrome matching `DashboardContent` while entries load: breadcrumb
  * row + primary action + `LeftPanelSkeleton` + `ContentTableSkeleton`. Shared by
  * `MainSlotSkeleton` / `AdminBootstrapSkeleton` so the main-area shimmer
- * matches `/cms/content` block skeletons.
+ * matches the admin index (`/cms`) block skeletons.
  */
-export function DashboardPageChromeSkeleton() {
+export function ContentPageChromeSkeleton() {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="flex min-h-[52px] shrink-0 items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">

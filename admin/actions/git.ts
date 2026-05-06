@@ -18,9 +18,11 @@ import {
   getPublishedPointerRef,
   isProductionMode,
   listGitHubCMSPullRequests,
+  listGitHubRecentCMSPullRequests,
   markPRReadyForReview,
   resolveContentBranch,
   saveGitHubFile,
+  type RecentCMSPullRequestState,
 } from '../github';
 import type { EntryCommit, EntryCommitHistory } from '../../types';
 import {
@@ -368,5 +370,36 @@ export const getEntryCommits = async (filePath: string): Promise<EntryCommitHist
   } catch (e) {
     logCmsServerError({ operation: 'getEntryCommits', message: getErrorMessage(e) });
     return empty;
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Dashboard reads (production-only, best-effort)
+// ---------------------------------------------------------------------------
+
+export type RecentCMSPullRequest = {
+  branch: string;
+  prUrl: string;
+  prNumber: number;
+  title: string;
+  state: RecentCMSPullRequestState;
+  updatedAt: string;
+  authorLogin: string | null;
+  authorAvatarUrl: string | null;
+};
+
+/**
+ * Most-recently-updated PRs tagged with the `cms-update` label, across all
+ * states (open / merged / closed). Powers the dashboard "Recent pull requests"
+ * card. Returns `[]` in dev or on error.
+ */
+export const getRecentCMSPullRequests = async (limit = 5): Promise<RecentCMSPullRequest[]> => {
+  if (!isProductionMode()) return [];
+
+  try {
+    return await listGitHubRecentCMSPullRequests(limit);
+  } catch (e) {
+    logCmsServerError({ operation: 'getRecentCMSPullRequests', message: getErrorMessage(e) });
+    return [];
   }
 };

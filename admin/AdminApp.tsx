@@ -5,7 +5,6 @@ import { CollectionPage } from './pages/CollectionPage';
 import { ContentModelPage } from './pages/ContentModelPage';
 import { ContentPage } from './pages/ContentPage';
 import { ContentTypePage } from './pages/ContentTypePage';
-import { DashboardPage } from './pages/DashboardPage';
 import { EntryPage } from './pages/EntryPage';
 import { MediaAssetPage } from './pages/MediaAssetPage';
 import { MediaPage } from './pages/MediaPage';
@@ -19,8 +18,8 @@ type AdminAppProps = {
  * file in the user app that re-exports this component as the default.
  *
  * Route segments map to admin pages:
- *   /cms                     → DashboardPage (empty home)
- *   /cms/content             → ContentPage (all entries)
+ *   /cms                     → ContentPage (admin home — content list)
+ *   /cms/content             → ContentPage (alias for /cms — kept for legacy links)
  *   /cms/content/<type>      → CollectionPage
  *   /cms/content/<type>/<id> → EntryPage
  *   /cms/chat                → ChatPage (gated on `isAgentEnabled(agentConfig)`)
@@ -39,7 +38,7 @@ export async function AdminApp({ params }: AdminAppProps) {
   const segments = path ?? [];
 
   if (segments.length === 0) {
-    return <DashboardPage />;
+    return <ContentPage />;
   }
 
   if (segments[0] === 'chat') {
