@@ -148,6 +148,7 @@ Write your body content here in Markdown.
 | `ctaTitle` | CTA — Title | `string` | — | plain text |
 | `ctaSubtitle` | CTA — Subtitle | `string` | — | plain text |
 | `footerText` | Footer — Text | `string` | — | plain text |
+| `heroImages` | Hero - Images | `reference` | — | JSON array of reference key strings Collections: `homeHeroCarousel`. Cardinality: `many`. |
 
 ### Example entry JSON
 
@@ -175,7 +176,8 @@ Write your body content here in Markdown.
     "useCases": null,
     "ctaTitle": "Example cta — title",
     "ctaSubtitle": "Example cta — subtitle",
-    "footerText": "Example footer — text"
+    "footerText": "Example footer — text",
+    "heroImages": ["homeHeroCarousel-<id>.json"]
   }
 }
 ```
@@ -276,6 +278,34 @@ Write your bio content here in Markdown.
   },
   "fields": {
     "title": "Example title"
+  }
+}
+```
+
+## Home Hero Carousel (`homeHeroCarousel`)
+
+- **Type:** hasMany (multiple entries)
+- **Path:** `cms/content/homeHeroCarousel/homeHeroCarousel-<uuid>.json`
+
+### Fields
+
+| Field | Label | Format | Required | Storage notes |
+| --- | --- | --- | --- | --- |
+| `title` | Title | `string` | yes | plain text |
+| `image` | Image | `image` | — | media entry UUID string |
+
+### Example entry JSON
+
+```json
+{
+  "sys": {
+    "id": "<uuid>",
+    "type": "homeHeroCarousel",
+    "status": "draft"
+  },
+  "fields": {
+    "title": "Example title",
+    "image": "<media-entry-uuid>"
   }
 }
 ```

@@ -9,6 +9,7 @@ import { queryKeys } from '../admin/query/keys';
 import { useMediaList } from '../admin/query/hooks/useMediaList';
 import { useConfig } from '../hooks/useConfig';
 import { toast } from '../hooks/useToast';
+import { stageMediaFiles } from '../lib/stageMediaFiles';
 import type { MediaFile } from '../types';
 
 import { FieldHintAndError } from './FieldHintAndError';
@@ -24,9 +25,26 @@ type FormImageFieldProps = {
   hint?: string;
   error?: string;
   onClearError?: (name: string) => void;
+  /**
+   * Notification callbacks. Existing callers (entry editor) ignore them; the
+   * markdown insert-image dialog uses both to publish `saveImage$` with full
+   * extension / publicUrl info that's only available at the moment of pick.
+   */
+  onPick?: (file: MediaFile) => void;
+  onUpload?: (uploadedIds: string[], stagedFiles: File[]) => void;
 };
 
-const FormImageField = ({ label, name, value, required, hint, error, onClearError }: FormImageFieldProps) => {
+const FormImageField = ({
+  label,
+  name,
+  value,
+  required,
+  hint,
+  error,
+  onClearError,
+  onPick,
+  onUpload,
+}: FormImageFieldProps) => {
   const config = useConfig();
   const queryClient = useQueryClient();
   const mediaList = useMediaList();
@@ -42,14 +60,9 @@ const FormImageField = ({ label, name, value, required, hint, error, onClearErro
 
   const stageFilesFromList = useCallback(
     (fileList: FileList) => {
-      const accepted: File[] = [];
-      for (const file of Array.from(fileList)) {
-        const ext = file.name.split('.').pop()?.toLowerCase() || '';
-        if (!config.mediaAllowedFormats.includes(ext)) {
-          toast({ title: `Skipped "${file.name}" — format .${ext} not allowed`, variant: 'destructive' });
-          continue;
-        }
-        accepted.push(file);
+      const { accepted, skipped } = stageMediaFiles(fileList, config.mediaAllowedFormats);
+      for (const { name, ext } of skipped) {
+        toast({ title: `Skipped "${name}" — format .${ext} not allowed`, variant: 'destructive' });
       }
       if (accepted.length > 0) setPendingUpload(accepted);
     },
@@ -62,20 +75,23 @@ const FormImageField = ({ label, name, value, required, hint, error, onClearErro
         setPendingUpload(null);
         return;
       }
+      const staged = pendingUpload ?? [];
+      onUpload?.(uploadedIds, staged);
       await queryClient.invalidateQueries({ queryKey: queryKeys.media.list() });
       setSelected(uploadedIds[0]);
       setPendingUpload(null);
       onClearError?.(name);
     },
-    [name, onClearError, queryClient],
+    [name, onClearError, onUpload, pendingUpload, queryClient],
   );
 
   const handlePickExisting = useCallback(
     (file: MediaFile) => {
+      onPick?.(file);
       setSelected(file.id);
       onClearError?.(name);
     },
-    [name, onClearError],
+    [name, onClearError, onPick],
   );
 
   return (

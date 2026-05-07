@@ -39,6 +39,7 @@ vi.mock('fs/promises', () => ({
     readFile: vi.fn(),
     writeFile: vi.fn(),
     unlink: vi.fn(),
+    mkdir: vi.fn(),
   },
 }));
 
@@ -774,6 +775,34 @@ describe('newFile', () => {
     const result = await newFile('post');
     expect(result).toEqual({ success: false, error: 'disk full' });
     expect(build.buildJsons).not.toHaveBeenCalled();
+  });
+
+  it('creates the collection directory before writing for first-entry creation in dev', async () => {
+    vi.mocked(fsPromises.mkdir).mockResolvedValue(undefined);
+    const result = await newFile('post');
+    expect(result.success).toBe(true);
+    expect(fsPromises.mkdir).toHaveBeenCalledWith(path.join(process.cwd(), 'cms/content/post'), { recursive: true });
+    const mkdirOrder = vi.mocked(fsPromises.mkdir).mock.invocationCallOrder[0];
+    const writeOrder = vi.mocked(fsPromises.writeFile).mock.invocationCallOrder[0];
+    expect(mkdirOrder).toBeLessThan(writeOrder);
+  });
+
+  it('succeeds in dev when the collection directory does not yet exist (writeFile would otherwise ENOENT)', async () => {
+    let directoryExists = false;
+    vi.mocked(fsPromises.mkdir).mockImplementation(async () => {
+      directoryExists = true;
+      return undefined;
+    });
+    vi.mocked(fsPromises.writeFile).mockImplementation(async () => {
+      if (!directoryExists) {
+        const err = new Error("ENOENT: no such file or directory, open 'cms/content/post/...'");
+        (err as NodeJS.ErrnoException).code = 'ENOENT';
+        throw err;
+      }
+      return undefined;
+    });
+    const result = await newFile('post');
+    expect(result.success).toBe(true);
   });
 });
 

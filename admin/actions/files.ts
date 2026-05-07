@@ -657,6 +657,7 @@ export const newFile = async (type: string): Promise<NewFileResult> => {
     const cookieStore = await cookies();
     const activeBranchDev = cookieStore.get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
     const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), file);
+    await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
     await fsPromises.writeFile(filePath, normalizedData, 'utf8');
     await persistBranchHistoryEntryIfNeeded(activeBranchDev, file);
     await syncEmbeddingsForUpsertIfEnabled(file, values, {}, activeBranchDev, false);

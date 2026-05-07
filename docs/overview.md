@@ -35,6 +35,7 @@ See [editing-schema.md](./editing-schema.md) for how to edit `cms/schema.json` s
 | `blog` | Blog | singleton |
 | `author` | Author | hasMany |
 | `role` | Role | hasMany |
+| `homeHeroCarousel` | Home Hero Carousel | hasMany |
 
 ## Entry JSON structure
 

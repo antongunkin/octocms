@@ -515,6 +515,130 @@ html {
   font-family: var(--ft-ui);
 }
 
+.editor-markdown.mdxeditor [contenteditable] h1,
+.editor-markdown.mdxeditor [contenteditable] h2,
+.editor-markdown.mdxeditor [contenteditable] h3,
+.editor-markdown.mdxeditor [contenteditable] h4,
+.editor-markdown.mdxeditor [contenteditable] h5,
+.editor-markdown.mdxeditor [contenteditable] h6 {
+  color: var(--text);
+}
+.editor-markdown.mdxeditor [contenteditable] h1 {
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0.67em 0;
+}
+.editor-markdown.mdxeditor [contenteditable] h2 {
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0.83em 0;
+}
+.editor-markdown.mdxeditor [contenteditable] h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 1em 0;
+}
+.editor-markdown.mdxeditor [contenteditable] h4 {
+  font-size: 1em;
+  font-weight: 600;
+  margin: 1.33em 0;
+}
+.editor-markdown.mdxeditor [contenteditable] h5 {
+  font-size: 0.875em;
+  font-weight: 600;
+  margin: 1.67em 0;
+}
+.editor-markdown.mdxeditor [contenteditable] h6 {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 2em 0;
+}
+.editor-markdown.mdxeditor [contenteditable] p {
+  margin: 0 0 0.75em;
+  line-height: 1.6;
+}
+.editor-markdown.mdxeditor [contenteditable] ul,
+.editor-markdown.mdxeditor [contenteditable] ol {
+  padding-left: 1.5em;
+  margin: 0 0 0.75em;
+}
+.editor-markdown.mdxeditor [contenteditable] ul {
+  list-style: disc;
+}
+.editor-markdown.mdxeditor [contenteditable] ol {
+  list-style: decimal;
+}
+.editor-markdown.mdxeditor [contenteditable] li {
+  margin: 0.25em 0;
+}
+.editor-markdown.mdxeditor [contenteditable] li > ul,
+.editor-markdown.mdxeditor [contenteditable] li > ol {
+  margin: 0.25em 0;
+}
+.editor-markdown.mdxeditor [contenteditable] a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.editor-markdown.mdxeditor [contenteditable] a:hover {
+  text-decoration-thickness: 2px;
+}
+.editor-markdown.mdxeditor [contenteditable] strong,
+.editor-markdown.mdxeditor [contenteditable] b {
+  font-weight: 700;
+}
+.editor-markdown.mdxeditor [contenteditable] em,
+.editor-markdown.mdxeditor [contenteditable] i {
+  font-style: italic;
+}
+.editor-markdown.mdxeditor [contenteditable] u {
+  text-decoration: underline;
+}
+.editor-markdown.mdxeditor [contenteditable] blockquote {
+  margin: 0 0 0.75em;
+  padding: 0.25em 0 0.25em 1em;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+  font-style: italic;
+}
+.editor-markdown.mdxeditor [contenteditable] :not(pre) > code {
+  font-family: var(--ft-mono);
+  font-size: 0.9em;
+  background: var(--surface-2);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+}
+.editor-markdown.mdxeditor [contenteditable] pre {
+  font-family: var(--ft-mono);
+  font-size: 0.9em;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 0.75em 1em;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0 0 0.75em;
+}
+.editor-markdown.mdxeditor [contenteditable] pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+.editor-markdown.mdxeditor [contenteditable] hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+.editor-markdown.mdxeditor [contenteditable] > :first-child {
+  margin-top: 0;
+}
+.editor-markdown.mdxeditor [contenteditable] > :last-child {
+  margin-bottom: 0;
+}
+
 .editor-markdown--invalid.mdxeditor {
   border-color: var(--danger);
 }
