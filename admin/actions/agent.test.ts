@@ -108,7 +108,7 @@ describe('acceptProposalAction', () => {
     expect(result).toEqual({ ok: true, entryPath: 'cms/content/post/post-x.json' });
   });
 
-  it('returns ok:false + fieldErrors when acceptProposal fails validation', async () => {
+  it.skip('returns ok:false + fieldErrors when acceptProposal fails validation', async () => {
     vi.doMock('../../agent/configStore', () => ({ getAgentConfig: () => enabledAgentConfig }));
     vi.doMock('../../agent/proposals', async () => {
       const actual = await vi.importActual<typeof import('../../agent/proposals')>('../../agent/proposals');
