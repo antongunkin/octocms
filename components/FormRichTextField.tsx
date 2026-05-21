@@ -639,13 +639,13 @@ const FormRichTextField = ({
   );
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
+    <div className="octo-ff-richtext">
+      <div className="octo-ff-richtext__label">
         {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
+        {required ? <span className="octo-ff-richtext__required">*</span> : null}
       </div>
       <input type="hidden" ref={hiddenInputRef} name={name} defaultValue={value} />
-      <div ref={editorWrapRef} className="relative">
+      <div ref={editorWrapRef} className="octo-ff-richtext__editor-wrap">
         <MDXEditor
           markdown={value}
           plugins={plugins}

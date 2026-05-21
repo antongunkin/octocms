@@ -12,9 +12,9 @@ export function FieldHintAndError({ hint, error }: FieldHintAndErrorProps) {
   if (!hint && !error) return null;
 
   return (
-    <div className="mt-1.5 space-y-1">
-      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+    <div className="octo-field-hint-error">
+      {hint ? <p className="octo-field-hint-error__hint">{hint}</p> : null}
+      {error ? <p className="octo-field-hint-error__error">{error}</p> : null}
     </div>
   );
 }

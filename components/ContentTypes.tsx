@@ -67,56 +67,62 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-muted/20">
+    <div className="octo-page-shell">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-4">
-        <h1 className="text-xl font-semibold text-foreground">
+      <div className="octo-page-chrome">
+        <h1 className="octo-page-chrome__title" style={{ fontSize: 20 }}>
           {selectedType
             ? (config.collections[selectedType as keyof typeof config.collections]?.label ?? selectedType)
             : 'Entries'}
         </h1>
         {selectedType && (
-          <Button
-            size="sm"
-            className="gap-1.5 bg-blue-600 hover:bg-blue-500 text-white"
-            onClick={addNew}
-            disabled={creating}
-          >
-            <Plus className="h-4 w-4" />
+          <Button size="sm" variant="default" onClick={addNew} disabled={creating}>
+            <Plus style={{ width: 16, height: 16 }} />
             Add entry
           </Button>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col overflow-hidden p-6">
+      <div style={{ display: 'flex', flex: 1, flexDirection: 'column', overflow: 'hidden', padding: 24 }}>
         {/* Search bar */}
-        <div className="mb-4 flex items-center gap-3">
-          <div className="relative max-w-sm flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="octo-content-search" style={{ maxWidth: 384, flex: 1 }}>
+            <Search className="octo-content-search__icon" style={{ width: 16, height: 16 }} />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter entries…"
-              className="pl-9"
+              style={{ paddingLeft: 36 }}
             />
           </div>
         </div>
 
         {/* Table */}
-        <div className="flex-1 overflow-auto rounded-lg border border-border bg-background">
+        <div
+          style={{
+            flex: 1,
+            overflow: 'auto',
+            borderRadius: 8,
+            border: '1px solid var(--border)',
+            background: 'var(--surface-1)',
+          }}
+        >
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-medium text-muted-foreground">Name</TableHead>
-                <TableHead className="font-medium text-muted-foreground">Updated</TableHead>
-                <TableHead className="font-medium text-muted-foreground">Status</TableHead>
-                <TableHead className="w-10" />
+              <TableRow>
+                <TableHead style={{ color: 'var(--muted)', fontWeight: 500 }}>Name</TableHead>
+                <TableHead style={{ color: 'var(--muted)', fontWeight: 500 }}>Updated</TableHead>
+                <TableHead style={{ color: 'var(--muted)', fontWeight: 500 }}>Status</TableHead>
+                <TableHead style={{ width: 40 }} />
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredEntries.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-32 text-center text-sm text-muted-foreground">
+                  <TableCell
+                    colSpan={4}
+                    style={{ height: 128, textAlign: 'center', fontSize: 14, color: 'var(--muted)' }}
+                  >
                     No entries found.
                   </TableCell>
                 </TableRow>
@@ -124,14 +130,14 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
                 filteredEntries.map((entry) => (
                   <TableRow
                     key={entry.path}
-                    className={cn('cursor-pointer', entry.status === 'archived' && 'opacity-60')}
+                    className={cn('octo-content-row', entry.status === 'archived' && 'octo-content-row--archived')}
                     onClick={() => {
                       onFileClick(entry);
                       router.push(`/cms/content/${entry.type}/${entry.id}`);
                     }}
                   >
-                    <TableCell className="font-medium">{entry.title}</TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell style={{ fontWeight: 500 }}>{entry.title}</TableCell>
+                    <TableCell style={{ color: 'var(--muted)' }}>
                       {entry.updatedAt ? relativeTime(entry.updatedAt) : '—'}
                     </TableCell>
                     <TableCell>
@@ -141,11 +147,11 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7"
+                        style={{ height: 28, width: 28 }}
                         disabled
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                        <MoreHorizontal style={{ width: 16, height: 16, color: 'var(--muted)' }} />
                       </Button>
                     </TableCell>
                   </TableRow>

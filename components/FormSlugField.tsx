@@ -90,10 +90,10 @@ const FormSlugField = ({
   };
 
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} htmlFor={name} type="slug" required={required} />
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="min-w-[200px] flex-1">
+      <div className="octo-ff-slug__row">
+        <div className="octo-ff-slug__input-wrap">
           <FieldShell error={!!error}>
             <input
               ref={inputRef}
@@ -108,7 +108,7 @@ const FormSlugField = ({
             />
           </FieldShell>
         </div>
-        <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={onRegenerate}>
+        <Button type="button" variant="outline" size="sm" onClick={onRegenerate}>
           Regenerate from title
         </Button>
       </div>

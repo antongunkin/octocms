@@ -12,7 +12,8 @@ import { cn } from '../../lib/utils';
 export function MainSlotSkeleton({ className }: { className?: string }) {
   return (
     <div
-      className={cn('flex min-h-0 flex-1 flex-col overflow-hidden', className)}
+      className={cn('octo-page-shell', 'octo-content-area', className)}
+      style={{ overflow: 'hidden' }}
       role="status"
       aria-label="Loading page"
     >
@@ -27,9 +28,9 @@ export function MainSlotSkeleton({ className }: { className?: string }) {
  */
 export function AdminBootstrapSkeleton() {
   return (
-    <div className="flex h-screen flex-col bg-background" role="status" aria-label="Loading CMS">
+    <div className="octo-layout" role="status" aria-label="Loading CMS">
       <TopHeaderSkeleton />
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="octo-page-shell" style={{ overflow: 'hidden' }}>
         <ContentPageChromeSkeleton />
       </div>
     </div>

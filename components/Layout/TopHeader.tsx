@@ -145,28 +145,32 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
   const isHeaderLoading = fetchingCount > 0 || mutatingCount > 0;
 
   return (
-    <header className="sticky top-0 z-50 flex h-14 flex-none items-center gap-[10px] border-b border-[var(--border)] bg-[var(--surface-1)] px-6 text-[var(--text)]">
+    <header className="octo-top-header">
       {/* Logo pill — transparent with border, links to main site */}
       <a
         href="/"
         target="_blank"
         rel="noopener noreferrer"
-        className="focus-ring inline-flex h-8 shrink-0 items-center gap-2 overflow-hidden whitespace-nowrap rounded-full border border-[var(--border)] bg-transparent px-3 text-[14px] font-bold tracking-[-0.01em] text-[var(--text)] no-underline"
+        className="octo-top-header__logo"
         aria-busy={isHeaderLoading}
         aria-label={isHeaderLoading ? `${projectName} — loading` : `${projectName} — opens site in new tab`}
       >
-        <span className="overflow-hidden text-ellipsis">{projectName}</span>
+        <span className="octo-top-header__logo-name">{projectName}</span>
         {isHeaderLoading ? (
-          <Loader2 size={12} className="h-3 w-3 shrink-0 animate-spin text-[var(--st-changed)]" aria-hidden />
+          <Loader2
+            size={12}
+            style={{ flexShrink: 0, color: 'var(--st-changed)', animation: 'octo-spin 1s linear infinite' }}
+            aria-hidden
+          />
         ) : (
-          <ExternalLink size={12} className="h-3 w-3 shrink-0 opacity-75" aria-hidden />
+          <ExternalLink size={12} style={{ flexShrink: 0, opacity: 0.75 }} aria-hidden />
         )}
       </a>
 
-      <span className="mx-1 h-[22px] w-px bg-[var(--border)]" />
+      <span className="octo-top-header__sep" />
 
       {/* Nav */}
-      <nav className="flex flex-none items-center gap-0.5">
+      <nav className="octo-top-header__nav">
         {NAV.map((n) => {
           if (n.id === 'chat') {
             if (agentStatusLoading) return <AgentNavSkeleton key={n.id} />;
@@ -177,12 +181,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
             <Link
               key={n.id}
               href={n.href}
-              className={cn(
-                'focus-ring inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full px-[14px] text-[14px] tracking-[-0.005em] no-underline',
-                isActive
-                  ? 'bg-[var(--surface-2)] font-semibold text-[var(--text)]'
-                  : 'bg-transparent font-medium text-[var(--text-2)] hover:text-[var(--text)]',
-              )}
+              className={cn('octo-top-header__nav-link', isActive && 'octo-top-header__nav-link--active')}
             >
               {n.label}
             </Link>
@@ -190,26 +189,21 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
         })}
       </nav>
 
-      <div className="flex-1" />
+      <div className="octo-top-header__spacer" />
 
       {/* Search trigger — opens CommandK */}
-      <button
-        type="button"
-        onClick={onCommandK}
-        className="focus-ring inline-flex h-8 min-w-[140px] cursor-pointer items-center justify-between gap-2 overflow-hidden whitespace-nowrap rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-3 text-[12px] text-[var(--muted)]"
-        style={{ flex: '0 1 150px' }}
-      >
-        <span className="inline-flex items-center gap-2 overflow-hidden">
-          <Search size={13} className="shrink-0" />
-          <span className="overflow-hidden text-ellipsis">Search…</span>
+      <button type="button" onClick={onCommandK} className="octo-top-header__search">
+        <span className="octo-top-header__search-inner">
+          <Search size={13} style={{ flexShrink: 0 }} />
+          <span className="octo-top-header__search-text">Search…</span>
         </span>
-        <span className="flex shrink-0 gap-1">
+        <span className="octo-top-header__search-kbd">
           <Kbd>⌘</Kbd>
           <Kbd>K</Kbd>
         </span>
       </button>
 
-      <span className="mx-1 h-[22px] w-px bg-[var(--border)]" />
+      <span className="octo-top-header__sep" />
 
       {/* Branch chip — always visible; menu opens in dev and prod (create branch before any edit) */}
       {branchChipLoading ? (
@@ -219,45 +213,42 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
           <DropdownMenuTrigger asChild>
             <BranchChip name={branchLabel} ahead={ahead} menuTrigger aria-label={`Branch menu, ${branchLabel}`} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-[300px]" sideOffset={5} align="end">
+          <DropdownMenuContent style={{ minWidth: 300 }} sideOffset={5} align="end">
             <DropdownMenuItem
-              className="cursor-pointer gap-2 text-sm"
               onSelect={() => {
                 setBranchOpen(false);
                 setCreateBranchOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" />
+              <Plus style={{ width: 16, height: 16 }} />
               Create new branch
             </DropdownMenuItem>
 
             {(branchListLoading || cmsBranches.length > 0) && <DropdownMenuSeparator />}
 
             {branchListLoading && (
-              <div className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--muted)]">
-                <RefreshCw className="h-3 w-3 animate-spin" />
+              <div className="octo-top-header__branch-loading">
+                <RefreshCw style={{ width: 12, height: 12, animation: 'octo-spin 1s linear infinite' }} />
                 Loading…
               </div>
             )}
 
             {!branchListLoading &&
               cmsBranches.map((b) => (
-                <div key={b.branch} className="flex items-center gap-2 rounded px-3 py-1.5 text-sm">
-                  <span className="w-3 shrink-0 text-xs text-[var(--brand-strong)]">
-                    {b.branch === activeBranch ? '●' : ''}
-                  </span>
+                <div key={b.branch} className="octo-top-header__branch-row">
+                  <span className="octo-top-header__branch-dot">{b.branch === activeBranch ? '●' : ''}</span>
                   <button
                     type="button"
-                    className="flex-1 cursor-pointer truncate border-none bg-transparent py-0.5 text-left font-mono text-xs text-[var(--text)]"
+                    className="octo-top-header__branch-name"
                     onClick={() => handleSwitchBranch(b.branch, b.prNumber === 0 && !b.prUrl)}
                   >
                     {b.branch}
                   </button>
-                  {b.isPublished && <span className="shrink-0 px-1 text-xs font-semibold text-[var(--ok)]">Live</span>}
+                  {b.isPublished && <span className="octo-top-header__branch-live">Live</span>}
                   {!b.isPublished && (
                     <button
                       type="button"
-                      className="shrink-0 cursor-pointer rounded border-none bg-transparent px-1 py-0.5 text-xs text-[var(--muted)] hover:text-[var(--ok)]"
+                      className="octo-top-header__branch-publish"
                       onClick={() => handlePublish(b.branch)}
                       title={`Publish ${b.branch}`}
                     >
@@ -269,19 +260,19 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
                       href={b.prUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="shrink-0 text-[var(--muted)] hover:text-[var(--text)]"
+                      style={{ flexShrink: 0, color: 'var(--muted)', textDecoration: 'none' }}
                       onClick={(e) => e.stopPropagation()}
                       title="Open PR on GitHub"
                     >
-                      <ExternalLink className="h-3 w-3" />
+                      <ExternalLink style={{ width: 12, height: 12 }} />
                     </a>
                   )}
                 </div>
               ))}
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer gap-2 text-sm text-[var(--muted)]" onSelect={handleClearBranch}>
-              <X className="h-4 w-4" />
+            <DropdownMenuItem onSelect={handleClearBranch}>
+              <X style={{ width: 16, height: 16 }} />
               Back to main
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -291,26 +282,31 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       {/* User avatar dropdown — design.html omits the chevron */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            className="focus-ring inline-flex h-8 cursor-pointer items-center rounded-full border-0 bg-transparent px-1 text-[var(--text-2)]"
-            aria-label="Account"
-          >
-            <Avatar className="h-[26px] w-[26px]">
+          <button type="button" className="octo-top-header__user-btn" aria-label="Account">
+            <Avatar style={{ height: 26, width: 26 }}>
               <AvatarImage src={data?.user?.image ?? ''} alt={data?.user?.name ?? ''} />
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-violet-500 text-[11.5px] font-semibold text-white">
+              <AvatarFallback
+                style={{
+                  background: 'linear-gradient(135deg,#3b82f6,#8b5cf6)',
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: '#fff',
+                }}
+              >
                 {userInitials}
               </AvatarFallback>
             </Avatar>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="min-w-[180px]" sideOffset={8} align="end">
-          {data?.user?.name && <div className="px-3 py-2 text-sm font-medium text-foreground">{data.user.name}</div>}
+        <DropdownMenuContent style={{ minWidth: 180 }} sideOffset={8} align="end">
+          {data?.user?.name && (
+            <div style={{ padding: '8px 12px', fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>
+              {data.user.name}
+            </div>
+          )}
           <ThemeToggle initialTheme={initialTheme} />
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer" onSelect={() => signOut()}>
-            Sign out
-          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => signOut()}>Sign out</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 

@@ -17,7 +17,7 @@ type FormStringFieldProps = {
 
 const FormStringField = ({ label, name, value, required, hint, error }: FormStringFieldProps) => {
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} htmlFor={name} type="string" required={required} />
       <FieldShell error={!!error}>
         <input

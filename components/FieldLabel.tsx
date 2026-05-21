@@ -12,15 +12,13 @@ type FieldLabelProps = {
 
 export function FieldLabel({ label, htmlFor, type, required, rightSlot }: FieldLabelProps) {
   return (
-    <div className="mb-2 flex items-baseline gap-2">
-      <label htmlFor={htmlFor} className="text-[13px] font-medium text-foreground leading-none">
+    <div className="octo-field-label">
+      <label htmlFor={htmlFor} className="octo-field-label__text">
         {label}
-        {required ? <span className="ml-0.5 text-destructive">*</span> : null}
+        {required ? <span className="octo-field-label__required">*</span> : null}
       </label>
-      {type ? <code className="font-mono text-[11px] text-muted-foreground/80 leading-none">{type}</code> : null}
-      {rightSlot ? (
-        <div className="ml-auto flex items-center gap-2 text-[12px] text-muted-foreground">{rightSlot}</div>
-      ) : null}
+      {type ? <code className="octo-field-label__type">{type}</code> : null}
+      {rightSlot ? <div className="octo-field-label__right">{rightSlot}</div> : null}
     </div>
   );
 }

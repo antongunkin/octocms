@@ -7,22 +7,24 @@ import { ShimmerBlock, ShimmerRow } from '../skeletons/primitives';
  */
 export function DashboardListSkeleton({ rows = 8 }: { rows?: number }) {
   return (
-    <div className="flex flex-1" role="status" aria-label="Loading content">
-      <aside className="w-60 border-r border-border bg-background p-4">
-        <ShimmerBlock className="mb-4 h-4 w-24" />
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 5 }, (_, i) => (
-            <ShimmerBlock key={i} className="h-7 w-full" />
-          ))}
+    <div style={{ display: 'flex', flex: 1 }} role="status" aria-label="Loading content">
+      <aside className="octo-left-panel" style={{ width: 240 }}>
+        <div className="octo-left-panel__section">
+          <ShimmerBlock style={{ height: 16, width: 96, marginBottom: 16 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {Array.from({ length: 5 }, (_, i) => (
+              <ShimmerBlock key={i} style={{ height: 28, width: '100%' }} />
+            ))}
+          </div>
         </div>
       </aside>
-      <div className="flex flex-1 flex-col gap-4 bg-muted/20 p-6">
-        <div className="flex items-center justify-between">
-          <ShimmerBlock className="h-7 w-40" />
-          <ShimmerBlock className="h-8 w-28 rounded-md" />
+      <div className="octo-content-area" style={{ padding: 24, gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <ShimmerBlock style={{ height: 28, width: 160 }} />
+          <ShimmerBlock style={{ height: 32, width: 112, borderRadius: 6 }} />
         </div>
-        <div className="rounded-lg border border-border bg-background p-4">
-          <div className="flex flex-col gap-3">
+        <div className="octo-card" style={{ padding: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {Array.from({ length: rows }, (_, i) => (
               <ShimmerRow key={i} widths={['40%', '12%', '14%', '12%']} />
             ))}

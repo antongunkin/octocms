@@ -75,16 +75,16 @@ const FormConditionalField = ({
   const serialized = useMemo(() => JSON.stringify(initialValues), [initialValues]);
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
+    <div className="octo-ff-conditional">
+      <div className="octo-ff-conditional__label">
         {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
+        {required ? <span className="octo-ff-conditional__required">*</span> : null}
       </div>
 
       <input type="hidden" name={name} value={serialized} />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-1">
-        <TabsList className="flex gap-0.5 h-auto bg-transparent border-b border-border rounded-none p-0">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="octo-ff-conditional__tabs">
+        <TabsList className="octo-ff-conditional__tablist">
           {branches.map((branch) => {
             const branchPrefix = `${name}.${branch.key}`;
             const hasBranchError = fieldErrors
@@ -95,25 +95,17 @@ const FormConditionalField = ({
               <TabsTrigger
                 key={branch.key}
                 value={branch.key}
-                className={cn(
-                  'relative px-3 py-1.5 text-sm font-medium transition-colors rounded-none',
-                  'text-muted-foreground hover:text-foreground',
-                  'data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground',
-                  'data-[state=active]:after:absolute data-[state=active]:after:bottom-[-1px] data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-primary',
-                  hasBranchError && 'text-destructive',
-                )}
+                className={cn('octo-ff-conditional__tab', hasBranchError && 'octo-ff-conditional__tab--error')}
               >
                 {branch.label}
-                <span className="ml-1.5 rounded bg-muted px-1 py-0.5 text-[10px] font-normal text-muted-foreground">
-                  {branch.key}
-                </span>
+                <span className="octo-ff-conditional__tab-key">{branch.key}</span>
               </TabsTrigger>
             );
           })}
         </TabsList>
 
         {branches.map((branch) => (
-          <TabsContent key={branch.key} value={branch.key} className="pt-3">
+          <TabsContent key={branch.key} value={branch.key} className="octo-ff-conditional__content">
             {branch.collection ? (
               <ReferenceBranchEditor
                 parentName={name}
@@ -168,7 +160,7 @@ function InlineBranchEditor({
   onClearFieldError,
 }: InlineBranchEditorProps) {
   return (
-    <div className="space-y-3">
+    <div className="octo-ff-conditional__branch">
       {Object.entries(fields).map(([key, def]) => {
         const rawVal = values[key];
         const errorKey = `${parentName}.${branchKey}.${key}`;

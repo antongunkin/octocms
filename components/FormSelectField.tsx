@@ -66,18 +66,18 @@ const FormSelectField = ({
     };
 
     return (
-      <div className="mb-5">
+      <div className="octo-form-field">
         <FieldLabel label={label} type="select" required={required} />
         <input type="hidden" name={name} value={JSON.stringify(multi)} />
-        <ul className="mt-1 space-y-2 list-none p-0">
+        <ul className="octo-ff-select__multi">
           {options.map((o) => (
             <li key={o.value}>
-              <label className="inline-flex cursor-pointer items-center gap-2 text-sm">
+              <label className="octo-ff-select__multi-label">
                 <input
                   type="checkbox"
                   checked={multi.includes(o.value)}
                   onChange={() => toggle(o.value)}
-                  className="rounded border-border"
+                  className="octo-ff-select__multi-checkbox"
                 />
                 <span>{o.label}</span>
               </label>
@@ -99,7 +99,7 @@ const FormSelectField = ({
       : single;
 
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} type="select" required={required} />
       <input type="hidden" name={name} value={single} />
       <Select
@@ -109,16 +109,13 @@ const FormSelectField = ({
           setSingle(v === EMPTY_VALUE ? '' : v);
         }}
       >
-        <SelectTrigger
-          className="field-shell h-10 w-full max-w-md rounded-full border-border bg-card px-4"
-          aria-invalid={error ? true : undefined}
-        >
+        <SelectTrigger className="field-shell octo-input--shell" aria-invalid={error ? true : undefined}>
           <SelectValue placeholder={allowEmpty ? '—' : 'Choose…'} />
         </SelectTrigger>
         <SelectContent>
           {allowEmpty ? (
             <SelectItem value={EMPTY_VALUE}>
-              <span className="text-muted-foreground">—</span>
+              <span className="octo-field-hint-error__hint">—</span>
             </SelectItem>
           ) : null}
           {options.map((o) => (

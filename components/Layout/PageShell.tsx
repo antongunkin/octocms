@@ -19,7 +19,7 @@ type PageShellRootProps = {
 };
 
 function PageShellRoot({ className, children }: PageShellRootProps) {
-  return <div className={cn('flex min-h-0 flex-1 flex-col', className)}>{children}</div>;
+  return <div className={cn('octo-page-shell', className)}>{children}</div>;
 }
 
 type PageShellBodyProps = {
@@ -33,8 +33,8 @@ type PageShellBodyProps = {
 
 function PageShellBody({ className, unpadded, centered, children }: PageShellBodyProps) {
   return (
-    <main className={cn('scroll min-h-0 flex-1 overflow-auto bg-[var(--bg)]', !unpadded && 'px-6 py-6', className)}>
-      {centered ? <div className="mx-auto w-full max-w-[1280px]">{children}</div> : children}
+    <main className={cn('octo-page-shell__body octo-scroll', unpadded && 'octo-page-shell__body--unpadded', className)}>
+      {centered ? <div className="octo-page-shell__centered">{children}</div> : children}
     </main>
   );
 }
@@ -49,13 +49,11 @@ type PageShellSplitProps = {
 function PageShellSplit({ className, asideWidth = 280, aside, children }: PageShellSplitProps) {
   return (
     <main
-      className={cn('grid min-h-0 flex-1 overflow-hidden bg-[var(--bg)]', className)}
+      className={cn('octo-page-shell__split', className)}
       style={{ gridTemplateColumns: `minmax(0, 1fr) ${asideWidth}px` }}
     >
-      <div className="scroll min-w-0 overflow-auto px-7 py-6 pb-14">{children}</div>
-      <aside className="scroll min-w-0 overflow-auto border-l border-[var(--border)] bg-[var(--surface-2)] px-4 py-5">
-        {aside}
-      </aside>
+      <div className="octo-page-shell__split-content octo-scroll">{children}</div>
+      <aside className="octo-page-shell__split-aside octo-scroll">{aside}</aside>
     </main>
   );
 }

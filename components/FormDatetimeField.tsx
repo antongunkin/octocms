@@ -40,9 +40,9 @@ const FormDatetimeField = ({
   const defaultValue = fromStored || fallbackNow || '';
 
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} htmlFor={name} type={isDateOnly ? 'date' : 'datetime'} required={required} />
-      <FieldShell error={!!error} className="max-w-md">
+      <FieldShell error={!!error} className="octo-ff-datetime__shell">
         <input
           id={name}
           className={FIELD_INPUT_CLASS}

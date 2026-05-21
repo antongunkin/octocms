@@ -34,9 +34,9 @@ const FormNumberField = ({
   const resolvedStep = step !== undefined ? step : valueType === 'int' ? 1 : 'any';
 
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} htmlFor={name} type="number" required={required} />
-      <FieldShell error={!!error} className="max-w-md">
+      <FieldShell error={!!error} className="octo-ff-number__shell">
         <input
           id={name}
           className={FIELD_INPUT_CLASS}

@@ -4,12 +4,12 @@ import { ShimmerBlock } from '../skeletons/primitives';
 
 export function DashboardContentSkeleton() {
   return (
-    <div className="flex flex-1 flex-col bg-muted/20" role="status" aria-label="Loading dashboard">
-      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-4">
-        <ShimmerBlock className="h-6 w-32" />
+    <div className="octo-page-shell" role="status" aria-label="Loading dashboard">
+      <div className="octo-page-chrome">
+        <ShimmerBlock style={{ height: 24, width: 128 }} />
       </div>
-      <div className="flex flex-1 items-center justify-center p-6">
-        <ShimmerBlock className="h-4 w-48" />
+      <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <ShimmerBlock style={{ height: 16, width: 192 }} />
       </div>
     </div>
   );

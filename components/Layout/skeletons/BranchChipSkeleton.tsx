@@ -12,7 +12,13 @@ export function BranchChipSkeleton() {
     <ShimmerBlock
       role="status"
       aria-label="Loading branch"
-      className="h-8 w-[88px] rounded-full border border-[var(--border)] bg-[var(--surface-1)]"
+      style={{
+        height: 32,
+        width: 88,
+        borderRadius: 9999,
+        border: '1px solid var(--border)',
+        background: 'var(--surface-1)',
+      }}
     />
   );
 }

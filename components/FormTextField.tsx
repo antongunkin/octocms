@@ -32,11 +32,11 @@ const FormTextField = ({
   onClearError,
 }: FormTextFieldProps) => {
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} htmlFor={name} type="text" required={required} />
       <textarea
         id={name}
-        className={cn(FIELD_TEXTAREA_CLASS, error && 'border-destructive')}
+        className={cn(FIELD_TEXTAREA_CLASS, error && 'octo-textarea--error')}
         name={name}
         rows={rows}
         defaultValue={value}

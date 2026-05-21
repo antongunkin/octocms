@@ -95,18 +95,18 @@ const FormImageField = ({
   );
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
+    <div className="octo-ff-image">
+      <div className="octo-ff-image__label">
         {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
+        {required ? <span className="octo-ff-image__required">*</span> : null}
       </div>
-      <div className="flex items-start gap-4">
+      <div className="octo-ff-image__body">
         {selected && previewUrl ? (
-          <div className="relative w-40 h-28 rounded-lg border border-border overflow-hidden bg-muted flex-none">
+          <div className="octo-ff-image__preview">
             <img
               src={previewUrl}
               alt={selectedEntry?.title || selectedEntry?.originalName || ''}
-              className="w-full h-full object-cover"
+              className="octo-ff-image__preview-img"
             />
             <button
               type="button"
@@ -114,29 +114,29 @@ const FormImageField = ({
                 setSelected('');
                 onClearError?.(name);
               }}
-              className="absolute top-1 right-1 rounded-full bg-black/60 text-white p-0.5 hover:bg-black/80"
+              className="octo-ff-image__clear"
               aria-label="Remove image"
             >
-              <X className="w-3.5 h-3.5" />
+              <X style={{ width: 14, height: 14 }} />
             </button>
           </div>
         ) : (
-          <div className="w-40 h-28 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/50 flex-none">
-            <ImageIcon className="w-8 h-8 text-muted-foreground" />
+          <div className="octo-ff-image__empty">
+            <ImageIcon style={{ width: 32, height: 32 }} />
           </div>
         )}
-        <div className="flex flex-col gap-2 pt-1">
+        <div className="octo-ff-image__actions">
           <Button type="button" variant="outline" size="sm" onClick={() => uploadInputRef.current?.click()}>
-            <Upload className="w-4 h-4" />
+            <Upload style={{ width: 16, height: 16 }} />
             Upload new image
           </Button>
           <Button type="button" variant="outline" size="sm" onClick={() => setShowSelectDialog(true)}>
-            <ImagePlus className="w-4 h-4" />
+            <ImagePlus style={{ width: 16, height: 16 }} />
             Select existing image
           </Button>
         </div>
         {selected && selectedEntry && (
-          <span className="text-xs text-muted-foreground break-all">
+          <span className="octo-ff-image__meta">
             {selectedEntry.title ? <div>{selectedEntry.title}</div> : null}
             {selectedEntry.originalName}
           </span>

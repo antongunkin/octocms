@@ -71,23 +71,23 @@ const FormColorField = ({
   };
 
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} type="color" required={required} />
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="octo-ff-color__row">
         <input
           type="color"
-          className={cn('h-10 w-12 cursor-pointer rounded-full border border-border bg-card p-1')}
+          className="octo-ff-color__picker"
           value={hex || PICKER_FALLBACK}
           onChange={onPickerChange}
           aria-invalid={error ? true : undefined}
           aria-label={`${label} color picker`}
         />
         {allowInput ? (
-          <div className="max-w-[12rem] flex-1">
+          <div className="octo-ff-color__input-wrap">
             <FieldShell error={!!error}>
               <input
                 type="text"
-                className={cn(FIELD_INPUT_CLASS, 'font-mono')}
+                className={cn(FIELD_INPUT_CLASS, 'octo-ff-color__hex-input')}
                 value={hexDraft}
                 onChange={(e) => {
                   setHexDraft(e.target.value);

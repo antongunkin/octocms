@@ -64,27 +64,18 @@ const DraggableItem = ({
       onDragOver={(e) => onDragOver(e, index)}
       onDragEnd={onDragEnd}
       onDrop={() => onDrop(index)}
-      className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 transition-colors hover:bg-muted/50 cursor-grab active:cursor-grabbing"
+      className="octo-ff-reference__item"
     >
-      <GripVertical className="w-4 h-4 text-muted-foreground flex-none" />
-      <button type="button" onClick={() => onEdit?.(item)} className="flex-1 min-w-0 text-left cursor-pointer group">
-        <div className="text-sm font-medium truncate group-hover:text-primary transition-colors">{item.title}</div>
-        <div className="text-xs text-muted-foreground">{collectionLabel}</div>
+      <GripVertical className="octo-ff-reference__item-grip" />
+      <button type="button" onClick={() => onEdit?.(item)} className="octo-ff-reference__item-body">
+        <div className="octo-ff-reference__item-title">{item.title}</div>
+        <div className="octo-ff-reference__item-type">{collectionLabel}</div>
       </button>
-      <button
-        type="button"
-        onClick={() => onEdit?.(item)}
-        className="flex-none p-1 rounded hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-        title="Edit inline"
-      >
-        <Pencil className="w-3.5 h-3.5" />
+      <button type="button" onClick={() => onEdit?.(item)} className="octo-ff-reference__item-edit" title="Edit inline">
+        <Pencil style={{ width: 14, height: 14 }} />
       </button>
-      <button
-        type="button"
-        onClick={() => onRemove(index)}
-        className="flex-none p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-      >
-        <Trash2 className="w-3.5 h-3.5" />
+      <button type="button" onClick={() => onRemove(index)} className="octo-ff-reference__item-remove">
+        <Trash2 style={{ width: 14, height: 14 }} />
       </button>
     </div>
   );
@@ -186,23 +177,23 @@ const AddExistingModal = ({
           <DialogTitle>Add existing content</DialogTitle>
         </DialogHeader>
 
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="octo-ff-reference__filter-row">
+          <div className="octo-ff-reference__modal-search">
+            <Search className="octo-ff-reference__modal-search-icon" />
             <input
               ref={searchRef}
               type="text"
               placeholder="Filter entries..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-input bg-background"
+              className="octo-ff-reference__modal-input"
             />
           </div>
           {allowedCollections.length > 1 && (
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 text-sm rounded-md border border-input bg-background"
+              className="octo-ff-reference__modal-type-select"
             >
               <option value="all">All types</option>
               {allowedCollections.map((col) => (
@@ -214,13 +205,13 @@ const AddExistingModal = ({
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto min-h-0 border border-border rounded-md">
+        <div className="octo-ff-reference__modal-list">
           {isLoading ? (
-            <div className="p-8 text-center text-muted-foreground text-sm">Loading...</div>
+            <div className="octo-ff-reference__modal-loading">Loading...</div>
           ) : filtered.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground text-sm">No entries found</div>
+            <div className="octo-ff-reference__modal-empty">No entries found</div>
           ) : (
-            <div className="divide-y divide-border">
+            <div className="octo-ff-reference__modal-rows">
               {filtered.map((entry) => {
                 const referenceKey = toReferenceKey(entry.path);
                 const alreadyAdded = selectedKeys.has(referenceKey);
@@ -232,9 +223,9 @@ const AddExistingModal = ({
                   <label
                     key={entry.path}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors',
-                      alreadyAdded ? 'opacity-40 cursor-not-allowed' : 'hover:bg-muted/50',
-                      isChecked && !alreadyAdded && 'bg-primary/5',
+                      'octo-ff-reference__modal-row',
+                      alreadyAdded && 'octo-ff-reference__modal-row--disabled',
+                      isChecked && !alreadyAdded && 'octo-ff-reference__modal-row--checked',
                     )}
                   >
                     <input
@@ -242,13 +233,12 @@ const AddExistingModal = ({
                       checked={isChecked || alreadyAdded}
                       disabled={alreadyAdded}
                       onChange={() => toggleCheck(referenceKey)}
-                      className="rounded border-input"
                     />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{entry.title}</div>
-                      <div className="text-xs text-muted-foreground">{collectionLabel}</div>
+                    <div className="octo-ff-reference__modal-row-body">
+                      <div className="octo-ff-reference__modal-row-title">{entry.title}</div>
+                      <div className="octo-ff-reference__modal-row-type">{collectionLabel}</div>
                     </div>
-                    {alreadyAdded && <span className="text-xs text-muted-foreground flex-none">Already added</span>}
+                    {alreadyAdded && <span className="octo-ff-reference__modal-row-added">Already added</span>}
                   </label>
                 );
               })}
@@ -327,14 +317,14 @@ const CreateNewModal = ({
 
         {allowedCollections.length > 1 ? (
           <div>
-            <label htmlFor="create-ref-type-select" className="block text-sm font-medium mb-1.5">
+            <label htmlFor="create-ref-type-select" className="octo-ff-reference__create-label">
               Content type
             </label>
             <select
               id="create-ref-type-select"
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background"
+              className="octo-ff-reference__create-select"
             >
               {allowedCollections.map((col) => (
                 <option key={col} value={col}>
@@ -344,7 +334,7 @@ const CreateNewModal = ({
             </select>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">
+          <p className="octo-ff-reference__create-desc">
             Create a new{' '}
             <strong>{config.collections[selectedType as keyof Config['collections']]?.label || selectedType}</strong>{' '}
             entry and add it to this field.
@@ -588,25 +578,25 @@ const FormReferenceField = ({
   const displayError = submitError ?? validationError;
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
+    <div className="octo-ff-reference">
+      <div className="octo-ff-reference__label">
         {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-        {cardinality === 'one' && <span className="text-xs text-muted-foreground ml-2">(single)</span>}
+        {required && <span className="octo-ff-reference__required">*</span>}
+        {cardinality === 'one' && <span className="octo-ff-reference__badge">(single)</span>}
         {maxItems !== undefined && cardinality === 'many' && (
-          <span className="text-xs text-muted-foreground ml-2">
+          <span className="octo-ff-reference__badge">
             ({items.length}/{maxItems})
           </span>
         )}
       </div>
 
       {isLoading ? (
-        <div className="text-sm text-muted-foreground py-4">Loading references...</div>
+        <div className="octo-ff-reference__loading">Loading references...</div>
       ) : (
         <>
           {/* Selected items list */}
           {items.length > 0 && (
-            <div className="flex flex-col gap-1.5 mb-3">
+            <div className="octo-ff-reference__items">
               {items.map((item, i) => (
                 <DraggableItem
                   key={`${item.path}-${i}`}
@@ -623,21 +613,17 @@ const FormReferenceField = ({
             </div>
           )}
 
-          {items.length === 0 && (
-            <div className="text-sm text-muted-foreground py-4 border border-dashed border-border rounded-lg text-center">
-              No items selected
-            </div>
-          )}
+          {items.length === 0 && <div className="octo-ff-reference__empty">No items selected</div>}
 
           {/* Action buttons */}
           {canAdd && (
-            <div className="flex gap-2 mt-2">
+            <div className="octo-ff-reference__add-row">
               <Button type="button" variant="outline" size="sm" onClick={() => setIsExistingOpen(true)}>
-                <Plus className="w-4 h-4" />
+                <Plus style={{ width: 16, height: 16 }} />
                 Add existing
               </Button>
               <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(true)}>
-                <Plus className="w-4 h-4" />
+                <Plus style={{ width: 16, height: 16 }} />
                 Create new
               </Button>
             </div>

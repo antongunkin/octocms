@@ -18,7 +18,7 @@ type FormUrlFieldProps = {
 
 const FormUrlField = ({ label, name, value, required, hint, error, onClearError }: FormUrlFieldProps) => {
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} htmlFor={name} type="url" required={required} />
       <FieldShell error={!!error}>
         <input

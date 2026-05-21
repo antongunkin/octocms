@@ -80,10 +80,10 @@ const FormMarkdownField = ({ label, name, value, required, hint, error, onClearE
   };
 
   return (
-    <div className="mb-6">
-      <div className="block text-xs font-medium text-muted-foreground mb-1.5">
+    <div className="octo-ff-markdown">
+      <div className="octo-ff-markdown__label">
         {label}
-        {required ? <span className="text-destructive ml-1">*</span> : null}
+        {required ? <span className="octo-ff-markdown__required">*</span> : null}
       </div>
       <input type="hidden" ref={markdownTextareRef} name={name} defaultValue={value} />
       <ErrorBoundary label="markdown editor">

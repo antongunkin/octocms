@@ -46,28 +46,28 @@ const FormJsonField = ({ label, name, value, required, hint, error, onClearError
 
   const statusLine =
     status === 'empty' ? (
-      <span className="text-muted-foreground text-sm">
+      <span className="octo-ff-json__status--empty">
         {required ? 'Enter JSON…' : 'Optional — leave empty for no value'}
       </span>
     ) : status === 'valid' ? (
-      <span className="text-sm text-green-600 light:text-green-700">Valid JSON</span>
+      <span className="octo-ff-json__status--valid">Valid JSON</span>
     ) : (
-      <span className="text-destructive text-sm">Invalid JSON</span>
+      <span className="octo-ff-json__status--invalid">Invalid JSON</span>
     );
 
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} htmlFor={name} type="json" required={required} />
       <textarea
         id={name}
-        className={cn(FIELD_TEXTAREA_CLASS, 'min-h-[160px] font-mono leading-relaxed', error && 'border-destructive')}
+        className={cn(FIELD_TEXTAREA_CLASS, 'octo-ff-json__textarea', error && 'octo-textarea--error')}
         name={name}
         value={text}
         onChange={handleChange}
         spellCheck={false}
         aria-invalid={error ? true : undefined}
       />
-      <div className="mt-1.5">{statusLine}</div>
+      <div className="octo-ff-json__status">{statusLine}</div>
       <FieldHintAndError hint={hint} error={error} />
     </div>
   );

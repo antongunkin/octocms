@@ -33,25 +33,28 @@ const FormBooleanField = ({
 }: FormBooleanFieldProps) => {
   const [checked, setChecked] = useState(value === 'true');
 
-  const segBase =
-    'h-8 px-4 text-[13px] font-medium rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/40';
-
   return (
-    <div className="mb-5">
+    <div className="octo-form-field">
       <FieldLabel label={label} type="boolean" required={required} />
       <input type="hidden" name={name} value={checked ? 'true' : 'false'} />
-      <div className="inline-flex items-center gap-1 rounded-full border border-border bg-card p-1">
+      <div className="octo-ff-boolean__track">
         <button
           type="button"
           onClick={() => setChecked(true)}
-          className={cn(segBase, checked ? 'bg-foreground text-background' : 'text-foreground hover:bg-muted/40')}
+          className={cn(
+            'octo-ff-boolean__seg',
+            checked ? 'octo-ff-boolean__seg--active' : 'octo-ff-boolean__seg--inactive',
+          )}
         >
           {trueLabel}
         </button>
         <button
           type="button"
           onClick={() => setChecked(false)}
-          className={cn(segBase, !checked ? 'bg-foreground text-background' : 'text-foreground hover:bg-muted/40')}
+          className={cn(
+            'octo-ff-boolean__seg',
+            !checked ? 'octo-ff-boolean__seg--active' : 'octo-ff-boolean__seg--inactive',
+          )}
         >
           {falseLabel}
         </button>

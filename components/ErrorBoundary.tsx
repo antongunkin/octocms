@@ -81,16 +81,9 @@ function DefaultBoundaryFallback({
 }) {
   const heading = label ? `This ${label} failed to load` : 'This section failed to load';
   return (
-    <div
-      role="alert"
-      className={cn(
-        'rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm',
-        'flex flex-col gap-2',
-        className,
-      )}
-    >
-      <p className="font-medium text-destructive">{heading}</p>
-      <p className="text-xs text-muted-foreground">{error.message || 'An unexpected error occurred.'}</p>
+    <div role="alert" className={cn('octo-error-boundary', className)}>
+      <p className="octo-error-boundary__title">{heading}</p>
+      <p className="octo-error-boundary__msg">{error.message || 'An unexpected error occurred.'}</p>
       <div>
         <Button type="button" variant="outline" size="sm" onClick={reset}>
           Try again

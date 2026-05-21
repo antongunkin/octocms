@@ -76,9 +76,9 @@ const CreateBranchDialog = ({ open, onOpenChange, onBranchCreated }: Props) => {
             possible after saving branch metadata to the repo.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-2 space-y-3">
-          <div>
-            <label htmlFor="branch-name-input" className="text-sm font-medium text-gray-700 block mb-1.5">
+        <div className="octo-create-branch__fields">
+          <div className="octo-create-branch__field">
+            <label htmlFor="branch-name-input" className="octo-label">
               Branch name
             </label>
             <input
@@ -87,12 +87,13 @@ const CreateBranchDialog = ({ open, onOpenChange, onBranchCreated }: Props) => {
               value={branchName}
               onChange={(e) => setBranchName(e.target.value)}
               onKeyDown={handleTextFieldEnter}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="octo-input field-shell"
+              style={{ fontFamily: 'var(--ft-mono)' }}
               disabled={isCreating}
             />
           </div>
-          <div>
-            <label htmlFor="workspace-title-input" className="text-sm font-medium text-gray-700 block mb-1.5">
+          <div className="octo-create-branch__field">
+            <label htmlFor="workspace-title-input" className="octo-label">
               Workspace title
             </label>
             <input
@@ -101,21 +102,22 @@ const CreateBranchDialog = ({ open, onOpenChange, onBranchCreated }: Props) => {
               value={workspaceTitle}
               onChange={(e) => setWorkspaceTitle(e.target.value)}
               onKeyDown={handleTextFieldEnter}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="octo-input field-shell"
               disabled={isCreating}
               placeholder="Used as the draft pull request title"
             />
           </div>
-          <div>
-            <label htmlFor="workspace-description-input" className="text-sm font-medium text-gray-700 block mb-1.5">
-              Description <span className="text-gray-500 font-normal">(optional)</span>
+          <div className="octo-create-branch__field">
+            <label htmlFor="workspace-description-input" className="octo-label">
+              Description <span className="octo-create-branch__opt">(optional)</span>
             </label>
             <textarea
               id="workspace-description-input"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y min-h-[4.5rem]"
+              className="octo-textarea field-textarea"
+              style={{ resize: 'vertical', minHeight: '4.5rem' }}
               disabled={isCreating}
               placeholder="Shown in the pull request body"
             />

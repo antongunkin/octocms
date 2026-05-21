@@ -230,29 +230,25 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
 
   // Header chrome that's safe to render before the entry resolves.
   const headerChrome = (
-    <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
-          <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div className="min-w-0 flex-1">
-          <div className="mb-px flex items-center gap-1.5 text-[12px]" style={{ color: 'var(--text-2)' }}>
-            <Link
-              href="/cms/content"
-              className="hover:text-foreground transition-colors"
-              style={{ color: 'var(--text-2)' }}
-            >
-              Content
+    <div className="octo-page-chrome">
+      <div className="octo-page-chrome__title-area">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
+            <Link href={`/cms/content/${type}`} aria-label="Back to collection">
+              <ArrowLeft className="h-4 w-4" />
             </Link>
-            <ChevronRight className="h-3 w-3 opacity-60" />
-            <span>{collectionLabel}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <h1 className="m-0 text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-              {entryTitle || collectionLabel}
-            </h1>
+          </Button>
+          <div className="octo-page-chrome__title-area">
+            <div className="octo-page-chrome__breadcrumb">
+              <Link href="/cms/content" style={{ color: 'var(--text-2)' }}>
+                Content
+              </Link>
+              <ChevronRight className="h-3 w-3" style={{ opacity: 0.6 }} />
+              <span>{collectionLabel}</span>
+            </div>
+            <div className="octo-page-chrome__title-row">
+              <h1 className="octo-page-chrome__title">{entryTitle || collectionLabel}</h1>
+            </div>
           </div>
         </div>
       </div>
@@ -261,11 +257,11 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
 
   if (isLoadingEntry) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="octo-edit-post">
         {headerChrome}
-        <div className="flex-1 min-h-0 overflow-hidden flex">
-          <div className="flex-1 min-w-0 overflow-y-auto bg-bg">
-            <div className="max-w-[960px] mx-auto px-6 py-6 pb-32">
+        <div className="octo-edit-post__body">
+          <div className="octo-edit-post__form-col">
+            <div className="octo-edit-post__form-wrap">
               <EntryFormSkeleton />
             </div>
           </div>
@@ -277,10 +273,10 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
 
   if (isNotFound || !post?.fields) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="octo-edit-post">
         {headerChrome}
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-muted-foreground">
-          <p className="text-sm font-medium">Entry not found.</p>
+        <div className="octo-edit-post__not-found">
+          <p style={{ fontSize: '14px', fontWeight: 500 }}>Entry not found.</p>
           <Button asChild variant="outline" size="sm">
             <Link href={`/cms/content/${type}`}>Back to {collectionLabel}</Link>
           </Button>

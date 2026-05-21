@@ -17,10 +17,10 @@ export type PageBarProps = {
 export function PageBar({ title, breadcrumb, status, right }: PageBarProps) {
   if (!title && !breadcrumb && !right) return null;
   return (
-    <div className="sticky top-14 z-40 flex min-h-[52px] flex-none items-center gap-3 border-b border-[var(--border)] bg-[var(--bg)] px-6 py-3">
-      <div className="min-w-0 flex-1">
+    <div className="octo-page-bar">
+      <div className="octo-page-bar__title-area">
         {breadcrumb && (
-          <div className="mb-px flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
+          <div className="octo-page-bar__breadcrumb">
             {breadcrumb.map((b, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <ChevronRightTiny />}
@@ -29,14 +29,12 @@ export function PageBar({ title, breadcrumb, status, right }: PageBarProps) {
             ))}
           </div>
         )}
-        <div className="flex min-w-0 items-center gap-2.5">
-          <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em]">
-            {title}
-          </h1>
+        <div className="octo-page-bar__title-row">
+          <h1 className="octo-page-bar__title">{title}</h1>
           {status && <StatusBadge status={status} size="sm" />}
         </div>
       </div>
-      {right && <div className="flex flex-none items-center gap-2">{right}</div>}
+      {right && <div className="octo-page-bar__right">{right}</div>}
     </div>
   );
 }
