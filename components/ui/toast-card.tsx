@@ -17,61 +17,107 @@ type ToastCardProps = {
   className?: string;
 };
 
-const railClass: Record<ToastCardTone, string> = {
-  default: 'bg-[var(--border-strong)]',
-  success: 'bg-[var(--ok)]',
-  error: 'bg-[var(--danger)]',
-  warn: 'bg-[var(--st-changed)]',
-  info: 'bg-[var(--accent)]',
-  brand: 'bg-[var(--brand)]',
+const railColor: Record<ToastCardTone, string> = {
+  default: 'var(--border-strong)',
+  success: 'var(--ok)',
+  error: 'var(--danger)',
+  warn: 'var(--st-changed)',
+  info: 'var(--accent)',
+  brand: 'var(--brand)',
 };
 
-const chipClass: Record<ToastCardTone, string> = {
-  default: 'bg-[var(--surface-2)] border-[var(--border)] text-[var(--text-2)]',
-  success: 'bg-[var(--ok-bg)] border-[var(--ok-bd)] text-[var(--ok)]',
-  error: 'bg-[var(--danger-bg)] border-[var(--danger-bd)] text-[var(--danger)]',
-  warn: 'bg-[var(--st-changed-bg)] border-[var(--st-changed-bd)] text-[var(--st-changed)]',
-  info: 'bg-[var(--accent-bg)] border-[var(--border)] text-[var(--accent-fg)]',
-  brand: 'bg-[var(--brand-bg)] border-[var(--brand)] text-[var(--brand-strong)]',
+const iconStyle: Record<ToastCardTone, React.CSSProperties> = {
+  default: { background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-2)' },
+  success: { background: 'var(--ok-bg)', border: '1px solid var(--ok-bd)', color: 'var(--ok)' },
+  error: { background: 'var(--danger-bg)', border: '1px solid var(--danger-bd)', color: 'var(--danger)' },
+  warn: { background: 'var(--st-changed-bg)', border: '1px solid var(--st-changed-bd)', color: 'var(--st-changed)' },
+  info: { background: 'var(--accent-bg)', border: '1px solid var(--border)', color: 'var(--accent-fg)' },
+  brand: { background: 'var(--brand-bg)', border: '1px solid var(--brand)', color: 'var(--brand-strong)' },
 };
 
 const defaultIcon: Record<ToastCardTone, React.ReactNode> = {
-  default: <Bell className="h-3.5 w-3.5" />,
-  success: <Check className="h-3.5 w-3.5" />,
-  error: <TriangleAlert className="h-3.5 w-3.5" />,
-  warn: <TriangleAlert className="h-3.5 w-3.5" />,
-  info: <Info className="h-3.5 w-3.5" />,
-  brand: <GitCommit className="h-3.5 w-3.5" />,
+  default: <Bell style={{ width: 14, height: 14 }} />,
+  success: <Check style={{ width: 14, height: 14 }} />,
+  error: <TriangleAlert style={{ width: 14, height: 14 }} />,
+  warn: <TriangleAlert style={{ width: 14, height: 14 }} />,
+  info: <Info style={{ width: 14, height: 14 }} />,
+  brand: <GitCommit style={{ width: 14, height: 14 }} />,
 };
 
 export function ToastCard({ tone = 'default', icon, title, body, action, time, onDismiss, className }: ToastCardProps) {
   return (
     <div
-      className={cn(
-        'relative flex w-full min-w-[360px] max-w-[420px] items-start gap-3 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-1)] py-3 pl-3.5 pr-3 shadow-md',
-        className,
-      )}
+      className={cn('octo-toast-card', className)}
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        minWidth: 360,
+        maxWidth: 420,
+        borderRadius: 12,
+        border: '1px solid var(--border)',
+        background: 'var(--surface-1)',
+        padding: '12px 12px 12px 14px',
+        boxShadow: 'var(--shadow-2)',
+      }}
     >
-      <span aria-hidden className={cn('absolute left-0 top-0 bottom-0 w-[3px]', railClass[tone])} />
+      {/* Left tone rail */}
       <span
-        className={cn('inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg border', chipClass[tone])}
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 3,
+          background: railColor[tone],
+        }}
+      />
+      {/* Icon chip */}
+      <span
+        className="octo-toast-card__icon"
+        style={{
+          display: 'inline-flex',
+          height: 28,
+          width: 28,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 8,
+          ...iconStyle[tone],
+        }}
       >
         {icon ?? defaultIcon[tone]}
       </span>
-      <div className="min-w-0 flex-1 pt-px">
-        <div className="flex items-baseline gap-2">
-          <div className="flex-1 min-w-0 truncate text-sm font-semibold tracking-[-0.005em] text-[var(--text)]">
+      {/* Body */}
+      <div className="octo-toast-card__body">
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <div
+            className="octo-toast-card__title"
+            style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
             {title}
           </div>
-          {time && <span className="flex-none font-mono text-[10px] text-[var(--muted)]">{time}</span>}
+          {time && (
+            <span style={{ flexShrink: 0, fontFamily: 'var(--ft-mono)', fontSize: 10, color: 'var(--muted)' }}>
+              {time}
+            </span>
+          )}
         </div>
-        {body && <div className="mt-1 text-xs leading-relaxed text-[var(--muted)]">{body}</div>}
+        {body && <div className="octo-toast-card__text">{body}</div>}
         {(action || onDismiss) && (
-          <div className="mt-2 flex items-center gap-4">
+          <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 16 }}>
             {action && (
               <button
                 type="button"
-                className="border-0 bg-transparent p-0 text-xs font-semibold text-[var(--text)] hover:underline cursor-pointer"
+                style={{
+                  border: 0,
+                  background: 'transparent',
+                  padding: 0,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: 'var(--text)',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                }}
               >
                 {action}
               </button>
@@ -80,7 +126,15 @@ export function ToastCard({ tone = 'default', icon, title, body, action, time, o
               <button
                 type="button"
                 onClick={onDismiss}
-                className="border-0 bg-transparent p-0 text-xs font-medium text-[var(--muted)] hover:text-[var(--text)] cursor-pointer"
+                style={{
+                  border: 0,
+                  background: 'transparent',
+                  padding: 0,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: 'var(--muted)',
+                  cursor: 'pointer',
+                }}
               >
                 Dismiss
               </button>
@@ -88,13 +142,26 @@ export function ToastCard({ tone = 'default', icon, title, body, action, time, o
           </div>
         )}
       </div>
+      {/* Dismiss button */}
       <button
         type="button"
         title="Close"
         onClick={onDismiss}
-        className="-mr-0.5 -mt-0.5 inline-flex h-6 w-6 flex-none items-center justify-center rounded-md border-0 bg-transparent text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] cursor-pointer"
+        style={{
+          flexShrink: 0,
+          display: 'inline-flex',
+          height: 24,
+          width: 24,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 6,
+          border: 0,
+          background: 'transparent',
+          color: 'var(--muted)',
+          cursor: 'pointer',
+        }}
       >
-        <X className="h-3 w-3" />
+        <X style={{ width: 12, height: 12 }} />
       </button>
     </div>
   );

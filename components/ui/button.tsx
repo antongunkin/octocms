@@ -1,77 +1,119 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
-
+import { GitCommit, GitBranch, ChevronDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
-const buttonVariants = cva(
-  'inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-full font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-[var(--border-strong)] bg-transparent text-[var(--text)] hover:bg-[var(--surface-2)]',
-        secondary: 'border border-[var(--border)] bg-[var(--surface-1)] text-[var(--text)] hover:bg-[var(--surface-2)]',
-        ghost: 'bg-transparent text-[var(--text)] hover:bg-[var(--surface-2)]',
-        link: 'text-primary underline-offset-4 hover:underline',
-        brand: 'bg-brand text-brand-fg hover:bg-brand/90',
-      },
-      size: {
-        default: 'h-9 gap-2 px-4 text-sm',
-        sm: 'h-[30px] gap-1.5 px-3 text-sm',
-        md: 'h-9 gap-2 px-4 text-sm',
-        lg: 'h-11 gap-2 px-5 text-[15px]',
-        icon: 'h-9 w-9',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  },
-);
-
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
+  variant?: 'default' | 'primary' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'brand';
+  size?: 'default' | 'sm' | 'md' | 'lg' | 'icon';
   icon?: React.ReactNode;
   iconRight?: React.ReactNode;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, icon, iconRight, children, ...props }, ref) => {
+export function buttonVariants({
+  variant = 'default',
+  size = 'default',
+  className,
+}: {
+  variant?: string;
+  size?: string;
+  className?: string;
+} = {}): string {
+  return cn(
+    'octo-button',
+    variant && `octo-button--${variant}`,
+    size && size !== 'default' && `octo-button--${size}`,
+    className,
+  );
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = 'default', size = 'default', asChild = false, icon, iconRight, children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
+    const cls = buttonVariants({ variant, size, className });
 
     if (asChild && React.isValidElement(children)) {
       const onlyChild = React.Children.only(children) as React.ReactElement<{ children?: React.ReactNode }>;
       const slotChildren = (
         <>
-          {icon ? <span className="inline-flex items-center">{icon}</span> : null}
+          {icon ? <span className="octo-button__icon">{icon}</span> : null}
           {onlyChild.props.children}
-          {iconRight ? <span className="inline-flex items-center">{iconRight}</span> : null}
+          {iconRight ? <span className="octo-button__icon">{iconRight}</span> : null}
         </>
       );
       const mergedChild = React.cloneElement(onlyChild, undefined, slotChildren);
-
       return (
-        <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props}>
+        <Comp className={cls} ref={ref} {...props}>
           {mergedChild}
         </Comp>
       );
     }
 
     return (
-      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props}>
-        {icon ? <span className="inline-flex items-center">{icon}</span> : null}
+      <Comp className={cls} ref={ref} {...props}>
+        {icon ? <span className="octo-button__icon">{icon}</span> : null}
         {children}
-        {iconRight ? <span className="inline-flex items-center">{iconRight}</span> : null}
+        {iconRight ? <span className="octo-button__icon">{iconRight}</span> : null}
       </Comp>
     );
   },
 );
 Button.displayName = 'Button';
 
-export { Button, buttonVariants };
+// ── PublishButton ─────────────────────────────────────────────────────────────
+
+type PublishButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  count?: number;
+  label?: string;
+  size?: 'sm' | 'md';
+};
+
+export const PublishButton = React.forwardRef<HTMLButtonElement, PublishButtonProps>(
+  ({ className, count = 0, label = 'Publish', size = 'md', ...props }, ref) => (
+    <button
+      ref={ref}
+      type="button"
+      className={cn('octo-button octo-button--publish', className)}
+      style={size === 'md' ? { height: '32px' } : undefined}
+      {...props}
+    >
+      <GitCommit size={13} />
+      {label}
+      {count > 0 && <span className="octo-button__publish-count">{count}</span>}
+    </button>
+  ),
+);
+PublishButton.displayName = 'PublishButton';
+
+// ── BranchChip ───────────────────────────────────────────────────────────────
+
+type BranchChipProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  name: string;
+  ahead?: number;
+  dirty?: number;
+  /** When true, show dropdown chevron and full emphasis even on base branch */
+  menuTrigger?: boolean;
+};
+
+export const BranchChip = React.forwardRef<HTMLButtonElement, BranchChipProps>(
+  ({ className, name, ahead = 0, dirty = 0, disabled, menuTrigger, ...props }, ref) => {
+    const isFeature = !disabled && (menuTrigger || name !== 'main');
+    return (
+      <button
+        ref={ref}
+        type="button"
+        disabled={disabled}
+        className={cn('octo-button octo-button--branch', !isFeature && 'octo-button--branch-disabled', className)}
+        {...props}
+      >
+        <GitBranch size={13} style={{ color: isFeature ? 'var(--brand-strong)' : undefined }} />
+        <span className="octo-button__branch-name">{name}</span>
+        {ahead > 0 && <span className="octo-button__branch-ahead">+{ahead}</span>}
+        {dirty > 0 && <span className="octo-button__branch-dirty">· {dirty}</span>}
+        {isFeature && <ChevronDown size={11} style={{ marginLeft: 1, opacity: 0.55 }} />}
+      </button>
+    );
+  },
+);
+BranchChip.displayName = 'BranchChip';

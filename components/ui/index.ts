@@ -59,7 +59,6 @@ export {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-  toastVariants,
 } from './toast';
 export type { ToastProps } from './toast';
 
@@ -89,5 +88,3 @@ export { Banner } from './banner';
 export { Empty } from './empty';
 export { ToastCard } from './toast-card';
 export type { ToastCardTone } from './toast-card';
-export { TabsPill } from './tabs-pill';
-export type { TabsPillItem } from './tabs-pill';

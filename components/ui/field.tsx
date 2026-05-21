@@ -30,37 +30,26 @@ export function Field({
   children,
 }: FieldProps) {
   return (
-    <div className={cn('flex flex-col', className)}>
-      <div className="mb-1.5 flex items-baseline gap-2">
-        <label htmlFor={htmlFor} className="text-xs font-medium text-[var(--text)]">
+    <div className={cn('octo-field', className)}>
+      <div className="octo-field__header">
+        <label htmlFor={htmlFor} className="octo-field__label">
           {label}
-          {required && <span className="ml-0.5 text-[var(--danger)]">*</span>}
+          {required && <span className="octo-field__required">*</span>}
         </label>
-        {schema && <code className="font-mono text-[10px] text-[var(--muted)]">{schema}</code>}
+        {schema && <code className="octo-field__schema">{schema}</code>}
         {locked && (
-          <span title="Locked" className="inline-flex text-[var(--muted)]">
+          <span title="Locked" className="octo-field__lock">
             <Lock size={12} />
           </span>
         )}
-        {dirty && (
-          <span
-            className="rounded-[4px] border px-2 font-mono text-[10px] font-medium"
-            style={{
-              color: 'var(--st-changed)',
-              background: 'var(--st-changed-bg)',
-              borderColor: 'var(--st-changed-bd)',
-            }}
-          >
-            ~ modified
-          </span>
-        )}
-        <div className="flex-1" />
-        {hint && <span className="text-xs text-[var(--muted)]">{hint}</span>}
+        {dirty && <span className="octo-field__dirty">~ modified</span>}
+        <div className="octo-field__spacer" />
+        {hint && <span className="octo-field__hint">{hint}</span>}
       </div>
-      {helper && <p className="mb-2 text-xs leading-relaxed text-[var(--muted)]">{helper}</p>}
+      {helper && <p className="octo-field__helper">{helper}</p>}
       {children}
       {error && (
-        <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-[var(--danger)]">
+        <div className="octo-field__error">
           <X size={11} />
           {error}
         </div>
