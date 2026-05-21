@@ -1778,6 +1778,7 @@ html {
 }
 .octo-content-row:hover { background: var(--surface-2); }
 .octo-content-row--archived { opacity: 0.6; }
+.octo-content-row--selected { background: var(--surface-2); }
 .octo-content-row__td { padding: 12px 16px; font-size: 14px; vertical-align: middle; }
 .octo-content-row__thumb-wrap {
   display: inline-flex;
@@ -3051,6 +3052,1048 @@ html {
   box-shadow: 0 0 0 2px color-mix(in oklab, var(--ring) 22%, transparent);
 }
 .octo-markdown-dialog__alt-hint { font-size: 12px; color: var(--muted); }
+
+/* ── octo-content-model ── */
+.octo-content-model {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+.octo-content-model__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+.octo-content-model__scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 20px 24px 48px;
+}
+.octo-content-model__filters {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── octo-schema-list (content type table) ── */
+.octo-schema-list {
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  box-shadow: var(--shadow-1);
+}
+.octo-schema-list__scroll { overflow: auto; }
+.octo-schema-list__table { width: 100%; border-collapse: collapse; }
+.octo-schema-list__thead { }
+.octo-schema-list__th-row {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.octo-schema-list__th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.octo-schema-list__th--icon { width: 40px; }
+.octo-schema-list__item {
+  cursor: pointer;
+  border-top: 1px solid var(--border);
+  transition: background-color 80ms;
+}
+.octo-schema-list__item:first-child { border-top: 0; }
+.octo-schema-list__item:hover { background: color-mix(in oklab, var(--surface-2) 60%, transparent); }
+.octo-schema-list__td { padding: 12px 16px; font-size: 14px; vertical-align: middle; }
+.octo-schema-list__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: var(--text);
+}
+.octo-schema-list__name-icon { color: var(--muted); }
+.octo-schema-list__key { font-family: var(--ft-mono); font-size: 12px; color: var(--muted); }
+.octo-schema-list__count { font-size: 14px; color: var(--muted); }
+.octo-schema-list__empty {
+  height: 128px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+.octo-schema-list__chevron {
+  display: flex;
+  justify-content: flex-end;
+}
+.octo-schema-list__chevron svg { color: var(--muted); opacity: 0.6; transition: opacity 80ms; }
+.octo-schema-list__item:hover .octo-schema-list__chevron svg { opacity: 1; }
+
+/* ── octo-schema-detail ── */
+.octo-schema-detail {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+.octo-schema-detail__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+  background: var(--bg);
+  padding: 20px 24px 48px;
+}
+.octo-schema-detail__aside {
+  display: flex;
+  width: 280px;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  border-left: 1px solid var(--border);
+  background: var(--surface-2);
+  padding: 20px 16px;
+}
+.octo-schema-detail__aside-section { }
+.octo-schema-detail__aside-label {
+  margin-bottom: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.octo-schema-detail__detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+.octo-schema-detail__detail-key {
+  width: 64px;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.octo-schema-detail__detail-val {
+  flex: 1;
+  min-width: 0;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.octo-schema-detail__detail-val--mono { font-family: var(--ft-mono); font-size: 11px; }
+
+/* ── octo-field-table (fields inside content type detail) ── */
+.octo-field-table__format-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+  padding: 2px 8px;
+  font-family: var(--ft-mono);
+  font-size: 11px;
+  color: var(--text);
+}
+.octo-field-table__flags { display: flex; flex-wrap: wrap; gap: 4px; }
+.octo-field-table__flag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 2px 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.octo-field-table__flag--required {
+  border-color: color-mix(in oklab, #60a5fa 30%, transparent);
+  background: color-mix(in oklab, #1e40af 15%, transparent);
+  color: #93c5fd;
+}
+.octo-field-table__star {
+  display: inline-flex;
+  height: 28px;
+  width: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 120ms;
+}
+.octo-field-table__star--active { background: color-mix(in oklab, #78350f 60%, transparent); color: #fcd34d; }
+.octo-field-table__star--allowed:not(.octo-field-table__star--active) { color: var(--muted); }
+.octo-field-table__star--allowed:not(.octo-field-table__star--active):hover {
+  background: var(--surface-2);
+  color: #f59e0b;
+}
+.octo-field-table__star--disabled { cursor: not-allowed; color: color-mix(in oklab, var(--muted) 30%, transparent); }
+.octo-field-table__label-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+.octo-field-table__label-btn:hover .octo-field-table__label-name { text-decoration: underline; }
+.octo-field-table__label-name { font-weight: 500; color: var(--text); }
+.octo-field-table__label-hint { margin-top: 2px; font-size: 12px; color: var(--muted); }
+.octo-field-table__json-pre {
+  margin: 0;
+  max-height: 70vh;
+  overflow: auto;
+  background: var(--surface-2);
+  padding: 16px;
+  font-family: var(--ft-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* ── octo-schema-impact ── */
+.octo-schema-impact {
+  border-radius: 6px;
+  border: 1px solid;
+  padding: 12px;
+  font-size: 12px;
+}
+.octo-schema-impact--amber {
+  border-color: #78350f;
+  background: #1c1005;
+  color: #fde68a;
+}
+.octo-schema-impact--destructive {
+  border-color: color-mix(in oklab, var(--danger) 30%, transparent);
+  background: color-mix(in oklab, var(--danger) 5%, transparent);
+  color: var(--danger);
+}
+.octo-schema-impact--muted {
+  border-color: var(--border);
+  background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+  color: var(--text);
+}
+.octo-schema-impact__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.octo-schema-impact__list {
+  max-height: 176px;
+  overflow: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.octo-schema-impact__item {
+  border-radius: 4px;
+  transition: background-color 80ms;
+}
+.octo-schema-impact__item-link { display: block; border-radius: 4px; text-decoration: none; color: inherit; }
+.octo-schema-impact__item-link:hover { background: rgba(255,255,255,0.05); }
+.octo-schema-impact__item-link:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.octo-schema-impact__item-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+}
+.octo-schema-impact__item-body { min-width: 0; flex: 1; }
+.octo-schema-impact__item-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; }
+.octo-schema-impact__item-meta { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; opacity: 0.8; }
+.octo-schema-impact__item-warnings { display: block; font-size: 11px; font-weight: 500; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.octo-schema-impact__badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  border-radius: 4px;
+  border: 1px solid;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.octo-schema-impact__badge--loss {
+  border-color: color-mix(in oklab, var(--danger) 30%, transparent);
+  background: color-mix(in oklab, var(--danger) 10%, transparent);
+  color: var(--danger);
+}
+.octo-schema-impact__badge--ok {
+  border-color: #064e3b;
+  background: #022c22;
+  color: #6ee7b7;
+}
+
+/* ── octo-cardinality-option (cardinality picker card) ── */
+.octo-cardinality-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 120ms, border-color 120ms;
+}
+.octo-cardinality-option:hover { background: color-mix(in oklab, var(--surface-2) 50%, transparent); }
+.octo-cardinality-option--active {
+  border-color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+}
+.octo-cardinality-option:disabled { cursor: not-allowed; opacity: 0.5; }
+.octo-cardinality-option__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.octo-cardinality-option__desc { font-size: 11px; color: var(--muted); }
+
+/* ── octo-field-dialog (FieldDialog misc) ── */
+.octo-field-dialog__format-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 20%, transparent);
+  padding: 8px 12px;
+}
+.octo-field-dialog__format-info { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.octo-field-dialog__format-key { font-family: var(--ft-mono); font-size: 11px; color: var(--muted); }
+.octo-field-dialog__format-badge {
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 2px 6px;
+  font-family: var(--ft-mono);
+  font-size: 11px;
+  color: var(--text);
+}
+.octo-field-dialog__options {
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.octo-field-dialog__options-heading { font-size: 12px; font-weight: 600; color: var(--text); }
+.octo-field-dialog__toggle-grid { display: grid; gap: 8px; grid-template-columns: repeat(3, 1fr); }
+.octo-field-toggle {
+  display: flex;
+  cursor: pointer;
+  align-items: flex-start;
+  gap: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 10px;
+  font-size: 12px;
+  transition: background-color 120ms;
+}
+.octo-field-toggle--disabled { cursor: not-allowed; opacity: 0.5; }
+.octo-field-toggle__text { display: flex; flex-direction: column; gap: 1px; }
+.octo-field-toggle__label { font-weight: 500; color: var(--text); display: block; }
+.octo-field-toggle__desc { display: block; font-size: 11px; color: var(--muted); }
+.octo-field-toggle--star-active {
+  border-color: #78350f;
+  background: #1c1005;
+}
+.octo-format-picker { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px 0; }
+.octo-format-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 120ms;
+}
+.octo-format-card:hover { background: color-mix(in oklab, var(--surface-2) 50%, transparent); }
+.octo-format-card--active {
+  border-color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+}
+.octo-format-card__label { font-size: 13px; font-weight: 600; color: var(--text); }
+.octo-format-card__code { font-family: var(--ft-mono); font-size: 10px; color: var(--muted); }
+.octo-format-card__desc { font-size: 11px; line-height: 1.4; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.octo-change-type-popover {
+  position: absolute;
+  right: 0;
+  z-index: 50;
+  margin-top: 4px;
+  width: 288px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  padding: 4px;
+  box-shadow: var(--shadow-2);
+}
+.octo-change-type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+.octo-change-type-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 4px;
+  padding: 4px 8px;
+  text-align: left;
+  font-size: 12px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 80ms;
+}
+.octo-change-type-item:hover { background: color-mix(in oklab, var(--surface-2) 50%, transparent); }
+.octo-change-type-item--active {
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+}
+.octo-change-type-item__label { font-weight: 500; color: var(--text); }
+.octo-change-type-item__code { font-family: var(--ft-mono); font-size: 10px; color: var(--muted); }
+
+/* ── octo-bool-toggle (BooleanToggle in SchemaOptionFieldInput) ── */
+.octo-bool-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 120ms, border-color 120ms;
+}
+.octo-bool-toggle--on {
+  border-color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+  color: var(--text);
+}
+.octo-bool-toggle:disabled { cursor: not-allowed; opacity: 0.5; }
+.octo-bool-toggle__track {
+  display: inline-block;
+  height: 12px;
+  width: 24px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--muted) 30%, transparent);
+  transition: background-color 120ms;
+}
+.octo-bool-toggle--on .octo-bool-toggle__track { background: var(--primary); }
+.octo-bool-toggle__thumb {
+  display: block;
+  height: 12px;
+  width: 12px;
+  border-radius: 9999px;
+  background: var(--bg);
+  box-shadow: 0 1px 2px rgba(0,0,0,.3);
+  transition: transform 120ms;
+}
+.octo-bool-toggle--on .octo-bool-toggle__thumb { transform: translateX(12px); }
+
+/* ── octo-branch-kind-pill (ConditionalBranchesEditor) ── */
+.octo-branch-kind-pill {
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 120ms;
+}
+.octo-branch-kind-pill:hover { background: color-mix(in oklab, var(--surface-2) 50%, transparent); }
+.octo-branch-kind-pill--active {
+  border-color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+  color: var(--text);
+}
+.octo-branch-kind-pill:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* ── octo-checkbox-list (CollectionsCheckboxList, DefaultOptionsCheckboxList) ── */
+.octo-checkbox-list {
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 8px;
+  max-height: 176px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.octo-checkbox-list__item {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  gap: 8px;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+.octo-checkbox-list__item:hover { background: color-mix(in oklab, var(--surface-2) 50%, transparent); }
+.octo-checkbox-list__item--disabled { cursor: not-allowed; opacity: 0.5; }
+.octo-checkbox-list__empty {
+  border-radius: 6px;
+  border: 1px dashed var(--border);
+  padding: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── octo-string-list-editor (StringListEditor / VariablesEditor) ── */
+.octo-string-list__tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.octo-string-list__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+  padding: 2px 6px;
+  font-size: 11px;
+}
+.octo-string-list__tag code { font-family: var(--ft-mono); }
+.octo-string-list__tag-remove {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: var(--muted);
+}
+.octo-string-list__tag-remove:hover { color: var(--danger); }
+.octo-string-list__input-row { display: flex; gap: 6px; }
+
+/* ── octo-select-options-editor ── */
+.octo-select-options { display: flex; flex-direction: column; gap: 6px; }
+.octo-select-option-row { display: flex; align-items: center; gap: 6px; }
+.octo-select-options__empty {
+  border-radius: 6px;
+  border: 1px dashed var(--border);
+  padding: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ── octo-option-field-input ── */
+.octo-option-field-input { display: flex; flex-direction: column; gap: 6px; }
+.octo-option-field-input__label { display: block; font-size: 12px; font-weight: 500; color: var(--text); }
+.octo-option-field-input__required { margin-left: 2px; color: var(--danger); }
+.octo-option-field-input__desc { font-size: 11px; color: var(--muted); }
+
+/* ── octo-nested-field-list ── */
+.octo-nested-field-list {
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 20%, transparent);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.octo-nested-field-list__empty { padding: 4px; font-size: 12px; color: var(--muted); }
+.octo-nested-field-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 4px;
+  background: var(--bg);
+  padding: 6px 8px;
+}
+.octo-nested-field-row__info { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.octo-nested-field-row__name { font-weight: 500; color: var(--text); }
+.octo-nested-field-row__key { margin-left: 6px; font-family: var(--ft-mono); font-size: 11px; color: var(--muted); }
+.octo-nested-field-row__format {
+  margin-left: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+  padding: 1px 4px;
+  font-family: var(--ft-mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ── octo-branch-list (ConditionalBranchesEditor branch cards) ── */
+.octo-branch-card {
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 10px;
+}
+.octo-branch-card__header { display: flex; align-items: flex-start; gap: 8px; }
+.octo-branch-card__grip { margin-top: 8px; flex-shrink: 0; cursor: grab; color: var(--muted); }
+.octo-branch-card__body { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.octo-branch-card__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.octo-branch-card__field { display: flex; flex-direction: column; gap: 2px; }
+.octo-branch-card__field-label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
+.octo-branch-card__kind-row { display: flex; gap: 6px; }
+.octo-branch-card__error { font-size: 12px; color: var(--danger); }
+
+/* ── octo-richtext-section ── */
+.octo-richtext-section { display: flex; flex-direction: column; gap: 6px; }
+.octo-richtext-section__title { font-size: 12px; font-weight: 600; color: var(--text); }
+.octo-richtext-section__desc { font-size: 11px; color: var(--muted); }
+.octo-richtext-toolbar-grid { display: grid; gap: 4px; grid-template-columns: repeat(2, 1fr); }
+.octo-richtext-toolbar-item {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  gap: 8px;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+.octo-richtext-toolbar-item:hover { background: color-mix(in oklab, var(--surface-2) 50%, transparent); }
+.octo-richtext-toolbar-item--disabled { cursor: not-allowed; opacity: 0.5; }
+.octo-richtext-embed-options {
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 20%, transparent);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.octo-richtext-collection-pill {
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 2px 8px;
+  font-family: var(--ft-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background-color 120ms;
+}
+.octo-richtext-collection-pill--selected {
+  border-color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+  color: var(--text);
+}
+.octo-richtext-props-grid { display: grid; grid-template-columns: 1fr 1fr 120px auto; gap: 4px; }
+
+/* ── octo-chat ── */
+.octo-chat {
+  display: flex;
+  height: calc(100dvh - 3.5rem);
+  flex: 1;
+  flex-direction: column;
+}
+.octo-chat__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+}
+.octo-chat__header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.octo-chat__header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.octo-chat__header-meta { color: var(--muted); }
+.octo-chat__usage {
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+  padding: 2px 10px;
+  font-family: var(--ft-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.octo-chat__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px;
+}
+.octo-chat__messages {
+  margin: 0 auto;
+  max-width: 768px;
+  padding: 16px 0;
+}
+.octo-chat__empty {
+  margin-top: 48px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+.octo-chat__empty-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+.octo-chat__notice {
+  margin: 12px 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.octo-chat__notice--stopped { color: var(--muted); }
+.octo-chat__notice--error {
+  border-color: color-mix(in oklab, var(--danger) 40%, transparent);
+  background: color-mix(in oklab, var(--danger) 10%, transparent);
+  color: var(--danger);
+}
+.octo-chat__notice--budget {
+  border-color: #78350f;
+  background: #fefce8;
+  color: #78350f;
+}
+.octo-chat__accept-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.octo-chat__attachments-notice {
+  margin: 12px 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.octo-chat__attachments-title { font-weight: 500; margin-bottom: 4px; }
+.octo-chat__attachments-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; }
+
+/* ── octo-chat-msg ── */
+.octo-chat-msg {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+}
+.octo-chat-msg--user { flex-direction: row-reverse; }
+.octo-chat-msg--assistant { flex-direction: row; }
+.octo-chat-msg__avatar {
+  margin-top: 2px;
+  display: flex;
+  height: 28px;
+  width: 28px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--surface-2);
+}
+.octo-chat-msg__body {
+  flex: 1;
+  min-width: 0;
+  max-width: 760px;
+}
+.octo-chat-msg--user .octo-chat-msg__body { text-align: right; }
+.octo-chat-msg__bubble {
+  display: inline-block;
+  border-radius: 16px;
+  padding: 10px 16px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-words;
+}
+.octo-chat-msg--user .octo-chat-msg__bubble {
+  background: #2563eb;
+  color: #fff;
+  text-align: left;
+}
+.octo-chat-msg--assistant .octo-chat-msg__bubble {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+}
+.octo-chat-msg__content { display: flex; flex-direction: column; gap: 4px; }
+.octo-chat-msg__thinking { color: var(--muted); }
+.octo-chat-msg__cursor {
+  display: inline-block;
+  width: 6px;
+  height: 12px;
+  margin-left: 4px;
+  background: currentColor;
+  vertical-align: baseline;
+  animation: octo-shimmer 1s ease-in-out infinite;
+}
+.octo-chat-msg__attachments { display: flex; flex-wrap: wrap; gap: 6px; }
+.octo-chat-msg__attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.4);
+  padding: 2px 8px;
+  font-size: 12px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.octo-chat-msg__system {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── octo-chat-composer ── */
+.octo-chat-composer {
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.octo-chat-composer--dragging { box-shadow: inset 0 0 0 2px var(--ring); }
+.octo-chat-composer__attachments { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px 0; }
+.octo-chat-composer__attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  padding: 4px 12px;
+  font-size: 12px;
+}
+.octo-chat-composer__chip-name { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.octo-chat-composer__chip-size { color: var(--muted); }
+.octo-chat-composer__chip-remove { color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; }
+.octo-chat-composer__chip-remove:hover { color: var(--text); }
+.octo-chat-composer__error { font-size: 12px; color: var(--danger); }
+.octo-chat-composer__row { display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px; }
+.octo-chat-composer__textarea {
+  flex: 1;
+  resize: none;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+  box-shadow: var(--shadow-1);
+  max-height: 160px;
+  transition: border-color 120ms;
+}
+.octo-chat-composer__textarea::placeholder { color: var(--muted); }
+.octo-chat-composer__textarea:focus { border-color: var(--ring); outline: none; box-shadow: 0 0 0 1px var(--ring); }
+.octo-chat-composer__textarea:disabled { opacity: 0.5; }
+
+/* ── octo-proposal-card ── */
+.octo-proposal-card {
+  margin: 12px 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text);
+}
+.octo-proposal-card--error { border-color: color-mix(in oklab, var(--danger) 50%, transparent); }
+.octo-proposal-card--accepted { opacity: 0.8; }
+.octo-proposal-card--rejected { opacity: 0.6; }
+.octo-proposal-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  padding: 8px 12px;
+}
+.octo-proposal-card__icon { flex-shrink: 0; color: var(--muted); }
+.octo-proposal-card__title { font-size: 12px; font-weight: 600; }
+.octo-proposal-card__summary { flex: 1; min-width: 0; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.octo-proposal-card__reasoning {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+}
+.octo-proposal-card__body { padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+.octo-proposal-card__error-body {
+  border-top: 1px solid color-mix(in oklab, var(--danger) 40%, transparent);
+  background: color-mix(in oklab, var(--danger) 10%, transparent);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--danger);
+}
+.octo-proposal-card__error-title { font-weight: 600; }
+.octo-proposal-card__error-list { margin-top: 4px; list-style: disc; padding-left: 16px; }
+.octo-proposal-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  padding: 8px 12px;
+}
+.octo-proposal-card__reject-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  padding: 8px 12px;
+}
+.octo-proposal-card__reject-input {
+  flex: 1;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+}
+.octo-proposal-card__reject-input:focus-visible { box-shadow: 0 0 0 1px var(--ring); }
+.octo-proposal-card__busy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.octo-proposal-card__status-badge { font-size: 11px; }
+.octo-proposal-card__status-badge--muted { color: var(--muted); }
+.octo-proposal-card__status-badge--accepted { display: flex; align-items: center; gap: 4px; color: #6ee7b7; }
+.octo-proposal-card__status-badge--error { display: flex; align-items: center; gap: 4px; color: var(--danger); }
+.octo-proposal-card__entry-path { font-family: var(--ft-mono); font-size: 11px; color: var(--muted); }
+.octo-proposal-card__field-row { }
+.octo-proposal-card__field-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.octo-proposal-card__field-label { font-weight: 600; text-transform: none; letter-spacing: normal; font-size: 11px; }
+.octo-proposal-card__field-key { font-family: var(--ft-mono); font-size: 10px; color: color-mix(in oklab, var(--muted) 70%, transparent); text-transform: none; letter-spacing: normal; }
+.octo-proposal-card__field-format { font-size: 10px; color: color-mix(in oklab, var(--muted) 60%, transparent); text-transform: none; letter-spacing: normal; }
+.octo-proposal-card__diff-inline { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 12px; }
+.octo-proposal-card__diff-del {
+  border-radius: 4px;
+  border: 1px solid color-mix(in oklab, #7f1d1d 40%, transparent);
+  background: color-mix(in oklab, #7f1d1d 40%, transparent);
+  padding: 4px 8px;
+  font-family: var(--ft-mono);
+  color: #fca5a5;
+}
+.octo-proposal-card__diff-add {
+  border-radius: 4px;
+  border: 1px solid color-mix(in oklab, #064e3b 40%, transparent);
+  background: color-mix(in oklab, #064e3b 40%, transparent);
+  padding: 4px 8px;
+  font-family: var(--ft-mono);
+  color: #6ee7b7;
+}
+.octo-proposal-card__create-meta {
+  font-size: 11px;
+  color: var(--muted);
+}
+.octo-proposal-card__create-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+.octo-proposal-card__create-row { border-top: 1px solid color-mix(in oklab, var(--border) 40%, transparent); }
+.octo-proposal-card__create-row:first-child { border-top: 0; }
+.octo-proposal-card__create-td { padding: 6px 0; vertical-align: top; }
+.octo-proposal-card__create-key { width: 33%; padding-right: 8px; }
+.octo-proposal-card__create-key-name { font-weight: 600; }
+.octo-proposal-card__create-key-format { margin-left: 8px; font-family: var(--ft-mono); font-size: 10px; color: color-mix(in oklab, var(--muted) 70%, transparent); }
+.octo-proposal-card__create-val pre { white-space: pre-wrap; word-break: break-words; font-family: var(--ft-mono); font-size: 11px; }
+.octo-proposal-card__unset { font-style: italic; color: color-mix(in oklab, var(--muted) 70%, transparent); }
+
+/* ── octo-tool-call-card ── */
+.octo-tool-call-card {
+  margin: 8px 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+  font-size: 12px;
+}
+.octo-tool-call-card--error { border-color: color-mix(in oklab, var(--danger) 40%, transparent); }
+.octo-tool-call-card__trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.octo-tool-call-card__chevron { flex-shrink: 0; transition: transform 120ms; }
+.octo-tool-call-card__chevron--open { transform: rotate(90deg); }
+.octo-tool-call-card__icon { flex-shrink: 0; color: var(--muted); }
+.octo-tool-call-card__name { font-family: var(--ft-mono); font-weight: 600; }
+.octo-tool-call-card__preview { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.octo-tool-call-card__status { flex-shrink: 0; }
+.octo-tool-call-card__body {
+  border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.octo-tool-call-card__section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.octo-tool-call-card__pre {
+  white-space: pre-wrap;
+  word-break: break-words;
+  font-family: var(--ft-mono);
+  font-size: 11px;
+  color: color-mix(in oklab, var(--text) 80%, transparent);
+}
 
 /* ============================================================
    7. Reset (@layer base)

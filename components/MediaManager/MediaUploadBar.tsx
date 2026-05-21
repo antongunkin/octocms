@@ -41,7 +41,7 @@ export function MediaUploadBar({ allowedFormats, onFiles, disabled }: MediaUploa
   const formatHint = allowedFormats.length > 0 ? allowedFormats.map((f) => f.toUpperCase()).join(', ') : 'any';
 
   return (
-    <div className="px-6 pt-4">
+    <div className="octo-media-upload-bar">
       <button
         type="button"
         onClick={openPicker}
@@ -49,20 +49,14 @@ export function MediaUploadBar({ allowedFormats, onFiles, disabled }: MediaUploa
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className={cn(
-          'flex w-full items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-5 text-sm transition-colors',
-          isDragging
-            ? 'border-primary bg-[var(--surface-3)] text-foreground'
-            : 'border-border bg-[var(--surface-1)] text-[var(--text-2)] hover:border-foreground/40 hover:text-foreground',
-          disabled && 'cursor-not-allowed opacity-60',
-        )}
+        className={cn('octo-media-upload-bar__btn', isDragging && 'octo-media-upload-bar__btn--dragging')}
       >
-        <CloudUpload className="h-5 w-5 shrink-0" />
-        <span className="text-left">
-          <span className="font-medium text-foreground">
+        <CloudUpload className="octo-media-upload-bar__icon h-5 w-5" />
+        <span>
+          <span className="octo-media-upload-bar__label">
             {isDragging ? 'Drop files to upload' : 'Drop images here or click to browse'}
           </span>
-          <span className="ml-2 text-xs text-muted-foreground">{formatHint}</span>
+          <span className="octo-media-upload-bar__hint">{formatHint}</span>
         </span>
       </button>
       <input
@@ -70,7 +64,7 @@ export function MediaUploadBar({ allowedFormats, onFiles, disabled }: MediaUploa
         type="file"
         accept={accept}
         multiple
-        className="hidden"
+        style={{ display: 'none' }}
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) onFiles(e.target.files);
           e.target.value = '';

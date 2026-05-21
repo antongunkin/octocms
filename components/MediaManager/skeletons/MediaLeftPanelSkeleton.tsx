@@ -8,15 +8,11 @@ import { ShimmerBlock } from '../../skeletons/primitives';
  */
 export function MediaLeftPanelSkeleton() {
   return (
-    <aside
-      role="status"
-      aria-label="Loading folders"
-      className="flex w-[248px] shrink-0 flex-col overflow-y-auto border-r border-border bg-[var(--surface-2)]"
-    >
-      <div className="px-3 py-4">
+    <aside role="status" aria-label="Loading folders" className="octo-media-left-panel">
+      <div style={{ padding: '12px 12px 16px' }}>
         <ShimmerBlock className="mb-3 h-7 w-full rounded-lg" />
         <ShimmerBlock className="mb-2 ml-2 h-3 w-16" />
-        <div className="flex flex-col gap-1.5">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {Array.from({ length: 5 }, (_, i) => (
             <ShimmerBlock key={i} className="h-7 w-full rounded-lg" />
           ))}

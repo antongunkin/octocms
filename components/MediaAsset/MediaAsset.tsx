@@ -99,9 +99,9 @@ export function MediaAsset({ id }: MediaAssetProps) {
   // skeletons so chip widths stay stable while the list resolves.
   if (isLoading) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-          <div className="flex min-w-0 flex-1 items-center gap-2">
+      <div className="octo-media-asset">
+        <div className="octo-page-chrome">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Button
               variant="ghost"
               size="icon"
@@ -113,7 +113,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
             </Button>
           </div>
         </div>
-        <div className="flex flex-1 overflow-hidden">
+        <div className="octo-media-asset__body">
           <MediaPreviewSkeleton />
           <MediaMetadataFormSkeleton />
         </div>
@@ -125,9 +125,9 @@ export function MediaAsset({ id }: MediaAssetProps) {
   // so navigation between assets stays inside the cached SPA.
   if (!file) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-muted-foreground">
+      <div className="octo-media-asset__not-found">
         <ImageIcon className="h-12 w-12" />
-        <p className="text-sm">Asset not found.</p>
+        <p style={{ fontSize: '14px' }}>Asset not found.</p>
         <Button variant="outline" size="sm" onClick={back}>
           Back to media
         </Button>
@@ -138,38 +138,39 @@ export function MediaAsset({ id }: MediaAssetProps) {
   const folderLabel = file.folder === '/' ? 'Root' : file.folder;
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="octo-media-asset">
       {/* Page header — same chrome as content list */}
-      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="-ml-2 h-7 w-7 text-muted-foreground"
-            onClick={back}
-            aria-label="Back to media"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="min-w-0 flex-1">
-            <div className="mb-px flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
-              <button
-                type="button"
-                onClick={back}
-                className="text-[var(--text-2)] hover:text-foreground"
-                style={{ color: 'var(--text-2)' }}
-              >
-                Media
-              </button>
-              <ChevronRight className="h-3 w-3 opacity-60" />
-              <span style={{ color: 'var(--text-2)' }}>{folderLabel}</span>
+      <div className="octo-page-chrome">
+        <div className="octo-page-chrome__title-area">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="-ml-2 h-7 w-7 text-muted-foreground"
+              onClick={back}
+              aria-label="Back to media"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <div className="octo-page-chrome__breadcrumb">
+                <button
+                  type="button"
+                  onClick={back}
+                  style={{ color: 'var(--text-2)', background: 'none', border: 0, cursor: 'pointer', padding: 0 }}
+                >
+                  Media
+                </button>
+                <ChevronRight className="h-3 w-3" style={{ opacity: 0.6 }} />
+                <span style={{ color: 'var(--text-2)' }}>{folderLabel}</span>
+              </div>
+              <div className="octo-page-chrome__title-row">
+                <h1 className="octo-page-chrome__title">{file.title || file.originalName}</h1>
+              </div>
             </div>
-            <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-              {file.title || file.originalName}
-            </h1>
           </div>
         </div>
-        <div className="flex flex-none items-center gap-2">
+        <div className="octo-page-chrome__right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={openInNewTab}>
             <ExternalLink className="h-4 w-4" />
             Open in new tab
@@ -187,22 +188,18 @@ export function MediaAsset({ id }: MediaAssetProps) {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="octo-media-asset__body">
         {/* Preview pane */}
-        <div className="flex flex-1 items-center justify-center overflow-auto bg-[var(--surface-2)] p-8">
-          <img
-            src={file.publicUrl}
-            alt={file.title || file.originalName}
-            className="max-h-full max-w-full rounded-lg border border-border bg-background object-contain shadow-sm"
-          />
+        <div className="octo-media-asset__preview">
+          <img src={file.publicUrl} alt={file.title || file.originalName} className="octo-media-asset__preview-img" />
         </div>
 
         {/* Sidebar form */}
-        <aside className="flex w-[360px] shrink-0 flex-col overflow-y-auto border-l border-border bg-background">
-          <div className="space-y-6 px-5 py-5">
-            <section className="space-y-1.5">
+        <aside className="octo-media-asset__sidebar">
+          <div className="octo-media-asset__sidebar-inner">
+            <section className="octo-media-asset__sidebar-section">
               <Label htmlFor="media-asset-title" className="text-xs text-muted-foreground">
-                Title <span className="text-destructive">*</span>
+                Title <span style={{ color: 'var(--danger)' }}>*</span>
               </Label>
               <input
                 id="media-asset-title"
@@ -228,7 +225,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
               </Button>
             </section>
 
-            <section className="space-y-1.5">
+            <section className="octo-media-asset__sidebar-section">
               <Label htmlFor="media-asset-folder" className="text-xs text-muted-foreground">
                 Folder
               </Label>
@@ -257,20 +254,30 @@ export function MediaAsset({ id }: MediaAssetProps) {
               >
                 Save folder
               </Button>
-              <p className="text-[11px] text-muted-foreground">
+              <p style={{ fontSize: '11px', color: 'var(--muted)' }}>
                 Folders are virtual labels for sorting &mdash; they aren&rsquo;t physical directories.
               </p>
             </section>
 
-            <section className="space-y-2.5 border-t border-border pt-5 text-sm">
-              <h3 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Details</h3>
-              <DetailRow label="File name" value={file.originalName} mono />
-              <DetailRow label="Format" value={file.extension.toUpperCase()} />
-              {file.width != null && file.height != null && (
-                <DetailRow label="Dimensions" value={`${file.width} × ${file.height}`} />
-              )}
-              <DetailRow label="Path" value={file.publicUrl} mono />
-              <DetailRow label="ID" value={file.id} mono />
+            <section
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                borderTop: '1px solid var(--border)',
+                paddingTop: '20px',
+              }}
+            >
+              <h3 className="octo-media-asset__details-heading">Details</h3>
+              <div className="octo-media-asset__details">
+                <DetailRow label="File name" value={file.originalName} mono />
+                <DetailRow label="Format" value={file.extension.toUpperCase()} />
+                {file.width != null && file.height != null && (
+                  <DetailRow label="Dimensions" value={`${file.width} × ${file.height}`} />
+                )}
+                <DetailRow label="Path" value={file.publicUrl} mono />
+                <DetailRow label="ID" value={file.id} mono />
+              </div>
             </section>
           </div>
         </aside>
@@ -300,9 +307,11 @@ export function MediaAsset({ id }: MediaAssetProps) {
 
 function DetailRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="flex items-start gap-2">
-      <span className="w-24 flex-none text-xs text-muted-foreground">{label}</span>
-      <span className={cn('break-all text-xs text-foreground', mono && 'font-mono')}>{value}</span>
+    <div className="octo-media-asset__detail">
+      <span className="octo-media-asset__detail-label">{label}</span>
+      <span className={cn('octo-media-asset__detail-value', mono && 'octo-media-asset__detail-value--mono')}>
+        {value}
+      </span>
     </div>
   );
 }

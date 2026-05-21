@@ -286,52 +286,39 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="octo-edit-post">
       {/* Page header — same chrome as MediaAsset / DashboardContent */}
-      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
-            <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div className="min-w-0 flex-1">
-            <div className="mb-px flex items-center gap-1.5 text-[12px]" style={{ color: 'var(--text-2)' }}>
-              <Link
-                href="/cms/content"
-                className="hover:text-foreground transition-colors"
-                style={{ color: 'var(--text-2)' }}
-              >
-                Content
+      <div className="octo-page-chrome">
+        <div className="octo-page-chrome__title-area">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
+              <Link href={`/cms/content/${type}`} aria-label="Back to collection">
+                <ArrowLeft className="h-4 w-4" />
               </Link>
-              <ChevronRight className="h-3 w-3 opacity-60" />
-              <span>{collectionLabel}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <h1 className="m-0 text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-                {entryTitle || collectionLabel}
-              </h1>
+            </Button>
+            <div>
+              <div className="octo-page-chrome__breadcrumb">
+                <Link href="/cms/content" style={{ color: 'var(--text-2)' }}>
+                  Content
+                </Link>
+                <ChevronRight className="h-3 w-3" style={{ opacity: 0.6 }} />
+                <span>{collectionLabel}</span>
+              </div>
+              <div className="octo-page-chrome__title-row">
+                <h1 className="octo-page-chrome__title">{entryTitle || collectionLabel}</h1>
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex flex-none items-center gap-2">
+        <div className="octo-page-chrome__right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {diffToggleVisible && (
-            <div
-              role="tablist"
-              aria-label="Edit or Diff view"
-              className="inline-flex rounded-md border border-border bg-muted/40 p-0.5"
-            >
+            <div role="tablist" aria-label="Edit or Diff view" className="octo-edit-post__view-toggle">
               <button
                 type="button"
                 role="tab"
                 aria-selected={viewMode === 'edit'}
                 onClick={() => setViewMode('edit')}
-                className={cn(
-                  'px-3 py-1 text-[13px] font-medium rounded transition-colors',
-                  viewMode === 'edit'
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
+                className={cn('octo-edit-post__view-btn', viewMode === 'edit' && 'octo-edit-post__view-btn--active')}
               >
                 Edit
               </button>
@@ -340,12 +327,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
                 role="tab"
                 aria-selected={viewMode === 'diff'}
                 onClick={() => setViewMode('diff')}
-                className={cn(
-                  'px-3 py-1 text-[13px] font-medium rounded transition-colors',
-                  viewMode === 'diff'
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
+                className={cn('octo-edit-post__view-btn', viewMode === 'diff' && 'octo-edit-post__view-btn--active')}
               >
                 Diff
               </button>
@@ -379,7 +361,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
 
       <form
         id="entry-form"
-        className="flex-1 min-h-0 overflow-hidden flex"
+        className="octo-edit-post__body"
         onSubmit={handleSubmit}
         onInput={(e) => {
           const t = e.target;
@@ -395,12 +377,12 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
         }}
       >
         {/* Main content column — independently scrollable */}
-        <div className="flex-1 min-w-0 overflow-y-auto bg-bg">
-          <div className="max-w-[960px] mx-auto px-6 py-6 pb-32">
+        <div className="octo-edit-post__form-col">
+          <div className="octo-edit-post__form-wrap">
             {viewMode === 'diff' && selectedFile ? (
               <DiffView collectionType={type} entryPath={selectedFile.path} />
             ) : (
-              <section className="rounded-2xl border border-border bg-bg px-7 py-7 shadow-1">
+              <section className="octo-edit-post__form-card">
                 <FormFields
                   key={`${filePath ?? ''}-${entryQuery.dataUpdatedAt}`}
                   selectedFile={selectedFile}
@@ -414,25 +396,23 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
         </div>
 
         {/* Sidebar — fixed width, independently scrollable, surface-2 panel */}
-        <aside className="w-[280px] shrink-0 overflow-y-auto border-l border-border bg-surface-2 px-4 py-5 flex flex-col gap-5">
+        <aside className="octo-edit-post__sidebar">
           {/* Entry details */}
-          <div>
-            <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-              Entry details
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-16 shrink-0 text-muted-foreground">ID</span>
-                <span className="flex-1 min-w-0 font-mono text-[11px] text-foreground truncate" title={post.sys?.id}>
+          <div className="octo-edit-post__sidebar-section">
+            <div className="octo-edit-post__sidebar-label">Entry details</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div className="octo-edit-post__detail-row">
+                <span className="octo-edit-post__detail-key">ID</span>
+                <span className="octo-edit-post__detail-val octo-edit-post__detail-val--mono" title={post.sys?.id}>
                   {post.sys?.id}
                 </span>
               </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-16 shrink-0 text-muted-foreground">Type</span>
-                <span className="flex-1 text-foreground">{collectionLabel}</span>
+              <div className="octo-edit-post__detail-row">
+                <span className="octo-edit-post__detail-key">Type</span>
+                <span className="octo-edit-post__detail-val">{collectionLabel}</span>
               </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-16 shrink-0 text-muted-foreground">Status</span>
+              <div className="octo-edit-post__detail-row">
+                <span className="octo-edit-post__detail-key">Status</span>
                 <StatusBadge status={currentStatus} />
               </div>
             </div>

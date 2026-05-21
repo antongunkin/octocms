@@ -4,7 +4,6 @@ import { FolderOpen, ImageIcon, Plus, X } from 'lucide-react';
 import React from 'react';
 
 import { LeftNavItem } from '../Layout/LeftNavItem';
-import { Button } from '../ui/button';
 
 export type MediaLeftPanelProps = {
   folders: string[];
@@ -33,8 +32,8 @@ export function MediaLeftPanel({
   const customSet = new Set(customFolders);
 
   return (
-    <aside className="flex w-[248px] shrink-0 flex-col overflow-y-auto border-r border-border bg-[var(--surface-2)]">
-      <nav className="space-y-0.5 px-3 py-4">
+    <aside className="octo-media-left-panel">
+      <nav className="octo-media-left-panel__all-nav octo-left-panel__nav">
         <LeftNavItem
           icon={<ImageIcon className="h-4 w-4" />}
           label="All files"
@@ -44,27 +43,26 @@ export function MediaLeftPanel({
         />
       </nav>
 
-      <div className="px-3 pb-4 pt-1">
-        <div className="mb-1 flex items-center px-2">
-          <p className="flex-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Folders</p>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="-mr-1 h-5 w-5 text-muted-foreground"
+      <div className="octo-media-left-panel__folder-nav">
+        <div className="octo-media-left-panel__folders-header">
+          <p className="octo-media-left-panel__folders-label">Folders</p>
+          <button
+            type="button"
+            className="octo-media-left-panel__add-folder"
             onClick={onAddFolder}
             aria-label="Add folder"
           >
             <Plus className="h-3 w-3" />
-          </Button>
+          </button>
         </div>
-        <nav className="space-y-0.5">
+        <nav className="octo-left-panel__nav">
           {folders.map((folder) => {
             const label = folder === '/' ? 'Root' : folder;
             const active = selectedFolder === folder;
             const canDelete = folder !== '/' && customSet.has(folder);
             const count = countByFolder[folder] ?? 0;
             return (
-              <div key={folder} className="group relative">
+              <div key={folder} className="octo-media-left-panel__folder-row">
                 {/*
                   Pass `count` to LeftNavItem only when there's no inline delete
                   button to swap with — otherwise we render the count and the
@@ -79,13 +77,9 @@ export function MediaLeftPanel({
                   onClick={() => onSelectFolder(folder)}
                 />
                 {canDelete && (
-                  <div className="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+                  <>
                     <span
-                      className={
-                        active
-                          ? 'text-xs tabular-nums text-foreground/60 group-hover:hidden'
-                          : 'text-xs tabular-nums text-muted-foreground group-hover:hidden'
-                      }
+                      className={`octo-media-left-panel__folder-count ${active ? 'octo-media-left-panel__folder-count--active' : 'octo-media-left-panel__folder-count--normal'}`}
                     >
                       {count}
                     </span>
@@ -96,11 +90,11 @@ export function MediaLeftPanel({
                         onDeleteFolder(folder);
                       }}
                       aria-label={`Delete folder ${folder}`}
-                      className="pointer-events-auto hidden h-5 w-5 items-center justify-center rounded text-muted-foreground hover:bg-[var(--surface-1)] hover:text-destructive group-hover:flex"
+                      className="octo-media-left-panel__folder-del"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
-                  </div>
+                  </>
                 )}
               </div>
             );

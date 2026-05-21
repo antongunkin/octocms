@@ -55,7 +55,7 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
   };
 
   return (
-    <div className="absolute right-2 top-2 z-10 flex gap-1 rounded-md border border-border bg-background/95 p-1 shadow-sm backdrop-blur">
+    <div className="octo-markdown-img-toolbar">
       <button
         type="button"
         title="Delete image"
@@ -64,7 +64,7 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
           e.preventDefault();
           setConfirmOpen(true);
         }}
-        className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-destructive"
+        className="octo-markdown-img-toolbar__btn octo-markdown-img-toolbar__btn--delete"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>
@@ -84,7 +84,7 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
             },
           });
         }}
-        className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+        className="octo-markdown-img-toolbar__btn octo-markdown-img-toolbar__btn--edit"
       >
         <Pencil className="h-3.5 w-3.5" />
       </button>
