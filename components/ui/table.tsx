@@ -42,9 +42,7 @@ const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<
 TableCell.displayName = 'TableCell';
 
 const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttributes<HTMLTableCaptionElement>>(
-  ({ className, ...props }, ref) => (
-    <caption ref={ref} className={cn('octo-table__caption', className)} {...props} />
-  ),
+  ({ className, ...props }, ref) => <caption ref={ref} className={cn('octo-table__caption', className)} {...props} />,
 );
 TableCaption.displayName = 'TableCaption';
 

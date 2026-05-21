@@ -349,6 +349,11 @@ html {
 .octo-shimmer {
   animation: octo-shimmer 2s ease-in-out infinite;
 }
+@keyframes octo-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 
 /* ============================================================
    5. BEM primitives  (octo-button, octo-card, octo-chip)
@@ -983,6 +988,7 @@ html {
 .octo-tabs__trigger:hover { color: var(--text); }
 .octo-tabs__trigger:focus-visible { box-shadow: 0 0 0 2px var(--ring); }
 .octo-tabs__trigger[data-state="active"] { background: var(--surface-1); color: var(--text); box-shadow: var(--shadow-1); }
+.octo-tabs__trigger[data-disabled] { pointer-events: none; color: var(--muted); opacity: 0.5; cursor: not-allowed; }
 .octo-tabs__trigger--pill {
   border-radius: 20px;
   padding: 4px 14px;
@@ -1011,6 +1017,7 @@ html {
 @media (min-width: 640px) {
   .octo-toast__viewport { max-width: 420px; }
 }
+.octo-toast__content { display: grid; gap: 4px; }
 .octo-toast {
   position: relative;
   display: flex;
@@ -1031,6 +1038,7 @@ html {
 .octo-toast[data-swipe="move"] { transform: translateX(var(--radix-toast-swipe-move-x)); }
 .octo-toast[data-swipe="cancel"] { transform: translateX(0); }
 .octo-toast[data-swipe="end"] { animation: octo-toast-swipe-out 100ms ease forwards; }
+.octo-toast--default { /* default — base .octo-toast styles apply */ }
 .octo-toast--destructive { border-color: var(--danger); background: var(--danger-bg, var(--surface-1)); }
 .octo-toast--success { border-color: var(--ok, #22c55e); }
 .octo-toast__title { font-size: 14px; font-weight: 600; color: var(--text); }
@@ -1051,6 +1059,7 @@ html {
   transition: opacity 120ms;
 }
 .octo-toast__close:hover { opacity: 1; }
+.octo-toast__close:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 4px; }
 .octo-toast__close svg { width: 16px; height: 16px; }
 .octo-toast__action {
   display: inline-flex;
@@ -1067,6 +1076,8 @@ html {
   transition: background-color 120ms;
 }
 .octo-toast__action:hover { background: var(--surface-2); }
+.octo-toast__action:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.octo-toast__action:disabled { pointer-events: none; opacity: 0.5; }
 .octo-toast--destructive .octo-toast__action { border-color: var(--danger); }
 @keyframes octo-toast-in {
   from { transform: translateY(100%); opacity: 0; }
@@ -1083,20 +1094,81 @@ html {
 
 /* ── octo-toast-card ── */
 .octo-toast-card {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  width: 100%;
+  overflow: hidden;
+  min-width: 360px;
+  max-width: 420px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  padding: 12px 12px 12px 14px;
+  box-shadow: var(--shadow-2);
 }
-.octo-toast-card__icon { flex-shrink: 0; margin-top: 2px; }
+.octo-toast-card__rail {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+.octo-toast-card__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 28px;
+  width: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  margin-top: 2px;
+}
+.octo-toast-card__icon svg { width: 14px; height: 14px; }
 .octo-toast-card__body { flex: 1; min-width: 0; }
-.octo-toast-card__title { font-size: 14px; font-weight: 600; color: var(--text); }
+.octo-toast-card__header { display: flex; align-items: baseline; gap: 8px; }
+.octo-toast-card__title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; color: var(--text); }
 .octo-toast-card__text { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.octo-toast-card__time { flex-shrink: 0; font-family: var(--ft-mono); font-size: 10px; color: var(--muted); }
+.octo-toast-card__actions { margin-top: 8px; display: flex; align-items: center; gap: 16px; }
+.octo-toast-card__action-btn { border: 0; background: transparent; padding: 0; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; text-decoration: underline; }
+.octo-toast-card__dismiss { border: 0; background: transparent; padding: 0; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; }
+.octo-toast-card__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  height: 24px;
+  width: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color 120ms;
+}
+.octo-toast-card__close svg { width: 12px; height: 12px; }
+.octo-toast-card__close:hover { background: var(--surface-2); }
+.octo-toast-card__close:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.octo-toast-card--default .octo-toast-card__rail { background: var(--border-strong); }
+.octo-toast-card--default .octo-toast-card__icon { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); }
+.octo-toast-card--success .octo-toast-card__rail { background: var(--ok); }
+.octo-toast-card--success .octo-toast-card__icon { background: var(--ok-bg); border: 1px solid var(--ok-bd); color: var(--ok); }
+.octo-toast-card--error .octo-toast-card__rail { background: var(--danger); }
+.octo-toast-card--error .octo-toast-card__icon { background: var(--danger-bg); border: 1px solid var(--danger-bd); color: var(--danger); }
+.octo-toast-card--warn .octo-toast-card__rail { background: var(--st-changed); }
+.octo-toast-card--warn .octo-toast-card__icon { background: var(--st-changed-bg); border: 1px solid var(--st-changed-bd); color: var(--st-changed); }
+.octo-toast-card--info .octo-toast-card__rail { background: var(--accent); }
+.octo-toast-card--info .octo-toast-card__icon { background: var(--accent-bg); border: 1px solid var(--border); color: var(--accent-fg); }
+.octo-toast-card--brand .octo-toast-card__rail { background: var(--brand); }
+.octo-toast-card--brand .octo-toast-card__icon { background: var(--brand-bg); border: 1px solid var(--brand); color: var(--brand-strong); }
 
 /* ── octo-table ── */
 .octo-table__wrapper { position: relative; width: 100%; overflow-x: auto; }
 .octo-table { width: 100%; caption-side: bottom; border-collapse: collapse; font-size: 14px; }
+.octo-table__head { border-bottom: 2px solid var(--border); }
 .octo-table__row { border-bottom: 1px solid var(--border); transition: background-color 80ms; }
+.octo-table__row[aria-selected="true"] { background: var(--accent-bg); }
 .octo-table__head .octo-table__row:hover,
 .octo-table__body .octo-table__row:hover { background: var(--surface-2); }
 .octo-table__header {

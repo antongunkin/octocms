@@ -23,6 +23,7 @@ const Toast = ({ className, variant = 'default', ...props }: ToastProps) => (
   <ToastPrimitives.Root
     className={cn(
       'octo-toast',
+      variant === 'default' && 'octo-toast--default',
       variant === 'destructive' && 'octo-toast--destructive',
       variant === 'success' && 'octo-toast--success',
       className,

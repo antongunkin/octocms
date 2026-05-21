@@ -15,7 +15,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         info: <Info style={{ width: 16, height: 16 }} />,
         warning: <TriangleAlert style={{ width: 16, height: 16 }} />,
         error: <OctagonX style={{ width: 16, height: 16 }} />,
-        loading: <LoaderCircle style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />,
+        loading: <LoaderCircle style={{ width: 16, height: 16, animation: 'octo-spin 1s linear infinite' }} />,
       }}
       {...props}
     />
