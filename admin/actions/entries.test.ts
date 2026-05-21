@@ -7,6 +7,7 @@ import { getEntryTitleField } from './utils';
 vi.mock('./files', () => ({
   getContentFiles: vi.fn(),
   getFile: vi.fn(),
+  getFileJson: vi.fn(),
 }));
 
 const mockConfig = {
@@ -73,7 +74,7 @@ describe('getEntryList', () => {
 
   it('extracts type, id, and path from file paths', async () => {
     vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/abc123.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({ fields: {} });
+    vi.mocked(filesModule.getFileJson).mockResolvedValue({ fields: {} });
 
     const [entry] = await getEntryList();
     expect(entry.type).toBe('post');
@@ -83,7 +84,7 @@ describe('getEntryList', () => {
 
   it('uses the entryTitle field as the entry title when available', async () => {
     vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/abc123.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({ fields: { title: 'My Post' } });
+    vi.mocked(filesModule.getFileJson).mockResolvedValue({ fields: { title: 'My Post' } });
 
     const [entry] = await getEntryList();
     expect(entry.title).toBe('My Post');
@@ -94,7 +95,7 @@ describe('getEntryList', () => {
     // live under `mediaContentFolder` (e.g. `cms/media/`) and never appear
     // here. Verify the function handles the "no media in input" contract.
     vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/p1.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({ fields: { title: 'Post' } });
+    vi.mocked(filesModule.getFileJson).mockResolvedValue({ fields: { title: 'Post' } });
 
     const result = await getEntryList();
     expect(result).toHaveLength(1);
@@ -103,7 +104,7 @@ describe('getEntryList', () => {
 
   it('defaults status to merged when sys.status is absent', async () => {
     vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/abc123.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({ fields: { title: 'T' } });
+    vi.mocked(filesModule.getFileJson).mockResolvedValue({ fields: { title: 'T' } });
 
     const [entry] = await getEntryList();
     expect(entry.status).toBe('merged');
@@ -111,7 +112,7 @@ describe('getEntryList', () => {
 
   it('falls back to the id as title when entryTitle field is empty', async () => {
     vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/abc123.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({ fields: { title: '' } });
+    vi.mocked(filesModule.getFileJson).mockResolvedValue({ fields: { title: '' } });
 
     const [entry] = await getEntryList();
     expect(entry.title).toBe('abc123');
@@ -119,15 +120,15 @@ describe('getEntryList', () => {
 
   it('falls back to the id as title when the collection has no entryTitle field', async () => {
     vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/item/xyz.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({ fields: { name: 'Widget' } });
+    vi.mocked(filesModule.getFileJson).mockResolvedValue({ fields: { name: 'Widget' } });
 
     const [entry] = await getEntryList();
     expect(entry.title).toBe('xyz');
   });
 
-  it('falls back to the id as title when getFile throws', async () => {
+  it('falls back to the id as title when getFileJson returns null', async () => {
     vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/abc123.json']);
-    vi.mocked(filesModule.getFile).mockRejectedValue(new Error('file not found'));
+    vi.mocked(filesModule.getFileJson).mockResolvedValue(null);
 
     const [entry] = await getEntryList();
     expect(entry.title).toBe('abc123');
@@ -139,7 +140,7 @@ describe('getEntryList', () => {
       'cms/content/post/a.json',
       'cms/content/post/b.json',
     ]);
-    vi.mocked(filesModule.getFile).mockImplementation(async (file) => ({
+    vi.mocked(filesModule.getFileJson).mockImplementation(async (file) => ({
       fields: { title: file.includes('/c.') ? 'Zebra' : file.includes('/a.') ? 'Apple' : 'Mango' },
     }));
 
@@ -147,9 +148,19 @@ describe('getEntryList', () => {
     expect(result.map((e) => e.title)).toEqual(['Apple', 'Mango', 'Zebra']);
   });
 
+  it('uses getFileJson (not getFile) to skip companion markdown reads', async () => {
+    vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/a.json', 'cms/content/post/b.json']);
+    vi.mocked(filesModule.getFileJson).mockResolvedValue({ fields: { title: 'T' } });
+
+    await getEntryList();
+
+    expect(filesModule.getFileJson).toHaveBeenCalledTimes(2);
+    expect(filesModule.getFile).not.toHaveBeenCalled();
+  });
+
   it('filters to the given collection when specified', async () => {
     vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/1.json']);
-    vi.mocked(filesModule.getFile).mockResolvedValue({ fields: {} });
+    vi.mocked(filesModule.getFileJson).mockResolvedValue({ fields: {} });
 
     await getEntryList('post');
     expect(filesModule.getContentFiles).toHaveBeenCalledWith('post');
@@ -160,7 +171,7 @@ describe('getEntryList', () => {
       'cms/content/post/p1.json',
       'cms/content/homePage/home.json',
     ]);
-    vi.mocked(filesModule.getFile).mockImplementation(async (file) => ({
+    vi.mocked(filesModule.getFileJson).mockImplementation(async (file) => ({
       fields: { title: file.includes('post') ? 'Post Entry' : 'Home Entry' },
     }));
 

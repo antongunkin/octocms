@@ -51,51 +51,13 @@ export async function loadProjectConfig(projectRoot: string) {
 }
 
 /**
- * Load the COLLECTIONS array from `octocms/admin/consts.ts`.
+ * Derive the collection name list from the user's config.
+ *
+ * Collection identity lives in `cms/schema.json` (mirrored into
+ * `cms/__generated__/schema.ts`); the package has no business hard-coding
+ * names. This mirrors `regenerateAll`'s pattern: `Object.keys(config.collections)`.
  */
 export async function loadCollections(projectRoot: string): Promise<readonly string[]> {
-  const { createJiti } = await import('jiti');
-  const alias: Record<string, string> = {};
-  const localOctocms = resolve(projectRoot, 'octocms');
-  if (existsSync(localOctocms)) {
-    alias['octocms/'] = localOctocms + '/';
-  }
-  const jiti = createJiti(join(projectRoot, '__cli_loader__.ts'), {
-    fsCache: false,
-    moduleCache: false,
-    alias,
-  });
-  const mod = (await jiti.import(join(projectRoot, 'octocms/admin/consts.ts'), {
-    default: true,
-    try: true,
-  })) as Record<string, unknown> | undefined;
-  if (!mod || !Array.isArray(mod.COLLECTIONS)) {
-    throw new Error('Could not load COLLECTIONS from octocms/admin/consts.ts');
-  }
-  return mod.COLLECTIONS as readonly string[];
-}
-
-/**
- * Load FIELD_TYPES from `octocms/admin/consts.ts`.
- */
-export async function loadFieldTypes(projectRoot: string): Promise<readonly string[]> {
-  const { createJiti } = await import('jiti');
-  const alias: Record<string, string> = {};
-  const localOctocms = resolve(projectRoot, 'octocms');
-  if (existsSync(localOctocms)) {
-    alias['octocms/'] = localOctocms + '/';
-  }
-  const jiti = createJiti(join(projectRoot, '__cli_loader__.ts'), {
-    fsCache: false,
-    moduleCache: false,
-    alias,
-  });
-  const mod = (await jiti.import(join(projectRoot, 'octocms/admin/consts.ts'), {
-    default: true,
-    try: true,
-  })) as Record<string, unknown> | undefined;
-  if (!mod || !Array.isArray(mod.FIELD_TYPES)) {
-    throw new Error('Could not load FIELD_TYPES from octocms/admin/consts.ts');
-  }
-  return mod.FIELD_TYPES as readonly string[];
+  const config = await loadProjectConfig(projectRoot);
+  return Object.keys(config.collections);
 }

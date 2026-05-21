@@ -93,7 +93,7 @@ const searchContentTool: ToolHandler = {
     if (hits.length === 0) {
       return JSON.stringify({
         results: [],
-        note: 'No results — verify the query, or try a broader phrasing. If embeddings.json is missing, run `npm run embeddings:gen` on your dev machine.',
+        note: 'No results — verify the query, or try a broader phrasing. If embeddings.json is missing, run `npx octocms embeddings:gen` on your dev machine.',
       });
     }
     return JSON.stringify({

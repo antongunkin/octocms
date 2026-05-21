@@ -5,10 +5,10 @@ import './registerConfig';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-import { glob } from 'glob';
 import { cookies } from 'next/headers';
 
 import { getConfig } from '../../lib/configStore';
+import { listLocalCollectionFiles, listLocalFilesRecursive, listLocalFilesWithExtensions } from '../../lib/localReader';
 import { getAgentConfig } from '../../agent/configStore';
 import { syncEmbeddingsAfterRemove, syncEmbeddingsAfterUpsert } from '../../agent/embeddingsHook';
 import { BRANCH_HISTORY_FILE_PATH, mergeHistoryContentWithAppendedEntry } from '../../lib/branchHistory';
@@ -299,8 +299,10 @@ export const getContentFiles = async (collection: string = '**') => {
       }
     }
 
-    const files = await glob(`${config.contentFolder}/${collection}/*.json`);
-    return files || [];
+    if (collection === '**') {
+      return await listLocalFilesRecursive(config.contentFolder, '.json');
+    }
+    return await listLocalCollectionFiles(`${config.contentFolder}/${collection}`);
   } catch (e) {
     return [];
   }
@@ -326,8 +328,7 @@ export const getMediaContentFiles = async (): Promise<string[]> => {
       }
     }
 
-    const files = await glob(`${folder}/*.json`);
-    return files || [];
+    return await listLocalCollectionFiles(folder);
   } catch (_e) {
     return [];
   }
@@ -349,10 +350,48 @@ export const getMediaFiles = async (folder: string = '**') => {
       }
     }
 
-    const files = await glob(`${config.mediaFolder}/${folder}/*.{${config.mediaAllowedFormats.join(',')}}`);
-    return files || [];
+    const dir = folder === '**' ? config.mediaFolder : `${config.mediaFolder}/${folder}`;
+    return await listLocalFilesWithExtensions(dir, config.mediaAllowedFormats, folder === '**');
   } catch (e) {
     return [];
+  }
+};
+
+/**
+ * Read only the raw entry JSON — no companion markdown/richtext merging.
+ * Use for list views where companion content is never needed.
+ */
+export const getFileJson = async (fileName: string): Promise<Record<string, unknown> | null> => {
+  if (isProductionMode()) {
+    let activeBranch: string | undefined;
+    try {
+      activeBranch = (await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
+    } catch {}
+
+    try {
+      const stored = await getStoredFile(fileName, activeBranch);
+      if (stored) return structuredClone(stored.content);
+    } catch {}
+
+    try {
+      const result = await getGitHubFile(fileName, activeBranch);
+      if (result) return JSON.parse(result.content) as Record<string, unknown>;
+    } catch {}
+
+    try {
+      const raw = await readGitHubFilePublic(fileName, activeBranch);
+      if (raw) return JSON.parse(raw) as Record<string, unknown>;
+    } catch {}
+
+    return null;
+  }
+
+  try {
+    const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), fileName);
+    const data = await fsPromises.readFile(filePath, { encoding: 'utf8' });
+    return JSON.parse(data) as Record<string, unknown>;
+  } catch {
+    return null;
   }
 };
 

@@ -2,7 +2,13 @@ import fsPromises from 'fs/promises';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { listLocalCollectionFiles, readLocalContentFile, readLocalRawFile } from './localReader';
+import {
+  listLocalCollectionFiles,
+  listLocalFilesRecursive,
+  listLocalFilesWithExtensions,
+  readLocalContentFile,
+  readLocalRawFile,
+} from './localReader';
 
 vi.mock('fs/promises', () => ({
   default: {
@@ -153,5 +159,142 @@ describe('listLocalCollectionFiles', () => {
     vi.mocked(fsPromises.readdir as any).mockRejectedValue(err);
 
     await expect(listLocalCollectionFiles('cms/content/post')).rejects.toThrow('Permission denied');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listLocalFilesRecursive
+// ---------------------------------------------------------------------------
+
+describe('listLocalFilesRecursive', () => {
+  it('returns relative paths for all files matching the extension, recursively', async () => {
+    vi.mocked(fsPromises.readdir as any).mockResolvedValue([
+      'post/post-1.json',
+      'post/post-2.json',
+      'author/author-1.json',
+      'post', // directory entry — filtered out by extension
+      'author',
+    ]);
+
+    const result = await listLocalFilesRecursive('cms/content', '.json');
+
+    expect(fsPromises.readdir).toHaveBeenCalledWith(`${process.cwd()}/cms/content`, { recursive: true });
+    expect(result).toEqual([
+      'cms/content/author/author-1.json',
+      'cms/content/post/post-1.json',
+      'cms/content/post/post-2.json',
+    ]);
+  });
+
+  it('normalizes backslashes to forward slashes', async () => {
+    vi.mocked(fsPromises.readdir as any).mockResolvedValue(['sub\\file.json']);
+
+    const result = await listLocalFilesRecursive('cms/content', '.json');
+
+    expect(result[0]).toBe('cms/content/sub/file.json');
+  });
+
+  it('returns [] when the directory does not exist (ENOENT)', async () => {
+    const err: any = new Error('ENOENT');
+    err.code = 'ENOENT';
+    vi.mocked(fsPromises.readdir as any).mockRejectedValue(err);
+
+    expect(await listLocalFilesRecursive('cms/content', '.json')).toEqual([]);
+  });
+
+  it('returns sorted results', async () => {
+    vi.mocked(fsPromises.readdir as any).mockResolvedValue(['b.json', 'a.json']);
+
+    const result = await listLocalFilesRecursive('cms/content', '.json');
+
+    expect(result).toEqual(['cms/content/a.json', 'cms/content/b.json']);
+  });
+
+  it('re-throws errors other than ENOENT', async () => {
+    const err: any = new Error('Permission denied');
+    err.code = 'EACCES';
+    vi.mocked(fsPromises.readdir as any).mockRejectedValue(err);
+
+    await expect(listLocalFilesRecursive('cms/content', '.json')).rejects.toThrow('Permission denied');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listLocalFilesWithExtensions
+// ---------------------------------------------------------------------------
+
+const makeDirentWithExts = (name: string, isFile = true) => ({ name, isFile: () => isFile });
+
+describe('listLocalFilesWithExtensions (non-recursive)', () => {
+  it('returns relative paths for files matching any of the given extensions', async () => {
+    vi.mocked(fsPromises.readdir as any).mockResolvedValue([
+      makeDirentWithExts('hero.jpg'),
+      makeDirentWithExts('photo.png'),
+      makeDirentWithExts('readme.txt'),
+      makeDirentWithExts('sub', false),
+    ]);
+
+    const result = await listLocalFilesWithExtensions('public/media', ['jpg', 'png']);
+
+    expect(fsPromises.readdir).toHaveBeenCalledWith(`${process.cwd()}/public/media`, { withFileTypes: true });
+    expect(result).toEqual(['public/media/hero.jpg', 'public/media/photo.png']);
+  });
+
+  it('accepts extensions with or without leading dot', async () => {
+    vi.mocked(fsPromises.readdir as any).mockResolvedValue([makeDirentWithExts('img.webp')]);
+
+    const withDot = await listLocalFilesWithExtensions('public/media', ['.webp']);
+    const withoutDot = await listLocalFilesWithExtensions('public/media', ['webp']);
+
+    expect(withDot).toEqual(['public/media/img.webp']);
+    expect(withoutDot).toEqual(['public/media/img.webp']);
+  });
+
+  it('returns [] when directory does not exist (ENOENT)', async () => {
+    const err: any = new Error('ENOENT');
+    err.code = 'ENOENT';
+    vi.mocked(fsPromises.readdir as any).mockRejectedValue(err);
+
+    expect(await listLocalFilesWithExtensions('public/media/missing', ['jpg'])).toEqual([]);
+  });
+
+  it('returns sorted results', async () => {
+    vi.mocked(fsPromises.readdir as any).mockResolvedValue([makeDirentWithExts('z.jpg'), makeDirentWithExts('a.png')]);
+
+    const result = await listLocalFilesWithExtensions('public/media', ['jpg', 'png']);
+
+    expect(result).toEqual(['public/media/a.png', 'public/media/z.jpg']);
+  });
+
+  it('re-throws errors other than ENOENT', async () => {
+    const err: any = new Error('Permission denied');
+    err.code = 'EACCES';
+    vi.mocked(fsPromises.readdir as any).mockRejectedValue(err);
+
+    await expect(listLocalFilesWithExtensions('public/media', ['jpg'])).rejects.toThrow('Permission denied');
+  });
+});
+
+describe('listLocalFilesWithExtensions (recursive)', () => {
+  it('recursively lists files matching extensions', async () => {
+    vi.mocked(fsPromises.readdir as any).mockResolvedValue([
+      'hero.jpg',
+      'sub/photo.png',
+      'readme.txt',
+      'sub', // directory — filtered by extension
+    ]);
+
+    const result = await listLocalFilesWithExtensions('public/media', ['jpg', 'png'], true);
+
+    expect(fsPromises.readdir).toHaveBeenCalledWith(`${process.cwd()}/public/media`, { recursive: true });
+    expect(result).toEqual(['public/media/hero.jpg', 'public/media/sub/photo.png']);
+  });
+
+  it('returns [] when directory does not exist (ENOENT)', async () => {
+    const err: any = new Error('ENOENT');
+    err.code = 'ENOENT';
+    vi.mocked(fsPromises.readdir as any).mockRejectedValue(err);
+
+    expect(await listLocalFilesWithExtensions('public/media', ['jpg'], true)).toEqual([]);
   });
 });

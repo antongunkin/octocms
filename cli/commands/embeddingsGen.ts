@@ -11,9 +11,8 @@
 import { mkdirSync, promises as fsPromises, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 
-import { glob } from 'glob';
-
 import { embedAll, EMBEDDINGS_STORE_PATH, loadEmbeddings, serializeStore } from '../../agent/embeddings';
+import { listLocalCollectionFiles, listLocalFilesRecursive } from '../../lib/localReader';
 import { log } from '../lib/logger';
 import { loadCollections, loadProjectConfig } from '../lib/project';
 import { validateConfig } from '../lib/validateConfig';
@@ -46,8 +45,8 @@ export async function embeddingsGenCommand(projectRoot: string): Promise<void> {
   let paths: string[] = [];
   try {
     const [contentPaths, mediaPaths] = await Promise.all([
-      glob(`${config.contentFolder}/**/*.json`),
-      glob(`${mediaFolder}/*.json`),
+      listLocalFilesRecursive(config.contentFolder, '.json'),
+      listLocalCollectionFiles(mediaFolder),
     ]);
     paths = [...contentPaths, ...mediaPaths];
   } finally {

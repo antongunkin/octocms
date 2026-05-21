@@ -1,14 +1,15 @@
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-import { glob } from 'glob';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import * as localReader from '../../lib/localReader';
 import * as github from '../github';
 import * as build from './build';
 import {
   getContentFiles,
   getFile,
+  getMediaContentFiles,
   getMediaFiles,
   newFile,
   removeFile,
@@ -43,8 +44,10 @@ vi.mock('fs/promises', () => ({
   },
 }));
 
-vi.mock('glob', () => ({
-  glob: vi.fn(),
+vi.mock('../../lib/localReader', () => ({
+  listLocalFilesRecursive: vi.fn(),
+  listLocalFilesWithExtensions: vi.fn(),
+  listLocalCollectionFiles: vi.fn(),
 }));
 
 vi.mock('../github', () => ({
@@ -143,22 +146,25 @@ describe('getContentFiles', () => {
     vi.mocked(github.isProductionMode).mockReturnValue(false);
   });
 
-  it('returns glob results in dev mode for a specific collection', async () => {
-    vi.mocked(glob).mockResolvedValue(['cms/content/post/123.json']);
+  it('returns listLocalCollectionFiles results in dev mode for a specific collection', async () => {
+    vi.mocked(localReader.listLocalCollectionFiles).mockResolvedValue(['cms/content/post/123.json']);
     const result = await getContentFiles('post');
     expect(result).toEqual(['cms/content/post/123.json']);
-    expect(glob).toHaveBeenCalledWith('cms/content/post/*.json');
+    expect(localReader.listLocalCollectionFiles).toHaveBeenCalledWith('cms/content/post');
   });
 
-  it('uses ** wildcard by default', async () => {
-    vi.mocked(glob).mockResolvedValue(['cms/content/post/123.json', 'cms/content/item/456.json']);
+  it('uses listLocalFilesRecursive by default (** collection)', async () => {
+    vi.mocked(localReader.listLocalFilesRecursive).mockResolvedValue([
+      'cms/content/post/123.json',
+      'cms/content/item/456.json',
+    ]);
     const result = await getContentFiles();
-    expect(glob).toHaveBeenCalledWith('cms/content/**/*.json');
+    expect(localReader.listLocalFilesRecursive).toHaveBeenCalledWith('cms/content', '.json');
     expect(result).toHaveLength(2);
   });
 
-  it('returns empty array when glob throws', async () => {
-    vi.mocked(glob).mockRejectedValue(new Error('disk error'));
+  it('returns empty array when local reader throws', async () => {
+    vi.mocked(localReader.listLocalFilesRecursive).mockRejectedValue(new Error('disk error'));
     const result = await getContentFiles();
     expect(result).toEqual([]);
   });
@@ -189,12 +195,58 @@ describe('getContentFiles', () => {
     expect(result).toEqual(['cms/content/post/123.json']);
   });
 
-  it('falls back to glob when GitHub API throws in production', async () => {
+  it('falls back to local reader when GitHub API throws in production', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
     vi.mocked(github.listGitHubFilesRecursive).mockRejectedValue(new Error('API error'));
-    vi.mocked(glob).mockResolvedValue(['cms/content/post/123.json']);
+    vi.mocked(localReader.listLocalFilesRecursive).mockResolvedValue(['cms/content/post/123.json']);
     const result = await getContentFiles();
     expect(result).toEqual(['cms/content/post/123.json']);
+  });
+});
+
+// ─── getMediaContentFiles ─────────────────────────────────────────────────────
+
+describe('getMediaContentFiles', () => {
+  beforeEach(() => {
+    vi.mocked(github.isProductionMode).mockReturnValue(false);
+  });
+
+  it('returns local collection files in dev mode', async () => {
+    vi.mocked(localReader.listLocalCollectionFiles).mockResolvedValue(['cms/media/media-abc.json']);
+    const result = await getMediaContentFiles();
+    expect(localReader.listLocalCollectionFiles).toHaveBeenCalledWith('cms/media');
+    expect(result).toEqual(['cms/media/media-abc.json']);
+  });
+
+  it('returns empty array when local reader throws in dev mode', async () => {
+    vi.mocked(localReader.listLocalCollectionFiles).mockRejectedValue(new Error('disk error'));
+    expect(await getMediaContentFiles()).toEqual([]);
+  });
+
+  it('uses listGitHubFiles in production', async () => {
+    vi.mocked(github.isProductionMode).mockReturnValue(true);
+    vi.mocked(github.listGitHubFiles).mockResolvedValue(['cms/media/media-abc.json']);
+    const result = await getMediaContentFiles();
+    expect(github.listGitHubFiles).toHaveBeenCalledWith('cms/media', '.json', undefined);
+    expect(result).toEqual(['cms/media/media-abc.json']);
+  });
+
+  it('passes cms-active-branch cookie in production', async () => {
+    vi.mocked(github.isProductionMode).mockReturnValue(true);
+    mockCookiesGet.mockImplementation((name: string) =>
+      name === 'cms-active-branch' ? { value: 'feature/x' } : undefined,
+    );
+    vi.mocked(github.listGitHubFiles).mockResolvedValue([]);
+    await getMediaContentFiles();
+    expect(github.listGitHubFiles).toHaveBeenCalledWith('cms/media', '.json', 'feature/x');
+  });
+
+  it('falls back to local reader when GitHub API throws in production', async () => {
+    vi.mocked(github.isProductionMode).mockReturnValue(true);
+    vi.mocked(github.listGitHubFiles).mockRejectedValue(new Error('API error'));
+    vi.mocked(localReader.listLocalCollectionFiles).mockResolvedValue(['cms/media/media-abc.json']);
+    const result = await getMediaContentFiles();
+    expect(result).toEqual(['cms/media/media-abc.json']);
   });
 });
 
@@ -205,21 +257,25 @@ describe('getMediaFiles', () => {
     vi.mocked(github.isProductionMode).mockReturnValue(false);
   });
 
-  it('returns glob results in dev mode', async () => {
-    vi.mocked(glob).mockResolvedValue(['public/media/photo.jpg']);
+  it('uses listLocalFilesWithExtensions (non-recursive) in dev mode for a named folder', async () => {
+    vi.mocked(localReader.listLocalFilesWithExtensions).mockResolvedValue(['public/media/photo.jpg']);
     const result = await getMediaFiles('photos');
-    expect(glob).toHaveBeenCalledWith('public/media/photos/*.{jpg,png,webp}');
+    expect(localReader.listLocalFilesWithExtensions).toHaveBeenCalledWith(
+      'public/media/photos',
+      ['jpg', 'png', 'webp'],
+      false,
+    );
     expect(result).toEqual(['public/media/photo.jpg']);
   });
 
-  it('uses ** wildcard for folder by default', async () => {
-    vi.mocked(glob).mockResolvedValue([]);
+  it('uses listLocalFilesWithExtensions (recursive) for the default ** folder', async () => {
+    vi.mocked(localReader.listLocalFilesWithExtensions).mockResolvedValue([]);
     await getMediaFiles();
-    expect(glob).toHaveBeenCalledWith('public/media/**/*.{jpg,png,webp}');
+    expect(localReader.listLocalFilesWithExtensions).toHaveBeenCalledWith('public/media', ['jpg', 'png', 'webp'], true);
   });
 
-  it('returns empty array when glob throws', async () => {
-    vi.mocked(glob).mockRejectedValue(new Error('disk error'));
+  it('returns empty array when local reader throws', async () => {
+    vi.mocked(localReader.listLocalFilesWithExtensions).mockRejectedValue(new Error('disk error'));
     expect(await getMediaFiles()).toEqual([]);
   });
 
@@ -253,10 +309,10 @@ describe('getMediaFiles', () => {
     expect(result).toEqual(['public/media/ipad/hero.webp']);
   });
 
-  it('falls back to glob when GitHub API throws in production', async () => {
+  it('falls back to local reader when GitHub API throws in production', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
     vi.mocked(github.listGitHubFilesRecursive).mockRejectedValue(new Error('API error'));
-    vi.mocked(glob).mockResolvedValue(['public/media/photo.jpg']);
+    vi.mocked(localReader.listLocalFilesWithExtensions).mockResolvedValue(['public/media/photo.jpg']);
     const result = await getMediaFiles();
     expect(result).toEqual(['public/media/photo.jpg']);
   });
@@ -333,8 +389,7 @@ describe('saveFile', () => {
     mockCookiesGet.mockImplementation((name: string) =>
       name === 'cms-active-branch' ? { value: 'save-feat' } : undefined,
     );
-    // Avoid falling through to real `glob` when production slug checks call `getContentFiles`
-    // (a rejected GitHub list mock would otherwise scan workspace `cms/content` and collide).
+    // Avoid falling through to real local reader when slug checks call `getContentFiles`.
     vi.mocked(github.listGitHubFiles).mockResolvedValue([]);
     vi.mocked(github.listGitHubFilesRecursive).mockResolvedValue([]);
   });

@@ -24,6 +24,49 @@ export async function readLocalRawFile(filePath: string): Promise<string> {
   }
 }
 
+/**
+ * List all files under `dirPath` whose name ends with `ext`, recursively.
+ * Returns paths like `dirPath/sub/file.ext` with forward slashes, sorted.
+ * Returns [] if the directory does not exist.
+ */
+export async function listLocalFilesRecursive(dirPath: string, ext: string): Promise<string[]> {
+  return listLocalFilesWithExtensions(dirPath, [ext], true);
+}
+
+/**
+ * List files in `dirPath` whose name ends with any of the given extensions.
+ * Pass `recursive: true` to descend into subdirectories.
+ * Extensions may include or omit the leading dot.
+ * Returns [] if the directory does not exist.
+ */
+export async function listLocalFilesWithExtensions(
+  dirPath: string,
+  extensions: string[],
+  recursive = false,
+): Promise<string[]> {
+  const fullDir = path.join(process.cwd(), dirPath);
+  const normalizedExts = extensions.map((e) => (e.startsWith('.') ? e : `.${e}`));
+
+  try {
+    if (recursive) {
+      const names = (await fsPromises.readdir(fullDir, { recursive: true })) as unknown as string[];
+      return names
+        .filter((n) => normalizedExts.some((e) => n.endsWith(e)))
+        .map((n) => `${dirPath}/${n}`.replace(/\\/g, '/'))
+        .sort();
+    }
+
+    const entries = await fsPromises.readdir(fullDir, { withFileTypes: true });
+    return (entries as import('fs').Dirent[])
+      .filter((e) => e.isFile() && normalizedExts.some((ext) => e.name.endsWith(ext)))
+      .map((e) => `${dirPath}/${e.name}`)
+      .sort();
+  } catch (error: any) {
+    if (error?.code === 'ENOENT') return [];
+    throw error;
+  }
+}
+
 /** List .json files in a collection directory on local disk. Returns [] if directory does not exist. */
 export async function listLocalCollectionFiles(dirPath: string): Promise<string[]> {
   const fullDir = path.join(process.cwd(), dirPath);

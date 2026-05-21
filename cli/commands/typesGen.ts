@@ -8,6 +8,7 @@
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
+import { FIELD_FORMATS } from '../../schema/fieldFormats';
 import {
   generateConfigInit,
   generateContentDecls,
@@ -17,7 +18,7 @@ import {
   generateTypes,
 } from '../lib/codegen';
 import { log } from '../lib/logger';
-import { loadCollections, loadFieldTypes, loadProjectConfig } from '../lib/project';
+import { loadCollections, loadProjectConfig } from '../lib/project';
 import { validateConfig } from '../lib/validateConfig';
 
 export async function typesGenCommand(projectRoot: string): Promise<void> {
@@ -25,7 +26,6 @@ export async function typesGenCommand(projectRoot: string): Promise<void> {
 
   const config = await loadProjectConfig(projectRoot);
   const collections = await loadCollections(projectRoot);
-  const fieldTypes = await loadFieldTypes(projectRoot);
 
   log.info('Validating config...');
   try {
@@ -45,7 +45,7 @@ export async function typesGenCommand(projectRoot: string): Promise<void> {
 
   const files = [
     { name: 'types.ts', content: generateTypes(config, collections) },
-    { name: 'enums.ts', content: generateEnums(config, collections, fieldTypes) },
+    { name: 'enums.ts', content: generateEnums(config, collections, FIELD_FORMATS) },
     { name: 'content.d.ts', content: generateContentDecls(config, collections) },
     { name: 'index.ts', content: generateIndex() },
     { name: 'query.ts', content: generateQuery() },

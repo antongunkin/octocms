@@ -397,8 +397,11 @@ const FormReferenceField = ({
     if (collection) {
       return [collection] as string[];
     }
-    // Default: all non-media collections
-    return Object.keys(config.collections).filter((c) => c !== 'homePage');
+    // Default: every `hasMany` collection. Singletons are 1-of-1 fixed-ID
+    // entries — referencing them would never produce a meaningful list.
+    return Object.entries(config.collections)
+      .filter(([, col]) => col?.hasMany)
+      .map(([name]) => name);
   }, [reference, collection, config.collections]);
 
   const cardinality = reference?.cardinality || 'many';

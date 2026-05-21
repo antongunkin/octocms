@@ -9,7 +9,7 @@ import { getConfig } from '../../lib/configStore';
 import type { Config } from '../types';
 import type { EntryListItem, EntryStatus } from '../../types';
 
-import { getContentFiles, getFile } from './files';
+import { getContentFiles, getFile, getFileJson } from './files';
 import { isProductionMode } from '../github';
 import { getMediaEntries } from './media';
 import { getEntryTitleField } from './utils';
@@ -17,8 +17,6 @@ import { getEntryTitleField } from './utils';
 export const getEntryList = async (collection: string = '**'): Promise<EntryListItem[]> => {
   const config = getConfig();
   const files = await getContentFiles(collection);
-  const entries: EntryListItem[] = [];
-
   // Build a media lookup so we can resolve thumbnail URLs for any entry that
   // has an `image` field. One batched call regardless of entry count.
   const mediaList = await getMediaEntries().catch(() => []);
@@ -40,53 +38,55 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
     return key;
   }
 
-  for (const file of files) {
-    const nameWithoutFolder = file.replace(`${config.contentFolder}/`, '').replace('.json', '');
-    const parts = nameWithoutFolder.split('/');
-    const type = parts[0];
-    const id = parts[parts.length - 1];
-    const titleField = getEntryTitleField(type);
+  const isProd = isProductionMode();
 
-    let title = id;
-    let status: EntryStatus = 'merged';
-    let updatedAt: string | undefined;
-    let thumbnailUrl: string | undefined;
+  const items = await Promise.all(
+    files.map(async (file) => {
+      const nameWithoutFolder = file.replace(`${config.contentFolder}/`, '').replace('.json', '');
+      const parts = nameWithoutFolder.split('/');
+      const type = parts[0];
+      const id = parts[parts.length - 1];
+      const titleField = getEntryTitleField(type);
 
-    try {
-      const content = await getFile(file);
+      let title = id;
+      let status: EntryStatus = 'merged';
+      let updatedAt: string | undefined;
+      let thumbnailUrl: string | undefined;
 
-      if (titleField && content?.fields?.[titleField]) {
-        title = content.fields[titleField];
-      }
-      const imgKey = firstImageFieldKey(type);
-      if (imgKey) {
-        const value = content?.fields?.[imgKey];
-        if (typeof value === 'string' && value.trim()) {
-          const hit = mediaById.get(value.trim());
-          if (hit) thumbnailUrl = hit.publicUrl;
+      const [contentResult, statResult] = await Promise.allSettled([
+        getFileJson(file),
+        isProd ? Promise.resolve(null) : fsPromises.stat(path.join(/*turbopackIgnore: true*/ process.cwd(), file)),
+      ]);
+
+      if (contentResult.status === 'fulfilled' && contentResult.value) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const content = contentResult.value as any;
+        if (titleField && content?.fields?.[titleField]) {
+          title = content.fields[titleField];
+        }
+        const imgKey = firstImageFieldKey(type);
+        if (imgKey) {
+          const value = content?.fields?.[imgKey];
+          if (typeof value === 'string' && value.trim()) {
+            const hit = mediaById.get(value.trim());
+            if (hit) thumbnailUrl = hit.publicUrl;
+          }
+        }
+        if (content?.sys?.status) {
+          status = content.sys.status;
         }
       }
-      if (content?.sys?.status) {
-        status = content.sys.status;
+
+      if (!isProd && statResult.status === 'fulfilled' && statResult.value) {
+        updatedAt = (statResult.value as { mtime: Date }).mtime.toISOString();
       }
-    } catch (_e) {
-      // Fall back to id as title
-    }
 
-    if (!isProductionMode()) {
-      try {
-        const stat = await fsPromises.stat(path.join(/*turbopackIgnore: true*/ process.cwd(), file));
-        updatedAt = stat.mtime.toISOString();
-      } catch {
-        // ignore
-      }
-    }
+      return { type, id, path: file, title, status, updatedAt, thumbnailUrl };
+    }),
+  );
 
-    entries.push({ type, id, path: file, title, status, updatedAt, thumbnailUrl });
-  }
-
-  entries.sort((a, b) => a.title.localeCompare(b.title));
-  return entries;
+  items.sort((a, b) => a.title.localeCompare(b.title));
+  return items;
 };
 
 /**

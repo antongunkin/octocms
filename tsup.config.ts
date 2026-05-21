@@ -1,5 +1,24 @@
+import { readdirSync } from 'fs';
+import { join } from 'path';
+
 import { defineConfig } from 'tsup';
-import { globSync } from 'glob';
+
+function listSourceFiles(dir: string, cwd: string): string[] {
+  try {
+    const names = readdirSync(join(cwd, dir), { recursive: true }) as unknown as string[];
+    return names
+      .filter(
+        (n) =>
+          (n.endsWith('.ts') || n.endsWith('.tsx')) &&
+          !n.endsWith('.test.ts') &&
+          !n.endsWith('.test.tsx') &&
+          !n.endsWith('.d.ts'),
+      )
+      .map((n) => `${dir}/${n}`.replace(/\\/g, '/'));
+  } catch {
+    return [];
+  }
+}
 
 const external = [
   // User-app path resolved via the consumer's tsconfig — never bundled into
@@ -33,7 +52,6 @@ const external = [
   'remark-gfm',
   'remark-mdx',
   'slugify',
-  'glob',
   // Optional peer deps for the chat agent — kept external so absence at install time is fine
   '@anthropic-ai/sdk',
   '@huggingface/transformers',
@@ -56,30 +74,23 @@ const cjsOutExtension = () => ({ js: '.cjs', dts: '.d.cts' });
 // server actions like `admin/actions/schema.ts` import `regenerateAll` / `validateConfig` from
 // `../../cli/lib/*` at request time. `cli/index.ts` and `cli/commands/**` stay out — those are
 // the CLI entry point bundled separately below.
+const ROOT_FILES = [
+  'index.ts',
+  'query.ts',
+  'config.ts',
+  'defineConfig.ts',
+  'types.ts',
+  'withOctoCMS.ts',
+  'github-public.ts',
+];
+const SOURCE_DIRS = ['admin', 'agent', 'components', 'hooks', 'lib', 'schema', 'utils', 'cli/lib'];
+const IGNORE_FILES = new Set(['cli/index.ts']);
+
 const allEntry = Object.fromEntries(
-  globSync(
-    [
-      'index.ts',
-      'query.ts',
-      'config.ts',
-      'defineConfig.ts',
-      'types.ts',
-      'withOctoCMS.ts',
-      'github-public.ts',
-      'admin/**/*.{ts,tsx}',
-      'agent/**/*.{ts,tsx}',
-      'components/**/*.{ts,tsx}',
-      'hooks/**/*.{ts,tsx}',
-      'lib/**/*.{ts,tsx}',
-      'schema/**/*.{ts,tsx}',
-      'utils/**/*.{ts,tsx}',
-      'cli/lib/**/*.{ts,tsx}',
-    ],
-    {
-      ignore: ['**/*.test.{ts,tsx}', '**/*.d.ts', 'cli/index.ts', 'cli/commands/**'],
-      cwd: import.meta.dirname,
-    },
-  ).map((f) => [f.replace(/\.(ts|tsx)$/, ''), f]),
+  [
+    ...ROOT_FILES,
+    ...SOURCE_DIRS.flatMap((d) => listSourceFiles(d, import.meta.dirname)).filter((f) => !IGNORE_FILES.has(f)),
+  ].map((f) => [f.replace(/\.(ts|tsx)$/, ''), f]),
 );
 
 // CJS subset — only modules loaded by next.config.ts (jiti/CJS context)

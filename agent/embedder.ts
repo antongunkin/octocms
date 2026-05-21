@@ -83,7 +83,7 @@ class LocalTransformersEmbedder implements Embedder {
             `Embeddings unavailable: '@huggingface/transformers' loaded but its native ` +
               `dependency 'onnxruntime-node' could not load (${msg}). On Vercel, add ` +
               `'./node_modules/onnxruntime-node/**' to 'outputFileTracingIncludes' ` +
-              `for the relevant routes, or rely on offline 'npm run embeddings:gen'.`,
+              `for the relevant routes, or rely on offline 'npx octocms embeddings:gen'.`,
           );
         }
         throw new Error(

@@ -1,8 +1,6 @@
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-import { glob } from 'glob';
-
 import {
   isProductionMode,
   listGitHubFilesRecursive,
@@ -10,6 +8,7 @@ import {
   resolveContentBranch,
 } from '../github-public';
 import { getConfig } from './configStore';
+import { listLocalFilesRecursive } from './localReader';
 import { companionMarkdownPathsForEntry, companionRichTextPathsForEntry } from './companionMarkdown';
 import { buildSearchIndex, type EntryForSearch } from './searchIndex';
 
@@ -17,7 +16,7 @@ const PREBUILT_REL_PATH = 'cms/__generated__/search-index.json';
 
 async function gatherEntriesFromLocalFs(publicCollectionKeys: string[]): Promise<EntryForSearch[]> {
   const config = getConfig();
-  const files = await glob(`${config.contentFolder}/**/*.json`);
+  const files = await listLocalFilesRecursive(config.contentFolder, '.json');
   const entries: EntryForSearch[] = [];
 
   for (const file of files) {

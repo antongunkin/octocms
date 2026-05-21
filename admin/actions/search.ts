@@ -5,10 +5,10 @@ import './registerConfig';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-import { glob } from 'glob';
 import { cookies } from 'next/headers';
 
 import { getConfig } from '../../lib/configStore';
+import { listLocalFilesRecursive } from '../../lib/localReader';
 import { companionMarkdownPathsForEntry, companionRichTextPathsForEntry } from '../../lib/companionMarkdown';
 import { buildSearchIndex, querySearchIndex, type EntryForSearch, type SearchResult } from '../../lib/searchIndex';
 
@@ -43,7 +43,7 @@ async function searchFromStore(query: string): Promise<SearchResult[]> {
 
 async function searchFromFilesystem(query: string): Promise<SearchResult[]> {
   const config = getConfig();
-  const files = await glob(`${config.contentFolder}/**/*.json`);
+  const files = await listLocalFilesRecursive(config.contentFolder, '.json');
   const entries: EntryForSearch[] = [];
 
   for (const file of files) {

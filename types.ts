@@ -1,8 +1,10 @@
 export type EntryStatus = 'draft' | 'published' | 'changed' | 'archived' | 'merged';
 
 // ---------------------------------------------------------------------------
-// Schema / config types (previously in octocms/admin/types)
-// COLLECTIONS constraint widened to `string` so this layer has no admin deps.
+// Schema / config types (previously in octocms/admin/types).
+// Collection names are kept as `string` — they are derived at runtime from
+// `config.collections` (see `regenerateAll` in cli/lib/codegen.ts), not from
+// any hard-coded list inside the package.
 // ---------------------------------------------------------------------------
 
 export type FieldFormat =

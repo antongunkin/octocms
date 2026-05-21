@@ -5,10 +5,14 @@
  * The script now imports these functions; the CLI `types:gen` command calls them directly.
  */
 
+import { FIELD_FORMATS } from '../../schema/fieldFormats';
 import type { CollectionField, Config, ConditionalBranchConfig } from '../../types';
 import { generateAgentIndex, generateAgentOverview, generateAgentSchema } from './agentDocs';
 import { generateSchemaDocs } from './schemaDocs';
 import { validateConfig } from './validateConfig';
+
+// Re-exported so existing call sites (`regenerateAll.test.ts`) keep working.
+export { FIELD_FORMATS };
 
 export const CODEGEN_BANNER = `/*
  * AUTO-GENERATED — DO NOT EDIT.
@@ -143,9 +147,19 @@ export function generateTypes(cfg: Config, collectionNames: readonly string[]): 
     lines.push('');
   }
 
-  // AnyEntry union
+  // AnyEntry union — wrap to one-per-line when the inline form would exceed
+  // oxfmt's 120-char limit, so codegen output matches the formatter.
   const entryNames = collectionNames.map((k) => `${pascalCase(k)}Entry`);
-  lines.push(`export type AnyEntry = ${entryNames.join(' | ')};`);
+  const inlineAnyEntry = `export type AnyEntry = ${entryNames.join(' | ')};`;
+  if (inlineAnyEntry.length > 120) {
+    lines.push('export type AnyEntry =');
+    entryNames.forEach((name, i) => {
+      const suffix = i === entryNames.length - 1 ? ';' : '';
+      lines.push(`  | ${name}${suffix}`);
+    });
+  } else {
+    lines.push(inlineAnyEntry);
+  }
   lines.push('');
 
   // EntryMap
@@ -411,31 +425,6 @@ if (userConfig.agentConfig) setAgentConfig(userConfig.agentConfig);
 // ---------------------------------------------------------------------------
 // regenerateAll — single entry point that produces every schema-driven file
 // ---------------------------------------------------------------------------
-
-/**
- * The fixed list of supported field formats. Mirrors `FieldFormat` in
- * `octocms/types.ts` and `FIELD_TYPES` in `octocms/admin/consts.ts`.
- *
- * Kept as a runtime constant so `regenerateAll()` does not need to import
- * `octocms/admin/consts` (which would pull admin code into the CLI surface).
- */
-export const FIELD_FORMATS = [
-  'string',
-  'text',
-  'markdown',
-  'boolean',
-  'reference',
-  'image',
-  'number',
-  'datetime',
-  'json',
-  'slug',
-  'select',
-  'url',
-  'color',
-  'conditional',
-  'richtext',
-] as const;
 
 /**
  * Regenerate every schema-driven artifact in memory and return them as a
