@@ -58,8 +58,6 @@ const REQUIRED_PEER_DEPS: readonly string[] = [
   '@radix-ui/react-tabs',
   '@radix-ui/react-toast',
   '@tanstack/react-query',
-  'clsx',
-  'glob',
   'minisearch',
   'next-auth',
   'octokit',

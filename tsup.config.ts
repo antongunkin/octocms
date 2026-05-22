@@ -42,7 +42,6 @@ const external = [
   'octokit',
   'sonner',
   'zod',
-  'clsx',
   'minisearch',
   'react-markdown',
   'rehype-sanitize',

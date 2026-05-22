@@ -33,8 +33,6 @@ vi.mock('fs/promises', () => ({
   },
 }));
 
-vi.mock('glob', () => ({ glob: vi.fn() }));
-
 vi.mock('../github', () => ({
   isProductionMode: vi.fn(() => false),
   assertGitHubConfig: vi.fn(() => ({ owner: 'o', repo: 'r', branch: 'main' })),
