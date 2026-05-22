@@ -11,7 +11,7 @@
  * a parent re-render.
  */
 
-import { ImageIcon, LayoutGrid, List, Search } from 'lucide-react';
+import { ImageIcon, LayoutGrid, List, Search } from '../ui/icons';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useMediaList } from '../../admin/query/hooks/useMediaList';

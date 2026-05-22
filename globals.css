@@ -10480,7 +10480,7 @@ html {
   padding-left: 4px;
 }
 
-/* ----- Icon sizing utilities (Lucide / SVG) ----- */
+/* ----- Icon sizing utilities (local SVG icons) ----- */
 .octo-icon-xs {
   width: 12px;
   height: 12px;

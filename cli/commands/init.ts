@@ -60,7 +60,6 @@ const REQUIRED_PEER_DEPS: readonly string[] = [
   '@tanstack/react-query',
   'clsx',
   'glob',
-  'lucide-react',
   'minisearch',
   'next-auth',
   'octokit',

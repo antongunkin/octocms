@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink } from '../ui/icons';
 
 import { useEntryCommits } from '../../admin/query/hooks/useEntryCommits';
 import { queryKeys } from '../../admin/query/keys';

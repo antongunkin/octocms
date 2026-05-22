@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileText, Layers } from 'lucide-react';
+import { FileText, Layers } from '../ui/icons';
 
 import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import { toast } from '../../hooks/useToast';

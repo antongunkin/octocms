@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { Variable } from 'lucide-react';
+import { Variable } from '../ui/icons';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 

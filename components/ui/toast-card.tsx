@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Bell, Check, GitCommit, Info, TriangleAlert, X } from 'lucide-react';
+import { Bell, Check, GitCommit, Info, TriangleAlert, X } from './icons';
 import { cn } from '../../lib/utils';
 
 export type ToastCardTone = 'default' | 'success' | 'error' | 'warn' | 'info' | 'brand';

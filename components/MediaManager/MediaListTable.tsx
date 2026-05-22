@@ -1,6 +1,6 @@
 'use client';
 
-import { Image as ImageIcon } from 'lucide-react';
+import { Image as ImageIcon } from '../ui/icons';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 

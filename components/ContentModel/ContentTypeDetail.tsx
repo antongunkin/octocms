@@ -14,7 +14,7 @@ import {
   Plus,
   Star,
   Trash2,
-} from 'lucide-react';
+} from '../ui/icons';
 
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';

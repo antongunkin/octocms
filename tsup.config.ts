@@ -43,7 +43,6 @@ const external = [
   'sonner',
   'zod',
   'clsx',
-  'lucide-react',
   'minisearch',
   'react-markdown',
   'rehype-sanitize',

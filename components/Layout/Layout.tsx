@@ -2,7 +2,7 @@
 
 import { signIn, useSession } from 'next-auth/react';
 import React, { Suspense, useEffect } from 'react';
-import { LogIn } from 'lucide-react';
+import { LogIn } from '../ui/icons';
 
 import { useConfig } from '../../hooks/useConfig';
 import type { Theme } from '../../admin/theme';

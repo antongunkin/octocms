@@ -18,7 +18,7 @@ import { openEditImageDialog$, parseImageDimension } from '@mdxeditor/editor';
 import { usePublisher } from '@mdxeditor/gurx';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNodeByKey } from 'lexical';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from '../ui/icons';
 import React, { useState } from 'react';
 
 import { Button } from '../ui/button';

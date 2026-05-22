@@ -14,7 +14,7 @@ import {
   LayoutList,
   Plus,
   Search,
-} from 'lucide-react';
+} from '../ui/icons';
 
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import { useBranch } from '../../admin/query/hooks/useBranch';

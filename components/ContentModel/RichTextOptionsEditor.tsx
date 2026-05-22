@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from '../ui/icons';
 
 import type { RichTextComponentDef, RichTextComponentProp, RichTextFieldConfig } from '../../types';
 import { Button } from '../ui/button';

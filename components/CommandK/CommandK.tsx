@@ -6,7 +6,7 @@
 import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { Bot, FileText, GitBranch, Plus, Search } from 'lucide-react';
+import { Bot, FileText, GitBranch, Plus, Search } from '../ui/icons';
 
 import { getEntryList } from '../../admin/actions/entries';
 import { getFile } from '../../admin/actions/files';

@@ -1,6 +1,6 @@
 'use client';
 
-import { FolderOpen, ImageIcon, Plus, X } from 'lucide-react';
+import { FolderOpen, ImageIcon, Plus, X } from '../ui/icons';
 import React from 'react';
 
 import { LeftNavItem } from '../Layout/LeftNavItem';

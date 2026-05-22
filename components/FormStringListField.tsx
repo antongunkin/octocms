@@ -1,6 +1,6 @@
 'use client';
 
-import { GripVertical, X } from 'lucide-react';
+import { GripVertical, X } from './ui/icons';
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { cn } from '../lib/utils';

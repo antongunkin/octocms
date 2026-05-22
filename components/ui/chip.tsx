@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import * as AvatarPrimitive from '@radix-ui/react-avatar';
-import { X } from 'lucide-react';
+import { X } from './icons';
 import { cn } from '../../lib/utils';
 import type { EntryStatus } from '../../types';
 

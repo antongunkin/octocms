@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft, Trash2 } from '../ui/icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';

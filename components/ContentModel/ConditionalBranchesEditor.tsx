@@ -17,7 +17,7 @@
  */
 
 import React, { useState } from 'react';
-import { GripVertical, Pencil, Plus, Trash2 } from 'lucide-react';
+import { GripVertical, Pencil, Plus, Trash2 } from '../ui/icons';
 
 import type { CollectionField, ConditionalBranchConfig } from '../../types';
 import { FIELD_FORMAT_META } from '../../schema/fieldFormats';

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronRight, Wrench, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, Wrench, AlertCircle, CheckCircle2 } from '../ui/icons';
 
 import { cn } from '../../lib/utils';
 

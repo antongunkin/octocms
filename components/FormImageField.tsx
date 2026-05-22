@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageIcon, ImagePlus, Upload, X } from 'lucide-react';
+import { ImageIcon, ImagePlus, Upload, X } from './ui/icons';
 import React, { useCallback, useRef, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';

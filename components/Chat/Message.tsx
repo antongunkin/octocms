@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Bot, Info, Paperclip, User } from 'lucide-react';
+import { Bot, Info, Paperclip, User } from '../ui/icons';
 
 import { cn } from '../../lib/utils';
 

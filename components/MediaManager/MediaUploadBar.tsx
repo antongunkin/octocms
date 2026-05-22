@@ -1,6 +1,6 @@
 'use client';
 
-import { CloudUpload } from 'lucide-react';
+import { CloudUpload } from '../ui/icons';
 import React, { useCallback, useState } from 'react';
 
 import { cn } from '../../lib/utils';

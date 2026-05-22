@@ -10,7 +10,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { AlertTriangle, ArrowRight, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, ArrowRight, ShieldCheck, ShieldAlert } from '../ui/icons';
 
 import type { SchemaImpactItem } from '../../admin/actions/schema';
 import { cn } from '../../lib/utils';

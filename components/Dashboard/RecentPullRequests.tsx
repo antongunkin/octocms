@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { GitBranch, GitPullRequest } from 'lucide-react';
+import { GitBranch, GitPullRequest } from '../ui/icons';
 
 import { Button } from '../ui/button';
 import { useRecentCMSPullRequests } from '../../admin/query/hooks/useRecentCMSPullRequests';

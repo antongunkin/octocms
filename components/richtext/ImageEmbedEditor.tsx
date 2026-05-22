@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ImageIcon, Upload, X } from 'lucide-react';
+import { ImageIcon, Upload, X } from '../ui/icons';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 

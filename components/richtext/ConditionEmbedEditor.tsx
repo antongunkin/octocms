@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { GitBranch, Plus, Trash2 } from 'lucide-react';
+import { GitBranch, Plus, Trash2 } from '../ui/icons';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 

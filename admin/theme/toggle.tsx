@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun } from '../../components/ui/icons';
 
 import { DropdownMenuItem, DropdownMenuSeparator } from '../../components/ui';
 import type { Theme } from './types';

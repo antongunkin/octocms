@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { GripVertical, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { GripVertical, Pencil, Plus, Search, Trash2 } from './ui/icons';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { getEntryList } from '../admin/actions/entries';

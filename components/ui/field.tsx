@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Lock, X } from 'lucide-react';
+import { Lock, X } from './icons';
 import { cn } from '../../lib/utils';
 
 type FieldProps = {

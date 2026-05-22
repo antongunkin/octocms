@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, FileText, Layers, Plus, Search } from 'lucide-react';
+import { ChevronRight, FileText, Layers, Plus, Search } from '../ui/icons';
 
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import { useSchema } from '../../admin/query/hooks/useSchema';

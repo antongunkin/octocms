@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
-import { MoreHorizontal, Plus, Search } from 'lucide-react';
+import { MoreHorizontal, Plus, Search } from './ui/icons';
 
 import { newFile } from '../admin/actions';
 import { useConfig } from '../hooks/useConfig';

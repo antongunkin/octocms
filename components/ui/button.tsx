@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { GitCommit, GitBranch, ChevronDown } from 'lucide-react';
+import { GitCommit, GitBranch, ChevronDown } from './icons';
 import { cn } from '../../lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

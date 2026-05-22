@@ -18,7 +18,7 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Star, Star as StarFilled } from 'lucide-react';
+import { ArrowLeft, Star, Star as StarFilled } from '../ui/icons';
 
 import { previewSchemaChange } from '../../admin/actions';
 import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';

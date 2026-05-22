@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertTriangle, FileText, Layers } from 'lucide-react';
+import { AlertTriangle, FileText, Layers } from '../ui/icons';
 
 import { previewSchemaChange } from '../../admin/actions';
 import type { PreviewSchemaResult } from '../../admin/actions/schema';

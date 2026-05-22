@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from '../ui/icons';
 
 import { useEntry } from '../../admin/query/hooks/useEntry';
 import { useEntryList } from '../../admin/query/hooks/useEntryList';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { Link2 } from 'lucide-react';
+import { Link2 } from '../ui/icons';
 import React, { useEffect } from 'react';
 
 import { useEntryBacklinks } from '../../admin/query/hooks/useEntryBacklinks';

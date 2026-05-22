@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Bot, CheckCheck, RefreshCw, StopCircle } from 'lucide-react';
+import { Bot, CheckCheck, RefreshCw, StopCircle } from '../ui/icons';
 
 import { Button } from '../ui/button';
 import { ErrorBoundary } from '../ErrorBoundary';

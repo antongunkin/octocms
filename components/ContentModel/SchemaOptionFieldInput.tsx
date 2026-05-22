@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from '../ui/icons';
 
 import type { SchemaOptionField } from '../../schema/types';
 import type { SelectOption } from '../../types';

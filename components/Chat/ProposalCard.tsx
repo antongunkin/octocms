@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertCircle, Check, CheckCircle2, FilePen, FilePlus, Loader2, X } from 'lucide-react';
+import { AlertCircle, Check, CheckCircle2, FilePen, FilePlus, Loader2, X } from '../ui/icons';
 
 import { useEntry } from '../../admin/query/hooks/useEntry';
 import { useConfig } from '../../hooks/useConfig';

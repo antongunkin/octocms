@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Paperclip, Send, X } from 'lucide-react';
+import { Paperclip, Send, X } from '../ui/icons';
 
 import { Button } from '../ui/button';
 

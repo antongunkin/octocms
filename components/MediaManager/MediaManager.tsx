@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageIcon, ChevronRight, LayoutGrid, List, Search, Upload } from 'lucide-react';
+import { ImageIcon, ChevronRight, LayoutGrid, List, Search, Upload } from '../ui/icons';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 

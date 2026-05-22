@@ -32,7 +32,7 @@ import {
 } from '@mdxeditor/editor';
 import type { JsxComponentDescriptor } from '@mdxeditor/editor';
 import { usePublisher } from '@mdxeditor/gurx';
-import { FileText, GitBranch, ImagePlus, Puzzle, Variable } from 'lucide-react';
+import { FileText, GitBranch, ImagePlus, Puzzle, Variable } from './ui/icons';
 
 import { cn } from '../lib/utils';
 import type { RichTextComponentDef, RichTextFieldConfig } from '../admin/types';
