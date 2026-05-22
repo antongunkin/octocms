@@ -46,20 +46,18 @@ export function AdminErrorView({
   const isAvailability = code === 'github_unavailable' || code === 'github_rate_limit';
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-muted/20 p-6">
-      <div className="w-full max-w-lg rounded-xl border border-border bg-background p-6 shadow-sm">
-        <h2 className="text-base font-semibold tracking-tight text-foreground">{title}</h2>
+    <div className="octo-admin-error">
+      <div className="octo-admin-error__card">
+        <h2 className="octo-admin-error__title">{title}</h2>
         {userMessage ? (
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">{userMessage}</p>
+          <p className="octo-admin-error__msg">{userMessage}</p>
         ) : (
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            An unexpected error occurred while loading this page.
-          </p>
+          <p className="octo-admin-error__msg">An unexpected error occurred while loading this page.</p>
         )}
         {isAvailability ? (
-          <p className="mt-1 text-xs text-muted-foreground">You can try again in a few minutes.</p>
+          <p className="octo-admin-error__hint">You can try again in a few minutes.</p>
         ) : null}
-        <div className="mt-5 flex flex-wrap gap-2">
+        <div className="octo-admin-error__actions">
           <Button type="button" size="sm" onClick={() => reset()}>
             Try again
           </Button>
@@ -67,9 +65,7 @@ export function AdminErrorView({
             <a href={backHref}>{backLabel}</a>
           </Button>
         </div>
-        {error.digest ? (
-          <p className="mt-6 text-[11px] uppercase tracking-wide text-muted-foreground">Reference: {error.digest}</p>
-        ) : null}
+        {error.digest ? <p className="octo-admin-error__digest">Reference: {error.digest}</p> : null}
       </div>
     </div>
   );

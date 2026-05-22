@@ -50,7 +50,7 @@ function ChevronRightTiny() {
       strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="opacity-50"
+      className="octo-u-opacity-50"
       aria-hidden="true"
     >
       <path d="M9 6l6 6-6 6" />

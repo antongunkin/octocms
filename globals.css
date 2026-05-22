@@ -4533,6 +4533,175 @@ html {
   .octo-search-box__result-snippet { color: #9ca3af; }
 }
 
+/* ----- Dialog content size helpers (replace Tailwind max-w-* / max-h-[vh] inline values) ----- */
+.octo-dialog-content--md { max-width: 28rem; }
+.octo-dialog-content--lg { max-width: 32rem; }
+.octo-dialog-content--xl { max-width: 36rem; }
+.octo-dialog-content--2xl { max-width: 42rem; }
+.octo-dialog-content--3xl { max-width: 48rem; }
+.octo-dialog-content--5xl { max-width: 64rem; }
+.octo-dialog-content--vh-80 { max-height: 80vh; }
+.octo-dialog-content--vh-85 { max-height: 85vh; }
+.octo-dialog-content--vh-88 { max-height: 88vh; }
+.octo-dialog-content--flex-col { display: flex; flex-direction: column; }
+.octo-dialog-content--overflow-y-auto { overflow-y: auto; }
+.octo-dialog-content--overflow-hidden { overflow: hidden; }
+.octo-dialog-content--no-padding { padding: 0; }
+
+/* ----- Generic admin layout utilities (introduced during Tailwind → BEM finishing pass) ----- */
+.octo-u-row { display: flex; align-items: center; }
+.octo-u-row-start { display: flex; align-items: flex-start; }
+.octo-u-row-baseline { display: flex; align-items: baseline; }
+.octo-u-stack { display: flex; flex-direction: column; }
+.octo-u-flex { display: flex; }
+.octo-u-grid { display: grid; }
+.octo-u-hidden { display: none; }
+.octo-u-flex-1 { flex: 1; }
+.octo-u-grow { flex-grow: 1; }
+.octo-u-shrink-0 { flex-shrink: 0; }
+.octo-u-wrap { flex-wrap: wrap; }
+.octo-u-center { align-items: center; justify-content: center; }
+.octo-u-between { justify-content: space-between; }
+.octo-u-end { justify-content: flex-end; }
+.octo-u-gap-1 { gap: 4px; }
+.octo-u-gap-1-5 { gap: 6px; }
+.octo-u-gap-2 { gap: 8px; }
+.octo-u-gap-3 { gap: 12px; }
+.octo-u-gap-4 { gap: 16px; }
+.octo-u-gap-6 { gap: 24px; }
+.octo-u-text-xs { font-size: 11px; }
+.octo-u-text-sm { font-size: 12px; }
+.octo-u-text-md { font-size: 13px; }
+.octo-u-text-base { font-size: 14px; }
+.octo-u-text-lg { font-size: 16px; }
+.octo-u-text-muted { color: var(--muted); }
+.octo-u-text-2 { color: var(--text-2); }
+.octo-u-text-danger { color: var(--danger); }
+.octo-u-text-fg { color: var(--text); }
+.octo-u-font-medium { font-weight: 500; }
+.octo-u-font-semibold { font-weight: 600; }
+.octo-u-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.octo-u-whitespace-pre-wrap { white-space: pre-wrap; }
+.octo-u-animate-spin { animation: octo-spin 1s linear infinite; }
+@keyframes octo-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.octo-u-opacity-50 { opacity: 0.5; }
+.octo-u-opacity-60 { opacity: 0.6; }
+.octo-u-cursor-pointer { cursor: pointer; }
+.octo-u-relative { position: relative; }
+.octo-u-absolute { position: absolute; }
+.octo-u-mt-1 { margin-top: 4px; }
+.octo-u-mt-2 { margin-top: 8px; }
+.octo-u-mt-3 { margin-top: 12px; }
+.octo-u-mt-4 { margin-top: 16px; }
+.octo-u-mb-1 { margin-bottom: 4px; }
+.octo-u-mb-2 { margin-bottom: 8px; }
+.octo-u-mb-3 { margin-bottom: 12px; }
+.octo-u-p-2 { padding: 8px; }
+.octo-u-p-3 { padding: 12px; }
+.octo-u-p-4 { padding: 16px; }
+.octo-u-p-6 { padding: 24px; }
+.octo-u-w-full { width: 100%; }
+.octo-u-h-full { height: 100%; }
+.octo-u-min-h-0 { min-height: 0; }
+.octo-u-overflow-hidden { overflow: hidden; }
+.octo-u-overflow-auto { overflow: auto; }
+.octo-u-rounded { border-radius: 4px; }
+.octo-u-rounded-md { border-radius: 6px; }
+.octo-u-rounded-lg { border-radius: 8px; }
+.octo-u-rounded-xl { border-radius: 12px; }
+.octo-u-rounded-full { border-radius: 9999px; }
+.octo-u-border { border: 1px solid var(--border); }
+.octo-u-border-strong { border: 1px solid var(--border-strong); }
+.octo-u-bg-bg { background: var(--bg); }
+.octo-u-bg-surface-1 { background: var(--surface-1); }
+.octo-u-bg-surface-2 { background: var(--surface-2); }
+.octo-u-bg-surface-3 { background: var(--surface-3); }
+.octo-u-mono { font-family: var(--ft-mono); }
+.octo-u-uppercase { text-transform: uppercase; }
+.octo-u-tracking-wide { letter-spacing: 0.025em; }
+.octo-u-leading-6 { line-height: 1.5rem; }
+.octo-u-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* ----- Admin error view ----- */
+.octo-admin-error { display: flex; flex: 1; align-items: center; justify-content: center; background: color-mix(in oklab, var(--surface-2) 20%, transparent); padding: 24px; }
+.octo-admin-error__card { width: 100%; max-width: 32rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); padding: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.octo-admin-error__title { font-size: 1rem; font-weight: 600; letter-spacing: -0.025em; color: var(--text); margin: 0; }
+.octo-admin-error__msg { margin-top: 8px; font-size: 14px; line-height: 1.5rem; color: var(--muted); }
+.octo-admin-error__hint { margin-top: 4px; font-size: 12px; color: var(--muted); }
+.octo-admin-error__actions { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
+.octo-admin-error__digest { margin-top: 24px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.025em; color: var(--muted); }
+
+/* ----- Theme toggle ----- */
+.octo-theme-toggle__item { cursor: pointer; gap: 8px; }
+.octo-theme-toggle__icon { width: 14px; height: 14px; }
+
+/* ----- Inline entry editor submit button ----- */
+.octo-inline-editor__submit { width: 100%; margin-bottom: 24px; }
+
+/* ----- Primary-emphasis button override (replaces Tailwind bg-foreground text-background hover:bg-foreground/90) ----- */
+.octo-btn-primary-fg { background: var(--text); color: var(--bg); }
+.octo-btn-primary-fg:hover { background: color-mix(in oklab, var(--text) 90%, transparent); }
+
+/* ----- Rich text inline custom-component dropdown wrapper ----- */
+.octo-richtext-toolbar-select-wrap { position: relative; display: inline-block; }
+.octo-richtext-toolbar-select { appearance: none; background: transparent; font-size: 12px; cursor: pointer; padding-right: 20px; padding-left: 4px; }
+
+/* ----- Icon sizing utilities (Lucide / SVG) ----- */
+.octo-icon-xs { width: 12px; height: 12px; }
+.octo-icon-sm { width: 14px; height: 14px; }
+.octo-icon-md { width: 16px; height: 16px; }
+.octo-icon-lg { width: 20px; height: 20px; }
+.octo-icon-xl { width: 32px; height: 32px; }
+.octo-icon-2xl { width: 48px; height: 48px; }
+.octo-icon-shrink { flex-shrink: 0; }
+
+/* ----- Skeleton block size utilities (deterministic shimmer chips for skeletons) ----- */
+.octo-skel-h-3 { height: 12px; }
+.octo-skel-h-4 { height: 16px; }
+.octo-skel-h-5 { height: 20px; }
+.octo-skel-h-6 { height: 24px; }
+.octo-skel-h-7 { height: 28px; }
+.octo-skel-h-8 { height: 32px; }
+.octo-skel-h-9 { height: 36px; }
+.octo-skel-h-40 { height: 160px; }
+.octo-skel-h-12 { height: 48px; }
+.octo-skel-h-16 { height: 64px; }
+.octo-skel-h-80 { height: 320px; }
+.octo-skel-w-2-3 { width: 66%; }
+.octo-skel-w-1-2 { width: 50%; }
+.octo-skel-w-7 { width: 28px; }
+.octo-skel-w-9 { width: 36px; }
+.octo-skel-w-12 { width: 48px; }
+.octo-skel-w-16 { width: 64px; }
+.octo-skel-w-20 { width: 80px; }
+.octo-skel-w-24 { width: 96px; }
+.octo-skel-w-28 { width: 112px; }
+.octo-skel-w-32 { width: 128px; }
+.octo-skel-w-36 { width: 144px; }
+.octo-skel-w-40 { width: 160px; }
+.octo-skel-w-44 { width: 176px; }
+.octo-skel-w-48 { width: 192px; }
+.octo-skel-w-64 { width: 256px; }
+.octo-skel-w-72 { width: 288px; }
+.octo-skel-w-80 { width: 320px; }
+.octo-skel-w-full { width: 100%; }
+.octo-skel-mb-2 { margin-bottom: 8px; }
+.octo-skel-mb-3 { margin-bottom: 12px; }
+.octo-skel-ml-2 { margin-left: 8px; }
+.octo-skel-rounded-md { border-radius: 6px; }
+.octo-skel-rounded-lg { border-radius: 8px; }
+.octo-skel-rounded-xl { border-radius: 12px; }
+.octo-skel-rounded-full { border-radius: 9999px; }
+.octo-skel-aspect-square { aspect-ratio: 1 / 1; }
+
+/* ----- Compact layout helpers for content model dialogs and dashboard skeletons ----- */
+.octo-stack-2 { display: flex; flex-direction: column; gap: 8px; }
+.octo-stack-3 { display: flex; flex-direction: column; gap: 12px; }
+.octo-stack-4 { display: flex; flex-direction: column; gap: 16px; }
+.octo-row-2 { display: flex; align-items: center; gap: 8px; }
+.octo-row-3 { display: flex; align-items: center; gap: 12px; }
+.octo-row-wrap-2 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
 /* ============================================================
    7. Reset (@layer base)
    Reset CSS — wrapped in @layer base so plain CSS utilities

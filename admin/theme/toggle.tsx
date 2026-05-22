@@ -30,8 +30,8 @@ export function ThemeToggle({ initialTheme }: { initialTheme: Theme }) {
   return (
     <>
       <DropdownMenuSeparator />
-      <DropdownMenuItem className="cursor-pointer gap-2" onSelect={toggle}>
-        {isLight ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
+      <DropdownMenuItem className="octo-theme-toggle__item" onSelect={toggle}>
+        {isLight ? <Moon className="octo-theme-toggle__icon" /> : <Sun className="octo-theme-toggle__icon" />}
         {isLight ? 'Dark mode' : 'Light mode'}
       </DropdownMenuItem>
     </>

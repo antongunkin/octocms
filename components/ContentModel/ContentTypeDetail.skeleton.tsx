@@ -8,13 +8,13 @@ export function ContentTypeDetailSkeleton({ rows = 8 }: { rows?: number }) {
     <div className="octo-shimmer-page" role="status" aria-label="Loading content type">
       <div className="octo-shimmer-page__header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <ShimmerBlock className="h-7 w-7 rounded-md" />
-          <ShimmerBlock className="h-6 w-44" />
+          <ShimmerBlock className="octo-skel-h-7 octo-skel-w-7 octo-skel-rounded-md" />
+          <ShimmerBlock className="octo-skel-h-6 octo-skel-w-44" />
         </div>
-        <ShimmerBlock className="h-8 w-28 rounded-md" />
+        <ShimmerBlock className="octo-skel-h-8 octo-skel-w-28 octo-skel-rounded-md" />
       </div>
       <div className="octo-shimmer-page__body">
-        <ShimmerBlock className="mb-3 h-4 w-32" />
+        <ShimmerBlock className="octo-skel-mb-3 octo-skel-h-4 octo-skel-w-32" />
         <div className="octo-shimmer-page__table">
           {Array.from({ length: rows }, (_, i) => (
             <ShimmerRow key={i} widths={['10%', '24%', '14%', '20%', '8%']} />

@@ -212,7 +212,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
         <div className="octo-inline-editor__header">
           <div className="octo-inline-editor__back">
             <Button variant="ghost" size="sm" onClick={handleClose}>
-              <ArrowLeft className="mr-1 h-4 w-4" />
+              <ArrowLeft className="octo-icon-md" style={{ marginRight: 4 }} />
               Back
             </Button>
           </div>
@@ -230,7 +230,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
                   Restore
                 </Button>
                 <Button variant="destructive" size="sm" onClick={openDeleteDialog} disabled={isSaving}>
-                  <Trash2 className="mr-1 h-4 w-4" />
+                  <Trash2 className="octo-icon-md" style={{ marginRight: 4 }} />
                   Delete permanently
                 </Button>
               </>
@@ -295,7 +295,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
                 </div>
                 <Button
                   type="submit"
-                  className="mb-6 w-full"
+                  className="octo-inline-editor__submit"
                   disabled={isSaving || Object.keys(fieldErrors).length > 0}
                 >
                   {isSaving ? 'Saving...' : 'Save'}

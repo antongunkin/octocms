@@ -102,7 +102,7 @@ export function Composer({
         <div className="octo-chat-composer__attachments">
           {files.map((f, i) => (
             <div key={`${f.name}-${i}`} className="octo-chat-composer__chip" data-testid="chat-attachment-chip">
-              <Paperclip className="h-3 w-3" />
+              <Paperclip className="octo-icon-xs" />
               <span className="octo-chat-composer__chip-name">{f.name}</span>
               <span className="octo-chat-composer__chip-size">{formatSize(f.size)}</span>
               <button
@@ -111,7 +111,7 @@ export function Composer({
                 aria-label={`Remove ${f.name}`}
                 className="octo-chat-composer__chip-remove"
               >
-                <X className="h-3 w-3" />
+                <X className="octo-icon-xs" />
               </button>
             </div>
           ))}
@@ -146,7 +146,7 @@ export function Composer({
           }
           onClick={() => fileRef.current?.click()}
         >
-          <Paperclip className="h-4 w-4" />
+          <Paperclip className="octo-icon-md" />
         </Button>
         <textarea
           ref={taRef}
@@ -172,9 +172,9 @@ export function Composer({
           onClick={send}
           disabled={disabled || (!value.trim() && files.length === 0)}
           size="sm"
-          className="gap-1.5"
+          className="octo-u-gap-1-5"
         >
-          <Send className="h-4 w-4" />
+          <Send className="octo-icon-md" />
           Send
         </Button>
       </div>

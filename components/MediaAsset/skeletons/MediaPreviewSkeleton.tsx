@@ -6,7 +6,7 @@ import { ShimmerBlock } from '../../skeletons/primitives';
 export function MediaPreviewSkeleton() {
   return (
     <div role="status" aria-label="Loading preview" className="octo-media-asset__preview">
-      <ShimmerBlock className="h-80 w-80 rounded-lg" />
+      <ShimmerBlock className="octo-skel-h-80 octo-skel-w-80 octo-skel-rounded-lg" />
     </div>
   );
 }

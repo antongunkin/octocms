@@ -22,17 +22,17 @@ export function ToolCallCard({ call }: Props) {
     <div className={cn('octo-tool-call-card', status === 'error' && 'octo-tool-call-card--error')}>
       <button type="button" onClick={() => setExpanded((v) => !v)} className="octo-tool-call-card__toggle">
         <ChevronRight
-          className={cn('octo-tool-call-card__chevron h-3 w-3', expanded && 'octo-tool-call-card__chevron--open')}
+          className={cn('octo-tool-call-card__chevron octo-icon-xs', expanded && 'octo-tool-call-card__chevron--open')}
         />
-        <Wrench className="octo-tool-call-card__icon h-3 w-3" />
+        <Wrench className="octo-tool-call-card__icon octo-icon-xs" />
         <span className="octo-tool-call-card__name">{call.name}</span>
         <span className="octo-tool-call-card__preview">{inputPreview}</span>
         {status === 'pending' && <span className="octo-tool-call-card__status">…</span>}
         {status === 'ok' && (
-          <CheckCircle2 className="h-3 w-3 octo-tool-call-card__status" style={{ color: 'var(--ok)' }} />
+          <CheckCircle2 className="octo-icon-xs octo-tool-call-card__status" style={{ color: 'var(--ok)' }} />
         )}
         {status === 'error' && (
-          <AlertCircle className="h-3 w-3 octo-tool-call-card__status" style={{ color: 'var(--danger)' }} />
+          <AlertCircle className="octo-icon-xs octo-tool-call-card__status" style={{ color: 'var(--danger)' }} />
         )}
       </button>
       {expanded && (

@@ -148,7 +148,7 @@ const FormImageField = ({
         ref={uploadInputRef}
         type="file"
         accept={config.mediaAllowedFormats.map((f) => `.${f}`).join(',')}
-        className="hidden"
+        className="octo-u-hidden"
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) stageFilesFromList(e.target.files);
           e.target.value = '';

@@ -7,8 +7,8 @@ export function ContentModelListSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <div className="octo-shimmer-page" role="status" aria-label="Loading content model">
       <div className="octo-shimmer-page__header">
-        <ShimmerBlock className="h-6 w-40" />
-        <ShimmerBlock className="h-8 w-36 rounded-md" />
+        <ShimmerBlock className="octo-skel-h-6 octo-skel-w-40" />
+        <ShimmerBlock className="octo-skel-h-8 octo-skel-w-36 octo-skel-rounded-md" />
       </div>
       <div className="octo-shimmer-page__body">
         <div className="octo-shimmer-page__table">

@@ -16,8 +16,8 @@ export function MediaListTableSkeleton({ rows = 8 }: { rows?: number }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 16px' }}>
         {Array.from({ length: rows }, (_, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <ShimmerBlock className="h-7 w-7 shrink-0 rounded-md" />
-            <ShimmerRow className="flex-1" widths={widths} />
+            <ShimmerBlock className="octo-skel-h-7 octo-skel-w-7 octo-u-shrink-0 octo-skel-rounded-md" />
+            <ShimmerRow className="octo-u-flex-1" widths={widths} />
           </div>
         ))}
       </div>

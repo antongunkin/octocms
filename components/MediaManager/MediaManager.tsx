@@ -155,7 +155,7 @@ const MediaManager = () => {
             <span style={{ color: 'var(--text-2)' }}>Media</span>
             {selectedFolder !== null && (
               <>
-                <ChevronRight className="h-3 w-3" style={{ opacity: 0.6 }} />
+                <ChevronRight className="octo-icon-xs" style={{ opacity: 0.6 }} />
                 <span style={{ color: 'var(--text-2)' }}>{selectedFolder === '/' ? 'Root' : selectedFolder}</span>
               </>
             )}
@@ -182,11 +182,11 @@ const MediaManager = () => {
           <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
           <Button
             size="sm"
-            className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
+            className="octo-u-gap-1-5 octo-btn-primary-fg"
             onClick={() => document.getElementById('media-upload-bar-input')?.click()}
             disabled={pendingUpload !== null}
           >
-            <Upload className="h-4 w-4" />
+            <Upload className="octo-icon-md" />
             Upload
           </Button>
         </div>
@@ -219,7 +219,7 @@ const MediaManager = () => {
           {/* Search bar */}
           <div className="octo-media-manager__search-bar">
             <div className="octo-media-manager__search-wrap">
-              <Search className="octo-media-manager__search-icon h-4 w-4" />
+              <Search className="octo-media-manager__search-icon octo-icon-md" />
               <input
                 ref={searchRef}
                 value={searchQuery}
@@ -240,7 +240,7 @@ const MediaManager = () => {
               )
             ) : filteredFiles.length === 0 ? (
               <div className="octo-media-manager__empty">
-                <ImageIcon className="h-12 w-12" />
+                <ImageIcon className="octo-icon-2xl" />
                 <p style={{ fontSize: '14px' }}>
                   {searchQuery ? 'No assets match this search' : 'No files in this folder yet'}
                 </p>

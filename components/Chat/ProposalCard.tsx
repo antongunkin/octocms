@@ -37,9 +37,9 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
     >
       <div className="octo-proposal-card__header">
         {isEdit ? (
-          <FilePen className="h-3.5 w-3.5 octo-proposal-card__header-icon" />
+          <FilePen className="octo-icon-sm octo-proposal-card__header-icon" />
         ) : (
-          <FilePlus className="h-3.5 w-3.5 octo-proposal-card__header-icon" />
+          <FilePlus className="octo-icon-sm octo-proposal-card__header-icon" />
         )}
         <span className="octo-proposal-card__kind">{isEdit ? 'Proposed edit' : 'Proposed new entry'}</span>
         <span className="octo-proposal-card__summary">{proposal.summary}</span>
@@ -59,7 +59,7 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
             <ul className="octo-proposal-card__error-list">
               {Object.entries(status.fieldErrors).map(([k, msg]) => (
                 <li key={k}>
-                  <code className="font-mono">{k}</code>: {msg}
+                  <code className="octo-u-mono">{k}</code>: {msg}
                 </li>
               ))}
             </ul>
@@ -69,8 +69,8 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
 
       {isPending && !showRejectInput && (
         <div className="octo-proposal-card__actions">
-          <Button size="sm" onClick={() => onAccept(proposal.id)} disabled={isBusy} className="gap-1.5">
-            <Check className="h-3.5 w-3.5" />
+          <Button size="sm" onClick={() => onAccept(proposal.id)} disabled={isBusy} className="octo-u-gap-1-5">
+            <Check className="octo-icon-sm" />
             Accept
           </Button>
           <Button
@@ -78,9 +78,9 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
             variant="outline"
             onClick={() => setShowRejectInput(true)}
             disabled={isBusy}
-            className="gap-1.5"
+            className="octo-u-gap-1-5"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="octo-icon-sm" />
             Reject
           </Button>
         </div>
@@ -123,7 +123,7 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
 
       {isBusy && (
         <div className="octo-proposal-card__busy">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          <Loader2 className="octo-icon-sm octo-u-animate-spin" />
           {status.kind === 'accepting' ? 'Saving entry...' : 'Rejecting...'}
         </div>
       )}
@@ -137,11 +137,11 @@ function StatusBadge({ status }: { status: ProposalUiState['status'] }) {
       return <span className="octo-proposal-card__status">Awaiting approval</span>;
     case 'accepting':
     case 'rejecting':
-      return <Loader2 className="h-3.5 w-3.5 animate-spin octo-proposal-card__status" />;
+      return <Loader2 className="octo-icon-sm octo-u-animate-spin octo-proposal-card__status" />;
     case 'accepted':
       return (
         <span className="octo-proposal-card__status octo-proposal-card__status--accepted">
-          <CheckCircle2 className="h-3.5 w-3.5" />
+          <CheckCircle2 className="octo-icon-sm" />
           Accepted
         </span>
       );
@@ -150,7 +150,7 @@ function StatusBadge({ status }: { status: ProposalUiState['status'] }) {
     case 'error':
       return (
         <span className="octo-proposal-card__status octo-proposal-card__status--error">
-          <AlertCircle className="h-3.5 w-3.5" />
+          <AlertCircle className="octo-icon-sm" />
           Error
         </span>
       );
@@ -177,7 +177,7 @@ function EditProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 'e
   if (entryQuery.isError) {
     return (
       <div className="octo-proposal-card__load-error">
-        Could not load <code className="font-mono">{proposal.entryPath}</code> to compute the diff.
+        Could not load <code className="octo-u-mono">{proposal.entryPath}</code> to compute the diff.
       </div>
     );
   }
@@ -185,7 +185,7 @@ function EditProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 'e
   return (
     <div className="octo-proposal-card__changes">
       <div className="octo-proposal-card__entry-path">
-        <span className="font-mono">{proposal.entryPath}</span>
+        <span className="octo-u-mono">{proposal.entryPath}</span>
       </div>
       {Object.entries(proposal.fieldChanges).map(([key, afterVal]) => {
         const def = fields[key];
@@ -196,8 +196,8 @@ function EditProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 'e
         return (
           <div key={key}>
             <div className="octo-proposal-card__field-label">
-              <span className="font-semibold">{def?.label ?? key}</span>
-              <code className="font-mono octo-proposal-card__field-key">{key}</code>
+              <span className="octo-u-font-semibold">{def?.label ?? key}</span>
+              <code className="octo-u-mono octo-proposal-card__field-key">{key}</code>
               {def?.format && <span className="octo-proposal-card__field-format">({def.format})</span>}
             </div>
             {isLong ? (
@@ -228,7 +228,7 @@ function CreateProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 
   return (
     <div className="octo-proposal-card__create">
       <div className="octo-proposal-card__create-meta">
-        New entry in <span className="font-mono">{proposal.collection}</span>
+        New entry in <span className="octo-u-mono">{proposal.collection}</span>
         {collection?.label ? ` (${collection.label})` : ''}
       </div>
       <table className="octo-proposal-card__create-table">
@@ -238,7 +238,7 @@ function CreateProposalBody({ proposal }: { proposal: Extract<Proposal, { kind: 
             return (
               <tr key={key} className="octo-proposal-card__create-row">
                 <td className="octo-proposal-card__create-key">
-                  <span className="font-semibold">{def.label}</span>
+                  <span className="octo-u-font-semibold">{def.label}</span>
                   <span className="octo-proposal-card__create-format">{def.format}</span>
                 </td>
                 <td className="octo-proposal-card__create-val">

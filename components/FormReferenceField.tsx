@@ -172,7 +172,7 @@ const AddExistingModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+      <DialogContent className="octo-dialog-content--2xl octo-dialog-content--vh-80 octo-dialog-content--flex-col">
         <DialogHeader>
           <DialogTitle>Add existing content</DialogTitle>
         </DialogHeader>
@@ -310,7 +310,7 @@ const CreateNewModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="octo-dialog-content--md">
         <DialogHeader>
           <DialogTitle>Create new entry</DialogTitle>
         </DialogHeader>

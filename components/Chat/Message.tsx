@@ -20,15 +20,15 @@ export function Message({ entry, proposals, onAcceptProposal, onRejectProposal }
   if (entry.kind === 'system') {
     return (
       <div className="octo-chat-msg octo-chat-msg--system">
-        <Info className="octo-chat-msg__system-icon h-3.5 w-3.5 shrink-0" />
-        <span className="whitespace-pre-wrap">{entry.text}</span>
+        <Info className="octo-chat-msg__system-icon octo-icon-sm octo-u-shrink-0" />
+        <span className="octo-u-whitespace-pre-wrap">{entry.text}</span>
       </div>
     );
   }
   const isUser = entry.kind === 'user';
   return (
     <div className={cn('octo-chat-msg', isUser ? 'octo-chat-msg--user' : 'octo-chat-msg--assistant')}>
-      <div className="octo-chat-msg__avatar">{isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}</div>
+      <div className="octo-chat-msg__avatar">{isUser ? <User className="octo-icon-md" /> : <Bot className="octo-icon-md" />}</div>
       <div className={cn('octo-chat-msg__body', isUser && 'octo-chat-msg__body--user')}>
         <div
           className={cn(
@@ -59,7 +59,7 @@ function UserBody({ entry }: { entry: Extract<ChatEntry, { kind: 'user' }> }) {
         <div className="octo-chat-msg__attach-names">
           {entry.attachmentNames.map((name, i) => (
             <span key={`${name}-${i}`} className="octo-chat-msg__attach-chip" data-testid="user-attachment-name">
-              <Paperclip className="h-3 w-3" />
+              <Paperclip className="octo-icon-xs" />
               <span className="octo-chat-msg__attach-chip-name">{name}</span>
             </span>
           ))}

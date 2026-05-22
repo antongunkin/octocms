@@ -71,7 +71,7 @@ function InsertCmsImageButton() {
         });
       }}
     >
-      <ImagePlus className="w-4 h-4" />
+      <ImagePlus className="octo-icon-md" />
     </button>
   );
 }
@@ -91,7 +91,7 @@ function InsertCmsRefButton() {
         });
       }}
     >
-      <FileText className="w-4 h-4" />
+      <FileText className="octo-icon-md" />
     </button>
   );
 }
@@ -111,7 +111,7 @@ function InsertCmsVarButton({ variables }: { variables: string[] }) {
         });
       }}
     >
-      <Variable className="w-4 h-4" />
+      <Variable className="octo-icon-md" />
     </button>
   );
 }
@@ -131,7 +131,7 @@ function InsertCmsConditionButton() {
         });
       }}
     >
-      <GitBranch className="w-4 h-4" />
+      <GitBranch className="octo-icon-md" />
     </button>
   );
 }
@@ -235,16 +235,16 @@ function InsertCustomComponentButton({ components }: { components: Record<string
           });
         }}
       >
-        <Puzzle className="w-4 h-4" />
+        <Puzzle className="octo-icon-md" />
       </button>
     );
   }
 
   // Multiple components — show a dropdown
   return (
-    <div className="relative inline-block">
+    <div className="octo-richtext-toolbar-select-wrap">
       <select
-        className="mdxeditor-toolbar-button appearance-none bg-transparent text-xs cursor-pointer pr-5 pl-1"
+        className="mdxeditor-toolbar-button octo-richtext-toolbar-select"
         value=""
         title="Insert component"
         onChange={(e) => {
@@ -392,7 +392,7 @@ const FormRichTextField = ({
         key: 'cms-image',
         label: 'CMS Image',
         description: 'Insert from media library',
-        icon: <ImagePlus className="w-4 h-4" />,
+        icon: <ImagePlus className="octo-icon-md" />,
         action: () => insertJsxRef.current?.({ kind: 'flow', name: 'CmsImage', props: { mediaId: '' } }),
         keywords: ['image', 'media', 'picture', 'photo'],
       });
@@ -403,7 +403,7 @@ const FormRichTextField = ({
         key: 'cms-ref',
         label: 'Entry Reference',
         description: 'Embed a content entry',
-        icon: <FileText className="w-4 h-4" />,
+        icon: <FileText className="octo-icon-md" />,
         action: () => insertJsxRef.current?.({ kind: 'flow', name: 'CmsRef', props: { id: '', display: 'block' } }),
         keywords: ['reference', 'entry', 'link', 'embed'],
       });
@@ -414,7 +414,7 @@ const FormRichTextField = ({
         key: 'cms-condition',
         label: 'Condition Block',
         description: 'A/B content branches',
-        icon: <GitBranch className="w-4 h-4" />,
+        icon: <GitBranch className="octo-icon-md" />,
         action: () => insertJsxRef.current?.({ kind: 'flow', name: 'CmsCondition', props: { field: '' } }),
         keywords: ['condition', 'branch', 'ab', 'test'],
       });
@@ -426,7 +426,7 @@ const FormRichTextField = ({
         key: 'cms-var',
         label: 'Template Variable',
         description: 'Dynamic value placeholder',
-        icon: <Variable className="w-4 h-4" />,
+        icon: <Variable className="octo-icon-md" />,
         action: () => insertJsxRef.current?.({ kind: 'text', name: 'CmsVar', props: { name: vars[0] ?? '' } }),
         keywords: ['variable', 'template', 'dynamic'],
       });
@@ -443,7 +443,7 @@ const FormRichTextField = ({
           key: `component-${cName}`,
           label: def.label,
           description: `Component: ${cName}`,
-          icon: <Puzzle className="w-4 h-4" />,
+          icon: <Puzzle className="octo-icon-md" />,
           action: () =>
             insertJsxRef.current?.({
               kind: def.kind === 'inline' ? 'text' : 'flow',
