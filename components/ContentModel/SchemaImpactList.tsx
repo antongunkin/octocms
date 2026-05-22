@@ -32,13 +32,6 @@ interface Props {
   asLinks?: boolean;
 }
 
-const TONE_CLASSES: Record<Tone, string> = {
-  amber:
-    'rounded-md border border-amber-900 bg-amber-950 p-3 text-xs text-amber-200 light:border-amber-200 light:bg-amber-50 light:text-amber-900',
-  destructive: 'rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive',
-  muted: 'rounded-md border border-border bg-muted/30 p-3 text-xs text-foreground',
-};
-
 export default function SchemaImpactList({
   items,
   limit = 30,
@@ -49,24 +42,24 @@ export default function SchemaImpactList({
 }: Props) {
   if (items.length === 0) {
     if (!emptyMessage) return null;
-    return <p className="text-xs text-muted-foreground">{emptyMessage}</p>;
+    return <p className="octo-dialog-field__hint">{emptyMessage}</p>;
   }
   const visible = items.slice(0, limit);
   const overflow = Math.max(items.length - limit, 0);
 
   return (
-    <div className={TONE_CLASSES[tone]}>
+    <div className={cn('octo-schema-impact', `octo-schema-impact--${tone}`)}>
       {title ? (
-        <div className="mb-1.5 flex items-center gap-1.5 font-medium">
+        <div className="octo-schema-impact__title">
           <AlertTriangle className="h-3.5 w-3.5" />
           {title}
         </div>
       ) : null}
-      <ul className="max-h-44 space-y-1 overflow-auto">
+      <ul className="octo-schema-impact__list">
         {visible.map((it) => (
           <ImpactRow key={it.path} item={it} asLink={asLinks} />
         ))}
-        {overflow > 0 ? <li className="pl-2 italic">…and {overflow} more.</li> : null}
+        {overflow > 0 ? <li style={{ paddingLeft: 8, fontStyle: 'italic' }}>…and {overflow} more.</li> : null}
       </ul>
     </div>
   );
@@ -74,14 +67,14 @@ export default function SchemaImpactList({
 
 function ImpactRow({ item, asLink }: { item: SchemaImpactItem; asLink: boolean }) {
   const inner = (
-    <span className="flex items-center justify-between gap-2 px-2 py-1.5">
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-medium">{item.title}</span>
-        <span className="block truncate text-[11px] opacity-80">
+    <span className="octo-schema-impact__item-inner">
+      <span className="octo-schema-impact__item-body">
+        <span className="octo-schema-impact__item-title">{item.title}</span>
+        <span className="octo-schema-impact__item-meta">
           <code className="font-mono">{item.type}</code> · {item.reasons.join('; ')}
         </span>
         {item.warnings.length > 0 ? (
-          <span className="mt-0.5 block truncate text-[11px] font-medium">⚠ {item.warnings.join('; ')}</span>
+          <span className="octo-schema-impact__item-warnings">⚠ {item.warnings.join('; ')}</span>
         ) : null}
       </span>
       <DataLossBadge dataLoss={item.dataLoss} />
@@ -93,17 +86,9 @@ function ImpactRow({ item, asLink }: { item: SchemaImpactItem; asLink: boolean }
   const href = `/cms/content/${item.type}/${item.id}`;
 
   return (
-    <li>
+    <li className="octo-schema-impact__item">
       {asLink ? (
-        <Link
-          href={href}
-          target="_blank"
-          rel="noreferrer"
-          className={cn(
-            'block rounded transition hover:bg-background/50',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
-          )}
-        >
+        <Link href={href} target="_blank" rel="noreferrer" className="octo-schema-impact__item-link">
           {inner}
         </Link>
       ) : (
@@ -116,14 +101,14 @@ function ImpactRow({ item, asLink }: { item: SchemaImpactItem; asLink: boolean }
 function DataLossBadge({ dataLoss }: { dataLoss: boolean }) {
   if (dataLoss) {
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded border border-destructive/30 bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-destructive">
+      <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge--loss')}>
         <ShieldAlert className="h-3 w-3" />
         Data loss
       </span>
     );
   }
   return (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded border border-emerald-900 bg-emerald-950 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-300 light:border-emerald-300 light:bg-emerald-50 light:text-emerald-700">
+    <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge--ok')}>
       <ShieldCheck className="h-3 w-3" />
       Preserved
     </span>

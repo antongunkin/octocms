@@ -67,17 +67,17 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
   }, [proposals, latestAssistantId]);
 
   return (
-    <div className="flex h-[calc(100dvh-3.5rem)] flex-1 flex-col">
+    <div className="octo-chat">
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-border px-4 py-2">
-        <div className="flex items-center gap-2 text-sm">
-          <Bot className="h-4 w-4 text-muted-foreground" />
-          <span className="font-medium">Chat</span>
-          <span className="text-muted-foreground">
-            · {PROVIDER_LABEL[provider]} · <span className="font-mono text-xs">{model}</span>
+      <div className="octo-chat__topbar">
+        <div className="octo-chat__topbar-left">
+          <Bot className="h-4 w-4" />
+          <span className="octo-chat__topbar-title">Chat</span>
+          <span className="octo-chat__topbar-meta">
+            · {PROVIDER_LABEL[provider]} · <span className="octo-chat__topbar-model">{model}</span>
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="octo-chat__topbar-right">
           <UsageBadge
             totalCostUSD={usage.totalCostUSD}
             inputTokens={usage.inputTokens}
@@ -106,13 +106,13 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
       </div>
 
       {/* Transcript */}
-      <div ref={scrollerRef} className="flex-1 overflow-y-auto px-4">
-        <div className="mx-auto max-w-3xl py-4">
+      <div ref={scrollerRef} className="octo-chat__scroller">
+        <div className="octo-chat__transcript">
           {entries.length === 0 && (
-            <div className="mt-12 text-center text-sm text-muted-foreground">
-              <Bot className="mx-auto mb-3 h-8 w-8 opacity-50" />
-              <div className="font-medium">Ask your CMS anything.</div>
-              <div className="mt-1">
+            <div className="octo-chat__empty">
+              <Bot className="octo-chat__empty-icon h-8 w-8" />
+              <div className="octo-chat__empty-title">Ask your CMS anything.</div>
+              <div className="octo-chat__empty-hint">
                 Try: <em>"show me posts about caching"</em> or <em>"fix the typo 'recieve' in any post"</em>.
               </div>
             </div>
@@ -129,7 +129,7 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
           ))}
 
           {pendingForLatest.length >= 2 && status !== 'streaming' && (
-            <div className="my-3 flex items-center justify-between rounded-md border border-border bg-muted/40 px-3 py-2 text-xs">
+            <div className="octo-chat__accept-all-bar">
               <span>
                 <strong>{pendingForLatest.length}</strong> proposals pending in this turn.
               </span>
@@ -145,9 +145,9 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
           )}
 
           {attachmentDiagnostics.length > 0 && (
-            <div className="my-3 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs">
-              <div className="font-medium mb-1">Attachments</div>
-              <ul className="space-y-0.5">
+            <div className="octo-chat__attachment-diag">
+              <div className="octo-chat__attachment-diag-title">Attachments</div>
+              <ul className="octo-chat__attachment-diag-list">
                 {attachmentDiagnostics.map((d, i) => (
                   <li key={i}>
                     {d.status === 'ok' ? (
@@ -155,7 +155,7 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
                         ✓ <span className="font-mono">{d.filename}</span> ({d.kind})
                       </span>
                     ) : (
-                      <span className="text-destructive">
+                      <span className="octo-chat__attachment-diag-error">
                         ✗ <span className="font-mono">{d.filename}</span> — {d.reason}
                       </span>
                     )}
@@ -166,21 +166,14 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
           )}
 
           {status === 'stopped' && (
-            <div
-              className="my-3 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
-              role="status"
-            >
+            <div className="octo-chat__status-bar" role="status">
               Stopped — the assistant was interrupted. Send another message to continue.
             </div>
           )}
 
-          {status === 'error' && error && (
-            <div className="my-3 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-              {error}
-            </div>
-          )}
+          {status === 'error' && error && <div className="octo-chat__error-bar">{error}</div>}
           {status === 'budget_exceeded' && (
-            <div className="my-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            <div className="octo-chat__budget-bar">
               Budget reached ({budgetReason ?? 'unknown'}). Click <strong>New conversation</strong> to start over, or
               raise the caps in <code>cms/octocms.config.ts</code>.
             </div>
@@ -213,10 +206,7 @@ function UsageBadge({
 }) {
   const cost = totalCostUSD > 0 ? `$${totalCostUSD.toFixed(4)}` : 'free';
   return (
-    <span
-      className="rounded-full border border-border bg-muted/50 px-2.5 py-0.5 font-mono text-[11px] text-muted-foreground"
-      title={`Input: ${inputTokens} tokens · Output: ${outputTokens} tokens`}
-    >
+    <span className="octo-chat__usage-badge" title={`Input: ${inputTokens} tokens · Output: ${outputTokens} tokens`}>
       {cost} · {inputTokens + outputTokens} tok
     </span>
   );

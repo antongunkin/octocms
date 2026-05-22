@@ -138,17 +138,14 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
   const activeBranch = branches.find((b) => b.key === activeTab);
 
   return (
-    <div className="my-2 rounded-lg border border-border bg-muted/30 p-3" contentEditable={false}>
+    <div className="octo-embed-editor" contentEditable={false}>
       {/* Header */}
-      <div className="flex items-center gap-2 mb-3">
-        <div
-          className="w-8 h-8 rounded-lg border border-border bg-teal-900 light:bg-teal-100 flex items-center
-              justify-center flex-none"
-        >
-          <GitBranch className="w-4 h-4 text-teal-300 light:text-teal-700" />
+      <div className="octo-embed-editor__header">
+        <div className="octo-embed-editor__icon octo-embed-editor__icon--condition">
+          <GitBranch style={{ width: 16, height: 16, color: '#5eead4' }} />
         </div>
-        <div className="flex-1 min-w-0">
-          <span className="text-xs font-medium text-muted-foreground">Condition embed</span>
+        <div className="octo-embed-editor__title-wrap">
+          <span className="octo-embed-editor__subtitle">Condition embed</span>
           {editingField ? (
             <input
               type="text"
@@ -163,54 +160,45 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                   setEditingField(false);
                 }
               }}
-              className="block text-sm font-medium w-full max-w-xs rounded border border-border bg-layout-bg px-1.5
-                  py-0.5 focus:outline-none"
+              className="octo-embed-editor__input"
+              style={{ display: 'block', maxWidth: 240 }}
               placeholder="Field name (e.g. promo)"
             />
           ) : (
             <button
               type="button"
               onClick={() => setEditingField(true)}
-              className="block text-sm font-medium hover:underline truncate"
+              className="octo-embed-editor__title"
               title="Click to edit condition field name"
             >
-              {currentField || <span className="text-muted-foreground italic">Set field name…</span>}
+              {currentField || <span style={{ color: 'var(--muted)', fontStyle: 'italic' }}>Set field name…</span>}
             </button>
           )}
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-border mb-2 flex-wrap">
+      <div className="octo-embed-editor__tabs">
         {branches.map((branch) => (
           <button
             key={branch.key}
             type="button"
             onClick={() => setActiveTab(branch.key)}
-            className={`px-3 py-1.5 text-xs font-medium border-b-2 transition-colors ${
-              activeTab === branch.key
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-            }`}
+            className={`octo-embed-editor__tab${activeTab === branch.key ? ' octo-embed-editor__tab--active' : ''}`}
           >
             {branch.key}
           </button>
         ))}
-        <button
-          type="button"
-          onClick={addBranch}
-          className="px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          title="Add branch"
-        >
-          <Plus className="w-3.5 h-3.5" />
+        <button type="button" onClick={addBranch} className="octo-embed-editor__tab-add" title="Add branch">
+          <Plus style={{ width: 14, height: 14 }} />
         </button>
       </div>
 
       {/* Active branch editor */}
       {activeBranch && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <label htmlFor={`condition-branch-key-${activeBranch.key}`} className="text-xs text-muted-foreground">
+        <div className="octo-embed-editor__body">
+          <div className="octo-embed-editor__branch-key-row">
+            <label htmlFor={`condition-branch-key-${activeBranch.key}`} className="octo-embed-editor__field-label">
               Key:
             </label>
             <input
@@ -218,7 +206,8 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               type="text"
               value={activeBranch.key}
               onChange={(e) => renameBranch(activeBranch.key, e.target.value)}
-              className="text-xs rounded border border-border bg-layout-bg px-1.5 py-0.5 w-32 focus:outline-none"
+              className="octo-embed-editor__input"
+              style={{ width: 128 }}
             />
             {branches.length > 1 && (
               <Button
@@ -226,10 +215,10 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => removeBranch(activeBranch.key)}
-                className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                style={{ height: 24, width: 24, padding: 0, color: 'var(--muted)' }}
                 title="Remove this branch"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 style={{ width: 14, height: 14 }} />
               </Button>
             )}
           </div>
@@ -237,17 +226,16 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
             value={activeBranch.content}
             onChange={(e) => updateBranchContent(activeBranch.key, e.target.value)}
             placeholder="Branch content (markdown)…"
-            className="w-full min-h-[80px] text-sm rounded-md border border-border bg-layout-bg px-3 py-2
-                resize-y focus:outline-none"
+            className="octo-embed-editor__textarea"
             rows={3}
           />
         </div>
       )}
 
       {branches.length === 0 && (
-        <div className="text-center py-4 text-sm text-muted-foreground">
+        <div className="octo-embed-editor__empty">
           No branches yet.{' '}
-          <button type="button" onClick={addBranch} className="text-primary hover:underline">
+          <button type="button" onClick={addBranch} className="octo-embed-editor__empty-link">
             Add one
           </button>
         </div>

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import React, { useMemo } from 'react';
 
-import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
 import { useFileState } from '../../hooks/useFileState';
 import type { SelectedFile } from '../../types';
@@ -32,63 +31,48 @@ const FileExplorer = ({ files = [], folders = [] }: FileExplorerProps) => {
   };
 
   return (
-    <div className="flex w-full h-full">
-      {/* Folders sidebar — matches CMSSidebar */}
-      <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-background overflow-y-auto">
-        <div className="p-2">
-          <p className="mb-1 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">Folders</p>
-          <nav className="space-y-0.5">
+    <div className="octo-file-explorer">
+      {/* Folders sidebar */}
+      <aside className="octo-file-explorer__sidebar">
+        <div className="octo-file-explorer__sidebar-inner">
+          <p className="octo-file-explorer__sidebar-label">Folders</p>
+          <nav className="octo-file-explorer__sidebar-nav">
             {folders.map((folder) => (
-              <Button
+              <button
                 key={folder}
-                asChild
-                variant="ghost"
-                className={cn(
-                  'h-8 w-full justify-start gap-2 px-2 text-sm font-normal',
-                  selectedType === folder ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-accent',
-                )}
+                type="button"
+                className={`octo-file-explorer__item${selectedType === folder ? ' octo-file-explorer__item--active' : ''}`}
+                onClick={() => onTypeClick(folder)}
               >
-                <button type="button" onClick={() => onTypeClick(folder)}>
-                  {folder !== '/' && '/'}
-                  {folder}
-                </button>
-              </Button>
+                {folder !== '/' && '/'}
+                {folder}
+              </button>
             ))}
           </nav>
         </div>
       </aside>
 
-      {/* Files area — matches DashboardContent layout */}
-      <div className="flex flex-1 flex-col overflow-hidden bg-muted/20">
-        <div className="flex items-center justify-between border-b border-border bg-background px-6 py-4">
-          <h1 className="text-xl font-semibold text-foreground">Files</h1>
+      {/* Files area */}
+      <div className="octo-file-explorer__main">
+        <div className="octo-file-explorer__main-header">
+          <h1 className="octo-file-explorer__main-title">Files</h1>
           {selectedType && (
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-500 text-white" onClick={addNew}>
+            <Button size="sm" style={{ background: '#2563eb', color: '#fff' }} onClick={addNew}>
               Add New
             </Button>
           )}
         </div>
-        <div className="flex-1 overflow-y-auto p-6">
-          <nav className="space-y-0.5">
+        <div className="octo-file-explorer__main-body">
+          <nav className="octo-file-explorer__files-nav">
             {sortedFiles.map((file, i) => (
-              <Button
+              <Link
                 key={i}
-                asChild
-                variant="ghost"
-                className={cn(
-                  'h-8 w-full justify-start gap-2 px-2 text-sm font-normal',
-                  selectedFile?.path === file.path
-                    ? 'bg-accent text-accent-foreground'
-                    : 'text-foreground hover:bg-accent',
-                )}
+                href={`/cms/media/${file.type === '/' ? '' : file.type + '/'}${file.id}`}
+                className={`octo-file-explorer__item${selectedFile?.path === file.path ? ' octo-file-explorer__item--active' : ''}`}
+                onClick={() => onFileClick(file)}
               >
-                <Link
-                  href={`/cms/media/${file.type === '/' ? '' : file.type + '/'}${file.id}`}
-                  onClick={() => onFileClick(file)}
-                >
-                  {file.id}
-                </Link>
-              </Button>
+                {file.id}
+              </Link>
             ))}
           </nav>
         </div>

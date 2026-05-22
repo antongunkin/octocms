@@ -205,28 +205,25 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
   const leftInsetPx = depth * 100;
 
   return (
-    <div className="absolute inset-0" style={{ zIndex: 10 + depth }}>
-      <div className="absolute inset-0 z-0 bg-black/30" aria-hidden />
-      <div
-        className="absolute z-10 top-0 right-0 bottom-0 flex min-w-0 flex-col bg-background shadow-lg animate-in slide-in-from-right-4 duration-200"
-        style={{ left: leftInsetPx }}
-      >
+    <div className="octo-inline-editor" style={{ zIndex: 10 + depth }}>
+      <div className="octo-inline-editor__backdrop" aria-hidden />
+      <div className="octo-inline-editor__panel" style={{ left: leftInsetPx }}>
         {/* Top bar */}
-        <div className="flex-none flex h-[var(--header-height)] items-center bg-background border-b border-border">
-          <div className="flex-none px-5 py-2.5">
+        <div className="octo-inline-editor__header">
+          <div className="octo-inline-editor__back">
             <Button variant="ghost" size="sm" onClick={handleClose}>
               <ArrowLeft className="mr-1 h-4 w-4" />
               Back
             </Button>
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="mb-0.5 flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="octo-inline-editor__title-wrap">
+            <div className="octo-inline-editor__collection">
               {collectionLabel}
               {entry && <StatusBadge status={currentStatus} />}
             </div>
-            <div className="truncate text-base font-semibold text-foreground">{entry?.fields?.title || entryId}</div>
+            <div className="octo-inline-editor__entry-title">{entry?.fields?.title || entryId}</div>
           </div>
-          <div className="flex-none px-5 py-2.5 flex items-center gap-2">
+          <div className="octo-inline-editor__actions">
             {currentStatus === 'archived' ? (
               <>
                 <Button variant="outline" size="sm" onClick={handleRestore} disabled={isSaving}>
@@ -238,7 +235,13 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
                 </Button>
               </>
             ) : (
-              <Button variant="outline" size="sm" className="text-gray-500" onClick={handleArchive} disabled={isSaving}>
+              <Button
+                variant="outline"
+                size="sm"
+                style={{ color: '#6b7280' }}
+                onClick={handleArchive}
+                disabled={isSaving}
+              >
                 Archive
               </Button>
             )}
@@ -247,12 +250,12 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
 
         {/* Content */}
         {isLoading ? (
-          <div className="flex flex-1 items-center justify-center text-muted-foreground">Loading entry...</div>
+          <div className="octo-inline-editor__loading">Loading entry...</div>
         ) : !entry ? (
-          <div className="flex flex-1 items-center justify-center text-muted-foreground">Entry not found</div>
+          <div className="octo-inline-editor__loading">Entry not found</div>
         ) : (
           <form
-            className="flex min-h-0 flex-1 overflow-auto"
+            className="octo-inline-editor__body"
             onSubmit={handleSubmit}
             onInput={(e) => {
               const t = e.target;
@@ -267,8 +270,8 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
               }
             }}
           >
-            <div className="flex-1 overflow-y-auto p-10 px-5">
-              <div className="mx-auto max-w-[1000px]">
+            <div className="octo-inline-editor__fields">
+              <div className="octo-inline-editor__fields-inner">
                 <FormFields
                   key={`${entryPath}-${entryQuery.dataUpdatedAt}`}
                   selectedFile={selectedFile}
@@ -278,14 +281,14 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
                 />
               </div>
             </div>
-            <div className="relative w-[360px] flex-none overflow-y-auto border-l border-border bg-background">
-              <div className="sticky left-0 top-0 w-full p-10 px-5">
-                <div className="mb-4 grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm">
-                  <span className="font-medium text-muted-foreground">ID:</span>
-                  <span className="text-foreground">{entryId}</span>
-                  <span className="font-medium text-muted-foreground">Type:</span>
-                  <span className="text-foreground">{collectionLabel}</span>
-                  <span className="font-medium text-muted-foreground">Status:</span>
+            <div className="octo-inline-editor__sidebar">
+              <div className="octo-inline-editor__sidebar-inner">
+                <div className="octo-inline-editor__meta-grid">
+                  <span className="octo-inline-editor__meta-key">ID:</span>
+                  <span className="octo-inline-editor__meta-val">{entryId}</span>
+                  <span className="octo-inline-editor__meta-key">Type:</span>
+                  <span className="octo-inline-editor__meta-val">{collectionLabel}</span>
+                  <span className="octo-inline-editor__meta-key">Status:</span>
                   <span>
                     <StatusBadge status={currentStatus} />
                   </span>
@@ -314,25 +317,27 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
               </DialogDescription>
             </DialogHeader>
             {isLoadingBacklinks ? (
-              <div className="py-2 text-sm text-muted-foreground">Checking references...</div>
+              <div className="octo-inline-editor__loading" style={{ padding: '8px 0' }}>
+                Checking references...
+              </div>
             ) : (
               deleteBacklinks.length > 0 && (
-                <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3">
-                  <p className="mb-1 text-sm font-medium text-destructive">
+                <div className="octo-inline-editor__delete-warning">
+                  <p className="octo-inline-editor__delete-warning-title">
                     This entry is referenced by {deleteBacklinks.length}{' '}
                     {deleteBacklinks.length === 1 ? 'entry' : 'entries'}:
                   </p>
-                  <ul className="space-y-0.5 text-sm text-muted-foreground">
+                  <ul className="octo-inline-editor__delete-warning-list">
                     {deleteBacklinks.map((link) => (
-                      <li key={link.path} className="truncate">
+                      <li key={link.path} className="octo-inline-editor__delete-warning-item">
                         {link.title}{' '}
-                        <span className="text-xs">
+                        <span style={{ fontSize: 12 }}>
                           ({config.collections[link.type as keyof Config['collections']]?.label || link.type})
                         </span>
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-2 text-sm text-destructive">Removing it will break those references.</p>
+                  <p className="octo-inline-editor__delete-warning-foot">Removing it will break those references.</p>
                 </div>
               )
             )}

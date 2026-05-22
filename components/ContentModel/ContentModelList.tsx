@@ -7,7 +7,6 @@ import { ChevronRight, FileText, Layers, Plus, Search } from 'lucide-react';
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import { useSchema } from '../../admin/query/hooks/useSchema';
 import { Button } from '../ui/button';
-import { cn } from '../../lib/utils';
 import CreateContentTypeDialog from './CreateContentTypeDialog';
 import { SchemaTableSkeleton } from './skeletons/SchemaTableSkeleton';
 
@@ -57,55 +56,53 @@ export default function ContentModelList() {
   }, [rows, search]);
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="octo-content-model">
       {/* Page header */}
-      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-        <div className="min-w-0 flex-1">
-          <div className="mb-px flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
+      <div className="octo-page-chrome">
+        <div className="octo-page-chrome__title-area">
+          <div className="octo-page-chrome__breadcrumb">
             <span style={{ color: 'var(--text-2)' }}>Model</span>
           </div>
-          <div>
-            <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-              Content Model
-            </h1>
+          <div className="octo-page-chrome__title-row">
+            <h1 className="octo-page-chrome__title">Content Model</h1>
           </div>
         </div>
-        <div className="flex flex-none items-center gap-2">
-          <span className="text-[13px] font-medium text-[var(--text-2)]">
-            Content types
-            <span className="ml-1.5 font-mono text-[12px] font-normal text-[var(--muted)]">{rows.length}</span>
-          </span>
-          <Button
-            size="sm"
-            className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
-            onClick={() => setCreateOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
-            Create content type
-          </Button>
+        <div className="octo-page-chrome__right">
+          <div className="octo-hdr-right">
+            <span className="octo-hdr-right__label">
+              Content types
+              <span className="octo-hdr-right__mono">{rows.length}</span>
+            </span>
+            <Button
+              size="sm"
+              className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
+              onClick={() => setCreateOpen(true)}
+            >
+              <Plus className="h-4 w-4" />
+              Create content type
+            </Button>
+          </div>
         </div>
       </div>
 
       {schema ? <CreateContentTypeDialog open={createOpen} onOpenChange={setCreateOpen} schema={schema} /> : null}
 
       {/* Body */}
-      <div className="flex flex-1 flex-col overflow-hidden bg-[var(--bg)]">
-        <div className="scroll flex-1 overflow-auto px-6 pb-12 pt-5">
-          <div className="flex flex-col gap-4">
+      <div className="octo-content-model__body">
+        <div className="octo-content-model__scroll octo-scroll">
+          <div className="octo-content-model__inner">
             {/* Filter bar */}
-            <div className="flex min-w-0 items-center gap-2.5">
-              <div className="relative min-w-[220px] flex-[0_1_420px]">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="octo-content-model__filters">
+              <div className="octo-search-wrap">
+                <Search className="octo-search-wrap__icon" />
                 <input
                   ref={searchRef}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Filter content types…"
-                  className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+                  className="octo-input octo-search-wrap__input"
                 />
-                <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-border bg-[var(--surface-2)] px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                  /
-                </kbd>
+                <kbd className="octo-search-wrap__kbd">/</kbd>
               </div>
             </div>
 
@@ -113,65 +110,52 @@ export default function ContentModelList() {
               <SchemaTableSkeleton />
             ) : (
               /* Table */
-              <div className="overflow-hidden rounded-xl border border-border bg-[var(--surface-1)] shadow-[var(--shadow-1)]">
-                <div className="overflow-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border bg-[var(--surface-2)]">
-                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                          Name
-                        </th>
-                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                          Key
-                        </th>
-                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                          Cardinality
-                        </th>
-                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                          Fields
-                        </th>
-                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                          Entries
-                        </th>
-                        <th className="w-10 px-4 py-2.5" />
+              <div className="octo-schema-list">
+                <div className="octo-schema-list__scroll">
+                  <table className="octo-schema-list__table">
+                    <thead className="octo-schema-list__thead">
+                      <tr className="octo-schema-list__th-row">
+                        <th className="octo-schema-list__th">Name</th>
+                        <th className="octo-schema-list__th">Key</th>
+                        <th className="octo-schema-list__th">Cardinality</th>
+                        <th className="octo-schema-list__th">Fields</th>
+                        <th className="octo-schema-list__th">Entries</th>
+                        <th className="octo-schema-list__th octo-schema-list__th--icon" />
                       </tr>
                     </thead>
                     <tbody>
                       {filtered.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="h-32 text-center text-sm text-muted-foreground">
+                          <td colSpan={6} className="octo-schema-list__empty">
                             No content types match your search.
                           </td>
                         </tr>
                       ) : (
-                        filtered.map((r, i) => (
+                        filtered.map((r) => (
                           <tr
                             key={r.key}
                             onClick={() => router.push(`/cms/model/${r.key}`)}
-                            className={cn(
-                              'group cursor-pointer transition-colors hover:bg-[var(--surface-2)]/60',
-                              i > 0 && 'border-t border-border',
-                            )}
+                            className="octo-schema-list__item"
                             onKeyDown={() => router.push(`/cms/model/${r.key}`)}
                           >
-                            <td className="px-4 py-3 text-sm">
-                              <span className="inline-flex items-center gap-2 font-medium text-foreground">
-                                {r.hasMany ? (
-                                  <Layers className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                  <FileText className="h-4 w-4 text-muted-foreground" />
-                                )}
+                            <td className="octo-schema-list__td">
+                              <span className="octo-schema-list__name">
+                                <span className="octo-schema-list__name-icon">
+                                  {r.hasMany ? <Layers className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+                                </span>
                                 {r.label}
                               </span>
                             </td>
-                            <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{r.key}</td>
-                            <td className="px-4 py-3 text-sm text-muted-foreground">
+                            <td className="octo-schema-list__td octo-schema-list__key">{r.key}</td>
+                            <td className="octo-schema-list__td octo-schema-list__count">
                               {r.hasMany ? 'Many entries' : 'Singleton'}
                             </td>
-                            <td className="px-4 py-3 text-sm text-muted-foreground">{r.fieldCount}</td>
-                            <td className="px-4 py-3 text-sm text-muted-foreground">{r.entryCount}</td>
-                            <td className="w-10 px-4 py-3 text-right">
-                              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground opacity-60 transition-opacity group-hover:opacity-100" />
+                            <td className="octo-schema-list__td octo-schema-list__count">{r.fieldCount}</td>
+                            <td className="octo-schema-list__td octo-schema-list__count">{r.entryCount}</td>
+                            <td className="octo-schema-list__td octo-schema-list__th--icon">
+                              <div className="octo-schema-list__chevron">
+                                <ChevronRight className="h-4 w-4" />
+                              </div>
                             </td>
                           </tr>
                         ))

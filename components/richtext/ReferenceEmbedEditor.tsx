@@ -102,25 +102,25 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
   const getCollectionLabel = (type: string) => config.collections[type as keyof Config['collections']]?.label || type;
 
   return (
-    <div className="my-2 rounded-lg border border-border bg-muted/30 p-3" contentEditable={false}>
+    <div className="octo-ref-embed" contentEditable={false}>
       {currentId && selectedEntry ? (
-        <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-lg border border-border bg-primary/10 flex items-center justify-center flex-none">
-            <FileText className="w-5 h-5 text-primary" />
+        <div className="octo-ref-embed__selected">
+          <div className="octo-ref-embed__icon-wrap">
+            <FileText style={{ width: 20, height: 20, color: 'var(--brand)' }} />
           </div>
-          <div className="flex flex-col gap-1 flex-1 min-w-0 pt-0.5">
-            <span className="text-xs font-medium text-muted-foreground">Reference embed · {currentDisplay}</span>
-            <span className="text-sm font-medium truncate">{selectedEntry.title}</span>
-            <span className="text-xs text-muted-foreground">{getCollectionLabel(selectedEntry.type)}</span>
+          <div className="octo-ref-embed__info">
+            <span className="octo-ref-embed__info-label">Reference embed · {currentDisplay}</span>
+            <span className="octo-ref-embed__info-title">{selectedEntry.title}</span>
+            <span className="octo-ref-embed__info-type">{getCollectionLabel(selectedEntry.type)}</span>
           </div>
-          <div className="flex gap-1 flex-none">
+          <div className="octo-ref-embed__actions">
             <button
               type="button"
               onClick={toggleDisplay}
-              className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+              className="octo-ref-embed__action-btn"
               title={`Switch to ${currentDisplay === 'inline' ? 'block' : 'inline'} display`}
             >
-              <Link2 className="w-3.5 h-3.5" />
+              <Link2 style={{ width: 14, height: 14 }} />
             </button>
             <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
               Change
@@ -128,35 +128,37 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
             <button
               type="button"
               onClick={handleClear}
-              className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+              className="octo-ref-embed__action-btn octo-ref-embed__action-btn--danger"
               title="Remove reference"
             >
-              <X className="w-3.5 h-3.5" />
+              <X style={{ width: 14, height: 14 }} />
             </button>
           </div>
         </div>
       ) : currentId && !selectedEntry ? (
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/50 flex-none">
-            <FileText className="w-5 h-5 text-muted-foreground" />
+        <div className="octo-ref-embed__loading">
+          <div className="octo-ref-embed__loading-icon">
+            <FileText style={{ width: 20, height: 20, color: 'var(--muted)' }} />
           </div>
-          <div className="flex-1">
-            <span className="text-sm text-muted-foreground block mb-0.5">
+          <div style={{ flex: 1 }}>
+            <span className="octo-ref-embed__loading-text">
               {isFetched && !listPending ? 'Referenced entry not found' : 'Loading…'}
             </span>
-            <span className="text-xs text-muted-foreground">{currentId}</span>
+            <span className="octo-ref-embed__loading-id">{currentId}</span>
           </div>
           <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
             Select entry
           </Button>
         </div>
       ) : (
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/50 flex-none">
-            <FileText className="w-5 h-5 text-muted-foreground" />
+        <div className="octo-ref-embed__empty-state">
+          <div className="octo-ref-embed__loading-icon">
+            <FileText style={{ width: 20, height: 20, color: 'var(--muted)' }} />
           </div>
           <div>
-            <span className="text-sm text-muted-foreground block mb-1">No entry selected</span>
+            <span className="octo-ref-embed__loading-text" style={{ marginBottom: 4 }}>
+              No entry selected
+            </span>
             <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
               Select entry
             </Button>

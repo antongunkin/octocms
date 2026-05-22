@@ -44,17 +44,17 @@ const ComponentEmbedEditor: React.FC<
     // Inline: compact pill with a popover-style edit on click
     return (
       <span
-        className="inline-flex items-center gap-1 rounded-full bg-amber-900 text-amber-200 text-xs font-medium px-2
-            py-0.5 mx-0.5 align-baseline light:bg-amber-100 light:text-amber-800"
+        className="octo-var-embed octo-var-embed--set"
+        style={{ background: '#78350f', color: '#fef3c7' }}
         contentEditable={false}
       >
-        <Puzzle className="w-3 h-3 shrink-0" />
+        <Puzzle style={{ width: 12, height: 12, flexShrink: 0 }} />
         <span>{componentDef.label}</span>
         {componentDef.props.map((prop) => {
           const value = getAttrValue(prop.name);
           if (!value) return null;
           return (
-            <span key={prop.name} className="text-amber-400 light:text-amber-600">
+            <span key={prop.name} style={{ color: '#fbbf24' }}>
               {prop.name}=&quot;{value}&quot;
             </span>
           );
@@ -65,21 +65,18 @@ const ComponentEmbedEditor: React.FC<
 
   // Block: full card with props form
   return (
-    <div className="my-2 rounded-lg border border-border bg-muted/30 p-3" contentEditable={false}>
-      <div className="flex items-center gap-2 mb-3">
-        <div
-          className="w-8 h-8 rounded-lg border border-border bg-amber-900 light:bg-amber-100 flex items-center
-              justify-center flex-none"
-        >
-          <Puzzle className="w-4 h-4 text-amber-300 light:text-amber-700" />
+    <div className="octo-embed-editor" contentEditable={false}>
+      <div className="octo-embed-editor__header">
+        <div className="octo-embed-editor__icon octo-embed-editor__icon--component">
+          <Puzzle style={{ width: 16, height: 16, color: '#fcd34d' }} />
         </div>
-        <div className="flex-1 min-w-0">
-          <span className="text-xs font-medium text-muted-foreground">Component</span>
-          <span className="text-sm font-medium block truncate">{componentDef.label}</span>
+        <div className="octo-embed-editor__title-wrap">
+          <span className="octo-embed-editor__subtitle">Component</span>
+          <span className="octo-embed-editor__title">{componentDef.label}</span>
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="octo-embed-editor__body">
         {componentDef.props.map((prop) => (
           <PropInput key={prop.name} prop={prop} value={getAttrValue(prop.name)} onChange={updateProp} />
         ))}
@@ -115,45 +112,43 @@ function PropInput({ prop, value, onChange }: PropInputProps) {
     [prop.name, onChange],
   );
 
-  const inputClasses = 'w-full text-sm rounded-md border border-border bg-layout-bg px-2 py-1.5 focus:outline-none';
-  const labelClasses = 'text-xs font-medium text-muted-foreground';
-
   switch (prop.type) {
     case 'boolean':
       return (
-        <label className="flex items-center gap-2 cursor-pointer">
+        <label className="octo-embed-editor__field-checkbox">
           <input
             type="checkbox"
             checked={value === 'true'}
             onChange={handleCheckbox}
-            className="rounded border-border"
+            className="octo-embed-editor__input"
+            style={{ width: 'auto' }}
           />
-          <span className={labelClasses}>
+          <span className="octo-embed-editor__field-label">
             {prop.label}
-            {prop.required && <span className="text-destructive ml-0.5">*</span>}
+            {prop.required && <span className="octo-embed-editor__field-required">*</span>}
           </span>
         </label>
       );
 
     case 'number':
       return (
-        <label className="block">
-          <span className={labelClasses}>
+        <label className="octo-embed-editor__field">
+          <span className="octo-embed-editor__field-label">
             {prop.label}
-            {prop.required && <span className="text-destructive ml-0.5">*</span>}
+            {prop.required && <span className="octo-embed-editor__field-required">*</span>}
           </span>
-          <input type="number" value={value} onChange={handleChange} className={inputClasses} />
+          <input type="number" value={value} onChange={handleChange} className="octo-embed-editor__input" />
         </label>
       );
 
     case 'select':
       return (
-        <label className="block">
-          <span className={labelClasses}>
+        <label className="octo-embed-editor__field">
+          <span className="octo-embed-editor__field-label">
             {prop.label}
-            {prop.required && <span className="text-destructive ml-0.5">*</span>}
+            {prop.required && <span className="octo-embed-editor__field-required">*</span>}
           </span>
-          <select value={value} onChange={handleChange} className={inputClasses}>
+          <select value={value} onChange={handleChange} className="octo-embed-editor__input">
             {!prop.required && <option value="">—</option>}
             {(prop.options ?? []).map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -166,35 +161,47 @@ function PropInput({ prop, value, onChange }: PropInputProps) {
 
     case 'url':
       return (
-        <label className="block">
-          <span className={labelClasses}>
+        <label className="octo-embed-editor__field">
+          <span className="octo-embed-editor__field-label">
             {prop.label}
-            {prop.required && <span className="text-destructive ml-0.5">*</span>}
+            {prop.required && <span className="octo-embed-editor__field-required">*</span>}
           </span>
-          <input type="url" value={value} onChange={handleChange} placeholder="https://…" className={inputClasses} />
+          <input
+            type="url"
+            value={value}
+            onChange={handleChange}
+            placeholder="https://…"
+            className="octo-embed-editor__input"
+          />
         </label>
       );
 
     case 'image':
       return (
-        <label className="block">
-          <span className={labelClasses}>
+        <label className="octo-embed-editor__field">
+          <span className="octo-embed-editor__field-label">
             {prop.label}
-            {prop.required && <span className="text-destructive ml-0.5">*</span>}
+            {prop.required && <span className="octo-embed-editor__field-required">*</span>}
           </span>
-          <input type="text" value={value} onChange={handleChange} placeholder="Media UUID" className={inputClasses} />
+          <input
+            type="text"
+            value={value}
+            onChange={handleChange}
+            placeholder="Media UUID"
+            className="octo-embed-editor__input"
+          />
         </label>
       );
 
     case 'string':
     default:
       return (
-        <label className="block">
-          <span className={labelClasses}>
+        <label className="octo-embed-editor__field">
+          <span className="octo-embed-editor__field-label">
             {prop.label}
-            {prop.required && <span className="text-destructive ml-0.5">*</span>}
+            {prop.required && <span className="octo-embed-editor__field-required">*</span>}
           </span>
-          <input type="text" value={value} onChange={handleChange} className={inputClasses} />
+          <input type="text" value={value} onChange={handleChange} className="octo-embed-editor__input" />
         </label>
       );
   }

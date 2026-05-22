@@ -104,18 +104,18 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
         </DialogHeader>
 
         {previewing ? (
-          <p className="text-sm text-muted-foreground">Checking impact…</p>
+          <p className="octo-dialog-field__hint">Checking impact…</p>
         ) : preview && !preview.valid ? (
-          <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-            <p className="font-medium">The change is invalid:</p>
-            <ul className="mt-1 list-disc space-y-1 pl-4 text-xs">
+          <div className="octo-error-box">
+            <p className="octo-error-box__title">The change is invalid:</p>
+            <ul className="octo-error-box__list octo-error-box__list--sm">
               {preview.errors.map((e, i) => (
                 <li key={i}>{e}</li>
               ))}
             </ul>
           </div>
         ) : preview ? (
-          <div className="space-y-3">
+          <div className="octo-dialog-fields">
             <SchemaImpactList
               tone="destructive"
               title={`Entries to delete (${ownEntries.length})`}
@@ -124,8 +124,8 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
             />
 
             {cascadingRefs.length > 0 ? (
-              <div className="space-y-1.5">
-                <p className="text-xs text-muted-foreground">
+              <div className="octo-dialog-fields">
+                <p className="octo-dialog-field__hint">
                   Reference values pointing at <code className="font-mono">{type}</code> entries will be pruned
                   automatically in the same commit so the public site never serves orphaned keys.
                 </p>
@@ -137,8 +137,8 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
               </div>
             ) : null}
 
-            <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm">
-              <label htmlFor="ct-confirm" className="mb-1.5 block font-medium text-destructive">
+            <div className="octo-confirm-box">
+              <label htmlFor="ct-confirm" className="octo-confirm-box__label">
                 Type <code className="font-mono">{confirmRequired}</code> to confirm
               </label>
               <input
@@ -147,7 +147,7 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 disabled={busy}
-                className="w-full rounded-md border border-destructive/30 bg-background px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-destructive/40"
+                className="octo-confirm-box__input"
                 autoComplete="off"
               />
             </div>

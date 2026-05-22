@@ -2,8 +2,6 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { cn } from '../../lib/utils';
-
 export type SlashMenuItem = {
   key: string;
   label: string;
@@ -88,7 +86,7 @@ export function SlashMenuOverlay({ items, open, filter, position, onSelect, onCl
     return (
       <div
         ref={menuRef}
-        className="fixed z-[10000] w-64 rounded-md border border-border bg-popover px-3 py-2 text-sm text-muted-foreground shadow-md"
+        className="octo-slash-menu octo-slash-menu--empty"
         style={{ top: position.top, left: position.left }}
       >
         No matching commands
@@ -97,11 +95,7 @@ export function SlashMenuOverlay({ items, open, filter, position, onSelect, onCl
   }
 
   return (
-    <div
-      ref={menuRef}
-      className="fixed z-[10000] w-64 max-h-72 overflow-y-auto rounded-md border border-border bg-popover shadow-md"
-      style={{ top: position.top, left: position.left }}
-    >
+    <div ref={menuRef} className="octo-slash-menu" style={{ top: position.top, left: position.left }}>
       {items.map((item, i) => (
         <button
           key={item.key}
@@ -109,17 +103,14 @@ export function SlashMenuOverlay({ items, open, filter, position, onSelect, onCl
             itemRefs.current[i] = el;
           }}
           type="button"
-          className={cn(
-            'flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-accent',
-            i === selectedIndex && 'bg-accent',
-          )}
+          className={`octo-slash-menu__item${i === selectedIndex ? ' octo-slash-menu__item--active' : ''}`}
           onMouseEnter={() => setSelectedIndex(i)}
           onClick={() => onSelect(item)}
         >
-          <span className="flex-shrink-0 text-muted-foreground">{item.icon}</span>
+          <span className="octo-slash-menu__item-icon">{item.icon}</span>
           <span>
-            <span className="block font-medium">{item.label}</span>
-            {item.description && <span className="block text-xs text-muted-foreground">{item.description}</span>}
+            <span className="octo-slash-menu__item-label">{item.label}</span>
+            {item.description && <span className="octo-slash-menu__item-desc">{item.description}</span>}
           </span>
         </button>
       ))}

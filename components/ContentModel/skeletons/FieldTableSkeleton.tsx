@@ -9,9 +9,9 @@ import { ShimmerBlock, ShimmerRow } from '../../skeletons/primitives';
 export function FieldTableSkeleton({ rows = 8 }: { rows?: number }) {
   const widths = ['10%', '24%', '14%', '20%', '8%'];
   return (
-    <div role="status" aria-label="Loading fields" className="rounded-lg border border-border bg-background p-4">
+    <div role="status" aria-label="Loading fields" className="octo-skeleton-table">
       <ShimmerBlock className="mb-3 h-4 w-32" />
-      <div className="flex flex-col gap-3">
+      <div className="octo-skeleton-table__rows">
         {Array.from({ length: rows }, (_, i) => (
           <ShimmerRow key={i} widths={widths} />
         ))}

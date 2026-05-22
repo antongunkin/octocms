@@ -3,13 +3,12 @@
 import * as React from 'react';
 import Link from 'next/link';
 
-import { cn } from '../../lib/utils';
 import { Kbd } from '../ui';
 
 export function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="py-1.5">
-      <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--muted)]">{label}</div>
+    <div className="octo-cmdk__section">
+      <div className="octo-cmdk__section-label">{label}</div>
       {children}
     </div>
   );
@@ -29,24 +28,19 @@ export type RowItemProps = {
   onClick?: (e: React.MouseEvent) => void;
 };
 
-const ROW_CLASSES =
-  'flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent px-4 py-2.5 text-left no-underline';
-
 export function RowItem({ icon, title, sub, badge, kbd, mono, active, href, onMouseEnter, onClick }: RowItemProps) {
+  const className = `octo-cmdk__item${active ? ' octo-cmdk__item--active' : ''}`;
+
   const inner = (
     <>
-      <span className="flex-none text-[var(--muted)]">{icon}</span>
-      <div className="min-w-0 flex-1">
-        <div className={cn('truncate text-sm font-medium text-[var(--text)]', mono && 'font-mono')}>{title}</div>
-        {sub && <div className="mt-0.5 truncate font-mono text-xs text-[var(--muted)]">{sub}</div>}
+      <span className="octo-cmdk__item-icon">{icon}</span>
+      <div className="octo-cmdk__item-body">
+        <div className={`octo-cmdk__item-label${mono ? ' octo-cmdk__item-label--mono' : ''}`}>{title}</div>
+        {sub && <div className="octo-cmdk__item-meta">{sub}</div>}
       </div>
-      {badge && (
-        <span className="rounded-[4px] bg-[var(--surface-2)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[var(--muted)]">
-          {badge}
-        </span>
-      )}
+      {badge && <span className="octo-cmdk__item-badge">{badge}</span>}
       {kbd && (
-        <span className="inline-flex gap-1">
+        <span className="octo-cmdk__item-kbd">
           {kbd.map((k, i) => (
             <Kbd key={i}>{k}</Kbd>
           ))}
@@ -54,8 +48,6 @@ export function RowItem({ icon, title, sub, badge, kbd, mono, active, href, onMo
       )}
     </>
   );
-
-  const className = cn(ROW_CLASSES, active && 'bg-[var(--surface-2)]');
 
   if (href) {
     return (

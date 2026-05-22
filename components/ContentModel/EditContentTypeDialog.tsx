@@ -150,9 +150,9 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
-          <div>
-            <label htmlFor="ct-label" className="mb-1.5 block text-sm font-medium text-foreground">
+        <div className="octo-dialog-fields">
+          <div className="octo-dialog-field">
+            <label htmlFor="ct-label" className="octo-dialog-field__label">
               Name
             </label>
             <Input
@@ -162,11 +162,11 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
               onChange={(e) => setLabel(e.target.value)}
               disabled={busy}
             />
-            {labelError ? <p className="mt-1 text-xs text-destructive">{labelError}</p> : null}
+            {labelError ? <p className="octo-dialog-field__error">{labelError}</p> : null}
           </div>
 
-          <div>
-            <label htmlFor="ct-key" className="mb-1.5 block text-sm font-medium text-foreground">
+          <div className="octo-dialog-field">
+            <label htmlFor="ct-key" className="octo-dialog-field__label">
               API identifier
             </label>
             <Input
@@ -178,15 +178,17 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
               disabled={busy}
               aria-invalid={Boolean(keyError || duplicateKey)}
             />
-            <p className={cn('mt-1 text-xs text-muted-foreground', (keyError || duplicateKey) && 'text-destructive')}>
+            <p
+              className={cn('octo-dialog-field__hint', (keyError || duplicateKey) && 'octo-dialog-field__hint--error')}
+            >
               {duplicateKey
                 ? `A content type with key "${trimmedKey}" already exists.`
                 : (keyError ??
                   'Renaming will move every entry file. References from other collections will need to be updated manually.')}
             </p>
             {keyChanged && entryCount > 0 && !keyError && !duplicateKey ? (
-              <div className="mt-2 flex gap-2 rounded-md border border-amber-900 bg-amber-950 p-2 text-xs text-amber-200 light:border-amber-200 light:bg-amber-50 light:text-amber-900">
-                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <div className="octo-inline-warn">
+                <AlertTriangle className="octo-inline-warn__icon" />
                 <span>
                   {entryCount} {entryCount === 1 ? 'entry' : 'entries'} will be renamed from{' '}
                   <code className="font-mono">cms/content/{type}/</code> to{' '}
@@ -196,9 +198,9 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
             ) : null}
           </div>
 
-          <div>
-            <span className="mb-1.5 block text-sm font-medium text-foreground">Cardinality</span>
-            <div className="grid grid-cols-2 gap-2">
+          <div className="octo-dialog-field">
+            <span className="octo-dialog-field__label">Cardinality</span>
+            <div className="octo-cardinality-grid">
               <CardinalityOption
                 active={hasMany}
                 disabled={busy || cardinalityLocked}
@@ -217,7 +219,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
               />
             </div>
             {cardinalityLocked ? (
-              <p className="mt-2 text-xs text-muted-foreground">
+              <p className="octo-dialog-field__hint">
                 Cardinality is locked once entries exist. Delete every entry first to switch.
               </p>
             ) : null}
@@ -233,9 +235,9 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
         ) : null}
 
         {preview && !preview.valid ? (
-          <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
-            <p className="font-medium">The change is invalid:</p>
-            <ul className="mt-1 list-disc space-y-1 pl-4">
+          <div className="octo-error-box">
+            <p className="octo-error-box__title">The change is invalid:</p>
+            <ul className="octo-error-box__list">
               {preview.errors.map((e, i) => (
                 <li key={i}>{e}</li>
               ))}
@@ -283,19 +285,13 @@ function CardinalityOption({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={cn(
-        'flex flex-col items-start gap-1 rounded-md border p-3 text-left transition',
-        active
-          ? 'border-primary bg-primary/10 ring-1 ring-primary/40 text-foreground'
-          : 'border-border bg-background hover:bg-muted/50',
-        disabled && 'cursor-not-allowed opacity-50',
-      )}
+      className={cn('octo-cardinality-option', active && 'octo-cardinality-option--active')}
     >
-      <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+      <span className="octo-cardinality-option__title">
         {icon}
         {title}
       </span>
-      <span className="text-xs text-muted-foreground">{description}</span>
+      <span className="octo-cardinality-option__desc">{description}</span>
     </button>
   );
 }

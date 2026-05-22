@@ -94,10 +94,10 @@ export default function ConditionalBranchesEditor({
   const usedKeys = new Set(branches.map((b) => b.key));
 
   return (
-    <div className="space-y-2">
-      <div className="space-y-2">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {branches.length === 0 ? (
-          <p className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
+          <p className="octo-checkbox-list__empty">
             Add at least one branch — each is a typed shape this field can hold.
           </p>
         ) : (
@@ -116,14 +116,14 @@ export default function ConditionalBranchesEditor({
                   if (dragIdx !== null) reorderBranch(dragIdx, idx);
                   setDragIdx(null);
                 }}
-                className="rounded-md border border-border bg-background p-2.5"
+                className="octo-branch-card"
               >
-                <div className="flex items-start gap-2">
-                  <GripVertical className="mt-2 h-3.5 w-3.5 shrink-0 cursor-grab text-muted-foreground" />
-                  <div className="flex-1 space-y-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <span className="block text-[11px] font-medium text-muted-foreground">Label</span>
+                <div className="octo-branch-card__header">
+                  <GripVertical className="octo-branch-card__grip h-3.5 w-3.5" />
+                  <div className="octo-branch-card__body">
+                    <div className="octo-branch-card__grid">
+                      <div className="octo-branch-card__field">
+                        <span className="octo-branch-card__field-label">Label</span>
                         <Input
                           value={branch.label}
                           onChange={(e) => updateBranch(idx, { label: e.target.value })}
@@ -131,8 +131,8 @@ export default function ConditionalBranchesEditor({
                           className="h-8 text-sm"
                         />
                       </div>
-                      <div>
-                        <span className="block text-[11px] font-medium text-muted-foreground">Key</span>
+                      <div className="octo-branch-card__field">
+                        <span className="octo-branch-card__field-label">Key</span>
                         <Input
                           value={branch.key}
                           onChange={(e) => updateBranch(idx, { key: e.target.value })}
@@ -142,12 +142,12 @@ export default function ConditionalBranchesEditor({
                       </div>
                     </div>
                     {keyInvalid || duplicate ? (
-                      <p className="text-xs text-destructive">
+                      <p className="octo-branch-card__error">
                         {duplicate ? 'Branch keys must be unique within the field.' : keyInvalid}
                       </p>
                     ) : null}
 
-                    <div className="flex gap-1.5">
+                    <div className="octo-branch-card__kind-row">
                       <BranchKindPill
                         active={!isReference}
                         label="Inline fields"
@@ -230,7 +230,7 @@ export default function ConditionalBranchesEditor({
 
       {branches.some((b) => !b.key) ||
       (branches.length > 0 && new Set(branches.map((b) => b.key)).size !== branches.length) ? (
-        <p className="text-xs text-destructive">All branches must have a unique non-empty key.</p>
+        <p className="octo-dialog-field__error-xs">All branches must have a unique non-empty key.</p>
       ) : null}
       {usedKeys.size > 0 ? null : null}
     </div>
@@ -254,11 +254,7 @@ function BranchKindPill({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={cn(
-        'rounded-md border px-2.5 py-1 text-xs transition',
-        active ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-background hover:bg-muted/50',
-        disabled && 'cursor-not-allowed opacity-50',
-      )}
+      className={cn('octo-branch-kind-pill', active && 'octo-branch-kind-pill--active')}
     >
       {label}
     </button>
@@ -283,16 +279,16 @@ function NestedFieldList({
     onChange(next);
   };
   return (
-    <div className="space-y-1.5 rounded-md border border-border bg-muted/20 p-2">
+    <div className="octo-nested-field-list">
       {entries.length === 0 ? (
-        <p className="px-1 text-xs text-muted-foreground">No fields in this branch yet.</p>
+        <p className="octo-nested-field-list__empty">No fields in this branch yet.</p>
       ) : (
         entries.map(([key, field]) => (
-          <div key={key} className="flex items-center gap-1.5 rounded bg-background px-2 py-1.5">
-            <span className="flex-1 truncate text-xs">
-              <span className="font-medium">{field.label}</span>
-              <code className="ml-1.5 text-muted-foreground">{key}</code>
-              <span className="ml-2 rounded border border-border bg-muted/40 px-1 py-0.5 text-[10px] font-mono text-muted-foreground">
+          <div key={key} className="octo-nested-field-row">
+            <span className="octo-nested-field-row__info">
+              <span className="octo-nested-field-row__name">{field.label}</span>
+              <code className="octo-nested-field-row__key">{key}</code>
+              <span className="octo-nested-field-row__format">
                 {FIELD_FORMAT_META[field.format]?.label ?? field.format}
               </span>
             </span>

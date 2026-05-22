@@ -58,21 +58,18 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
   };
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <Section
         title="Toolbar"
         description="All buttons are enabled by default. Turn off any you do not want to expose."
       >
-        <div className="grid gap-1 sm:grid-cols-2">
+        <div className="octo-richtext-toolbar-grid">
           {TOOLBAR_KEYS.map(({ key, label }) => {
             const on = toolbar[key] !== false;
             return (
               <label
                 key={String(key)}
-                className={cn(
-                  'flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 text-xs hover:bg-muted/50',
-                  disabled && 'cursor-not-allowed opacity-50',
-                )}
+                className={cn('octo-richtext-toolbar-item', disabled && 'octo-richtext-toolbar-item--disabled')}
               >
                 <input type="checkbox" checked={on} disabled={disabled} onChange={() => setToolbar(key, !on)} />
                 <span>{label}</span>
@@ -83,8 +80,8 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
       </Section>
 
       <Section title="Embeds" description="Allow editors to embed live content alongside markdown text.">
-        <div className="space-y-2">
-          <label className="flex cursor-pointer items-center gap-2 text-xs">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={Boolean(embeds.references)}
@@ -94,9 +91,9 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
             <span>References to other entries</span>
           </label>
           {embeds.references ? (
-            <div className="space-y-1.5 rounded-md border border-border bg-muted/20 p-2">
+            <div className="octo-richtext-embed-options">
               <div>
-                <span className="block text-[11px] font-medium text-muted-foreground">Display</span>
+                <span style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'var(--muted)' }}>Display</span>
                 <Select
                   value={embeds.references.display ?? 'both'}
                   onValueChange={(v) =>
@@ -117,12 +114,16 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
                 </Select>
               </div>
               <div>
-                <span className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                <span
+                  style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'var(--muted)', marginBottom: 4 }}
+                >
                   Allowed collections (none = any)
                 </span>
-                <div className="flex flex-wrap gap-1">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                   {availableCollections.length === 0 ? (
-                    <span className="text-[11px] italic text-muted-foreground">No collections defined yet.</span>
+                    <span style={{ fontSize: 11, fontStyle: 'italic', color: 'var(--muted)' }}>
+                      No collections defined yet.
+                    </span>
                   ) : (
                     availableCollections.map((c) => {
                       const selected = embeds.references?.collections?.includes(c) === true;
@@ -143,10 +144,8 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
                             });
                           }}
                           className={cn(
-                            'rounded-md border px-2 py-0.5 text-[11px] font-mono transition',
-                            selected
-                              ? 'border-primary bg-primary/10 text-foreground'
-                              : 'border-border bg-background hover:bg-muted/50',
+                            'octo-richtext-collection-pill',
+                            selected && 'octo-richtext-collection-pill--selected',
                           )}
                         >
                           {c}
@@ -159,7 +158,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
             </div>
           ) : null}
 
-          <label className="flex cursor-pointer items-center gap-2 text-xs">
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={embeds.images === true}
@@ -169,7 +168,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
             <span>Images from media library</span>
           </label>
 
-          <label className="flex cursor-pointer items-center gap-2 text-xs">
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={embeds.conditions === true}
@@ -205,10 +204,10 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
 
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5">
+    <div className="octo-richtext-section">
       <div>
-        <h4 className="text-xs font-semibold text-foreground">{title}</h4>
-        {description ? <p className="text-[11px] text-muted-foreground">{description}</p> : null}
+        <h4 className="octo-richtext-section__title">{title}</h4>
+        {description ? <p className="octo-richtext-section__desc">{description}</p> : null}
       </div>
       {children}
     </div>
@@ -232,18 +231,15 @@ function VariablesEditor({
     setDraft('');
   };
   return (
-    <div className="space-y-1.5">
-      <div className="flex flex-wrap gap-1">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
         {value.map((v) => (
-          <span
-            key={v}
-            className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-1.5 py-0.5 font-mono text-[11px]"
-          >
+          <span key={v} className="octo-string-list__tag" style={{ fontFamily: 'var(--ft-mono)', fontSize: 11 }}>
             {v}
             <button
               type="button"
               onClick={() => onChange(value.filter((x) => x !== v))}
-              className="text-muted-foreground hover:text-destructive"
+              className="octo-string-list__tag-remove"
               disabled={disabled}
               aria-label={`Remove ${v}`}
             >
@@ -252,7 +248,7 @@ function VariablesEditor({
           </span>
         ))}
       </div>
-      <div className="flex gap-1.5">
+      <div className="octo-string-list__input-row">
         <Input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -307,17 +303,15 @@ function ComponentsEditor({
   };
 
   return (
-    <div className="space-y-1.5">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {entries.length === 0 ? (
-        <p className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
-          No custom components defined.
-        </p>
+        <p className="octo-checkbox-list__empty">No custom components defined.</p>
       ) : (
         entries.map(([name, def]) => (
-          <div key={name} className="rounded-md border border-border bg-background p-2 space-y-1.5">
-            <div className="grid grid-cols-2 gap-1.5">
-              <div>
-                <span className="block text-[11px] font-medium text-muted-foreground">Name (PascalCase)</span>
+          <div key={name} className="octo-branch-card" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="octo-branch-card__grid">
+              <div className="octo-branch-card__field">
+                <span className="octo-branch-card__field-label">Name (PascalCase)</span>
                 <Input
                   value={name}
                   onChange={(e) => renameComponent(name, e.target.value)}
@@ -325,8 +319,8 @@ function ComponentsEditor({
                   className="h-8 font-mono text-xs"
                 />
               </div>
-              <div>
-                <span className="block text-[11px] font-medium text-muted-foreground">Display label</span>
+              <div className="octo-branch-card__field">
+                <span className="octo-branch-card__field-label">Display label</span>
                 <Input
                   value={def.label}
                   onChange={(e) => updateComponent(name, { label: e.target.value })}
@@ -335,8 +329,8 @@ function ComponentsEditor({
                 />
               </div>
             </div>
-            <div>
-              <span className="block text-[11px] font-medium text-muted-foreground">Kind</span>
+            <div className="octo-branch-card__field">
+              <span className="octo-branch-card__field-label">Kind</span>
               <Select
                 value={def.kind}
                 onValueChange={(v) => updateComponent(name, { kind: v as 'inline' | 'block' })}
@@ -353,7 +347,9 @@ function ComponentsEditor({
             </div>
 
             <div>
-              <span className="mb-1 block text-[11px] font-medium text-muted-foreground">Props</span>
+              <span style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'var(--muted)', marginBottom: 4 }}>
+                Props
+              </span>
               <PropsEditor
                 value={def.props}
                 onChange={(props) => updateComponent(name, { props })}
@@ -361,7 +357,7 @@ function ComponentsEditor({
               />
             </div>
 
-            <div className="flex justify-end">
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Button
                 type="button"
                 variant="ghost"
@@ -405,9 +401,9 @@ function PropsEditor({
     );
   }
   return (
-    <div className="space-y-1">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       {value.map((p, i) => (
-        <div key={i} className="grid grid-cols-[1fr_1fr_120px_auto] gap-1">
+        <div key={i} className="octo-richtext-props-grid">
           <Input
             placeholder="name"
             value={p.name}

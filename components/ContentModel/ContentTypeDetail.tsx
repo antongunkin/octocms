@@ -85,15 +85,15 @@ export default function ContentTypeDetail({ type }: Props) {
   // Loading state — render the field-table skeleton while schema resolves.
   if (isLoading || !schema) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden bg-[var(--bg)]">
-        <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
+      <div className="octo-content-model">
+        <div className="octo-page-chrome">
           <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
             <Link href="/cms/model" aria-label="Back to Content Model">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
         </div>
-        <div className="flex-1 px-6 pt-5">
+        <div className="octo-schema-detail__main">
           <FieldTableSkeleton />
         </div>
       </div>
@@ -102,11 +102,10 @@ export default function ContentTypeDetail({ type }: Props) {
 
   if (!collection) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 bg-[var(--bg)] p-6 text-center">
-        <p className="text-sm font-medium text-foreground">Content type not found</p>
-        <p className="max-w-sm text-sm text-muted-foreground">
-          No collection with key <code className="rounded bg-muted px-1 py-0.5 font-mono">{type}</code> exists in the
-          schema.
+      <div className="octo-not-found">
+        <p className="octo-not-found__title">Content type not found</p>
+        <p className="octo-not-found__desc">
+          No collection with key <code className="octo-not-found__code">{type}</code> exists in the schema.
         </p>
         <Button asChild variant="outline" size="sm">
           <Link href="/cms/model">Back to Content Model</Link>
@@ -184,69 +183,71 @@ export default function ContentTypeDetail({ type }: Props) {
   // ---------------------------------------------------------------------
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="octo-content-model">
       {/* Page header — same chrome as DashboardContent / EditPost */}
-      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
-            <Link href="/cms/model" aria-label="Back to Content Model">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div className="min-w-0 flex-1">
-            <div className="mb-px flex items-center gap-1.5 text-[12px]" style={{ color: 'var(--text-2)' }}>
-              <Link
-                href="/cms/model"
-                className="transition-colors hover:text-foreground"
-                style={{ color: 'var(--text-2)' }}
-              >
-                Model
+      <div className="octo-page-chrome">
+        <div className="octo-page-chrome__title-area">
+          <div style={{ display: 'flex', minWidth: 0, flex: 1, alignItems: 'center', gap: 8 }}>
+            <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
+              <Link href="/cms/model" aria-label="Back to Content Model">
+                <ArrowLeft className="h-4 w-4" />
               </Link>
-              <ChevronRight className="h-3 w-3 opacity-60" />
-              <span className="font-mono text-[11px] text-[var(--muted)]">{type}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {collection.hasMany ? (
-                <Layers className="h-4 w-4 shrink-0 text-muted-foreground" />
-              ) : (
-                <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
-              )}
-              <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-                {collection.label}
-              </h1>
+            </Button>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div className="octo-page-chrome__breadcrumb">
+                <Link
+                  href="/cms/model"
+                  className="transition-colors hover:text-foreground"
+                  style={{ color: 'var(--text-2)' }}
+                >
+                  Model
+                </Link>
+                <ChevronRight className="h-3 w-3 opacity-60" />
+                <span style={{ fontFamily: 'var(--ft-mono)', fontSize: 11, color: 'var(--muted)' }}>{type}</span>
+              </div>
+              <div className="octo-page-chrome__title-row">
+                {collection.hasMany ? (
+                  <Layers className="h-4 w-4 shrink-0 text-muted-foreground" />
+                ) : (
+                  <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                )}
+                <h1 className="octo-page-chrome__title">{collection.label}</h1>
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex flex-none items-center gap-2">
-          <Button
-            size="sm"
-            className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
-            onClick={() => setAddFieldOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
-            Add field
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="outline" aria-label="More actions" className="h-9 w-9">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => setEditOpen(true)}>
-                <Pencil className="mr-2 h-3.5 w-3.5" />
-                Edit content type
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onSelect={() => setDeleteOpen(true)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="mr-2 h-3.5 w-3.5" />
-                Delete content type
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="octo-page-chrome__right">
+          <div className="octo-hdr-right">
+            <Button
+              size="sm"
+              className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
+              onClick={() => setAddFieldOpen(true)}
+            >
+              <Plus className="h-4 w-4" />
+              Add field
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="outline" aria-label="More actions" className="h-9 w-9">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => setEditOpen(true)}>
+                  <Pencil className="mr-2 h-3.5 w-3.5" />
+                  Edit content type
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => setDeleteOpen(true)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-3.5 w-3.5" />
+                  Delete content type
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
@@ -282,9 +283,9 @@ export default function ContentTypeDetail({ type }: Props) {
         />
       ) : null}
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="octo-schema-detail">
         {/* Main content column — independently scrollable */}
-        <div className="flex flex-1 flex-col overflow-y-auto bg-[var(--bg)] px-6 pb-12 pt-5">
+        <div className="octo-schema-detail__main">
           <Tabs defaultValue="fields" className="flex flex-1 flex-col">
             <TabsList className="self-start">
               <TabsTrigger value="fields">Fields</TabsTrigger>
@@ -355,12 +356,10 @@ export default function ContentTypeDetail({ type }: Props) {
                               <button
                                 type="button"
                                 onClick={() => setEditFieldKey(key)}
-                                className="flex flex-col items-start text-left hover:underline"
+                                className="octo-field-table__label-btn"
                               >
-                                <span className="font-medium">{field.label}</span>
-                                {field.hint ? (
-                                  <span className="mt-0.5 text-xs text-muted-foreground">{field.hint}</span>
-                                ) : null}
+                                <span className="octo-field-table__label-name">{field.label}</span>
+                                {field.hint ? <span className="octo-field-table__label-hint">{field.hint}</span> : null}
                               </button>
                             </TableCell>
                             <TableCell className="font-mono text-xs text-muted-foreground">{key}</TableCell>
@@ -383,12 +382,12 @@ export default function ContentTypeDetail({ type }: Props) {
                                 disabled={!titleAllowed || field.entryTitle === true}
                                 onClick={() => void setEntryTitle(key)}
                                 className={cn(
-                                  'inline-flex h-7 w-7 items-center justify-center rounded-full transition',
+                                  'octo-field-table__star',
                                   field.entryTitle
-                                    ? 'bg-amber-950 text-amber-400 light:bg-amber-50 light:text-amber-500'
+                                    ? 'octo-field-table__star--active'
                                     : titleAllowed
-                                      ? 'text-muted-foreground hover:bg-muted hover:text-amber-500'
-                                      : 'cursor-not-allowed text-muted-foreground/30',
+                                      ? 'octo-field-table__star--allowed'
+                                      : 'octo-field-table__star--disabled',
                                 )}
                                 aria-pressed={field.entryTitle === true}
                                 aria-label={field.entryTitle ? 'Current entry title' : 'Set as entry title'}
@@ -437,7 +436,7 @@ export default function ContentTypeDetail({ type }: Props) {
 
             <TabsContent value="json" className="mt-4 flex-1">
               <Card className="overflow-hidden p-0">
-                <pre className="m-0 max-h-[70vh] overflow-auto bg-[var(--surface-2)] p-4 font-mono text-xs leading-5 text-foreground">
+                <pre className="octo-field-table__json-pre">
                   <code>{collectionJson}</code>
                 </pre>
               </Card>
@@ -446,39 +445,39 @@ export default function ContentTypeDetail({ type }: Props) {
         </div>
 
         {/* Sidebar — same chrome as EditPost */}
-        <aside className="flex w-[280px] shrink-0 flex-col gap-5 overflow-y-auto border-l border-border bg-[var(--surface-2)] px-4 py-5">
-          <div>
-            <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-              Type details
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Key</span>
-                <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-foreground" title={type}>
+        <aside className="octo-schema-detail__aside">
+          <div className="octo-schema-detail__aside-section">
+            <div className="octo-schema-detail__aside-label">Type details</div>
+            <div className="octo-schema-detail__detail-rows">
+              <div className="octo-schema-detail__detail-row">
+                <span className="octo-schema-detail__detail-key">Key</span>
+                <span className="octo-schema-detail__detail-val octo-schema-detail__detail-val--mono" title={type}>
                   {type}
                 </span>
               </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Cardinality</span>
-                <span className="flex-1 text-foreground">{collection.hasMany ? 'Many entries' : 'Singleton'}</span>
+              <div className="octo-schema-detail__detail-row">
+                <span className="octo-schema-detail__detail-key">Cardinality</span>
+                <span className="octo-schema-detail__detail-val">
+                  {collection.hasMany ? 'Many entries' : 'Singleton'}
+                </span>
               </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Entry title</span>
-                <span className="min-w-0 flex-1 truncate text-foreground">
+              <div className="octo-schema-detail__detail-row">
+                <span className="octo-schema-detail__detail-key">Entry title</span>
+                <span className="octo-schema-detail__detail-val">
                   {entryTitleKey ? (
-                    <code className="font-mono text-[11px]">{entryTitleKey}</code>
+                    <code className="octo-schema-detail__detail-val--mono">{entryTitleKey}</code>
                   ) : (
-                    <span className="text-muted-foreground">— not set —</span>
+                    <span style={{ color: 'var(--muted)' }}>— not set —</span>
                   )}
                 </span>
               </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Fields</span>
-                <span className="flex-1 text-foreground">{fields.length}</span>
+              <div className="octo-schema-detail__detail-row">
+                <span className="octo-schema-detail__detail-key">Fields</span>
+                <span className="octo-schema-detail__detail-val">{fields.length}</span>
               </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Entries</span>
-                <span className="flex-1 text-foreground">{entryCount}</span>
+              <div className="octo-schema-detail__detail-row">
+                <span className="octo-schema-detail__detail-key">Entries</span>
+                <span className="octo-schema-detail__detail-val">{entryCount}</span>
               </div>
             </div>
           </div>
@@ -495,10 +494,7 @@ export default function ContentTypeDetail({ type }: Props) {
 function FormatBadge({ field }: { field: CollectionField }) {
   const meta = FIELD_FORMAT_META[field.format];
   return (
-    <span
-      className="inline-flex items-center rounded-md border border-border bg-muted/40 px-2 py-0.5 font-mono text-xs text-foreground"
-      title={meta?.description ?? field.format}
-    >
+    <span className="octo-field-table__format-badge" title={meta?.description ?? field.format}>
       {field.format}
     </span>
   );
@@ -552,18 +548,19 @@ function FieldFlags({ field }: { field: CollectionField }) {
   }
 
   if (flags.length === 0) {
-    return <span className="text-xs text-muted-foreground">—</span>;
+    return (
+      <span className="octo-field-table__flags">
+        <span className="text-xs text-muted-foreground">—</span>
+      </span>
+    );
   }
 
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="octo-field-table__flags">
       {flags.map((flag, i) => (
         <span
           key={i}
-          className={cn(
-            'inline-flex items-center rounded-md border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground',
-            flag === 'required' && 'border-blue-200 bg-blue-50 text-blue-700',
-          )}
+          className={cn('octo-field-table__flag', flag === 'required' && 'octo-field-table__flag--required')}
         >
           {flag}
         </span>

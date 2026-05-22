@@ -127,26 +127,26 @@ export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fi
         </DialogHeader>
 
         {previewing ? (
-          <p className="text-sm text-muted-foreground">Checking impact…</p>
+          <p className="octo-dialog-field__hint">Checking impact…</p>
         ) : preview && !preview.valid ? (
-          <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-            <p className="font-medium">The change is invalid:</p>
-            <ul className="mt-1 list-disc space-y-1 pl-4 text-xs">
+          <div className="octo-error-box">
+            <p className="octo-error-box__title">The change is invalid:</p>
+            <ul className="octo-error-box__list octo-error-box__list--sm">
               {preview.errors.map((e, i) => (
                 <li key={i}>{e}</li>
               ))}
             </ul>
-            <p className="mt-2 text-xs">
+            <p className="octo-error-box__note">
               Cancel and adjust the schema first (e.g. set a different field as the entry title or add a slugSource).
             </p>
           </div>
         ) : preview ? (
-          <div className="space-y-3">
+          <div className="octo-dialog-fields">
             {ownEntries.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Schema-only change — no entries store this field.</p>
+              <p className="octo-dialog-field__hint">Schema-only change — no entries store this field.</p>
             ) : (
               <>
-                <p className="text-xs text-muted-foreground">
+                <p className="octo-dialog-field__hint">
                   Any value stored in <code className="font-mono">{fieldKey}</code> on these entries will be discarded.
                 </p>
                 <SchemaImpactList
@@ -157,8 +157,8 @@ export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fi
               </>
             )}
 
-            <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm">
-              <label htmlFor="field-confirm" className="mb-1.5 block font-medium text-destructive">
+            <div className="octo-confirm-box">
+              <label htmlFor="field-confirm" className="octo-confirm-box__label">
                 Type <code className="font-mono">{fieldKey}</code> to confirm
               </label>
               <Input

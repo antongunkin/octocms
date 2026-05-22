@@ -104,38 +104,34 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
   const filteredEntries = selectedFolder ? mediaEntries.filter((f) => f.folder === selectedFolder) : mediaEntries;
 
   return (
-    <div className="my-2 rounded-lg border border-border bg-muted/30 p-3" contentEditable={false}>
+    <div className="octo-image-embed" contentEditable={false}>
       {currentMediaId && selectedEntry ? (
-        <div className="flex items-start gap-3">
-          <div className="relative w-48 h-32 rounded-lg border border-border overflow-hidden bg-muted flex-none">
+        <div className="octo-image-embed__selected">
+          <div className="octo-image-embed__thumb-wrap">
             <img
               src={selectedEntry.publicUrl}
               alt={selectedEntry.title || selectedEntry.originalName || ''}
-              className="w-full h-full object-cover"
+              className="octo-image-embed__thumb"
             />
-            <button
-              type="button"
-              onClick={() => updateMediaId('')}
-              className="absolute top-1 right-1 rounded-full bg-black/60 text-white p-0.5 hover:bg-black/80"
-            >
-              <X className="w-3.5 h-3.5" />
+            <button type="button" onClick={() => updateMediaId('')} className="octo-image-embed__clear">
+              <X style={{ width: 14, height: 14 }} />
             </button>
           </div>
-          <div className="flex flex-col gap-1.5 pt-1">
-            <span className="text-xs font-medium text-muted-foreground">Image embed</span>
-            <span className="text-sm break-all">{selectedEntry.title || selectedEntry.originalName}</span>
+          <div className="octo-image-embed__info">
+            <span className="octo-image-embed__info-label">Image embed</span>
+            <span className="octo-image-embed__info-name">{selectedEntry.title || selectedEntry.originalName}</span>
             <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
               Change image
             </Button>
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-3">
-          <div className="w-16 h-16 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/50 flex-none">
-            <ImageIcon className="w-6 h-6 text-muted-foreground" />
+        <div className="octo-image-embed__empty-state">
+          <div className="octo-image-embed__placeholder">
+            <ImageIcon className="octo-image-embed__placeholder-icon" style={{ width: 24, height: 24 }} />
           </div>
           <div>
-            <span className="text-sm text-muted-foreground block mb-1">No image selected</span>
+            <span className="octo-image-embed__no-label">No image selected</span>
             <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
               Select image
             </Button>

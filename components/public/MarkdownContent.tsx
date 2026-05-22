@@ -4,8 +4,6 @@ import Markdown from 'react-markdown';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import remarkGfm from 'remark-gfm';
 
-import { cn } from '../../lib/utils';
-
 /**
  * Sanitization schema: extends the default GitHub-flavoured schema with
  * the same tag/attribute allowlist that was previously applied via sanitize-html.
@@ -38,7 +36,7 @@ const MarkdownContent = ({ children, className }: MarkdownContentProps) => {
   }
 
   return (
-    <div className={cn(className)}>
+    <div className={`octo-markdown-content${className ? ` ${className}` : ''}`}>
       <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}>
         {children}
       </Markdown>

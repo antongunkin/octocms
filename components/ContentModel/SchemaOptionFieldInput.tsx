@@ -40,13 +40,13 @@ export default function SchemaOptionFieldInput({
   disabled,
 }: Props) {
   return (
-    <div className="space-y-1.5">
-      <label className="block text-xs font-medium text-foreground">
+    <div className="octo-option-field-input">
+      <label className="octo-option-field-input__label">
         {spec.label}
-        {spec.required ? <span className="ml-0.5 text-destructive">*</span> : null}
+        {spec.required ? <span className="octo-option-field-input__required">*</span> : null}
       </label>
       {renderControl({ spec, value, onChange, availableCollections, selectOptions, disabled })}
-      {spec.description ? <p className="text-xs text-muted-foreground">{spec.description}</p> : null}
+      {spec.description ? <p className="octo-option-field-input__desc">{spec.description}</p> : null}
     </div>
   );
 }
@@ -163,7 +163,7 @@ function renderControl({
         />
       );
     default:
-      return <p className="text-xs text-muted-foreground">Unsupported option type: {spec.type}</p>;
+      return <p className="octo-option-field-input__desc">Unsupported option type: {spec.type}</p>;
   }
 }
 
@@ -188,24 +188,10 @@ function BooleanToggle({
       onClick={() => onChange(!value)}
       disabled={disabled}
       aria-pressed={value}
-      className={cn(
-        'inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs transition',
-        value ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-background hover:bg-muted/50',
-        disabled && 'cursor-not-allowed opacity-50',
-      )}
+      className={cn('octo-bool-toggle', value && 'octo-bool-toggle--on')}
     >
-      <span
-        className={cn(
-          'inline-block h-3 w-6 shrink-0 rounded-full bg-muted-foreground/30 transition',
-          value && 'bg-primary',
-        )}
-      >
-        <span
-          className={cn(
-            'block h-3 w-3 rounded-full bg-background shadow transition',
-            value ? 'translate-x-3' : 'translate-x-0',
-          )}
-        />
+      <span className="octo-bool-toggle__track">
+        <span className="octo-bool-toggle__thumb" />
       </span>
       <span>{value ? 'On' : 'Off'}</span>
       <span className="sr-only">{label}</span>
@@ -225,23 +211,13 @@ function CollectionsCheckboxList({
   disabled?: boolean;
 }) {
   if (available.length === 0) {
-    return (
-      <p className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
-        No collections in the schema yet.
-      </p>
-    );
+    return <p className="octo-checkbox-list__empty">No collections in the schema yet.</p>;
   }
   const selected = new Set(value);
   return (
-    <div className="space-y-1 rounded-md border border-border bg-background p-2 max-h-44 overflow-auto">
+    <div className="octo-checkbox-list">
       {available.map((c) => (
-        <label
-          key={c}
-          className={cn(
-            'flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 text-xs hover:bg-muted/50',
-            disabled && 'cursor-not-allowed opacity-50',
-          )}
-        >
+        <label key={c} className={cn('octo-checkbox-list__item', disabled && 'octo-checkbox-list__item--disabled')}>
           <input
             type="checkbox"
             disabled={disabled}
@@ -257,7 +233,7 @@ function CollectionsCheckboxList({
         </label>
       ))}
       {value.length === 0 ? (
-        <p className="px-1.5 pt-1 text-[11px] italic text-muted-foreground">
+        <p style={{ padding: '4px 6px', fontSize: 11, fontStyle: 'italic', color: 'var(--muted)' }}>
           None selected — references can target any collection.
         </p>
       ) : null}
@@ -278,14 +254,11 @@ function DefaultOptionsCheckboxList({
 }) {
   const selected = new Set(value);
   return (
-    <div className="space-y-1 rounded-md border border-border bg-background p-2 max-h-44 overflow-auto">
+    <div className="octo-checkbox-list">
       {options.map((o) => (
         <label
           key={o.value}
-          className={cn(
-            'flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 text-xs hover:bg-muted/50',
-            disabled && 'cursor-not-allowed opacity-50',
-          )}
+          className={cn('octo-checkbox-list__item', disabled && 'octo-checkbox-list__item--disabled')}
         >
           <input
             type="checkbox"
@@ -330,15 +303,13 @@ function SelectOptionsEditor({
   }
 
   return (
-    <div className="space-y-1.5">
-      <div className="space-y-1">
+    <div className="octo-select-options">
+      <div>
         {value.length === 0 ? (
-          <p className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
-            No options yet — add at least one.
-          </p>
+          <p className="octo-select-options__empty">No options yet — add at least one.</p>
         ) : (
           value.map((o, i) => (
-            <div key={i} className="flex items-center gap-1.5">
+            <div key={i} className="octo-select-option-row">
               <Input
                 placeholder="Label"
                 value={o.label}
@@ -374,7 +345,7 @@ function SelectOptionsEditor({
       <Button type="button" variant="outline" size="sm" onClick={add} disabled={disabled} className="h-7 text-xs">
         <Plus className="mr-1 h-3 w-3" /> Add option
       </Button>
-      {valueDuplicates.size > 0 ? <p className="text-xs text-destructive">Option values must be unique.</p> : null}
+      {valueDuplicates.size > 0 ? <p className="octo-dialog-field__error-xs">Option values must be unique.</p> : null}
     </div>
   );
 }
@@ -396,18 +367,15 @@ function StringListEditor({
     setDraft('');
   };
   return (
-    <div className="space-y-1.5">
-      <div className="flex flex-wrap gap-1">
+    <div className="octo-string-list">
+      <div className="octo-string-list__tags">
         {value.map((v) => (
-          <span
-            key={v}
-            className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-1.5 py-0.5 text-xs"
-          >
+          <span key={v} className="octo-string-list__tag">
             <code className="font-mono">{v}</code>
             <button
               type="button"
               onClick={() => onChange(value.filter((x) => x !== v))}
-              className="text-muted-foreground hover:text-destructive"
+              className="octo-string-list__tag-remove"
               disabled={disabled}
               aria-label={`Remove ${v}`}
             >
@@ -416,7 +384,7 @@ function StringListEditor({
           </span>
         ))}
       </div>
-      <div className="flex gap-1.5">
+      <div className="octo-string-list__input-row">
         <Input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}

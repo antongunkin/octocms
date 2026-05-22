@@ -105,10 +105,10 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
-          <div>
-            <label htmlFor="ct-name" className="mb-1.5 block text-sm font-medium text-foreground">
-              Name <span className="text-muted-foreground">(required)</span>
+        <div className="octo-dialog-fields">
+          <div className="octo-dialog-field">
+            <label htmlFor="ct-name" className="octo-dialog-field__label">
+              Name <span className="octo-dialog-field__optional">required</span>
             </label>
             <Input
               id="ct-name"
@@ -118,7 +118,7 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
               placeholder="e.g. Recipe"
               disabled={busy}
             />
-            <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+            <div className="octo-dialog-field__hint-row">
               <span>Appears in entry lists and the editor header.</span>
               <span>
                 {trimmedName.length} / {NAME_LIMIT}
@@ -126,9 +126,9 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
             </div>
           </div>
 
-          <div>
-            <label htmlFor="ct-key" className="mb-1.5 block text-sm font-medium text-foreground">
-              API identifier <span className="text-muted-foreground">(required)</span>
+          <div className="octo-dialog-field">
+            <label htmlFor="ct-key" className="octo-dialog-field__label">
+              API identifier <span className="octo-dialog-field__optional">required</span>
             </label>
             <Input
               id="ct-key"
@@ -143,21 +143,26 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
               disabled={busy}
               aria-invalid={Boolean(keyError || duplicateKey)}
             />
-            <div className="mt-1 flex justify-between gap-3 text-xs">
-              <span className={cn('text-muted-foreground', (keyError || duplicateKey) && 'text-destructive')}>
+            <div className="octo-dialog-field__hint-row">
+              <span
+                className={cn(
+                  'octo-dialog-field__hint',
+                  (keyError || duplicateKey) && 'octo-dialog-field__hint--error',
+                )}
+              >
                 {duplicateKey
                   ? `A content type with key "${trimmedKey}" already exists.`
                   : (keyError ?? 'Used in JSON, generated types, and the query API.')}
               </span>
-              <span className="text-muted-foreground">
+              <span className="octo-dialog-field__hint">
                 {trimmedKey.length} / {KEY_LIMIT}
               </span>
             </div>
           </div>
 
-          <div>
-            <span className="mb-1.5 block text-sm font-medium text-foreground">Cardinality</span>
-            <div className="grid grid-cols-2 gap-2">
+          <div className="octo-dialog-field">
+            <span className="octo-dialog-field__label">Cardinality</span>
+            <div className="octo-cardinality-grid">
               <CardinalityOption
                 active={hasMany}
                 disabled={busy}
@@ -212,19 +217,13 @@ function CardinalityOption({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={cn(
-        'flex flex-col items-start gap-1 rounded-md border p-3 text-left transition',
-        active
-          ? 'border-primary bg-primary/10 ring-1 ring-primary/40 text-foreground'
-          : 'border-border bg-background hover:bg-muted/50',
-        disabled && 'cursor-not-allowed opacity-50',
-      )}
+      className={cn('octo-cardinality-option', active && 'octo-cardinality-option--active')}
     >
-      <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+      <span className="octo-cardinality-option__title">
         {icon}
         {title}
       </span>
-      <span className="text-xs text-muted-foreground">{description}</span>
+      <span className="octo-cardinality-option__desc">{description}</span>
     </button>
   );
 }

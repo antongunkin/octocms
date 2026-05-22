@@ -32,22 +32,18 @@ const VariableEmbedEditor: React.FC<JsxEditorProps & { allowedVariables?: string
 
   const variables = allowedVariables ?? [];
 
-  const selectClassName =
-    'max-w-[min(280px,85vw)] rounded-md border border-violet-600 bg-violet-950 px-1.5 py-0.5 text-xs font-medium ' +
-    'text-violet-100 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400/50 ' +
-    'light:border-violet-300 light:bg-white light:text-violet-900';
-
   // If the variable is set and in the allowed list (or no allowed list), show the pill + visible select
   if (currentName && (variables.length === 0 || variables.includes(currentName))) {
     return (
-      <span
-        className="inline-flex items-center gap-1.5 rounded-full bg-violet-900 text-violet-200 text-xs font-medium
-          px-2 py-0.5 mx-0.5 align-baseline light:bg-violet-100 light:text-violet-800"
-        contentEditable={false}
-      >
-        <Variable className="w-3 h-3 shrink-0" aria-hidden />
+      <span className="octo-var-embed octo-var-embed--set" contentEditable={false}>
+        <Variable className="octo-var-embed__icon" aria-hidden />
         {variables.length > 0 ? (
-          <select value={currentName} onChange={handleChange} className={selectClassName} aria-label="Change variable">
+          <select
+            value={currentName}
+            onChange={handleChange}
+            className="octo-var-embed__select"
+            aria-label="Change variable"
+          >
             {variables.map((v) => (
               <option key={v} value={v}>
                 {v}
@@ -63,15 +59,15 @@ const VariableEmbedEditor: React.FC<JsxEditorProps & { allowedVariables?: string
 
   // No variable selected yet — show a compact picker
   return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full border border-dashed border-violet-700 bg-violet-950
-        text-violet-300 text-xs font-medium px-2 py-0.5 mx-0.5 align-baseline light:bg-violet-50
-        light:text-violet-600 light:border-violet-400"
-      contentEditable={false}
-    >
-      <Variable className="w-3 h-3 shrink-0" />
+    <span className="octo-var-embed octo-var-embed--unset" contentEditable={false}>
+      <Variable className="octo-var-embed__icon" />
       {variables.length > 0 ? (
-        <select value={currentName} onChange={handleChange} className={selectClassName} aria-label="Select variable">
+        <select
+          value={currentName}
+          onChange={handleChange}
+          className="octo-var-embed__select"
+          aria-label="Select variable"
+        >
           <option value="">Pick variable…</option>
           {variables.map((v) => (
             <option key={v} value={v}>
@@ -80,7 +76,7 @@ const VariableEmbedEditor: React.FC<JsxEditorProps & { allowedVariables?: string
           ))}
         </select>
       ) : (
-        <span className="text-violet-400 italic">No variables configured</span>
+        <span className="octo-var-embed__none">No variables configured</span>
       )}
     </span>
   );

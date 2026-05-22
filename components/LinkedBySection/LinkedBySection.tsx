@@ -33,9 +33,9 @@ const LinkedBySection = ({ entryPath }: LinkedBySectionProps) => {
 
   if (isLoading) {
     return (
-      <div>
-        <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Links</div>
-        <div className="text-sm text-muted-foreground">Loading...</div>
+      <div className="octo-linked-by">
+        <div className="octo-linked-by__title">Links</div>
+        <div className="octo-linked-by__loading">Loading...</div>
       </div>
     );
   }
@@ -43,12 +43,12 @@ const LinkedBySection = ({ entryPath }: LinkedBySectionProps) => {
   if (backlinks.length === 0) return null;
 
   return (
-    <div>
-      <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Links</div>
-      <p className="text-sm text-muted-foreground mb-2">
+    <div className="octo-linked-by">
+      <div className="octo-linked-by__title">Links</div>
+      <p className="octo-linked-by__summary">
         {backlinks.length === 1 ? '1 entry links' : `${backlinks.length} entries link`} to this entry:
       </p>
-      <ul className="space-y-1">
+      <ul className="octo-linked-by__list">
         {backlinks.map((link) => {
           const linkCollectionLabel = config.collections[link.type as keyof Config['collections']]?.label || link.type;
           return (
@@ -63,12 +63,12 @@ const LinkedBySection = ({ entryPath }: LinkedBySectionProps) => {
                     title: link.title,
                   })
                 }
-                className="flex items-center gap-2 w-full text-left px-2 py-1.5 rounded-md hover:bg-muted/50 transition-colors group"
+                className="octo-linked-by__item"
               >
-                <Link2 className="w-3.5 h-3.5 text-muted-foreground flex-none" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate group-hover:text-primary">{link.title}</div>
-                  <div className="text-xs text-muted-foreground">{linkCollectionLabel}</div>
+                <Link2 className="octo-linked-by__item-icon" />
+                <div className="octo-linked-by__item-body">
+                  <div className="octo-linked-by__item-title">{link.title}</div>
+                  <div className="octo-linked-by__item-type">{linkCollectionLabel}</div>
                 </div>
               </button>
             </li>

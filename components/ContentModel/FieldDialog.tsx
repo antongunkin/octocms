@@ -274,11 +274,11 @@ export default function FieldDialog(props: Props) {
               }}
             />
           ) : (
-            <div className="space-y-4 py-1">
-              <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-muted/20 px-3 py-2">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="font-mono text-[11px] text-muted-foreground">format:</span>
-                  <span className="rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[11px]">
+            <div className="octo-dialog-fields">
+              <div className="octo-field-dialog__format-row">
+                <div className="octo-field-dialog__format-info">
+                  <span className="octo-field-dialog__format-key">format:</span>
+                  <span className="octo-field-dialog__format-badge">
                     {meta?.label} ({draft.format})
                   </span>
                 </div>
@@ -311,9 +311,9 @@ export default function FieldDialog(props: Props) {
               </div>
 
               {/* Common fields */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <span className="mb-1 block text-xs font-medium text-foreground">Label</span>
+              <div className="octo-field-common-grid">
+                <div className="octo-dialog-field">
+                  <span className="octo-dialog-field__label-xs">Label</span>
                   <Input
                     value={draft.label}
                     maxLength={NAME_LIMIT}
@@ -321,10 +321,10 @@ export default function FieldDialog(props: Props) {
                     disabled={busy}
                     placeholder="Title"
                   />
-                  {labelError ? <p className="mt-1 text-[11px] text-destructive">{labelError}</p> : null}
+                  {labelError ? <p className="octo-dialog-field__error-xs">{labelError}</p> : null}
                 </div>
-                <div>
-                  <span className="mb-1 block text-xs font-medium text-foreground">Key</span>
+                <div className="octo-dialog-field">
+                  <span className="octo-dialog-field__label-xs">Key</span>
                   <Input
                     value={draft.key}
                     maxLength={KEY_LIMIT}
@@ -338,8 +338,8 @@ export default function FieldDialog(props: Props) {
                   />
                   <p
                     className={cn(
-                      'mt-1 text-[11px] text-muted-foreground',
-                      (keyError || duplicateKey) && 'text-destructive',
+                      'octo-dialog-field__hint-xs',
+                      (keyError || duplicateKey) && 'octo-dialog-field__hint--error',
                     )}
                   >
                     {duplicateKey
@@ -349,8 +349,8 @@ export default function FieldDialog(props: Props) {
                 </div>
               </div>
 
-              <div>
-                <span className="mb-1 block text-xs font-medium text-foreground">Hint</span>
+              <div className="octo-dialog-field">
+                <span className="octo-dialog-field__label-xs">Hint</span>
                 <Input
                   value={draft.hint}
                   onChange={(e) => setDraft((d) => ({ ...d, hint: e.target.value }))}
@@ -359,7 +359,7 @@ export default function FieldDialog(props: Props) {
                 />
               </div>
 
-              <div className="grid gap-2 sm:grid-cols-3">
+              <div className="octo-field-dialog__toggle-grid">
                 <ToggleCheckbox
                   label="Required"
                   description="Block save until non-empty"
@@ -385,8 +385,8 @@ export default function FieldDialog(props: Props) {
 
               {/* Per-format options */}
               {meta && meta.optionFields.length > 0 ? (
-                <div className="space-y-3 rounded-md border border-border bg-background p-3">
-                  <h4 className="text-xs font-semibold text-foreground">Options</h4>
+                <div className="octo-field-dialog__options">
+                  <h4 className="octo-field-dialog__options-heading">Options</h4>
                   {/* When `select.multiple` is true we hide `defaultOption`, and when false
                       we hide `defaultOptions`. */}
                   {meta.optionFields
@@ -411,8 +411,8 @@ export default function FieldDialog(props: Props) {
               ) : null}
 
               {draft.format === 'conditional' ? (
-                <div className="space-y-2 rounded-md border border-border bg-background p-3">
-                  <h4 className="text-xs font-semibold text-foreground">Branches</h4>
+                <div className="octo-field-dialog__options">
+                  <h4 className="octo-field-dialog__options-heading">Branches</h4>
                   <ConditionalBranchesEditor
                     branches={draft.branches}
                     onChange={(branches) => setDraft((d) => ({ ...d, branches }))}
@@ -426,8 +426,8 @@ export default function FieldDialog(props: Props) {
               ) : null}
 
               {draft.format === 'richtext' ? (
-                <div className="space-y-2 rounded-md border border-border bg-background p-3">
-                  <h4 className="text-xs font-semibold text-foreground">Rich text configuration</h4>
+                <div className="octo-field-dialog__options">
+                  <h4 className="octo-field-dialog__options-heading">Rich text configuration</h4>
                   <RichTextOptionsEditor
                     value={draft.richtext}
                     onChange={(richtext) => setDraft((d) => ({ ...d, richtext }))}
@@ -439,9 +439,9 @@ export default function FieldDialog(props: Props) {
 
               {/* Preview / impact */}
               {preview && !preview.valid ? (
-                <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
-                  <p className="font-medium">The change is invalid:</p>
-                  <ul className="mt-1 list-disc space-y-1 pl-4">
+                <div className="octo-error-box">
+                  <p className="octo-error-box__title">The change is invalid:</p>
+                  <ul className="octo-error-box__list">
                     {preview.errors.map((e, i) => (
                       <li key={i}>{e}</li>
                     ))}
@@ -458,7 +458,7 @@ export default function FieldDialog(props: Props) {
               ) : null}
 
               {formatChanged ? (
-                <div className="rounded-md border border-amber-900 bg-amber-950 p-2.5 text-xs text-amber-200 light:border-amber-200 light:bg-amber-50 light:text-amber-900">
+                <div className="octo-inline-warn">
                   <strong>Heads up:</strong> changing format from <code>{initialField?.format}</code> to{' '}
                   <code>{draft.format}</code> may discard existing values that cannot be safely coerced. Click{' '}
                   <em>Preview</em> to see which entries will lose data.
@@ -544,7 +544,7 @@ function FormatPicker({
   onPick: (format: FieldFormat) => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-2 py-2 sm:grid-cols-3">
+    <div className="octo-format-picker">
       {FIELD_FORMATS.map((fmt) => {
         const meta = FIELD_FORMAT_META[fmt];
         const active = fmt === currentFormat;
@@ -553,16 +553,11 @@ function FormatPicker({
             key={fmt}
             type="button"
             onClick={() => onPick(fmt)}
-            className={cn(
-              'flex flex-col items-start gap-1 rounded-md border p-2.5 text-left transition',
-              active
-                ? 'border-primary bg-primary/10 ring-1 ring-primary/40'
-                : 'border-border bg-background hover:bg-muted/50',
-            )}
+            className={cn('octo-format-card', active && 'octo-format-card--active')}
           >
-            <span className="text-sm font-semibold text-foreground">{meta.label}</span>
-            <code className="text-[10px] font-mono text-muted-foreground">{fmt}</code>
-            <p className="text-[11px] leading-snug text-muted-foreground line-clamp-3">{meta.description}</p>
+            <span className="octo-format-card__label">{meta.label}</span>
+            <code className="octo-format-card__code">{fmt}</code>
+            <p className="octo-format-card__desc">{meta.description}</p>
           </button>
         );
       })}
@@ -579,13 +574,13 @@ function ChangeTypeMenu({
 }) {
   const [openPicker, setOpenPicker] = useState(false);
   return (
-    <div className="relative">
+    <div style={{ position: 'relative' }}>
       <Button type="button" variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setOpenPicker((v) => !v)}>
         Change type
       </Button>
       {openPicker ? (
-        <div className="absolute right-0 z-50 mt-1 w-72 rounded-md border border-border bg-popover p-1 shadow-lg">
-          <div className="grid grid-cols-2 gap-1">
+        <div className="octo-change-type-popover">
+          <div className="octo-change-type-grid">
             {FIELD_FORMATS.map((fmt) => {
               const meta = FIELD_FORMAT_META[fmt];
               const active = fmt === currentFormat;
@@ -593,17 +588,14 @@ function ChangeTypeMenu({
                 <button
                   key={fmt}
                   type="button"
-                  className={cn(
-                    'flex flex-col items-start rounded px-2 py-1 text-left text-xs hover:bg-muted/50',
-                    active && 'bg-primary/10 ring-1 ring-primary/40',
-                  )}
+                  className={cn('octo-change-type-item', active && 'octo-change-type-item--active')}
                   onClick={() => {
                     if (!active) onChange(fmt);
                     setOpenPicker(false);
                   }}
                 >
-                  <span className="font-medium">{meta.label}</span>
-                  <code className="font-mono text-[10px] text-muted-foreground">{fmt}</code>
+                  <span className="octo-change-type-item__label">{meta.label}</span>
+                  <code className="octo-change-type-item__code">{fmt}</code>
                 </button>
               );
             })}
@@ -628,12 +620,7 @@ function ToggleCheckbox({
   disabled?: boolean;
 }) {
   return (
-    <label
-      className={cn(
-        'flex cursor-pointer items-start gap-2 rounded-md border border-border bg-background p-2.5 text-xs',
-        disabled && 'cursor-not-allowed opacity-50',
-      )}
-    >
+    <label className={cn('octo-field-toggle', disabled && 'octo-field-toggle--disabled')}>
       <input
         type="checkbox"
         className="mt-0.5"
@@ -641,9 +628,9 @@ function ToggleCheckbox({
         disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
       />
-      <span>
-        <span className="block font-medium text-foreground">{label}</span>
-        {description ? <span className="block text-[11px] text-muted-foreground">{description}</span> : null}
+      <span className="octo-field-toggle__text">
+        <span className="octo-field-toggle__label">{label}</span>
+        {description ? <span className="octo-field-toggle__desc">{description}</span> : null}
       </span>
     </label>
   );
@@ -669,11 +656,9 @@ function EntryTitleToggle({
     <label
       aria-label="Entry title"
       className={cn(
-        'flex cursor-pointer items-start gap-2 rounded-md border p-2.5 text-xs transition',
-        checked
-          ? 'border-amber-900 bg-amber-950 light:border-amber-300 light:bg-amber-50'
-          : 'border-border bg-background',
-        (disabled || !allowed) && 'cursor-not-allowed opacity-50',
+        'octo-field-toggle',
+        checked && 'octo-field-toggle--star-active',
+        (disabled || !allowed) && 'octo-field-toggle--disabled',
       )}
       title={allowed ? '' : 'Entry title must be a non-list string, text, or slug field.'}
     >
@@ -684,12 +669,12 @@ function EntryTitleToggle({
         disabled={disabled || !allowed}
         onChange={(e) => onChange(e.target.checked)}
       />
-      <span>
-        <span className="flex items-center gap-1 font-medium text-foreground">
+      <span className="octo-field-toggle__text">
+        <span className="octo-field-toggle__label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Icon className={cn('h-3.5 w-3.5', checked ? 'fill-amber-400 text-amber-500' : 'text-muted-foreground')} />
           Entry title
         </span>
-        <span className="block text-[11px] text-muted-foreground">Use as display title in entry lists.</span>
+        <span className="octo-field-toggle__desc">Use as display title in entry lists.</span>
       </span>
     </label>
   );

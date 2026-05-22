@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 
 import type { SearchResult } from '../../lib/searchIndex';
-import { cn } from '../../lib/utils';
 
 /** Escape special regex characters in a string. */
 function escapeRegex(s: string): string {
@@ -24,7 +23,7 @@ function highlightTerms(text: string, terms: string[]): React.ReactNode {
 
   return parts.map((part, i) =>
     i % 2 === 1 ? (
-      <mark key={i} className="bg-yellow-200 dark:bg-yellow-800 text-inherit rounded-sm px-0.5">
+      <mark key={i} style={{ background: '#fef08a', color: 'inherit', borderRadius: 2, padding: '0 2px' }}>
         {part}
       </mark>
     ) : (
@@ -158,9 +157,9 @@ export default function SearchBox({ placeholder = 'Search...', className = '' }:
   };
 
   return (
-    <div className={cn('relative w-full', className)}>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+    <div className={`octo-search-box${className ? ` ${className}` : ''}`}>
+      <div className="octo-search-box__input-wrap">
+        <Search className="octo-search-box__icon" size={18} />
         <input
           ref={inputRef}
           type="text"
@@ -173,21 +172,11 @@ export default function SearchBox({ placeholder = 'Search...', className = '' }:
             }
           }}
           placeholder={placeholder}
-          className={cn(
-            'w-full pl-10 pr-10 py-2 text-sm border border-gray-200 rounded-lg',
-            'bg-white text-gray-900 placeholder-gray-400',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
-            'dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500',
-          )}
+          className="octo-search-box__input"
           autoComplete="off"
         />
         {query && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            aria-label="Clear search"
-          >
+          <button type="button" onClick={handleClear} className="octo-search-box__clear" aria-label="Clear search">
             <X size={18} />
           </button>
         )}
@@ -195,45 +184,30 @@ export default function SearchBox({ placeholder = 'Search...', className = '' }:
 
       {/* Dropdown results */}
       {isOpen && (results.length > 0 || isSearching) && (
-        <div
-          ref={dropdownRef}
-          className={cn(
-            'absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700',
-            'rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto',
-          )}
-        >
-          {isSearching && results.length === 0 && (
-            <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">Searching...</div>
-          )}
+        <div ref={dropdownRef} className="octo-search-box__results">
+          {isSearching && results.length === 0 && <div className="octo-search-box__searching">Searching...</div>}
 
           {results.length > 0 && (
-            <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+            <ul className="octo-search-box__list">
               {results.map((result, index) => (
                 <li
                   key={result.id}
                   data-result-item
-                  className={cn(
-                    'p-0 transition-colors',
-                    index === selectedIndex
-                      ? 'bg-blue-50 dark:bg-blue-900/30'
-                      : 'bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800',
-                  )}
+                  className={`octo-search-box__result${index === selectedIndex ? ' octo-search-box__result--active' : ''}`}
                 >
                   <button
                     type="button"
                     onClick={() => navigateToResult(result)}
-                    className="w-full text-left px-4 py-3 flex flex-col gap-1"
+                    className="octo-search-box__result-btn"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-gray-900 dark:text-gray-100 truncate text-sm">
+                    <div className="octo-search-box__result-top">
+                      <span className="octo-search-box__result-title">
                         {highlightTerms(result.title, Object.keys(result.match))}
                       </span>
-                      <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">
-                        {result.typeLabel}
-                      </span>
+                      <span className="octo-search-box__result-badge">{result.typeLabel}</span>
                     </div>
                     {Object.values(result.match).flat().includes('content') && result.snippet && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 text-left">
+                      <p className="octo-search-box__result-snippet">
                         {highlightTerms(result.snippet, Object.keys(result.match))}
                       </p>
                     )}

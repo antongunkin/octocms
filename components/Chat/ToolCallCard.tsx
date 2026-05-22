@@ -19,39 +19,32 @@ export function ToolCallCard({ call }: Props) {
   const resultPreview = call.result ? truncate(call.result.content, 280) : 'Running…';
 
   return (
-    <div
-      className={cn(
-        'my-2 rounded-md border bg-muted/40 text-xs',
-        status === 'error' ? 'border-destructive/40' : 'border-border',
-      )}
-    >
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center gap-2 px-3 py-2 text-left bg-transparent border-0 cursor-pointer"
-      >
-        <ChevronRight className={cn('h-3 w-3 transition-transform', expanded && 'rotate-90')} />
-        <Wrench className="h-3 w-3 text-muted-foreground" />
-        <span className="font-mono font-semibold">{call.name}</span>
-        <span className="text-muted-foreground truncate flex-1">{inputPreview}</span>
-        {status === 'pending' && <span className="text-muted-foreground">…</span>}
-        {status === 'ok' && <CheckCircle2 className="h-3 w-3 text-green-600" />}
-        {status === 'error' && <AlertCircle className="h-3 w-3 text-destructive" />}
+    <div className={cn('octo-tool-call-card', status === 'error' && 'octo-tool-call-card--error')}>
+      <button type="button" onClick={() => setExpanded((v) => !v)} className="octo-tool-call-card__toggle">
+        <ChevronRight
+          className={cn('octo-tool-call-card__chevron h-3 w-3', expanded && 'octo-tool-call-card__chevron--open')}
+        />
+        <Wrench className="octo-tool-call-card__icon h-3 w-3" />
+        <span className="octo-tool-call-card__name">{call.name}</span>
+        <span className="octo-tool-call-card__preview">{inputPreview}</span>
+        {status === 'pending' && <span className="octo-tool-call-card__status">…</span>}
+        {status === 'ok' && (
+          <CheckCircle2 className="h-3 w-3 octo-tool-call-card__status" style={{ color: 'var(--ok)' }} />
+        )}
+        {status === 'error' && (
+          <AlertCircle className="h-3 w-3 octo-tool-call-card__status" style={{ color: 'var(--danger)' }} />
+        )}
       </button>
       {expanded && (
-        <div className="border-t border-border/50 px-3 py-2 space-y-2">
+        <div className="octo-tool-call-card__body">
           <div>
-            <div className="text-muted-foreground mb-1 text-[11px] uppercase tracking-wide">Input</div>
-            <pre className="whitespace-pre-wrap break-words font-mono text-[11px] text-foreground/80">
-              {prettyJson(call.parsedInput, call.inputJson)}
-            </pre>
+            <div className="octo-tool-call-card__section-label">Input</div>
+            <pre className="octo-tool-call-card__pre">{prettyJson(call.parsedInput, call.inputJson)}</pre>
           </div>
           {call.result && (
             <div>
-              <div className="text-muted-foreground mb-1 text-[11px] uppercase tracking-wide">Result</div>
-              <pre className="whitespace-pre-wrap break-words font-mono text-[11px] text-foreground/80">
-                {prettyResult(resultPreview, call.result.content)}
-              </pre>
+              <div className="octo-tool-call-card__section-label">Result</div>
+              <pre className="octo-tool-call-card__pre">{prettyResult(resultPreview, call.result.content)}</pre>
             </div>
           )}
         </div>
