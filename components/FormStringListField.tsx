@@ -51,7 +51,7 @@ const ListRow = ({
     className="octo-ff-list__item"
   >
     <span className="octo-ff-list__item-grip" aria-hidden>
-      <GripVertical style={{ height: 16, width: 16 }} />
+      <GripVertical className="octo-icon-md" />
     </span>
     <span className="octo-ff-list__item-value">{row.value}</span>
     <span className="octo-ff-list__item-sep" aria-hidden />
@@ -61,7 +61,7 @@ const ListRow = ({
       className="octo-ff-list__item-remove"
       aria-label={`Remove ${row.value}`}
     >
-      <X style={{ height: 16, width: 16 }} />
+      <X className="octo-icon-md" />
     </button>
   </div>
 );

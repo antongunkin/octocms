@@ -8,17 +8,5 @@ import { ShimmerBlock } from '../../skeletons/primitives';
  * doesn't shift width when the real chip mounts.
  */
 export function BranchChipSkeleton() {
-  return (
-    <ShimmerBlock
-      role="status"
-      aria-label="Loading branch"
-      style={{
-        height: 32,
-        width: 88,
-        borderRadius: 9999,
-        border: '1px solid var(--border)',
-        background: 'var(--surface-1)',
-      }}
-    />
-  );
+  return <ShimmerBlock role="status" aria-label="Loading branch" className="octo-top-header__user-skel" />;
 }

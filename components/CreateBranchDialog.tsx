@@ -87,8 +87,7 @@ const CreateBranchDialog = ({ open, onOpenChange, onBranchCreated }: Props) => {
               value={branchName}
               onChange={(e) => setBranchName(e.target.value)}
               onKeyDown={handleTextFieldEnter}
-              className="octo-input field-shell"
-              style={{ fontFamily: 'var(--ft-mono)' }}
+              className="octo-input field-shell octo-u-mono"
               disabled={isCreating}
             />
           </div>

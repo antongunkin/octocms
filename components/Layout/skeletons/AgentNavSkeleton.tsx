@@ -8,5 +8,5 @@ import React from 'react';
  * we just want layout stability.
  */
 export function AgentNavSkeleton() {
-  return <div aria-hidden="true" style={{ display: 'inline-flex', height: 32, width: 60 }} />;
+  return <div aria-hidden="true" className="octo-top-header__chat-nav-skel" />;
 }

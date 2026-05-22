@@ -232,7 +232,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
   const headerChrome = (
     <div className="octo-page-chrome">
       <div className="octo-page-chrome__title-area">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="octo-u-row octo-u-gap-2">
           <Button asChild variant="ghost" size="icon" className="octo-btn-back">
             <Link href={`/cms/content/${type}`} aria-label="Back to collection">
               <ArrowLeft className="octo-icon-md" />
@@ -240,10 +240,10 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
           </Button>
           <div className="octo-page-chrome__title-area">
             <div className="octo-page-chrome__breadcrumb">
-              <Link href="/cms/content" style={{ color: 'var(--text-2)' }}>
+              <Link href="/cms/content" className="octo-u-text-2">
                 Content
               </Link>
-              <ChevronRight className="octo-icon-xs" style={{ opacity: 0.6 }} />
+              <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
               <span>{collectionLabel}</span>
             </div>
             <div className="octo-page-chrome__title-row">
@@ -276,7 +276,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
       <div className="octo-edit-post">
         {headerChrome}
         <div className="octo-edit-post__not-found">
-          <p style={{ fontSize: '14px', fontWeight: 500 }}>Entry not found.</p>
+          <p className="octo-u-text-base octo-u-font-medium">Entry not found.</p>
           <Button asChild variant="outline" size="sm">
             <Link href={`/cms/content/${type}`}>Back to {collectionLabel}</Link>
           </Button>
@@ -290,7 +290,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
       {/* Page header — same chrome as MediaAsset / DashboardContent */}
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="octo-u-row octo-u-gap-2">
             <Button asChild variant="ghost" size="icon" className="octo-btn-back">
               <Link href={`/cms/content/${type}`} aria-label="Back to collection">
                 <ArrowLeft className="octo-icon-md" />
@@ -298,10 +298,10 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
             </Button>
             <div>
               <div className="octo-page-chrome__breadcrumb">
-                <Link href="/cms/content" style={{ color: 'var(--text-2)' }}>
+                <Link href="/cms/content" className="octo-u-text-2">
                   Content
                 </Link>
-                <ChevronRight className="octo-icon-xs" style={{ opacity: 0.6 }} />
+                <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
                 <span>{collectionLabel}</span>
               </div>
               <div className="octo-page-chrome__title-row">
@@ -310,7 +310,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
             </div>
           </div>
         </div>
-        <div className="octo-page-chrome__right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="octo-page-chrome__right octo-u-row octo-u-gap-2">
           {diffToggleVisible && (
             <div role="tablist" aria-label="Edit or Diff view" className="octo-edit-post__view-toggle">
               <button
@@ -400,7 +400,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
           {/* Entry details */}
           <div className="octo-edit-post__sidebar-section">
             <div className="octo-edit-post__sidebar-label">Entry details</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="octo-u-stack octo-u-gap-3">
               <div className="octo-edit-post__detail-row">
                 <span className="octo-edit-post__detail-key">ID</span>
                 <span className="octo-edit-post__detail-val octo-edit-post__detail-val--mono" title={post.sys?.id}>

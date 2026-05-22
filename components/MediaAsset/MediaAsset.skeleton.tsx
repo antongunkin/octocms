@@ -7,7 +7,7 @@ export function MediaAssetSkeleton() {
   return (
     <div className="octo-media-asset" role="status" aria-label="Loading asset">
       <div className="octo-page-chrome">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="octo-skel-row-8">
           <ShimmerBlock className="octo-skel-h-7 octo-skel-w-7 octo-skel-rounded-md" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <ShimmerBlock className="octo-skel-h-3 octo-skel-w-24" />

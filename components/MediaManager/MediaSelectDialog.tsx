@@ -142,15 +142,12 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
               ) : filteredFiles.length === 0 ? (
                 <div className="octo-media-select-dialog__empty">
                   <ImageIcon className="octo-icon-2xl" />
-                  <p style={{ fontSize: '14px' }}>
+                  <p className="octo-u-text-base">
                     {searchQuery ? 'No assets match this search' : 'No files in this folder'}
                   </p>
                 </div>
               ) : viewMode === 'grid' ? (
-                <div
-                  className="octo-media-grid"
-                  style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}
-                >
+                <div className="octo-media-grid octo-media-grid--auto">
                   {filteredFiles.map((file) => {
                     const isSelected = selectedId === file.id;
                     return (

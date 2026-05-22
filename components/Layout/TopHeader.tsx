@@ -157,13 +157,9 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       >
         <span className="octo-top-header__logo-name">{projectName}</span>
         {isHeaderLoading ? (
-          <Loader2
-            size={12}
-            style={{ flexShrink: 0, color: 'var(--st-changed)', animation: 'octo-spin 1s linear infinite' }}
-            aria-hidden
-          />
+          <Loader2 size={12} className="octo-top-header__logo-spinner" aria-hidden />
         ) : (
-          <ExternalLink size={12} style={{ flexShrink: 0, opacity: 0.75 }} aria-hidden />
+          <ExternalLink size={12} className="octo-top-header__logo-icon" aria-hidden />
         )}
       </a>
 
@@ -194,7 +190,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       {/* Search trigger — opens CommandK */}
       <button type="button" onClick={onCommandK} className="octo-top-header__search">
         <span className="octo-top-header__search-inner">
-          <Search size={13} style={{ flexShrink: 0 }} />
+          <Search size={13} className="octo-u-shrink-0" />
           <span className="octo-top-header__search-text">Search…</span>
         </span>
         <span className="octo-top-header__search-kbd">
@@ -213,14 +209,14 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
           <DropdownMenuTrigger asChild>
             <BranchChip name={branchLabel} ahead={ahead} menuTrigger aria-label={`Branch menu, ${branchLabel}`} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent style={{ minWidth: 300 }} sideOffset={5} align="end">
+          <DropdownMenuContent className="octo-top-header__dropdown-branch" sideOffset={5} align="end">
             <DropdownMenuItem
               onSelect={() => {
                 setBranchOpen(false);
                 setCreateBranchOpen(true);
               }}
             >
-              <Plus style={{ width: 16, height: 16 }} />
+              <Plus className="octo-icon-md" />
               Create new branch
             </DropdownMenuItem>
 
@@ -228,7 +224,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
 
             {branchListLoading && (
               <div className="octo-top-header__branch-loading">
-                <RefreshCw style={{ width: 12, height: 12, animation: 'octo-spin 1s linear infinite' }} />
+                <RefreshCw className="octo-top-header__branch-spinner" />
                 Loading…
               </div>
             )}
@@ -260,11 +256,11 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
                       href={b.prUrl}
                       target="_blank"
                       rel="noreferrer"
-                      style={{ flexShrink: 0, color: 'var(--muted)', textDecoration: 'none' }}
+                      className="octo-top-header__branch-pr-link"
                       onClick={(e) => e.stopPropagation()}
                       title="Open PR on GitHub"
                     >
-                      <ExternalLink style={{ width: 12, height: 12 }} />
+                      <ExternalLink className="octo-icon-xs" />
                     </a>
                   )}
                 </div>
@@ -272,7 +268,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
 
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={handleClearBranch}>
-              <X style={{ width: 16, height: 16 }} />
+              <X className="octo-icon-md" />
               Back to main
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -283,27 +279,14 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button type="button" className="octo-top-header__user-btn" aria-label="Account">
-            <Avatar style={{ height: 26, width: 26 }}>
+            <Avatar className="octo-top-header__avatar">
               <AvatarImage src={data?.user?.image ?? ''} alt={data?.user?.name ?? ''} />
-              <AvatarFallback
-                style={{
-                  background: 'linear-gradient(135deg,#3b82f6,#8b5cf6)',
-                  fontSize: 11.5,
-                  fontWeight: 600,
-                  color: '#fff',
-                }}
-              >
-                {userInitials}
-              </AvatarFallback>
+              <AvatarFallback className="octo-top-header__avatar-fallback">{userInitials}</AvatarFallback>
             </Avatar>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent style={{ minWidth: 180 }} sideOffset={8} align="end">
-          {data?.user?.name && (
-            <div style={{ padding: '8px 12px', fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>
-              {data.user.name}
-            </div>
-          )}
+        <DropdownMenuContent className="octo-top-header__dropdown-user" sideOffset={8} align="end">
+          {data?.user?.name && <div className="octo-top-header__user-name">{data.user.name}</div>}
           <ThemeToggle initialTheme={initialTheme} />
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => signOut()}>Sign out</DropdownMenuItem>

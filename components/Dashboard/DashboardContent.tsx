@@ -96,7 +96,7 @@ export default function DashboardContent({ selectedType }: Props) {
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
           <div className="octo-page-chrome__breadcrumb">
-            <span style={{ color: 'var(--text-2)' }}>Content</span>
+            <span className="octo-u-text-2">Content</span>
           </div>
           <div className="octo-page-chrome__title-row">
             <h1 className="octo-page-chrome__title">{selectedTypeLabel ?? 'Content'}</h1>
@@ -108,7 +108,7 @@ export default function DashboardContent({ selectedType }: Props) {
       </div>
 
       {/* Body: left nav + right content */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="octo-u-flex octo-u-flex-1 octo-u-overflow-hidden">
         {isLoadingEntries ? (
           <LeftPanelSkeleton />
         ) : (
@@ -174,9 +174,9 @@ function AddEntryButton({ collections }: { collections: string[] }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size="sm" variant="default" disabled={creating}>
-          <Plus style={{ width: 16, height: 16 }} />
+          <Plus className="octo-icon-md" />
           Add content
-          <ChevronDown style={{ width: 12, height: 12, opacity: 0.7 }} />
+          <ChevronDown className="octo-icon-xs octo-u-opacity-70" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -222,21 +222,21 @@ function LeftPanel({
         <nav className="octo-left-panel__nav">
           <LeftNavItem
             href="/cms"
-            icon={<LayoutList style={{ width: 16, height: 16 }} />}
+            icon={<LayoutList className="octo-icon-md" />}
             label="All content"
             count={entries.length}
             active={!isBranched && !isRecent && !selectedType}
           />
           <LeftNavItem
             href="/cms?tab=branched"
-            icon={<GitBranch style={{ width: 16, height: 16 }} />}
+            icon={<GitBranch className="octo-icon-md" />}
             label="Branched content"
             count={branchedCount}
             active={isBranched}
           />
           <LeftNavItem
             href="/cms?tab=recent"
-            icon={<GitPullRequest style={{ width: 16, height: 16 }} />}
+            icon={<GitPullRequest className="octo-icon-md" />}
             label="Recent PRs"
             count={recentPRsCount}
             active={isRecent}
@@ -245,7 +245,7 @@ function LeftPanel({
       </div>
 
       {collections.length > 0 && (
-        <div className="octo-left-panel__section" style={{ paddingTop: 4 }}>
+        <div className="octo-left-panel__section octo-u-pt-1">
           <span className="octo-left-panel__section-label">Collections</span>
           <nav className="octo-left-panel__nav">
             {collections.map((c) => {
@@ -254,7 +254,7 @@ function LeftPanel({
                 <LeftNavItem
                   key={c}
                   href={`/cms/content/${c}`}
-                  icon={<FileText style={{ width: 16, height: 16 }} />}
+                  icon={<FileText className="octo-icon-md" />}
                   label={label}
                   count={countByType[c] ?? 0}
                   active={selectedType === c}
@@ -356,7 +356,7 @@ function ContentTable({
         <div className="octo-content-table-inner">
           <div className="octo-content-filters">
             <div className="octo-content-search">
-              <Search className="octo-content-search__icon" style={{ width: 16, height: 16 }} />
+              <Search className="octo-content-search__icon octo-icon-md" />
               <input
                 ref={searchRef}
                 value={search}
@@ -368,9 +368,7 @@ function ContentTable({
             </div>
             {!lockedType && (
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger
-                  style={{ height: 36, width: 130, flexShrink: 0, borderRadius: 9999, fontSize: 14, fontWeight: 400 }}
-                >
+                <SelectTrigger className="octo-select__trigger--pill">
                   <SelectValue placeholder="Any type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -384,9 +382,7 @@ function ContentTable({
               </Select>
             )}
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger
-                style={{ height: 36, width: 130, flexShrink: 0, borderRadius: 9999, fontSize: 14, fontWeight: 400 }}
-              >
+              <SelectTrigger className="octo-select__trigger--pill">
                 <SelectValue placeholder="Any status" />
               </SelectTrigger>
               <SelectContent>
@@ -400,7 +396,7 @@ function ContentTable({
             </Select>
             <div className="octo-content-sort">
               <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as 'newest' | 'oldest')}>
-                <SelectTrigger style={{ height: 36, width: 138, borderRadius: 9999, fontSize: 14, fontWeight: 400 }}>
+                <SelectTrigger className="octo-select__trigger--pill">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -452,7 +448,7 @@ function ContentTable({
               </span>
               <div className="octo-content-card__footer-pages">
                 <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
-                  <ChevronLeft style={{ width: 14, height: 14 }} />
+                  <ChevronLeft className="octo-icon-sm" />
                   Prev
                 </Button>
                 <Button
@@ -462,7 +458,7 @@ function ContentTable({
                   disabled={page >= totalPages - 1}
                 >
                   Next
-                  <ChevronRight style={{ width: 14, height: 14 }} />
+                  <ChevronRight className="octo-icon-sm" />
                 </Button>
               </div>
             </div>
@@ -493,7 +489,7 @@ function BranchedView({
       <div className="octo-branched-empty">
         <div className="octo-branched-empty__inner">
           <div className="octo-branched-empty__icon">
-            <GitBranch style={{ width: 20, height: 20 }} />
+            <GitBranch className="octo-icon-lg" />
           </div>
           <p className="octo-branched-empty__title">No active branch</p>
           <p className="octo-branched-empty__text">
@@ -509,7 +505,7 @@ function BranchedView({
       <div className="octo-branched-empty">
         <div className="octo-branched-empty__inner">
           <div className="octo-branched-empty__icon">
-            <GitBranch style={{ width: 20, height: 20 }} />
+            <GitBranch className="octo-icon-lg" />
           </div>
           <p className="octo-branched-empty__title">No changes on this branch yet</p>
           <p className="octo-branched-empty__text">Edits you make will appear here.</p>
@@ -560,7 +556,7 @@ function EntryRow({
             {entry.thumbnailUrl ? (
               <img src={entry.thumbnailUrl} alt="" loading="lazy" />
             ) : (
-              <ImageIcon style={{ width: 14, height: 14, opacity: 0.6 }} />
+              <ImageIcon className="octo-icon-sm octo-u-opacity-60" />
             )}
           </span>
           <span className="octo-content-row__title">{entry.title}</span>
@@ -575,7 +571,7 @@ function EntryRow({
           style={{ color: `var(--st-${entry.status})` }}
           title={entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
         >
-          <GitBranch style={{ width: 14, height: 14, flexShrink: 0 }} />
+          <GitBranch className="octo-icon-sm octo-u-shrink-0" />
           <span className="octo-content-row__branch-label">{branchLabel}</span>
         </span>
       </td>

@@ -106,7 +106,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
       {currentId && selectedEntry ? (
         <div className="octo-ref-embed__selected">
           <div className="octo-ref-embed__icon-wrap">
-            <FileText style={{ width: 20, height: 20, color: 'var(--brand)' }} />
+            <FileText className="octo-icon-lg octo-u-text-brand" />
           </div>
           <div className="octo-ref-embed__info">
             <span className="octo-ref-embed__info-label">Reference embed · {currentDisplay}</span>
@@ -120,7 +120,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               className="octo-ref-embed__action-btn"
               title={`Switch to ${currentDisplay === 'inline' ? 'block' : 'inline'} display`}
             >
-              <Link2 style={{ width: 14, height: 14 }} />
+              <Link2 className="octo-icon-sm" />
             </button>
             <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
               Change
@@ -131,16 +131,16 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               className="octo-ref-embed__action-btn octo-ref-embed__action-btn--danger"
               title="Remove reference"
             >
-              <X style={{ width: 14, height: 14 }} />
+              <X className="octo-icon-sm" />
             </button>
           </div>
         </div>
       ) : currentId && !selectedEntry ? (
         <div className="octo-ref-embed__loading">
           <div className="octo-ref-embed__loading-icon">
-            <FileText style={{ width: 20, height: 20, color: 'var(--muted)' }} />
+            <FileText className="octo-icon-lg octo-u-text-muted" />
           </div>
-          <div style={{ flex: 1 }}>
+          <div className="octo-u-flex-1">
             <span className="octo-ref-embed__loading-text">
               {isFetched && !listPending ? 'Referenced entry not found' : 'Loading…'}
             </span>
@@ -153,12 +153,10 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
       ) : (
         <div className="octo-ref-embed__empty-state">
           <div className="octo-ref-embed__loading-icon">
-            <FileText style={{ width: 20, height: 20, color: 'var(--muted)' }} />
+            <FileText className="octo-icon-lg octo-u-text-muted" />
           </div>
           <div>
-            <span className="octo-ref-embed__loading-text" style={{ marginBottom: 4 }}>
-              No entry selected
-            </span>
+            <span className="octo-ref-embed__loading-text octo-u-mb-1">No entry selected</span>
             <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
               Select entry
             </Button>
@@ -182,12 +180,9 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           </DialogHeader>
 
           {/* Search + filter bar */}
-          <div style={{ display: 'flex', gap: 8 }}>
-            <div style={{ position: 'relative', flex: 1 }}>
-              <Search
-                className="octo-icon-md octo-u-text-muted"
-                style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
-              />
+          <div className="octo-ref-embed__search-row">
+            <div className="octo-ref-embed__search-wrap">
+              <Search className="octo-icon-md octo-u-text-muted octo-ref-embed__search-icon" />
               <input
                 type="text"
                 value={searchQuery}
@@ -200,7 +195,6 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               value={collectionFilter ?? ''}
               onChange={(e) => setCollectionFilter(e.target.value || null)}
               className="octo-media-asset__input"
-              style={{ width: 'auto' }}
             >
               <option value="">All collections</option>
               {availableCollections.map((type) => (
@@ -212,17 +206,13 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           </div>
 
           {/* Entry list */}
-          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, border: '1px solid var(--border)', borderRadius: 8 }}>
+          <div className="octo-ref-embed__list">
             {listPending && entries.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted)', fontSize: 14 }}>
-                Loading entries…
-              </div>
+              <div className="octo-ref-embed__empty">Loading entries…</div>
             ) : filteredEntries.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted)', fontSize: 14 }}>
-                {searchQuery ? 'No matching entries' : 'No entries found'}
-              </div>
+              <div className="octo-ref-embed__empty">{searchQuery ? 'No matching entries' : 'No entries found'}</div>
             ) : (
-              <div style={{ borderTop: '1px solid var(--border)' }}>
+              <div className="octo-ref-embed__divider">
                 {filteredEntries.map((entry) => {
                   const refKey = toReferenceKey(entry.path);
                   const isSelected = refKey === toReferenceKey(currentId);
@@ -246,25 +236,11 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                       }}
                     >
                       <FileText className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            fontSize: 14,
-                            fontWeight: 500,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {entry.title}
-                        </div>
-                        <div style={{ fontSize: 11, color: 'var(--muted)' }}>{getCollectionLabel(entry.type)}</div>
+                      <div className="octo-ref-embed__entry-info">
+                        <div className="octo-ref-embed__entry-title">{entry.title}</div>
+                        <div className="octo-ref-embed__entry-meta">{getCollectionLabel(entry.type)}</div>
                       </div>
-                      {isSelected && (
-                        <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--brand)', flexShrink: 0 }}>
-                          Selected
-                        </span>
-                      )}
+                      {isSelected && <span className="octo-ref-embed__selected-badge">Selected</span>}
                     </button>
                   );
                 })}

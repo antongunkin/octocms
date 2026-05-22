@@ -72,10 +72,10 @@ const DraggableItem = ({
         <div className="octo-ff-reference__item-type">{collectionLabel}</div>
       </button>
       <button type="button" onClick={() => onEdit?.(item)} className="octo-ff-reference__item-edit" title="Edit inline">
-        <Pencil style={{ width: 14, height: 14 }} />
+        <Pencil className="octo-icon-sm" />
       </button>
       <button type="button" onClick={() => onRemove(index)} className="octo-ff-reference__item-remove">
-        <Trash2 style={{ width: 14, height: 14 }} />
+        <Trash2 className="octo-icon-sm" />
       </button>
     </div>
   );
@@ -619,11 +619,11 @@ const FormReferenceField = ({
           {canAdd && (
             <div className="octo-ff-reference__add-row">
               <Button type="button" variant="outline" size="sm" onClick={() => setIsExistingOpen(true)}>
-                <Plus style={{ width: 16, height: 16 }} />
+                <Plus className="octo-icon-md" />
                 Add existing
               </Button>
               <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(true)}>
-                <Plus style={{ width: 16, height: 16 }} />
+                <Plus className="octo-icon-md" />
                 Create new
               </Button>
             </div>

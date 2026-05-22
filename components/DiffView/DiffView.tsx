@@ -33,9 +33,9 @@ export function DiffView({ collectionType, entryPath }: DiffViewProps) {
   if (diffQuery.isPending && !diff) {
     return (
       <div className="octo-diff-view">
-        <div className="octo-diff-view__skeleton-line" style={{ height: 24, width: 256 }} />
-        <div className="octo-diff-view__skeleton-line" style={{ height: 96 }} />
-        <div className="octo-diff-view__skeleton-line" style={{ height: 96 }} />
+        <div className="octo-diff-view__skeleton-line octo-diff-view__skeleton-line--heading" />
+        <div className="octo-diff-view__skeleton-line octo-diff-view__skeleton-line--content" />
+        <div className="octo-diff-view__skeleton-line octo-diff-view__skeleton-line--content" />
       </div>
     );
   }
@@ -49,8 +49,8 @@ export function DiffView({ collectionType, entryPath }: DiffViewProps) {
       <div className="octo-diff-view__empty">
         <p className="octo-diff-view__empty-title">No unmerged changes for this entry</p>
         <p className="octo-diff-view__empty-sub">
-          Active branch <code style={{ fontFamily: 'var(--ft-mono)' }}>{diff.activeBranch || '—'}</code> matches{' '}
-          <code style={{ fontFamily: 'var(--ft-mono)' }}>{diff.baseBranch}</code> for this file.
+          Active branch <code className="octo-u-mono">{diff.activeBranch || '—'}</code> matches{' '}
+          <code className="octo-u-mono">{diff.baseBranch}</code> for this file.
         </p>
       </div>
     );

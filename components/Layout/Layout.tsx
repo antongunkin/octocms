@@ -38,7 +38,7 @@ const Layout = ({ children, initialTheme }: LayoutProps) => {
             <h1 className="octo-layout__sign-in-title">{config.projectName} CMS</h1>
             <p className="octo-layout__sign-in-subtitle">Sign in to manage your content</p>
             <Button onClick={() => signIn('github', { callbackUrl: '/cms' })} size="lg">
-              <LogIn style={{ width: 16, height: 16 }} />
+              <LogIn className="octo-icon-md" />
               Sign in with GitHub
             </Button>
           </div>

@@ -6,10 +6,10 @@ export function DashboardContentSkeleton() {
   return (
     <div className="octo-page-shell" role="status" aria-label="Loading dashboard">
       <div className="octo-page-chrome">
-        <ShimmerBlock style={{ height: 24, width: 128 }} />
+        <ShimmerBlock className="octo-dashboard-skel__heading-skel" />
       </div>
-      <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <ShimmerBlock style={{ height: 16, width: 192 }} />
+      <div className="octo-dashboard-skel__empty">
+        <ShimmerBlock className="octo-dashboard-skel__empty-line" />
       </div>
     </div>
   );

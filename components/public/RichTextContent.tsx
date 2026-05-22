@@ -208,12 +208,12 @@ function RenderImage({ image }: { image: ResolvedImageField }) {
 
   // Fallback for images without dimensions — use fill with a container
   return (
-    <span style={{ position: 'relative', display: 'block', width: '100%', aspectRatio: '16/9' }}>
+    <span className="octo-richtext-content__image-wrap">
       <Image
         src={image.src}
         alt={image.alt}
         fill
-        style={{ objectFit: 'cover' }}
+        className="octo-richtext-content__image"
         {...(image.blurDataURL ? { placeholder: 'blur' as const, blurDataURL: image.blurDataURL } : {})}
       />
     </span>

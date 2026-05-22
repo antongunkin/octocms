@@ -94,8 +94,8 @@ export default function ConditionalBranchesEditor({
   const usedKeys = new Set(branches.map((b) => b.key));
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div className="octo-u-stack octo-u-gap-2">
+      <div className="octo-u-stack octo-u-gap-2">
         {branches.length === 0 ? (
           <p className="octo-checkbox-list__empty">
             Add at least one branch — each is a typed shape this field can hold.

@@ -11,38 +11,18 @@ import { ShimmerBlock } from '../../skeletons/primitives';
 export function TopHeaderSkeleton() {
   return (
     <header className="octo-top-header" aria-hidden>
-      <ShimmerBlock
-        style={{ height: 32, width: 120, flexShrink: 0, borderRadius: 9999, border: '1px solid var(--border)' }}
-      />
+      <ShimmerBlock className="octo-top-header__logo-skel" />
       <span className="octo-top-header__sep" />
       <nav className="octo-top-header__nav">
         {Array.from({ length: 4 }, (_, i) => (
-          <ShimmerBlock key={i} style={{ height: 32, width: 76, flexShrink: 0, borderRadius: 9999 }} />
+          <ShimmerBlock key={i} className="octo-top-header__nav-link-skel" />
         ))}
       </nav>
       <div className="octo-top-header__spacer" />
-      <ShimmerBlock
-        style={{
-          height: 32,
-          width: 150,
-          flexShrink: 0,
-          borderRadius: 9999,
-          border: '1px solid var(--border)',
-          background: 'var(--surface-2)',
-        }}
-      />
+      <ShimmerBlock className="octo-top-header__branch-skel" />
       <span className="octo-top-header__sep" />
-      <ShimmerBlock
-        style={{
-          height: 32,
-          width: 88,
-          flexShrink: 0,
-          borderRadius: 9999,
-          border: '1px solid var(--border)',
-          background: 'var(--surface-1)',
-        }}
-      />
-      <ShimmerBlock style={{ height: 26, width: 26, flexShrink: 0, borderRadius: 9999 }} />
+      <ShimmerBlock className="octo-top-header__user-skel" />
+      <ShimmerBlock className="octo-top-header__avatar-skel" />
     </header>
   );
 }

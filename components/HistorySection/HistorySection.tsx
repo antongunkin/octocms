@@ -98,7 +98,7 @@ const HistorySection = ({ entryPath, flat }: HistorySectionProps) => {
       {showSeeAll && (
         <a href={seeAllUrl} target="_blank" rel="noreferrer" className="octo-history__see-all">
           See all commits
-          <ExternalLink style={{ width: 12, height: 12 }} />
+          <ExternalLink className="octo-icon-xs" />
         </a>
       )}
     </>

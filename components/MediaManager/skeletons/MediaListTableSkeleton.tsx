@@ -13,9 +13,9 @@ export function MediaListTableSkeleton({ rows = 8 }: { rows?: number }) {
       <div className="octo-content-card__th-row" style={{ padding: '10px 16px' }}>
         <ShimmerRow widths={widths} />
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 16px' }}>
+      <div className="octo-content-table__skel-body">
         {Array.from({ length: rows }, (_, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div key={i} className="octo-skel-row-gap-16">
             <ShimmerBlock className="octo-skel-h-7 octo-skel-w-7 octo-u-shrink-0 octo-skel-rounded-md" />
             <ShimmerRow className="octo-u-flex-1" widths={widths} />
           </div>

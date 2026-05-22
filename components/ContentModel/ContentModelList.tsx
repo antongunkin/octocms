@@ -61,7 +61,7 @@ export default function ContentModelList() {
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
           <div className="octo-page-chrome__breadcrumb">
-            <span style={{ color: 'var(--text-2)' }}>Model</span>
+            <span className="octo-u-text-2">Model</span>
           </div>
           <div className="octo-page-chrome__title-row">
             <h1 className="octo-page-chrome__title">Content Model</h1>

@@ -59,7 +59,11 @@ export default function SchemaImpactList({
         {visible.map((it) => (
           <ImpactRow key={it.path} item={it} asLink={asLinks} />
         ))}
-        {overflow > 0 ? <li style={{ paddingLeft: 8, fontStyle: 'italic' }}>…and {overflow} more.</li> : null}
+        {overflow > 0 ? (
+          <li className="octo-u-italic" style={{ paddingLeft: 8 }}>
+            …and {overflow} more.
+          </li>
+        ) : null}
       </ul>
     </div>
   );

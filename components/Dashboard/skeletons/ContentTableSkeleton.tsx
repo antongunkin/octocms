@@ -13,20 +13,18 @@ export function ContentTableSkeleton({ rows = 8 }: { rows?: number }) {
       <div className="octo-content-table-wrap octo-scroll">
         <div className="octo-content-table-inner">
           <div className="octo-content-filters">
-            <ShimmerBlock style={{ height: 36, flex: '0 1 420px', borderRadius: 8 }} />
-            <ShimmerBlock style={{ height: 36, width: 130, borderRadius: 9999 }} />
-            <ShimmerBlock style={{ height: 36, width: 130, borderRadius: 9999 }} />
+            <ShimmerBlock className="octo-content-table__skel-search" />
+            <ShimmerBlock className="octo-content-table__skel-filter" />
+            <ShimmerBlock className="octo-content-table__skel-filter" />
             <div className="octo-content-sort">
-              <ShimmerBlock style={{ height: 36, width: 138, borderRadius: 9999 }} />
+              <ShimmerBlock className="octo-content-table__skel-new" />
             </div>
           </div>
           <div className="octo-content-card">
-            <div
-              style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface-2)', padding: '10px 16px' }}
-            >
+            <div className="octo-content-table__skel-header">
               <ShimmerRow widths={['40%', '14%', '16%', '12%']} />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 16px' }}>
+            <div className="octo-content-table__skel-body">
               {Array.from({ length: rows }, (_, i) => (
                 <ShimmerRow key={i} widths={['40%', '14%', '16%', '12%']} />
               ))}

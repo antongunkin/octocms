@@ -70,59 +70,48 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
     <div className="octo-page-shell">
       {/* Header */}
       <div className="octo-page-chrome">
-        <h1 className="octo-page-chrome__title" style={{ fontSize: 20 }}>
+        <h1 className="octo-page-chrome__title octo-u-text-xl">
           {selectedType
             ? (config.collections[selectedType as keyof typeof config.collections]?.label ?? selectedType)
             : 'Entries'}
         </h1>
         {selectedType && (
           <Button size="sm" variant="default" onClick={addNew} disabled={creating}>
-            <Plus style={{ width: 16, height: 16 }} />
+            <Plus className="octo-icon-md" />
             Add entry
           </Button>
         )}
       </div>
 
-      <div style={{ display: 'flex', flex: 1, flexDirection: 'column', overflow: 'hidden', padding: 24 }}>
+      <div className="octo-content-types__body">
         {/* Search bar */}
-        <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div className="octo-content-search" style={{ maxWidth: 384, flex: 1 }}>
-            <Search className="octo-content-search__icon" style={{ width: 16, height: 16 }} />
+        <div className="octo-content-types__toolbar">
+          <div className="octo-content-search octo-content-types__search-wrap">
+            <Search className="octo-content-search__icon octo-icon-md" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter entries…"
-              style={{ paddingLeft: 36 }}
+              className="octo-search-input--icon-padded"
             />
           </div>
         </div>
 
         {/* Table */}
-        <div
-          style={{
-            flex: 1,
-            overflow: 'auto',
-            borderRadius: 8,
-            border: '1px solid var(--border)',
-            background: 'var(--surface-1)',
-          }}
-        >
+        <div className="octo-content-types__table-wrap">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead style={{ color: 'var(--muted)', fontWeight: 500 }}>Name</TableHead>
-                <TableHead style={{ color: 'var(--muted)', fontWeight: 500 }}>Updated</TableHead>
-                <TableHead style={{ color: 'var(--muted)', fontWeight: 500 }}>Status</TableHead>
+                <TableHead className="octo-table-head--muted">Name</TableHead>
+                <TableHead className="octo-table-head--muted">Updated</TableHead>
+                <TableHead className="octo-table-head--muted">Status</TableHead>
                 <TableHead style={{ width: 40 }} />
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredEntries.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    style={{ height: 128, textAlign: 'center', fontSize: 14, color: 'var(--muted)' }}
-                  >
+                  <TableCell colSpan={4} className="octo-content-types__empty">
                     No entries found.
                   </TableCell>
                 </TableRow>
@@ -136,22 +125,16 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
                       router.push(`/cms/content/${entry.type}/${entry.id}`);
                     }}
                   >
-                    <TableCell style={{ fontWeight: 500 }}>{entry.title}</TableCell>
-                    <TableCell style={{ color: 'var(--muted)' }}>
+                    <TableCell className="octo-u-font-medium">{entry.title}</TableCell>
+                    <TableCell className="octo-u-text-muted">
                       {entry.updatedAt ? relativeTime(entry.updatedAt) : '—'}
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={entry.status} />
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        style={{ height: 28, width: 28 }}
-                        disabled
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <MoreHorizontal style={{ width: 16, height: 16, color: 'var(--muted)' }} />
+                      <Button variant="ghost" size="icon" disabled onClick={(e) => e.stopPropagation()}>
+                        <MoreHorizontal className="octo-icon-md octo-u-text-muted" />
                       </Button>
                     </TableCell>
                   </TableRow>

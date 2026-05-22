@@ -1461,6 +1461,22 @@ html {
   font-size: 14px;
   color: var(--muted);
 }
+.octo-top-header__logo-spinner { flex-shrink: 0; color: var(--st-changed); animation: octo-spin 1s linear infinite; }
+.octo-top-header__logo-icon    { flex-shrink: 0; opacity: 0.75; }
+.octo-top-header__branch-spinner { width: 12px; height: 12px; animation: octo-spin 1s linear infinite; }
+.octo-top-header__branch-pr-link { flex-shrink: 0; color: var(--muted); text-decoration: none; }
+.octo-top-header__avatar       { height: 26px; width: 26px; }
+.octo-top-header__avatar-fallback { background: linear-gradient(135deg, #3b82f6, #8b5cf6); font-size: 11.5px; font-weight: 600; color: #fff; }
+.octo-top-header__dropdown-branch { min-width: 300px; }
+.octo-top-header__dropdown-user   { min-width: 180px; }
+.octo-top-header__user-name    { padding: 8px 12px; font-size: 14px; font-weight: 500; color: var(--text); }
+/* skeleton placeholders */
+.octo-top-header__logo-skel       { height: 32px; width: 120px; flex-shrink: 0; border-radius: 9999px; border: 1px solid var(--border); }
+.octo-top-header__nav-link-skel   { height: 32px; width: 76px;  flex-shrink: 0; border-radius: 9999px; }
+.octo-top-header__branch-skel     { height: 32px; width: 150px; flex-shrink: 0; border-radius: 9999px; border: 1px solid var(--border); background: var(--surface-2); }
+.octo-top-header__user-skel       { height: 32px; width: 88px;  flex-shrink: 0; border-radius: 9999px; border: 1px solid var(--border); background: var(--surface-1); }
+.octo-top-header__avatar-skel     { height: 26px; width: 26px;  flex-shrink: 0; border-radius: 9999px; }
+.octo-top-header__chat-nav-skel   { display: inline-flex; height: 32px; width: 60px; }
 
 /* ── octo-left-nav-item ── */
 .octo-left-nav-item {
@@ -1651,6 +1667,18 @@ html {
 }
 .octo-page-chrome__right { flex: none; }
 
+/* ─── Page chrome skeleton ───────────────────────────── */
+.octo-page-chrome--skel        { display: flex; min-height: 0; flex: 1; flex-direction: column; overflow: hidden; }
+.octo-page-chrome__skel-content { display: flex; min-height: 0; flex: 1; overflow: hidden; }
+.octo-page-chrome__skel-left   { display: flex; align-items: center; gap: 8px; }
+.octo-page-chrome__skel-col    { display: flex; flex-direction: column; gap: 4px; }
+.octo-page-chrome__skel-right  { display: flex; gap: 8px; }
+.octo-page-chrome__skel-actions { display: flex; gap: 8px; }
+/* ShimmerBlock helpers for page chrome skeleton */
+.octo-page-chrome__skel-title  { height: 24px; width: 160px; max-width: 100%; border-radius: 4px; }
+.octo-page-chrome__skel-subtitle { height: 12px; width: 64px; }
+.octo-page-chrome__skel-btn    { height: 32px; width: 112px; flex-shrink: 0; border-radius: 6px; }
+
 /* ── octo-left-panel ── */
 .octo-left-panel {
   display: flex;
@@ -1673,6 +1701,10 @@ html {
   color: var(--muted);
 }
 .octo-left-panel__nav { display: flex; flex-direction: column; gap: 2px; }
+.octo-left-panel__nav--gap-6   { gap: 6px; }
+.octo-left-panel__section--pt  { padding-top: 4px; }
+.octo-left-panel__skel-col     { display: flex; flex-direction: column; gap: 8px; }
+.octo-left-panel--w-240        { width: 240px; }
 
 /* ── octo-content-area ── */
 .octo-content-area {
@@ -1688,6 +1720,15 @@ html {
   padding: 20px 24px 48px;
 }
 .octo-content-table-inner { display: flex; flex-direction: column; gap: 16px; }
+
+/* ─── Content table skeleton ─────────────────────────── */
+.octo-content-table__skel-header { border-bottom: 1px solid var(--border); background: var(--surface-2); padding: 10px 16px; }
+.octo-content-table__skel-body   { display: flex; flex-direction: column; gap: 12px; padding: 12px 16px; }
+/* ShimmerBlock size helpers for content table skeleton */
+.octo-content-table__skel-search { height: 36px; flex: 0 1 420px; border-radius: 8px; }
+.octo-content-table__skel-filter { height: 36px; width: 130px; border-radius: 9999px; }
+.octo-content-table__skel-new    { height: 36px; width: 138px; border-radius: 9999px; }
+
 .octo-content-filters {
   display: flex;
   min-width: 0;
@@ -1799,6 +1840,7 @@ html {
   color: var(--muted);
 }
 .octo-content-row__thumb img { height: 100%; width: 100%; object-fit: cover; }
+.octo-content-row__thumb--sm { width: 36px; height: 36px; }
 .octo-content-row__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; color: var(--text); }
 .octo-content-row__meta { color: var(--muted); }
 .octo-content-row__branch {
@@ -1966,6 +2008,17 @@ html {
   background: var(--surface-2);
   animation: octo-shimmer 2s ease-in-out infinite;
 }
+.octo-pr-skel__line--primary   { width: 50%; }
+.octo-pr-skel__line--secondary { width: 66%; height: 10px; }
+
+/* ─── Dashboard skeleton specifics ───────────────────── */
+.octo-dashboard-skel__wrap   { display: flex; flex: 1; }
+.octo-dashboard-skel__panel  { width: 240px; }
+.octo-dashboard-skel__content { padding: 24px; gap: 16px; }
+.octo-dashboard-skel__card   { padding: 16px; }
+.octo-dashboard-skel__heading-skel { height: 24px; width: 128px; }
+.octo-dashboard-skel__empty  { display: flex; flex: 1; align-items: center; justify-content: center; padding: 24px; }
+.octo-dashboard-skel__empty-line { height: 16px; width: 192px; }
 
 /* ── octo-error-boundary ── */
 .octo-error-boundary {
@@ -1985,6 +2038,7 @@ html {
 .octo-create-branch__fields { padding: 8px 0; display: flex; flex-direction: column; gap: 12px; }
 .octo-create-branch__field { display: flex; flex-direction: column; gap: 6px; }
 .octo-create-branch__opt { color: var(--muted); font-weight: 400; }
+.octo-create-branch__textarea { resize: vertical; min-height: 4.5rem; }
 
 /* ── octo-form-field (generic wrapper used by all field types) ── */
 .octo-form-field { margin-bottom: 20px; }
@@ -2524,6 +2578,18 @@ html {
   box-shadow: var(--shadow-1);
 }
 
+/* ─── EditPost skeleton ──────────────────────────────── */
+.octo-edit-post__form-skel     { display: flex; flex-direction: column; gap: 20px; }
+.octo-edit-post__field-skel    { display: flex; flex-direction: column; gap: 8px; }
+.octo-edit-post__sidebar-skel  { display: flex; flex-direction: column; gap: 10px; }
+/* ShimmerBlock size helpers for edit-post skeleton */
+.octo-edit-post__skel-label    { height: 14px; width: 96px; }
+.octo-edit-post__skel-field-sm { height: 36px; width: 100%; }
+.octo-edit-post__skel-field-lg { height: 160px; width: 100%; }
+.octo-edit-post__skel-card     { padding: 16px; }
+.octo-edit-post__skel-mt       { margin-top: 8px; }
+.octo-edit-post__skel-mb       { margin-bottom: 10px; }
+
 /* ── octo-media-manager ── */
 .octo-media-manager {
   display: flex;
@@ -2686,6 +2752,14 @@ html {
   font-size: 12px;
   color: var(--muted);
 }
+.octo-media-grid--auto { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+
+/* ─── MediaManager skeleton ──────────────────────────── */
+.octo-media-manager__skel-header { padding: 16px 24px 0; }
+.octo-media-manager__skel-mid    { padding: 12px 24px; }
+.octo-media-manager__skel-content { background: var(--bg); }
+.octo-media-grid__item-skel      { display: flex; flex-direction: column; gap: 8px; }
+.octo-media-grid--skel           { padding: 0 24px 24px; }
 
 /* ── octo-media-upload-bar ── */
 .octo-media-upload-bar { padding: 16px 24px 0; }
@@ -2717,6 +2791,7 @@ html {
 .octo-media-upload-bar__icon { flex-shrink: 0; }
 .octo-media-upload-bar__label { font-weight: 500; color: var(--text); }
 .octo-media-upload-bar__hint { margin-left: 8px; font-size: 12px; color: var(--muted); }
+.octo-media-upload-bar__input { display: none; }
 
 /* ── octo-media-left-panel (MediaLeftPanel) ── */
 .octo-media-left-panel {
@@ -2799,6 +2874,9 @@ html {
 .octo-media-left-panel__folder-row:hover .octo-media-left-panel__folder-count { display: none; }
 .octo-media-left-panel__folder-row:hover .octo-media-left-panel__folder-del { display: flex; }
 .octo-media-left-panel__folder-del:hover { background: var(--surface-1); color: var(--danger); }
+.octo-media-left-panel--skel         { padding: 12px; }
+.octo-media-left-panel__skel-inner   { padding: 12px 12px 16px; }
+.octo-media-left-panel__skel-col     { display: flex; flex-direction: column; gap: 6px; }
 
 /* ── octo-media-select-dialog ── */
 .octo-media-select-dialog__body {
@@ -2984,6 +3062,18 @@ html {
   padding: 32px;
   color: var(--muted);
 }
+.octo-media-asset__details-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+/* ─── MediaAsset skeleton ────────────────────────────── */
+.octo-media-asset__skel-section { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border); padding-top: 20px; }
+.octo-media-asset__skel-row     { display: flex; gap: 8px; }
+.octo-media-asset__form-skel    { display: flex; flex-direction: column; gap: 6px; }
 
 /* ── octo-upload-dialog (MediaUploadDialog rows) ── */
 .octo-upload-dialog__rows { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; padding: 8px 4px 8px 0; }
@@ -3008,6 +3098,7 @@ html {
   font-size: 12px;
   color: var(--muted);
 }
+.octo-upload-check { width: 14px; height: 14px; border-radius: 3px; }
 
 /* ── octo-folder-dialog (CreateFolderDialog / DeleteFolderDialog fields) ── */
 .octo-folder-dialog__body { padding: 16px 0; display: flex; flex-direction: column; gap: 6px; }
@@ -3342,6 +3433,8 @@ html {
   background: #022c22;
   color: #6ee7b7;
 }
+.octo-schema-impact__overflow       { padding-left: 8px; }
+.octo-schema-option-field__help     { padding: 4px 6px; font-size: 11px; font-style: italic; color: var(--muted); }
 
 /* ── octo-cardinality-option (cardinality picker card) ── */
 .octo-cardinality-option {
@@ -3705,6 +3798,76 @@ html {
   color: var(--text);
 }
 .octo-richtext-props-grid { display: grid; grid-template-columns: 1fr 1fr 120px auto; gap: 4px; }
+
+/* ─── Rich Text Options Editor ───────────────────── */
+.octo-rt-opts__section   { display: flex; flex-direction: column; gap: 16px; }
+.octo-rt-opts__group     { display: flex; flex-direction: column; gap: 8px; }
+.octo-rt-opts__group--sm { display: flex; flex-direction: column; gap: 6px; }
+.octo-rt-opts__group--xs { display: flex; flex-direction: column; gap: 4px; }
+.octo-rt-opts__check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.octo-rt-opts__sub-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.octo-rt-opts__sub-label--mb { margin-bottom: 4px; }
+.octo-rt-opts__chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.octo-rt-opts__empty-text { font-size: 11px; font-style: italic; color: var(--muted); }
+.octo-rt-opts__mono-tag { font-family: var(--ft-mono); font-size: 11px; }
+.octo-rt-opts__remove-row { display: flex; justify-content: flex-end; }
+
+/* ─── Content Types list ─────────────────────────── */
+.octo-content-types__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 24px;
+}
+.octo-content-types__toolbar {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.octo-content-types__search-wrap { max-width: 384px; flex: 1; }
+.octo-content-types__table-wrap {
+  flex: 1;
+  overflow: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+}
+.octo-content-types__empty {
+  height: 128px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Content Type Detail additions ─────────────── */
+.octo-content-type-detail__header-row { display: flex; min-width: 0; flex: 1; align-items: center; gap: 8px; }
+.octo-content-type-detail__title-col  { min-width: 0; flex: 1; }
+.octo-content-type-detail__type-badge { font-family: var(--ft-mono); font-size: 11px; color: var(--muted); }
+
+/* ContentTypeDetail skeleton */
+.octo-content-type-detail__skel-header { display: flex; align-items: center; gap: 12px; }
+/* ShimmerBlock size helpers */
+.octo-content-type-detail__skel-name   { height: 20px; width: 180px; }
+.octo-content-type-detail__skel-type   { height: 12px; width: 80px; }
+
+/* Search input with leading icon offset */
+.octo-search-input--icon-padded { padding-left: 36px; }
 
 /* ── octo-chat ── */
 .octo-chat {
@@ -4281,6 +4444,8 @@ html {
 .octo-diff-view__empty-sub { font-size: 12px; color: var(--muted); margin: 0; }
 .octo-diff-view__skeleton-line { border-radius: 4px; background: color-mix(in oklab, var(--surface-2) 40%, transparent); }
 .octo-diff-view__error { font-size: 13.5px; color: var(--muted); }
+.octo-diff-view__skeleton-line--heading { height: 24px; width: 256px; }
+.octo-diff-view__skeleton-line--content { height: 96px; }
 
 /* DiffHunk */
 .octo-diff-hunk { border-radius: 6px; border: 1px solid var(--border); background: var(--surface-1); overflow: hidden; }
@@ -4375,6 +4540,7 @@ html {
 .octo-inline-editor__delete-warning-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font-size: 13.5px; color: var(--muted); }
 .octo-inline-editor__delete-warning-item { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .octo-inline-editor__delete-warning-foot { margin-top: 8px; font-size: 13.5px; color: var(--danger); }
+.octo-inline-editor__archive-btn { color: #6b7280; }
 
 /* ------ CommandK ------ */
 .octo-cmdk { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-start; justify-content: center; background: rgba(0, 0, 0, 0.4); padding: 0 16px; padding-top: 12vh; backdrop-filter: blur(4px); }
@@ -4412,6 +4578,7 @@ html {
 .octo-file-explorer__item { display: flex; height: 32px; width: 100%; align-items: center; gap: 8px; padding: 0 8px; border: none; border-radius: 4px; background: transparent; font-size: 13.5px; font-weight: normal; color: var(--text); text-decoration: none; cursor: pointer; transition: background 0.15s; }
 .octo-file-explorer__item:hover { background: var(--surface-2); }
 .octo-file-explorer__item--active { background: var(--surface-2); }
+.octo-file-explorer__btn-add { background: #2563eb; color: #fff; }
 
 /* ------ Embed editors (richtext) ------ */
 .octo-embed-editor { margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); background: color-mix(in oklab, var(--surface-2) 30%, transparent); padding: 12px; }
@@ -4442,6 +4609,16 @@ html {
 .octo-embed-editor__empty { text-align: center; padding: 16px; font-size: 13.5px; color: var(--muted); }
 .octo-embed-editor__empty-link { color: var(--brand); background: none; border: none; cursor: pointer; }
 .octo-embed-editor__empty-link:hover { text-decoration: underline; }
+
+/* ─── Embed Editors (ComponentEmbed / ConditionEmbed) ─── */
+.octo-var-embed--set           { background: #78350f; color: #fef3c7; }
+.octo-var-embed__prop          { color: #fbbf24; }
+.octo-embed-editor__icon-component  { width: 16px; height: 16px; color: #fcd34d; }
+.octo-embed-editor__icon-condition  { width: 16px; height: 16px; color: #5eead4; }
+.octo-embed-editor__field-input     { display: block; max-width: 240px; }
+.octo-embed-editor__branch-key-input { width: 128px; }
+.octo-embed-editor__delete-btn      { height: 24px; width: 24px; padding: 0; color: var(--muted); }
+.octo-embed-editor__checkbox-input  { width: auto; }
 
 /* Image embed editor */
 .octo-image-embed { margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); background: color-mix(in oklab, var(--surface-2) 30%, transparent); padding: 12px; }
@@ -4476,6 +4653,103 @@ html {
 .octo-ref-embed__loading-id { font-size: 12px; color: var(--muted); }
 .octo-ref-embed__empty-state { display: flex; align-items: center; gap: 12px; }
 
+/* ─── Image Embed Editor ────────────────────────── */
+.octo-image-embed__dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.octo-image-embed__upload-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.octo-image-embed__upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 448px;
+}
+.octo-image-embed__body {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.octo-image-embed__folders {
+  width: 144px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  padding-right: 8px;
+}
+.octo-image-embed__scroller { flex: 1; overflow-y: auto; }
+.octo-image-embed__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.octo-image-embed__thumb-img { width: 100%; height: 100%; object-fit: cover; }
+.octo-image-embed__thumb-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+}
+.octo-image-embed__thumb-caption {
+  font-size: 11px;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+.octo-image-embed__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 0;
+  color: var(--muted);
+}
+
+/* ─── Reference Embed Editor ─────────────────────── */
+.octo-ref-embed__search-row { display: flex; gap: 8px; }
+.octo-ref-embed__search-wrap { position: relative; flex: 1; }
+.octo-ref-embed__search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.octo-ref-embed__list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.octo-ref-embed__empty {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.octo-ref-embed__divider { border-top: 1px solid var(--border); }
+.octo-ref-embed__entry-info { flex: 1; min-width: 0; }
+.octo-ref-embed__entry-title {
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.octo-ref-embed__entry-meta { font-size: 11px; color: var(--muted); }
+.octo-ref-embed__selected-badge { font-size: 11px; font-weight: 500; color: var(--brand); flex-shrink: 0; }
+
 /* Slash command menu */
 .octo-slash-menu { position: fixed; z-index: 10000; width: 256px; max-height: 288px; overflow-y: auto; border-radius: 6px; border: 1px solid var(--border); background: var(--surface-1); box-shadow: var(--shadow-3, 0 4px 16px rgba(0,0,0,0.3)); }
 .octo-slash-menu--empty { padding: 8px 12px; font-size: 13.5px; color: var(--muted); }
@@ -4502,6 +4776,20 @@ html {
 /* ------ Public components ------ */
 .octo-markdown-content { }
 .octo-richtext-content { }
+
+/* ─── Public RichTextContent ─────────────────────────── */
+.octo-richtext-content__image-wrap  { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; }
+.octo-richtext-content__image       { object-fit: cover; }
+.octo-richtext-content__reference-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+}
+.octo-richtext-content__reference-type  { font-size: 12px; color: var(--muted); display: block; margin-bottom: 2px; }
+.octo-richtext-content__reference-title { font-size: 13.5px; font-weight: 500; }
+
 .octo-search-box { position: relative; width: 100%; }
 .octo-search-box__input-wrap { position: relative; }
 .octo-search-box__icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; pointer-events: none; }
@@ -4512,6 +4800,7 @@ html {
 .octo-search-box__clear:hover { color: #4b5563; }
 .octo-search-box__results { position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 50; max-height: 384px; overflow-y: auto; }
 .octo-search-box__searching { padding: 12px 16px; font-size: 13.5px; color: #6b7280; text-align: center; }
+.octo-search-box__highlight { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 2px; }
 .octo-search-box__list { list-style: none; margin: 0; padding: 0; }
 .octo-search-box__result { padding: 0; transition: background 0.1s; }
 .octo-search-box__result--active { background: #eff6ff; }
@@ -4621,6 +4910,26 @@ html {
 .octo-u-tracking-wide { letter-spacing: 0.025em; }
 .octo-u-leading-6 { line-height: 1.5rem; }
 .octo-u-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.octo-u-mt-0-5 { margin-top: 2px; }
+.octo-u-pt-1   { padding-top: 4px; }
+.octo-u-pt-5   { padding-top: 20px; }
+.octo-u-pr-2   { padding-right: 8px; }
+.octo-u-overflow-y-auto { overflow-y: auto; }
+.octo-u-min-w-0 { min-width: 0; }
+.octo-u-text-center { text-align: center; }
+.octo-u-word-break-all { word-break: break-all; }
+.octo-u-italic { font-style: italic; }
+.octo-u-border-right { border-right: 1px solid var(--border); }
+.octo-u-border-top   { border-top:  1px solid var(--border); }
+.octo-u-text-brand   { color: var(--brand); }
+.octo-u-text-white   { color: #fff; }
+.octo-u-self-start   { align-self: flex-start; }
+.octo-u-text-xl      { font-size: 20px; }
+.octo-u-col-span-full { grid-column: 1 / -1; }
+.octo-u-object-cover { object-fit: cover; }
+.octo-u-mr-1         { margin-right: 4px; }
+.octo-u-py-2         { padding-top: 8px; padding-bottom: 8px; }
+.octo-u-text-ok      { color: var(--ok); }
 
 /* ----- Admin error view ----- */
 .octo-admin-error { display: flex; flex: 1; align-items: center; justify-content: center; background: color-mix(in oklab, var(--surface-2) 20%, transparent); padding: 24px; }
@@ -4653,6 +4962,7 @@ html {
 .octo-icon-lg { width: 20px; height: 20px; }
 .octo-icon-xl { width: 32px; height: 32px; }
 .octo-icon-2xl { width: 48px; height: 48px; }
+.octo-icon-24 { width: 24px; height: 24px; }
 .octo-icon-shrink { flex-shrink: 0; }
 
 /* ----- Skeleton block size utilities (deterministic shimmer chips for skeletons) ----- */
@@ -4693,6 +5003,10 @@ html {
 .octo-skel-rounded-xl { border-radius: 12px; }
 .octo-skel-rounded-full { border-radius: 9999px; }
 .octo-skel-aspect-square { aspect-ratio: 1 / 1; }
+.octo-field--skel              { gap: 6px; }
+.octo-card--skel-layout        { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.octo-card__skel-lines         { display: flex; flex-direction: column; gap: 8px; }
+.octo-page-shell--skel-overflow { overflow: hidden; }
 
 /* ----- Compact layout helpers for content model dialogs and dashboard skeletons ----- */
 .octo-stack-2 { display: flex; flex-direction: column; gap: 8px; }
@@ -4701,6 +5015,20 @@ html {
 .octo-row-2 { display: flex; align-items: center; gap: 8px; }
 .octo-row-3 { display: flex; align-items: center; gap: 12px; }
 .octo-row-wrap-2 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* ─── Skeleton layout helpers ────────────────────────── */
+/* These are layout containers *around* ShimmerBlocks — not the shimmer blocks themselves */
+.octo-skel-row-12  { display: flex; align-items: center; gap: 12px; }
+.octo-skel-row-8   { display: flex; align-items: center; gap: 8px; }
+.octo-skel-col-20  { display: flex; flex-direction: column; gap: 20px; }
+.octo-skel-col-12  { display: flex; flex-direction: column; gap: 12px; }
+.octo-skel-col-10  { display: flex; flex-direction: column; gap: 10px; }
+.octo-skel-col-8   { display: flex; flex-direction: column; gap: 8px; }
+.octo-skel-col-6   { display: flex; flex-direction: column; gap: 6px; }
+.octo-skel-col-4   { display: flex; flex-direction: column; gap: 4px; }
+.octo-skel-row-gap-8 { display: flex; gap: 8px; }
+.octo-skel-row-gap-16 { display: flex; align-items: center; gap: 16px; }
+.octo-skel-between { display: flex; align-items: center; justify-content: space-between; }
 
 /* ============================================================
    7. Reset (@layer base)
@@ -4827,6 +5155,14 @@ html {
 /* Danger menu item */
 .octo-menu-item--danger { color: var(--danger); }
 .octo-menu-item--danger:focus { color: var(--danger); }
+/* Breadcrumb button reset */
+.octo-btn-breadcrumb {
+  color: var(--text-2);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
 
 /* ----- Table BEM finishing extras ----- */
 .octo-table-row--no-hover:hover { background: transparent; }
@@ -4840,6 +5176,7 @@ html {
 .octo-table-head--muted { font-weight: 500; color: var(--muted); }
 .octo-table-head--right { text-align: right; }
 .octo-table-head--w20 { width: 80px; }
+.octo-table-head--action { width: 40px; }
 
 /* ----- Table hover-group pattern (show action buttons on row hover) ----- */
 .octo-btn-row-action { opacity: 0; transition: opacity 0.1s; }
@@ -4878,6 +5215,14 @@ html {
 /* ----- Select trigger size modifiers (for sub-md form selects) ----- */
 .octo-select__trigger--sm { height: 30px; font-size: 12px; }
 .octo-select__trigger--xs { height: 28px; font-size: 11px; }
+.octo-select__trigger--pill {
+  height: 36px;
+  width: 130px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 400;
+}
 /* Input / select error state */
 .octo-input--invalid { border-color: color-mix(in oklab, var(--danger) 50%, transparent); }
 .octo-select__trigger--invalid { border-color: color-mix(in oklab, var(--danger) 50%, transparent); }

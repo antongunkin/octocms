@@ -18,9 +18,7 @@ export function FieldShell({ error, className, prefix, suffix, children }: Field
   return (
     <div className={cn('field-shell octo-input--shell', error && 'octo-input--shell--error', className)}>
       {prefix ? <span className="octo-input__affix">{prefix}</span> : null}
-      <div className="octo-input__inner-wrap" style={{ flex: 1, minWidth: 0 }}>
-        {children}
-      </div>
+      <div className="octo-input__inner-wrap octo-u-flex-1 octo-u-min-w-0">{children}</div>
       {suffix ? <span className="octo-input__affix">{suffix}</span> : null}
     </div>
   );

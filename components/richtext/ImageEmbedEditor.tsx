@@ -114,7 +114,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               className="octo-image-embed__thumb"
             />
             <button type="button" onClick={() => updateMediaId('')} className="octo-image-embed__clear">
-              <X style={{ width: 14, height: 14 }} />
+              <X className="octo-icon-sm" />
             </button>
           </div>
           <div className="octo-image-embed__info">
@@ -128,7 +128,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
       ) : (
         <div className="octo-image-embed__empty-state">
           <div className="octo-image-embed__placeholder">
-            <ImageIcon className="octo-image-embed__placeholder-icon" style={{ width: 24, height: 24 }} />
+            <ImageIcon className="octo-image-embed__placeholder-icon octo-icon-24" />
           </div>
           <div>
             <span className="octo-image-embed__no-label">No image selected</span>
@@ -153,16 +153,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           <DialogHeader>
             <DialogTitle>Select or upload image</DialogTitle>
           </DialogHeader>
-          <div
-            style={{
-              border: '2px dashed var(--border)',
-              borderRadius: 8,
-              padding: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 12,
-            }}
-          >
+          <div className="octo-image-embed__dropzone">
             <input
               ref={uploadInputRef}
               type="file"
@@ -174,7 +165,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               }}
             />
             {!stagedFile ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+              <div className="octo-image-embed__upload-placeholder">
                 <Button
                   type="button"
                   variant="outline"
@@ -187,24 +178,23 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                 </Button>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 448 }}>
-                <p style={{ fontSize: 14, color: 'var(--muted)', wordBreak: 'break-all' }}>{stagedFile.name}</p>
+              <div className="octo-image-embed__upload-form">
+                <p className="octo-u-text-base octo-u-text-muted octo-u-word-break-all">{stagedFile.name}</p>
                 <div>
                   <Label htmlFor="richtext-image-upload-title" className="octo-field-label">
-                    Title <span style={{ color: 'var(--danger)' }}>*</span>
+                    Title <span className="octo-u-text-danger">*</span>
                   </Label>
                   <input
                     id="richtext-image-upload-title"
                     type="text"
                     value={uploadTitle}
                     onChange={(e) => setUploadTitle(e.target.value)}
-                    className="octo-media-asset__input"
-                    style={{ marginTop: 4 }}
+                    className="octo-media-asset__input octo-u-mt-1"
                     placeholder="Shown as default alt text when this image is used"
                     disabled={isPending}
                   />
                 </div>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div className="octo-u-flex octo-u-gap-2">
                   <Button type="button" size="sm" onClick={confirmStagedUpload} disabled={isPending}>
                     Upload
                   </Button>
@@ -223,19 +213,11 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                 </div>
               </div>
             )}
-            {isPending && <span style={{ fontSize: 11, color: 'var(--muted)' }}>Uploading...</span>}
+            {isPending && <span className="octo-u-text-xs octo-u-text-muted">Uploading...</span>}
           </div>
-          <div style={{ display: 'flex', gap: 16, flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <div className="octo-image-embed__body">
             {folders.length > 1 && (
-              <div
-                style={{
-                  width: 144,
-                  flexShrink: 0,
-                  overflowY: 'auto',
-                  borderRight: '1px solid var(--border)',
-                  paddingRight: 8,
-                }}
-              >
+              <div className="octo-image-embed__folders">
                 <button
                   type="button"
                   onClick={() => setSelectedFolder(null)}
@@ -277,8 +259,8 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                 ))}
               </div>
             )}
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            <div className="octo-image-embed__scroller">
+              <div className="octo-image-embed__grid">
                 {filteredEntries.map((entry) => {
                   const isSelected = currentMediaId === entry.id;
                   return (
@@ -300,38 +282,15 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                       <img
                         src={entry.publicUrl}
                         alt={entry.title || entry.originalName}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        className="octo-image-embed__thumb-img"
                       />
-                      <div
-                        style={{
-                          position: 'absolute',
-                          inset: '0 0 auto',
-                          bottom: 0,
-                          background: 'rgba(0,0,0,0.6)',
-                          padding: '4px 8px',
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: 11,
-                            color: '#fff',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            display: 'block',
-                          }}
-                        >
-                          {entry.title || entry.originalName}
-                        </span>
+                      <div className="octo-image-embed__thumb-overlay">
+                        <span className="octo-image-embed__thumb-caption">{entry.title || entry.originalName}</span>
                       </div>
                     </button>
                   );
                 })}
-                {filteredEntries.length === 0 && (
-                  <div style={{ gridColumn: 'span 3', textAlign: 'center', padding: '48px 0', color: 'var(--muted)' }}>
-                    No images found
-                  </div>
-                )}
+                {filteredEntries.length === 0 && <div className="octo-image-embed__empty">No images found</div>}
               </div>
             </div>
           </div>

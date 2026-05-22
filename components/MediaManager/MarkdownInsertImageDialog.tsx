@@ -150,7 +150,7 @@ function EditMarkdownImage({ initialAlt, initialSrc }: { initialAlt: string; ini
         <DialogHeader>
           <DialogTitle>Edit image</DialogTitle>
         </DialogHeader>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '8px 0' }}>
+        <div className="octo-u-stack octo-u-gap-4 octo-u-py-2">
           {initialSrc ? (
             <div className="octo-markdown-dialog__preview">
               {/* eslint-disable-next-line jsx-a11y/alt-text */}

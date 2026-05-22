@@ -117,21 +117,21 @@ const FormImageField = ({
               className="octo-ff-image__clear"
               aria-label="Remove image"
             >
-              <X style={{ width: 14, height: 14 }} />
+              <X className="octo-icon-sm" />
             </button>
           </div>
         ) : (
           <div className="octo-ff-image__empty">
-            <ImageIcon style={{ width: 32, height: 32 }} />
+            <ImageIcon className="octo-icon-xl" />
           </div>
         )}
         <div className="octo-ff-image__actions">
           <Button type="button" variant="outline" size="sm" onClick={() => uploadInputRef.current?.click()}>
-            <Upload style={{ width: 16, height: 16 }} />
+            <Upload className="octo-icon-md" />
             Upload new image
           </Button>
           <Button type="button" variant="outline" size="sm" onClick={() => setShowSelectDialog(true)}>
-            <ImagePlus style={{ width: 16, height: 16 }} />
+            <ImagePlus className="octo-icon-md" />
             Select existing image
           </Button>
         </div>

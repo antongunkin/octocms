@@ -16,9 +16,9 @@ import { ShimmerBlock } from './primitives';
  */
 export function FormFieldSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('octo-field', className)} role="status" aria-label="Loading field" style={{ gap: 6 }}>
-      <ShimmerBlock style={{ height: 12, width: 96 }} />
-      <ShimmerBlock style={{ height: 36, width: '100%' }} />
+    <div className={cn('octo-field', 'octo-field--skel', className)} role="status" aria-label="Loading field">
+      <ShimmerBlock className="octo-skel-h-3 octo-skel-w-24" />
+      <ShimmerBlock className="octo-skel-h-9 octo-skel-w-full" />
     </div>
   );
 }
@@ -29,16 +29,11 @@ export function FormFieldSkeleton({ className }: { className?: string }) {
  */
 export function CardSkeleton({ lines = 3, className }: { lines?: number; className?: string }) {
   return (
-    <div
-      role="status"
-      aria-label="Loading card"
-      className={cn('octo-card', className)}
-      style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}
-    >
-      <ShimmerBlock style={{ height: 16, width: '33%' }} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div role="status" aria-label="Loading card" className={cn('octo-card', 'octo-card--skel-layout', className)}>
+      <ShimmerBlock className="octo-skel-h-4" style={{ width: '33%' }} />
+      <div className="octo-card__skel-lines">
         {Array.from({ length: lines }, (_, i) => (
-          <ShimmerBlock key={i} style={{ height: 12, width: '100%' }} />
+          <ShimmerBlock key={i} className="octo-skel-h-3 octo-skel-w-full" />
         ))}
       </div>
     </div>

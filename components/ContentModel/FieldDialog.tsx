@@ -574,7 +574,7 @@ function ChangeTypeMenu({
 }) {
   const [openPicker, setOpenPicker] = useState(false);
   return (
-    <div style={{ position: 'relative' }}>
+    <div className="octo-u-relative">
       <Button
         type="button"
         variant="ghost"
@@ -629,7 +629,7 @@ function ToggleCheckbox({
     <label className={cn('octo-field-toggle', disabled && 'octo-field-toggle--disabled')}>
       <input
         type="checkbox"
-        style={{ marginTop: 2 }}
+        className="octo-u-mt-0-5"
         checked={checked}
         disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
@@ -670,13 +670,13 @@ function EntryTitleToggle({
     >
       <input
         type="checkbox"
-        style={{ marginTop: 2 }}
+        className="octo-u-mt-0-5"
         checked={checked}
         disabled={disabled || !allowed}
         onChange={(e) => onChange(e.target.checked)}
       />
       <span className="octo-field-toggle__text">
-        <span className="octo-field-toggle__label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <span className="octo-field-toggle__label octo-u-row octo-u-gap-1">
           <Icon className={cn('octo-icon-sm', checked ? 'octo-field-table__star--filled' : 'octo-u-text-muted')} />
           Entry title
         </span>

@@ -171,7 +171,7 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               className="octo-embed-editor__title"
               title="Click to edit condition field name"
             >
-              {currentField || <span style={{ color: 'var(--muted)', fontStyle: 'italic' }}>Set field name…</span>}
+              {currentField || <span className="octo-u-text-muted octo-u-italic">Set field name…</span>}
             </button>
           )}
         </div>
@@ -190,7 +190,7 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           </button>
         ))}
         <button type="button" onClick={addBranch} className="octo-embed-editor__tab-add" title="Add branch">
-          <Plus style={{ width: 14, height: 14 }} />
+          <Plus className="octo-icon-sm" />
         </button>
       </div>
 
@@ -218,7 +218,7 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                 style={{ height: 24, width: 24, padding: 0, color: 'var(--muted)' }}
                 title="Remove this branch"
               >
-                <Trash2 style={{ width: 14, height: 14 }} />
+                <Trash2 className="octo-icon-sm" />
               </Button>
             )}
           </div>

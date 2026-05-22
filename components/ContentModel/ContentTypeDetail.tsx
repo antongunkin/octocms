@@ -187,19 +187,19 @@ export default function ContentTypeDetail({ type }: Props) {
       {/* Page header — same chrome as DashboardContent / EditPost */}
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
-          <div style={{ display: 'flex', minWidth: 0, flex: 1, alignItems: 'center', gap: 8 }}>
+          <div className="octo-content-type-detail__header-row">
             <Button asChild variant="ghost" size="icon" className="octo-btn-back">
               <Link href="/cms/model" aria-label="Back to Content Model">
                 <ArrowLeft className="octo-icon-md" />
               </Link>
             </Button>
-            <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="octo-content-type-detail__title-col">
               <div className="octo-page-chrome__breadcrumb">
-                <Link href="/cms/model" style={{ color: 'var(--text-2)' }}>
+                <Link href="/cms/model" className="octo-u-text-2">
                   Model
                 </Link>
-                <ChevronRight className="octo-icon-xs" style={{ opacity: 0.6 }} />
-                <span style={{ fontFamily: 'var(--ft-mono)', fontSize: 11, color: 'var(--muted)' }}>{type}</span>
+                <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
+                <span className="octo-content-type-detail__type-badge">{type}</span>
               </div>
               <div className="octo-page-chrome__title-row">
                 {collection.hasMany ? (
@@ -276,7 +276,7 @@ export default function ContentTypeDetail({ type }: Props) {
         {/* Main content column — independently scrollable */}
         <div className="octo-schema-detail__main">
           <Tabs defaultValue="fields" className="octo-tabs--flex-col">
-            <TabsList style={{ alignSelf: 'flex-start' }}>
+            <TabsList className="octo-u-self-start">
               <TabsTrigger value="fields">Fields</TabsTrigger>
               <TabsTrigger value="json">JSON</TabsTrigger>
             </TabsList>
@@ -458,7 +458,7 @@ export default function ContentTypeDetail({ type }: Props) {
                   {entryTitleKey ? (
                     <code className="octo-schema-detail__detail-val--mono">{entryTitleKey}</code>
                   ) : (
-                    <span style={{ color: 'var(--muted)' }}>— not set —</span>
+                    <span className="octo-u-text-muted">— not set —</span>
                   )}
                 </span>
               </div>

@@ -75,15 +75,10 @@ export function MediaListTable({ files, onPickFile, selectedId }: MediaListTable
                   <td className="octo-content-row__td octo-content-row__meta">
                     {file.width != null && file.height != null ? `${file.width} × ${file.height}` : '—'}
                   </td>
-                  <td
-                    className="octo-content-row__td octo-content-row__meta"
-                    style={{ fontFamily: 'var(--ft-mono)', fontSize: '12px' }}
-                  >
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                      <ImageIcon className="octo-icon-sm octo-u-shrink-0" style={{ opacity: 0.6 }} />
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {file.originalName}
-                      </span>
+                  <td className="octo-content-row__td octo-content-row__meta octo-u-mono octo-u-text-sm">
+                    <span className="octo-u-flex octo-u-gap-1-5">
+                      <ImageIcon className="octo-icon-sm octo-u-shrink-0 octo-u-opacity-60" />
+                      <span className="octo-u-truncate">{file.originalName}</span>
                     </span>
                   </td>
                 </tr>

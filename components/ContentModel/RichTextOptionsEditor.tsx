@@ -58,7 +58,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div className="octo-rt-opts__section">
       <Section
         title="Toolbar"
         description="All buttons are enabled by default. Turn off any you do not want to expose."
@@ -80,8 +80,8 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
       </Section>
 
       <Section title="Embeds" description="Allow editors to embed live content alongside markdown text.">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer' }}>
+        <div className="octo-rt-opts__group">
+          <label className="octo-rt-opts__check-label">
             <input
               type="checkbox"
               checked={Boolean(embeds.references)}
@@ -93,7 +93,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
           {embeds.references ? (
             <div className="octo-richtext-embed-options">
               <div>
-                <span style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'var(--muted)' }}>Display</span>
+                <span className="octo-rt-opts__sub-label">Display</span>
                 <Select
                   value={embeds.references.display ?? 'both'}
                   onValueChange={(v) =>
@@ -114,16 +114,12 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
                 </Select>
               </div>
               <div>
-                <span
-                  style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'var(--muted)', marginBottom: 4 }}
-                >
+                <span className="octo-rt-opts__sub-label octo-rt-opts__sub-label--mb">
                   Allowed collections (none = any)
                 </span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                <div className="octo-rt-opts__chip-row">
                   {availableCollections.length === 0 ? (
-                    <span style={{ fontSize: 11, fontStyle: 'italic', color: 'var(--muted)' }}>
-                      No collections defined yet.
-                    </span>
+                    <span className="octo-rt-opts__empty-text">No collections defined yet.</span>
                   ) : (
                     availableCollections.map((c) => {
                       const selected = embeds.references?.collections?.includes(c) === true;
@@ -158,7 +154,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
             </div>
           ) : null}
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer' }}>
+          <label className="octo-rt-opts__check-label">
             <input
               type="checkbox"
               checked={embeds.images === true}
@@ -168,7 +164,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
             <span>Images from media library</span>
           </label>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer' }}>
+          <label className="octo-rt-opts__check-label">
             <input
               type="checkbox"
               checked={embeds.conditions === true}
@@ -231,10 +227,10 @@ function VariablesEditor({
     setDraft('');
   };
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+    <div className="octo-rt-opts__group--sm">
+      <div className="octo-rt-opts__chip-row">
         {value.map((v) => (
-          <span key={v} className="octo-string-list__tag" style={{ fontFamily: 'var(--ft-mono)', fontSize: 11 }}>
+          <span key={v} className="octo-string-list__tag octo-rt-opts__mono-tag">
             {v}
             <button
               type="button"
@@ -303,12 +299,12 @@ function ComponentsEditor({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <div className="octo-rt-opts__group--sm">
       {entries.length === 0 ? (
         <p className="octo-checkbox-list__empty">No custom components defined.</p>
       ) : (
         entries.map(([name, def]) => (
-          <div key={name} className="octo-branch-card" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div key={name} className="octo-branch-card octo-rt-opts__group--sm">
             <div className="octo-branch-card__grid">
               <div className="octo-branch-card__field">
                 <span className="octo-branch-card__field-label">Name (PascalCase)</span>
@@ -347,9 +343,7 @@ function ComponentsEditor({
             </div>
 
             <div>
-              <span style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'var(--muted)', marginBottom: 4 }}>
-                Props
-              </span>
+              <span className="octo-rt-opts__sub-label octo-rt-opts__sub-label--mb">Props</span>
               <PropsEditor
                 value={def.props}
                 onChange={(props) => updateComponent(name, { props })}
@@ -357,7 +351,7 @@ function ComponentsEditor({
               />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div className="octo-rt-opts__remove-row">
               <Button
                 type="button"
                 variant="ghost"
@@ -408,7 +402,7 @@ function PropsEditor({
     );
   }
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div className="octo-rt-opts__group--xs">
       {value.map((p, i) => (
         <div key={i} className="octo-richtext-props-grid">
           <Input

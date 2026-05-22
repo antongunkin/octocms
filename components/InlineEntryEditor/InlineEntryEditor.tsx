@@ -212,7 +212,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
         <div className="octo-inline-editor__header">
           <div className="octo-inline-editor__back">
             <Button variant="ghost" size="sm" onClick={handleClose}>
-              <ArrowLeft className="octo-icon-md" style={{ marginRight: 4 }} />
+              <ArrowLeft className="octo-icon-md octo-u-mr-1" />
               Back
             </Button>
           </div>
@@ -230,7 +230,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
                   Restore
                 </Button>
                 <Button variant="destructive" size="sm" onClick={openDeleteDialog} disabled={isSaving}>
-                  <Trash2 className="octo-icon-md" style={{ marginRight: 4 }} />
+                  <Trash2 className="octo-icon-md octo-u-mr-1" />
                   Delete permanently
                 </Button>
               </>
@@ -317,9 +317,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
               </DialogDescription>
             </DialogHeader>
             {isLoadingBacklinks ? (
-              <div className="octo-inline-editor__loading" style={{ padding: '8px 0' }}>
-                Checking references...
-              </div>
+              <div className="octo-inline-editor__loading octo-u-py-2">Checking references...</div>
             ) : (
               deleteBacklinks.length > 0 && (
                 <div className="octo-inline-editor__delete-warning">
@@ -331,7 +329,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
                     {deleteBacklinks.map((link) => (
                       <li key={link.path} className="octo-inline-editor__delete-warning-item">
                         {link.title}{' '}
-                        <span style={{ fontSize: 12 }}>
+                        <span className="octo-u-text-sm">
                           ({config.collections[link.type as keyof Config['collections']]?.label || link.type})
                         </span>
                       </li>

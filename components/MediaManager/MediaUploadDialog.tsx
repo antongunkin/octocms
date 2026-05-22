@@ -111,7 +111,7 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
                     const checked = e.target.checked;
                     setRows((prev) => prev.map((r, j) => (j === i ? { ...r, generateBlur: checked } : r)));
                   }}
-                  style={{ height: '14px', width: '14px', borderRadius: '3px' }}
+                  className="octo-upload-check"
                   disabled={isPending}
                 />
                 Generate blur placeholder

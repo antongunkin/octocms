@@ -101,7 +101,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
     return (
       <div className="octo-media-asset">
         <div className="octo-page-chrome">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="octo-u-row octo-u-gap-2">
             <Button variant="ghost" size="icon" className="octo-btn-back" onClick={back} aria-label="Back to media">
               <ArrowLeft className="octo-icon-md" />
             </Button>
@@ -121,7 +121,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
     return (
       <div className="octo-media-asset__not-found">
         <ImageIcon className="octo-icon-2xl" />
-        <p style={{ fontSize: '14px' }}>Asset not found.</p>
+        <p className="octo-u-text-base">Asset not found.</p>
         <Button variant="outline" size="sm" onClick={back}>
           Back to media
         </Button>
@@ -136,21 +136,17 @@ export function MediaAsset({ id }: MediaAssetProps) {
       {/* Page header — same chrome as content list */}
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="octo-u-row octo-u-gap-2">
             <Button variant="ghost" size="icon" className="octo-btn-back" onClick={back} aria-label="Back to media">
               <ArrowLeft className="octo-icon-md" />
             </Button>
             <div>
               <div className="octo-page-chrome__breadcrumb">
-                <button
-                  type="button"
-                  onClick={back}
-                  style={{ color: 'var(--text-2)', background: 'none', border: 0, cursor: 'pointer', padding: 0 }}
-                >
+                <button type="button" onClick={back} className="octo-btn-breadcrumb">
                   Media
                 </button>
-                <ChevronRight className="octo-icon-xs" style={{ opacity: 0.6 }} />
-                <span style={{ color: 'var(--text-2)' }}>{folderLabel}</span>
+                <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
+                <span className="octo-u-text-2">{folderLabel}</span>
               </div>
               <div className="octo-page-chrome__title-row">
                 <h1 className="octo-page-chrome__title">{file.title || file.originalName}</h1>
@@ -158,7 +154,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
             </div>
           </div>
         </div>
-        <div className="octo-page-chrome__right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="octo-page-chrome__right octo-u-row octo-u-gap-2">
           <Button variant="outline" size="sm" className="octo-u-gap-1-5" onClick={openInNewTab}>
             <ExternalLink className="octo-icon-md" />
             Open in new tab
@@ -187,7 +183,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
           <div className="octo-media-asset__sidebar-inner">
             <section className="octo-media-asset__sidebar-section">
               <Label htmlFor="media-asset-title" className="octo-field-label-hint">
-                Title <span style={{ color: 'var(--danger)' }}>*</span>
+                Title <span className="octo-u-text-danger">*</span>
               </Label>
               <input
                 id="media-asset-title"
@@ -236,20 +232,12 @@ export function MediaAsset({ id }: MediaAssetProps) {
               >
                 Save folder
               </Button>
-              <p style={{ fontSize: '11px', color: 'var(--muted)' }}>
+              <p className="octo-u-text-xs octo-u-text-muted">
                 Folders are virtual labels for sorting &mdash; they aren&rsquo;t physical directories.
               </p>
             </section>
 
-            <section
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-                borderTop: '1px solid var(--border)',
-                paddingTop: '20px',
-              }}
-            >
+            <section className="octo-media-asset__details-section">
               <h3 className="octo-media-asset__details-heading">Details</h3>
               <div className="octo-media-asset__details">
                 <DetailRow label="File name" value={file.originalName} mono />

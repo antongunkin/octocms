@@ -48,7 +48,7 @@ const ComponentEmbedEditor: React.FC<
         style={{ background: '#78350f', color: '#fef3c7' }}
         contentEditable={false}
       >
-        <Puzzle style={{ width: 12, height: 12, flexShrink: 0 }} />
+        <Puzzle className="octo-icon-xs octo-u-shrink-0" />
         <span>{componentDef.label}</span>
         {componentDef.props.map((prop) => {
           const value = getAttrValue(prop.name);

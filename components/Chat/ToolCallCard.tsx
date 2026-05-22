@@ -28,12 +28,8 @@ export function ToolCallCard({ call }: Props) {
         <span className="octo-tool-call-card__name">{call.name}</span>
         <span className="octo-tool-call-card__preview">{inputPreview}</span>
         {status === 'pending' && <span className="octo-tool-call-card__status">…</span>}
-        {status === 'ok' && (
-          <CheckCircle2 className="octo-icon-xs octo-tool-call-card__status" style={{ color: 'var(--ok)' }} />
-        )}
-        {status === 'error' && (
-          <AlertCircle className="octo-icon-xs octo-tool-call-card__status" style={{ color: 'var(--danger)' }} />
-        )}
+        {status === 'ok' && <CheckCircle2 className="octo-icon-xs octo-tool-call-card__status octo-u-text-ok" />}
+        {status === 'error' && <AlertCircle className="octo-icon-xs octo-tool-call-card__status octo-u-text-danger" />}
       </button>
       {expanded && (
         <div className="octo-tool-call-card__body">

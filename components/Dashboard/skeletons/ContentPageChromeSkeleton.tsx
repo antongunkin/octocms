@@ -13,21 +13,21 @@ import { LeftPanelSkeleton } from './LeftPanelSkeleton';
  */
 export function ContentPageChromeSkeleton() {
   return (
-    <div style={{ display: 'flex', minHeight: 0, flex: 1, flexDirection: 'column', overflow: 'hidden' }}>
+    <div className="octo-page-chrome--skel">
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
           <div className="octo-page-chrome__breadcrumb">
-            <ShimmerBlock style={{ height: 12, width: 64 }} />
+            <ShimmerBlock className="octo-skel-h-3 octo-skel-w-16" />
           </div>
           <div>
-            <ShimmerBlock style={{ height: 24, width: 160, maxWidth: '100%', borderRadius: 4 }} />
+            <ShimmerBlock className="octo-skel-h-6 octo-skel-w-40" style={{ maxWidth: '100%', borderRadius: 4 }} />
           </div>
         </div>
         <div className="octo-page-chrome__right">
-          <ShimmerBlock style={{ height: 32, width: 112, flexShrink: 0, borderRadius: 6 }} />
+          <ShimmerBlock className="octo-skel-h-8 octo-skel-w-28 octo-skel-rounded-md octo-u-shrink-0" />
         </div>
       </div>
-      <div style={{ display: 'flex', minHeight: 0, flex: 1, overflow: 'hidden' }}>
+      <div className="octo-u-flex octo-u-min-h-0 octo-u-flex-1 octo-u-overflow-hidden">
         <LeftPanelSkeleton />
         <ContentTableSkeleton />
       </div>

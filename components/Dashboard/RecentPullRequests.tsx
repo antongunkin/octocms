@@ -24,7 +24,7 @@ export function RecentPullRequestsView() {
           <div>
             <h2 className="octo-pr-list__heading">Recent pull requests</h2>
             <p className="octo-pr-list__sub">
-              Latest <code style={{ fontFamily: 'var(--ft-mono)' }}>cms-update</code> PRs · open and merged
+              Latest <code className="octo-u-mono">cms-update</code> PRs · open and merged
             </p>
           </div>
           {recentPRsQ.isPending && !recentPRsQ.data ? (
@@ -90,12 +90,11 @@ function EmptyState() {
   return (
     <div className="octo-pr-empty">
       <div className="octo-pr-empty__icon">
-        <GitPullRequest style={{ width: 20, height: 20 }} />
+        <GitPullRequest className="octo-icon-lg" />
       </div>
       <p className="octo-pr-empty__title">No CMS pull requests yet</p>
       <p className="octo-pr-empty__text">
-        Pull requests labelled <code style={{ fontFamily: 'var(--ft-mono)' }}>cms-update</code> will show up here as
-        they're opened.
+        Pull requests labelled <code className="octo-u-mono">cms-update</code> will show up here as they're opened.
       </p>
     </div>
   );
@@ -108,8 +107,8 @@ function RecentPullRequestsSkeleton() {
         <div key={i} className="octo-pr-skel__row">
           <div className="octo-pr-skel__tile" />
           <div className="octo-pr-skel__lines">
-            <div className="octo-pr-skel__line" style={{ width: '50%' }} />
-            <div className="octo-pr-skel__line" style={{ width: '66%', height: 10 }} />
+            <div className="octo-pr-skel__line octo-pr-skel__line--primary" />
+            <div className="octo-pr-skel__line octo-pr-skel__line--secondary" />
           </div>
           <div className="octo-pr-skel__btn" />
         </div>

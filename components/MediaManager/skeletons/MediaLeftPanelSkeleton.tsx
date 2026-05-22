@@ -9,10 +9,10 @@ import { ShimmerBlock } from '../../skeletons/primitives';
 export function MediaLeftPanelSkeleton() {
   return (
     <aside role="status" aria-label="Loading folders" className="octo-media-left-panel">
-      <div style={{ padding: '12px 12px 16px' }}>
+      <div className="octo-media-left-panel__skel-inner">
         <ShimmerBlock className="octo-skel-mb-3 octo-skel-h-7 octo-skel-w-full octo-skel-rounded-lg" />
         <ShimmerBlock className="octo-skel-mb-2 octo-skel-ml-2 octo-skel-h-3 octo-skel-w-16" />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div className="octo-skel-col-6">
           {Array.from({ length: 5 }, (_, i) => (
             <ShimmerBlock key={i} className="octo-skel-h-7 octo-skel-w-full octo-skel-rounded-lg" />
           ))}

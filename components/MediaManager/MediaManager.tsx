@@ -152,11 +152,11 @@ const MediaManager = () => {
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
           <div className="octo-page-chrome__breadcrumb">
-            <span style={{ color: 'var(--text-2)' }}>Media</span>
+            <span className="octo-u-text-2">Media</span>
             {selectedFolder !== null && (
               <>
-                <ChevronRight className="octo-icon-xs" style={{ opacity: 0.6 }} />
-                <span style={{ color: 'var(--text-2)' }}>{selectedFolder === '/' ? 'Root' : selectedFolder}</span>
+                <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
+                <span className="octo-u-text-2">{selectedFolder === '/' ? 'Root' : selectedFolder}</span>
               </>
             )}
           </div>
@@ -164,18 +164,10 @@ const MediaManager = () => {
             <h1 className="octo-page-chrome__title">{breadcrumbFolderLabel}</h1>
           </div>
         </div>
-        <div className="octo-page-chrome__right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-2)' }}>
+        <div className="octo-page-chrome__right octo-u-row octo-u-gap-2">
+          <span className="octo-u-text-md octo-u-font-medium octo-u-text-2">
             Assets
-            <span
-              style={{
-                marginLeft: '6px',
-                fontFamily: 'var(--ft-mono)',
-                fontSize: '12px',
-                fontWeight: 400,
-                color: 'var(--muted)',
-              }}
-            >
+            <span className="octo-u-mono octo-u-text-sm octo-u-text-muted" style={{ marginLeft: '6px' }}>
               {filteredFiles.length}
             </span>
           </span>
@@ -241,7 +233,7 @@ const MediaManager = () => {
             ) : filteredFiles.length === 0 ? (
               <div className="octo-media-manager__empty">
                 <ImageIcon className="octo-icon-2xl" />
-                <p style={{ fontSize: '14px' }}>
+                <p className="octo-u-text-base">
                   {searchQuery ? 'No assets match this search' : 'No files in this folder yet'}
                 </p>
               </div>
