@@ -139,7 +139,7 @@ export default function ConditionalBranchesEditor({
                           disabled={disabled}
                           className={cn(
                             'octo-u-mono octo-select__trigger--xs',
-                            (keyInvalid || duplicate) && 'border-destructive/50',
+                            (keyInvalid || duplicate) && 'octo-input--invalid',
                           )}
                         />
                       </div>

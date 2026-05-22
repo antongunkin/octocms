@@ -215,7 +215,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
                 Folder
               </Label>
               <Select value={folderDraft} onValueChange={setFolderDraft} disabled={isPending}>
-                <SelectTrigger id="media-asset-folder" className="">
+                <SelectTrigger id="media-asset-folder">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

@@ -324,7 +324,7 @@ function SelectOptionsEditor({
                 disabled={disabled}
                 className={cn(
                   'octo-u-flex-1 octo-u-mono octo-select__trigger--xs',
-                  (o.value === '' || valueDuplicates.has(o.value)) && 'border-destructive/50',
+                  (o.value === '' || valueDuplicates.has(o.value)) && 'octo-input--invalid',
                 )}
               />
               <Button

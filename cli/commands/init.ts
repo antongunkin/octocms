@@ -58,7 +58,6 @@ const REQUIRED_PEER_DEPS: readonly string[] = [
   '@radix-ui/react-tabs',
   '@radix-ui/react-toast',
   '@tanstack/react-query',
-  'class-variance-authority',
   'clsx',
   'glob',
   'lucide-react',
@@ -72,7 +71,6 @@ const REQUIRED_PEER_DEPS: readonly string[] = [
   'sharp',
   'slugify',
   'sonner',
-  'tailwind-merge',
   'zod',
 ];
 

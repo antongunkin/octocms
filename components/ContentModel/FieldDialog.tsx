@@ -629,7 +629,7 @@ function ToggleCheckbox({
     <label className={cn('octo-field-toggle', disabled && 'octo-field-toggle--disabled')}>
       <input
         type="checkbox"
-        className="mt-0.5"
+        style={{ marginTop: 2 }}
         checked={checked}
         disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
@@ -670,7 +670,7 @@ function EntryTitleToggle({
     >
       <input
         type="checkbox"
-        className="mt-0.5"
+        style={{ marginTop: 2 }}
         checked={checked}
         disabled={disabled || !allowed}
         onChange={(e) => onChange(e.target.checked)}

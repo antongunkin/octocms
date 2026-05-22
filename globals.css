@@ -4878,6 +4878,9 @@ html {
 /* ----- Select trigger size modifiers (for sub-md form selects) ----- */
 .octo-select__trigger--sm { height: 30px; font-size: 12px; }
 .octo-select__trigger--xs { height: 28px; font-size: 11px; }
+/* Input / select error state */
+.octo-input--invalid { border-color: color-mix(in oklab, var(--danger) 50%, transparent); }
+.octo-select__trigger--invalid { border-color: color-mix(in oklab, var(--danger) 50%, transparent); }
 
 /* ----- Star fill for entry-title field ----- */
 .octo-field-table__star--filled { fill: #f59e0b; color: #d97706; }

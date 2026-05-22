@@ -276,7 +276,7 @@ export default function ContentTypeDetail({ type }: Props) {
         {/* Main content column — independently scrollable */}
         <div className="octo-schema-detail__main">
           <Tabs defaultValue="fields" className="octo-tabs--flex-col">
-            <TabsList className="self-start">
+            <TabsList style={{ alignSelf: 'flex-start' }}>
               <TabsTrigger value="fields">Fields</TabsTrigger>
               <TabsTrigger value="json">JSON</TabsTrigger>
             </TabsList>

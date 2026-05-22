@@ -119,7 +119,7 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
             </div>
           ))}
         </div>
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter>
           <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
             Cancel
           </Button>
