@@ -54,9 +54,7 @@ export function AdminErrorView({
         ) : (
           <p className="octo-admin-error__msg">An unexpected error occurred while loading this page.</p>
         )}
-        {isAvailability ? (
-          <p className="octo-admin-error__hint">You can try again in a few minutes.</p>
-        ) : null}
+        {isAvailability ? <p className="octo-admin-error__hint">You can try again in a few minutes.</p> : null}
         <div className="octo-admin-error__actions">
           <Button type="button" size="sm" onClick={() => reset()}>
             Try again

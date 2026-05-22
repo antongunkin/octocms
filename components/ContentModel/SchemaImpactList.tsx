@@ -51,7 +51,7 @@ export default function SchemaImpactList({
     <div className={cn('octo-schema-impact', `octo-schema-impact--${tone}`)}>
       {title ? (
         <div className="octo-schema-impact__title">
-          <AlertTriangle className="h-3.5 w-3.5" />
+          <AlertTriangle className="octo-icon-sm" />
           {title}
         </div>
       ) : null}
@@ -71,14 +71,14 @@ function ImpactRow({ item, asLink }: { item: SchemaImpactItem; asLink: boolean }
       <span className="octo-schema-impact__item-body">
         <span className="octo-schema-impact__item-title">{item.title}</span>
         <span className="octo-schema-impact__item-meta">
-          <code className="font-mono">{item.type}</code> · {item.reasons.join('; ')}
+          <code className="octo-u-mono">{item.type}</code> · {item.reasons.join('; ')}
         </span>
         {item.warnings.length > 0 ? (
           <span className="octo-schema-impact__item-warnings">⚠ {item.warnings.join('; ')}</span>
         ) : null}
       </span>
       <DataLossBadge dataLoss={item.dataLoss} />
-      {asLink ? <ArrowRight className="h-3.5 w-3.5 shrink-0 opacity-50" /> : null}
+      {asLink ? <ArrowRight className="octo-icon-sm octo-u-shrink-0 octo-u-opacity-50" /> : null}
     </span>
   );
 
@@ -102,14 +102,14 @@ function DataLossBadge({ dataLoss }: { dataLoss: boolean }) {
   if (dataLoss) {
     return (
       <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge--loss')}>
-        <ShieldAlert className="h-3 w-3" />
+        <ShieldAlert className="octo-icon-xs" />
         Data loss
       </span>
     );
   }
   return (
     <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge--ok')}>
-      <ShieldCheck className="h-3 w-3" />
+      <ShieldCheck className="octo-icon-xs" />
       Preserved
     </span>
   );

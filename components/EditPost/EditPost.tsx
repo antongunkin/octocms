@@ -233,9 +233,9 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
     <div className="octo-page-chrome">
       <div className="octo-page-chrome__title-area">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
+          <Button asChild variant="ghost" size="icon" className="octo-btn-back">
             <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="octo-icon-md" />
             </Link>
           </Button>
           <div className="octo-page-chrome__title-area">
@@ -243,7 +243,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
               <Link href="/cms/content" style={{ color: 'var(--text-2)' }}>
                 Content
               </Link>
-              <ChevronRight className="h-3 w-3" style={{ opacity: 0.6 }} />
+              <ChevronRight className="octo-icon-xs" style={{ opacity: 0.6 }} />
               <span>{collectionLabel}</span>
             </div>
             <div className="octo-page-chrome__title-row">
@@ -291,9 +291,9 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
+            <Button asChild variant="ghost" size="icon" className="octo-btn-back">
               <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="octo-icon-md" />
               </Link>
             </Button>
             <div>
@@ -301,7 +301,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
                 <Link href="/cms/content" style={{ color: 'var(--text-2)' }}>
                   Content
                 </Link>
-                <ChevronRight className="h-3 w-3" style={{ opacity: 0.6 }} />
+                <ChevronRight className="octo-icon-xs" style={{ opacity: 0.6 }} />
                 <span>{collectionLabel}</span>
               </div>
               <div className="octo-page-chrome__title-row">

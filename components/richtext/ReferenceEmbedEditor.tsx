@@ -176,27 +176,31 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           }
         }}
       >
-        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+        <DialogContent className="octo-dialog-content--3xl octo-dialog-content--vh-80 octo-dialog-content--flex-col">
           <DialogHeader>
             <DialogTitle>Select entry to embed</DialogTitle>
           </DialogHeader>
 
           {/* Search + filter bar */}
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <Search
+                className="octo-icon-md octo-u-text-muted"
+                style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
+              />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Filter entries…"
-                className="w-full text-sm pl-8 pr-3 py-2 rounded-md border border-border bg-layout-bg"
+                className="octo-ff-reference__search-input"
               />
             </div>
             <select
               value={collectionFilter ?? ''}
               onChange={(e) => setCollectionFilter(e.target.value || null)}
-              className="text-sm rounded-md border border-border bg-layout-bg px-2 py-2"
+              className="octo-media-asset__input"
+              style={{ width: 'auto' }}
             >
               <option value="">All collections</option>
               {availableCollections.map((type) => (
@@ -208,15 +212,17 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           </div>
 
           {/* Entry list */}
-          <div className="flex-1 overflow-y-auto min-h-0 border border-border rounded-md">
+          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, border: '1px solid var(--border)', borderRadius: 8 }}>
             {listPending && entries.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground text-sm">Loading entries…</div>
+              <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted)', fontSize: 14 }}>
+                Loading entries…
+              </div>
             ) : filteredEntries.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground text-sm">
+              <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted)', fontSize: 14 }}>
                 {searchQuery ? 'No matching entries' : 'No entries found'}
               </div>
             ) : (
-              <div className="divide-y divide-border">
+              <div style={{ borderTop: '1px solid var(--border)' }}>
                 {filteredEntries.map((entry) => {
                   const refKey = toReferenceKey(entry.path);
                   const isSelected = refKey === toReferenceKey(currentId);
@@ -225,16 +231,40 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                       key={`${entry.type}-${entry.id}`}
                       type="button"
                       onClick={() => handleSelect(entry)}
-                      className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-colors ${
-                        isSelected ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                      }`}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '8px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        background: isSelected ? 'color-mix(in oklab, var(--brand) 10%, transparent)' : 'transparent',
+                        color: isSelected ? 'var(--brand)' : 'var(--text)',
+                        border: 0,
+                        cursor: 'pointer',
+                        borderBottom: '1px solid var(--border)',
+                      }}
                     >
-                      <FileText className="w-4 h-4 flex-none text-muted-foreground" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{entry.title}</div>
-                        <div className="text-xs text-muted-foreground">{getCollectionLabel(entry.type)}</div>
+                      <FileText className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 500,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {entry.title}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--muted)' }}>{getCollectionLabel(entry.type)}</div>
                       </div>
-                      {isSelected && <span className="text-xs font-medium text-primary flex-none">Selected</span>}
+                      {isSelected && (
+                        <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--brand)', flexShrink: 0 }}>
+                          Selected
+                        </span>
+                      )}
                     </button>
                   );
                 })}

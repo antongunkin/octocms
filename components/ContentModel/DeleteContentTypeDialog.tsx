@@ -94,12 +94,13 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="octo-dialog-content--2xl">
         <DialogHeader>
           <DialogTitle>Delete content type</DialogTitle>
           <DialogDescription>
-            Permanently remove <strong>{collection.label}</strong> (<code className="font-mono text-xs">{type}</code>)
-            from the schema. All of its entries and companion files will be deleted in the same commit.
+            Permanently remove <strong>{collection.label}</strong> (
+            <code className="octo-u-mono octo-u-text-xs">{type}</code>) from the schema. All of its entries and
+            companion files will be deleted in the same commit.
           </DialogDescription>
         </DialogHeader>
 
@@ -126,7 +127,7 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
             {cascadingRefs.length > 0 ? (
               <div className="octo-dialog-fields">
                 <p className="octo-dialog-field__hint">
-                  Reference values pointing at <code className="font-mono">{type}</code> entries will be pruned
+                  Reference values pointing at <code className="octo-u-mono">{type}</code> entries will be pruned
                   automatically in the same commit so the public site never serves orphaned keys.
                 </p>
                 <SchemaImpactList
@@ -139,7 +140,7 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
 
             <div className="octo-confirm-box">
               <label htmlFor="ct-confirm" className="octo-confirm-box__label">
-                Type <code className="font-mono">{confirmRequired}</code> to confirm
+                Type <code className="octo-u-mono">{confirmRequired}</code> to confirm
               </label>
               <input
                 id="ct-confirm"

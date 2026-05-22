@@ -99,8 +99,8 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[80vh] max-w-5xl flex-col overflow-hidden p-0">
-        <DialogHeader className="border-b border-border px-6 py-4">
+      <DialogContent className="octo-dialog-content--5xl octo-dialog-content--vh-80 octo-dialog-content--flex-col octo-dialog-content--overflow-hidden octo-dialog-content--no-padding">
+        <DialogHeader className="octo-dialog-header--bordered">
           <DialogTitle>Select an image</DialogTitle>
         </DialogHeader>
 
@@ -124,7 +124,7 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
           <div className="octo-media-select-dialog__content">
             <div className="octo-media-select-dialog__toolbar">
               <div className="octo-media-select-dialog__search-wrap">
-                <Search className="octo-media-select-dialog__search-icon h-4 w-4" />
+                <Search className="octo-media-select-dialog__search-icon octo-icon-md" />
                 <input
                   ref={searchRef}
                   value={searchQuery}
@@ -141,7 +141,7 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
                 <div className="octo-media-select-dialog__loading">Loading…</div>
               ) : filteredFiles.length === 0 ? (
                 <div className="octo-media-select-dialog__empty">
-                  <ImageIcon className="h-12 w-12" />
+                  <ImageIcon className="octo-icon-2xl" />
                   <p style={{ fontSize: '14px' }}>
                     {searchQuery ? 'No assets match this search' : 'No files in this folder'}
                   </p>
@@ -201,7 +201,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         onClick={() => onChange('grid')}
         className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn--active')}
       >
-        <LayoutGrid className="h-3.5 w-3.5" />
+        <LayoutGrid className="octo-icon-sm" />
       </button>
       <button
         type="button"
@@ -211,7 +211,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         onClick={() => onChange('list')}
         className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn--active')}
       >
-        <List className="h-3.5 w-3.5" />
+        <List className="octo-icon-sm" />
       </button>
     </div>
   );

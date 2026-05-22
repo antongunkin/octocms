@@ -54,7 +54,7 @@ export function CreateFolderDialog({ open, onOpenChange, existing, onCreate }: C
             </DialogDescription>
           </DialogHeader>
           <div className="octo-folder-dialog__body">
-            <Label htmlFor="new-folder-name" className="text-xs text-muted-foreground">
+            <Label htmlFor="new-folder-name" className="octo-field-label-hint">
               Folder name
             </Label>
             <input

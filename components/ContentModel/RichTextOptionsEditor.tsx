@@ -103,7 +103,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
                   }
                   disabled={disabled}
                 >
-                  <SelectTrigger className="h-8 text-xs">
+                  <SelectTrigger className="octo-select__trigger--xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -260,7 +260,7 @@ function VariablesEditor({
           }}
           placeholder="user.firstName"
           disabled={disabled}
-          className="h-8 flex-1 font-mono text-xs"
+          className="octo-u-flex-1 octo-u-mono octo-select__trigger--xs"
         />
         <Button type="button" variant="outline" size="sm" onClick={commit} disabled={disabled || !draft.trim()}>
           Add
@@ -316,7 +316,7 @@ function ComponentsEditor({
                   value={name}
                   onChange={(e) => renameComponent(name, e.target.value)}
                   disabled={disabled}
-                  className="h-8 font-mono text-xs"
+                  className="octo-u-mono octo-select__trigger--xs"
                 />
               </div>
               <div className="octo-branch-card__field">
@@ -325,7 +325,7 @@ function ComponentsEditor({
                   value={def.label}
                   onChange={(e) => updateComponent(name, { label: e.target.value })}
                   disabled={disabled}
-                  className="h-8 text-sm"
+                  className="octo-select__trigger--sm"
                 />
               </div>
             </div>
@@ -336,7 +336,7 @@ function ComponentsEditor({
                 onValueChange={(v) => updateComponent(name, { kind: v as 'inline' | 'block' })}
                 disabled={disabled}
               >
-                <SelectTrigger className="h-8 text-xs">
+                <SelectTrigger className="octo-select__trigger--xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -362,18 +362,18 @@ function ComponentsEditor({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-7 text-xs text-muted-foreground hover:text-destructive"
+                className="octo-button--icon-xs octo-button--danger-ghost"
                 onClick={() => removeComponent(name)}
                 disabled={disabled}
               >
-                <Trash2 className="mr-1 h-3 w-3" /> Remove component
+                <Trash2 className="octo-icon-xs" /> Remove component
               </Button>
             </div>
           </div>
         ))
       )}
-      <Button type="button" variant="outline" size="sm" onClick={addComponent} disabled={disabled} className="h-8">
-        <Plus className="mr-1 h-3.5 w-3.5" /> Add component
+      <Button type="button" variant="outline" size="sm" onClick={addComponent} disabled={disabled}>
+        <Plus className="octo-icon-sm" /> Add component
       </Button>
     </div>
   );
@@ -395,8 +395,15 @@ function PropsEditor({
 
   if (value.length === 0) {
     return (
-      <Button type="button" variant="outline" size="sm" onClick={add} disabled={disabled} className="h-7 text-xs">
-        <Plus className="mr-1 h-3 w-3" /> Add prop
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={add}
+        disabled={disabled}
+        className="octo-button--icon-xs"
+      >
+        <Plus className="octo-icon-xs" /> Add prop
       </Button>
     );
   }
@@ -409,21 +416,21 @@ function PropsEditor({
             value={p.name}
             onChange={(e) => update(i, { name: e.target.value })}
             disabled={disabled}
-            className="h-7 font-mono text-xs"
+            className="octo-u-mono octo-select__trigger--xs"
           />
           <Input
             placeholder="Label"
             value={p.label}
             onChange={(e) => update(i, { label: e.target.value })}
             disabled={disabled}
-            className="h-7 text-xs"
+            className="octo-select__trigger--xs"
           />
           <Select
             value={p.type}
             onValueChange={(v) => update(i, { type: v as RichTextComponentProp['type'] })}
             disabled={disabled}
           >
-            <SelectTrigger className="h-7 text-xs">
+            <SelectTrigger className="octo-select__trigger--xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -438,17 +445,24 @@ function PropsEditor({
             type="button"
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+            className="octo-button--icon-xs octo-button--danger-ghost"
             onClick={() => remove(i)}
             disabled={disabled}
             aria-label="Remove prop"
           >
-            <Trash2 className="h-3 w-3" />
+            <Trash2 className="octo-icon-xs" />
           </Button>
         </div>
       ))}
-      <Button type="button" variant="outline" size="sm" onClick={add} disabled={disabled} className="h-7 text-xs">
-        <Plus className="mr-1 h-3 w-3" /> Add prop
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={add}
+        disabled={disabled}
+        className="octo-button--icon-xs"
+      >
+        <Plus className="octo-icon-xs" /> Add prop
       </Button>
     </div>
   );

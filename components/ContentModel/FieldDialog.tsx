@@ -253,7 +253,7 @@ export default function FieldDialog(props: Props) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[88vh] overflow-y-auto sm:max-w-2xl">
+        <DialogContent className="octo-dialog-content--3xl octo-dialog-content--vh-88 octo-dialog-content--overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>
@@ -288,9 +288,9 @@ export default function FieldDialog(props: Props) {
                     variant="ghost"
                     size="sm"
                     onClick={() => setStep('format')}
-                    className="h-7 text-xs"
+                    className="octo-button--icon-xs"
                   >
-                    <ArrowLeft className="mr-1 h-3 w-3" /> Change type
+                    <ArrowLeft className="octo-icon-xs" /> Change type
                   </Button>
                 ) : (
                   <ChangeTypeMenu
@@ -333,7 +333,7 @@ export default function FieldDialog(props: Props) {
                       setKeyTouched(true);
                     }}
                     disabled={busy}
-                    className="font-mono text-sm"
+                    className="octo-u-mono"
                     aria-invalid={Boolean(keyError || duplicateKey)}
                   />
                   <p
@@ -575,7 +575,13 @@ function ChangeTypeMenu({
   const [openPicker, setOpenPicker] = useState(false);
   return (
     <div style={{ position: 'relative' }}>
-      <Button type="button" variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setOpenPicker((v) => !v)}>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="octo-button--icon-xs"
+        onClick={() => setOpenPicker((v) => !v)}
+      >
         Change type
       </Button>
       {openPicker ? (
@@ -671,7 +677,7 @@ function EntryTitleToggle({
       />
       <span className="octo-field-toggle__text">
         <span className="octo-field-toggle__label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Icon className={cn('h-3.5 w-3.5', checked ? 'fill-amber-400 text-amber-500' : 'text-muted-foreground')} />
+          <Icon className={cn('octo-icon-sm', checked ? 'octo-field-table__star--filled' : 'octo-u-text-muted')} />
           Entry title
         </span>
         <span className="octo-field-toggle__desc">Use as display title in entry lists.</span>

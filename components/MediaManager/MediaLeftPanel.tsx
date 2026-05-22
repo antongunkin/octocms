@@ -35,7 +35,7 @@ export function MediaLeftPanel({
     <aside className="octo-media-left-panel">
       <nav className="octo-media-left-panel__all-nav octo-left-panel__nav">
         <LeftNavItem
-          icon={<ImageIcon className="h-4 w-4" />}
+          icon={<ImageIcon className="octo-icon-md" />}
           label="All files"
           count={totalCount}
           active={isAllActive}
@@ -52,7 +52,7 @@ export function MediaLeftPanel({
             onClick={onAddFolder}
             aria-label="Add folder"
           >
-            <Plus className="h-3 w-3" />
+            <Plus className="octo-icon-xs" />
           </button>
         </div>
         <nav className="octo-left-panel__nav">
@@ -70,7 +70,7 @@ export function MediaLeftPanel({
                   nest a button inside another button (invalid HTML).
                 */}
                 <LeftNavItem
-                  icon={<FolderOpen className="h-4 w-4" />}
+                  icon={<FolderOpen className="octo-icon-md" />}
                   label={label}
                   count={canDelete ? undefined : count}
                   active={active}
@@ -92,7 +92,7 @@ export function MediaLeftPanel({
                       aria-label={`Delete folder ${folder}`}
                       className="octo-media-left-panel__folder-del"
                     >
-                      <X className="h-3.5 w-3.5" />
+                      <X className="octo-icon-sm" />
                     </button>
                   </>
                 )}

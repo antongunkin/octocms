@@ -324,7 +324,7 @@ const FormRichTextField = ({
       key: 'h1',
       label: 'Heading 1',
       description: 'Large section heading',
-      icon: <span className="text-xs font-bold">H1</span>,
+      icon: <span style={{ fontSize: 11, fontWeight: 700 }}>H1</span>,
       action: () => editorRef.current?.insertMarkdown('\n# '),
       keywords: ['heading', 'title'],
     });
@@ -332,7 +332,7 @@ const FormRichTextField = ({
       key: 'h2',
       label: 'Heading 2',
       description: 'Medium section heading',
-      icon: <span className="text-xs font-bold">H2</span>,
+      icon: <span style={{ fontSize: 11, fontWeight: 700 }}>H2</span>,
       action: () => editorRef.current?.insertMarkdown('\n## '),
       keywords: ['heading', 'title'],
     });
@@ -340,49 +340,49 @@ const FormRichTextField = ({
       key: 'h3',
       label: 'Heading 3',
       description: 'Small section heading',
-      icon: <span className="text-xs font-bold">H3</span>,
+      icon: <span style={{ fontSize: 11, fontWeight: 700 }}>H3</span>,
       action: () => editorRef.current?.insertMarkdown('\n### '),
       keywords: ['heading', 'title'],
     });
     items.push({
       key: 'bullet-list',
       label: 'Bullet List',
-      icon: <span className="text-xs">•</span>,
+      icon: <span style={{ fontSize: 11 }}>•</span>,
       action: () => editorRef.current?.insertMarkdown('\n- '),
       keywords: ['list', 'bullet', 'unordered'],
     });
     items.push({
       key: 'numbered-list',
       label: 'Numbered List',
-      icon: <span className="text-xs">1.</span>,
+      icon: <span style={{ fontSize: 11 }}>1.</span>,
       action: () => editorRef.current?.insertMarkdown('\n1. '),
       keywords: ['list', 'numbered', 'ordered'],
     });
     items.push({
       key: 'quote',
       label: 'Quote',
-      icon: <span className="text-xs">&gt;</span>,
+      icon: <span style={{ fontSize: 11 }}>&gt;</span>,
       action: () => editorRef.current?.insertMarkdown('\n> '),
       keywords: ['quote', 'blockquote'],
     });
     items.push({
       key: 'code-block',
       label: 'Code Block',
-      icon: <span className="text-xs font-mono">{'{}'}</span>,
+      icon: <span style={{ fontSize: 11, fontFamily: 'var(--ft-mono)' }}>{'{}'}</span>,
       action: () => editorRef.current?.insertMarkdown('\n```\n\n```\n'),
       keywords: ['code', 'block'],
     });
     items.push({
       key: 'divider',
       label: 'Divider',
-      icon: <span className="text-xs">—</span>,
+      icon: <span style={{ fontSize: 11 }}>—</span>,
       action: () => editorRef.current?.insertMarkdown('\n---\n'),
       keywords: ['divider', 'hr', 'horizontal', 'rule'],
     });
     items.push({
       key: 'table',
       label: 'Table',
-      icon: <span className="text-xs">⊞</span>,
+      icon: <span style={{ fontSize: 11 }}>⊞</span>,
       action: () => editorRef.current?.insertMarkdown('\n| Col 1 | Col 2 |\n| --- | --- |\n| Cell | Cell |\n'),
       keywords: ['table', 'grid'],
     });

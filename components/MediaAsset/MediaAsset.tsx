@@ -102,14 +102,8 @@ export function MediaAsset({ id }: MediaAssetProps) {
       <div className="octo-media-asset">
         <div className="octo-page-chrome">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="-ml-2 h-7 w-7 text-muted-foreground"
-              onClick={back}
-              aria-label="Back to media"
-            >
-              <ArrowLeft className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="octo-btn-back" onClick={back} aria-label="Back to media">
+              <ArrowLeft className="octo-icon-md" />
             </Button>
           </div>
         </div>
@@ -126,7 +120,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
   if (!file) {
     return (
       <div className="octo-media-asset__not-found">
-        <ImageIcon className="h-12 w-12" />
+        <ImageIcon className="octo-icon-2xl" />
         <p style={{ fontSize: '14px' }}>Asset not found.</p>
         <Button variant="outline" size="sm" onClick={back}>
           Back to media
@@ -143,14 +137,8 @@ export function MediaAsset({ id }: MediaAssetProps) {
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="-ml-2 h-7 w-7 text-muted-foreground"
-              onClick={back}
-              aria-label="Back to media"
-            >
-              <ArrowLeft className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="octo-btn-back" onClick={back} aria-label="Back to media">
+              <ArrowLeft className="octo-icon-md" />
             </Button>
             <div>
               <div className="octo-page-chrome__breadcrumb">
@@ -161,7 +149,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
                 >
                   Media
                 </button>
-                <ChevronRight className="h-3 w-3" style={{ opacity: 0.6 }} />
+                <ChevronRight className="octo-icon-xs" style={{ opacity: 0.6 }} />
                 <span style={{ color: 'var(--text-2)' }}>{folderLabel}</span>
               </div>
               <div className="octo-page-chrome__title-row">
@@ -171,18 +159,18 @@ export function MediaAsset({ id }: MediaAssetProps) {
           </div>
         </div>
         <div className="octo-page-chrome__right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={openInNewTab}>
-            <ExternalLink className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="octo-u-gap-1-5" onClick={openInNewTab}>
+            <ExternalLink className="octo-icon-md" />
             Open in new tab
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            className="octo-button--danger-ghost"
             onClick={() => setConfirmDelete(true)}
             disabled={isPending}
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="octo-icon-md" />
             Delete
           </Button>
         </div>
@@ -198,7 +186,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
         <aside className="octo-media-asset__sidebar">
           <div className="octo-media-asset__sidebar-inner">
             <section className="octo-media-asset__sidebar-section">
-              <Label htmlFor="media-asset-title" className="text-xs text-muted-foreground">
+              <Label htmlFor="media-asset-title" className="octo-field-label-hint">
                 Title <span style={{ color: 'var(--danger)' }}>*</span>
               </Label>
               <input
@@ -208,16 +196,13 @@ export function MediaAsset({ id }: MediaAssetProps) {
                 onChange={(e) => setTitleDraft(e.target.value)}
                 disabled={isPending}
                 placeholder="Used as alt text when this image is referenced"
-                className={cn(
-                  'w-full rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm text-foreground',
-                  'focus:outline-none focus:ring-2 focus:ring-primary/30',
-                )}
+                className="octo-media-asset__input"
               />
               <Button
                 type="button"
                 size="sm"
                 variant="secondary"
-                className="w-full"
+                className="octo-button--w-full"
                 onClick={handleSaveTitle}
                 disabled={isPending || titleDraft.trim() === file.title}
               >
@@ -226,14 +211,11 @@ export function MediaAsset({ id }: MediaAssetProps) {
             </section>
 
             <section className="octo-media-asset__sidebar-section">
-              <Label htmlFor="media-asset-folder" className="text-xs text-muted-foreground">
+              <Label htmlFor="media-asset-folder" className="octo-field-label-hint">
                 Folder
               </Label>
               <Select value={folderDraft} onValueChange={setFolderDraft} disabled={isPending}>
-                <SelectTrigger
-                  id="media-asset-folder"
-                  className="h-9 w-full rounded-lg border-border text-sm font-normal"
-                >
+                <SelectTrigger id="media-asset-folder" className="">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -248,7 +230,7 @@ export function MediaAsset({ id }: MediaAssetProps) {
                 type="button"
                 size="sm"
                 variant="secondary"
-                className="w-full"
+                className="octo-button--w-full"
                 onClick={handleSaveFolder}
                 disabled={isPending || folderDraft === file.folder}
               >

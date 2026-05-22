@@ -285,7 +285,7 @@ const MediaManager = () => {
         type="file"
         accept={config.mediaAllowedFormats.map((f) => `.${f}`).join(',')}
         multiple
-        className="hidden"
+        className="octo-u-hidden"
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) openUploadQueue(e.target.files);
           e.target.value = '';
@@ -327,7 +327,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         onClick={() => onChange('grid')}
         className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn--active')}
       >
-        <LayoutGrid className="h-3.5 w-3.5" />
+        <LayoutGrid className="octo-icon-sm" />
       </button>
       <button
         type="button"
@@ -337,7 +337,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         onClick={() => onChange('list')}
         className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn--active')}
       >
-        <List className="h-3.5 w-3.5" />
+        <List className="octo-icon-sm" />
       </button>
     </div>
   );

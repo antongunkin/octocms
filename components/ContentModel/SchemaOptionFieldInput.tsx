@@ -71,7 +71,7 @@ function renderControl({
             onValueChange={(v) => onChange(v === '__none__' ? undefined : v)}
             disabled={disabled}
           >
-            <SelectTrigger className="h-9 text-sm">
+            <SelectTrigger className="octo-select__trigger--sm">
               <SelectValue placeholder="No default" />
             </SelectTrigger>
             <SelectContent>
@@ -90,7 +90,7 @@ function renderControl({
           value={typeof value === 'string' ? value : ''}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="h-9"
+          className=""
         />
       );
     }
@@ -106,7 +106,7 @@ function renderControl({
             onChange(Number.isFinite(n) ? n : undefined);
           }}
           disabled={disabled}
-          className="h-9"
+          className=""
         />
       );
     case 'boolean':
@@ -114,7 +114,7 @@ function renderControl({
     case 'enum':
       return (
         <Select value={typeof value === 'string' ? value : ''} onValueChange={(v) => onChange(v)} disabled={disabled}>
-          <SelectTrigger className="h-9 text-sm">
+          <SelectTrigger className="octo-select__trigger--sm">
             <SelectValue placeholder="Select…" />
           </SelectTrigger>
           <SelectContent>
@@ -229,7 +229,7 @@ function CollectionsCheckboxList({
               onChange(available.filter((k) => next.has(k)));
             }}
           />
-          <code className="font-mono">{c}</code>
+          <code className="octo-u-mono">{c}</code>
         </label>
       ))}
       {value.length === 0 ? (
@@ -272,7 +272,7 @@ function DefaultOptionsCheckboxList({
             }}
           />
           <span>{o.label}</span>
-          <code className="font-mono text-muted-foreground">({o.value})</code>
+          <code className="octo-u-mono octo-u-text-muted">({o.value})</code>
         </label>
       ))}
     </div>
@@ -315,7 +315,7 @@ function SelectOptionsEditor({
                 value={o.label}
                 onChange={(e) => update(i, { label: e.target.value })}
                 disabled={disabled}
-                className="h-9 flex-1"
+                className="octo-u-flex-1"
               />
               <Input
                 placeholder="value"
@@ -323,7 +323,7 @@ function SelectOptionsEditor({
                 onChange={(e) => update(i, { value: e.target.value })}
                 disabled={disabled}
                 className={cn(
-                  'h-9 flex-1 font-mono text-xs',
+                  'octo-u-flex-1 octo-u-mono octo-select__trigger--xs',
                   (o.value === '' || valueDuplicates.has(o.value)) && 'border-destructive/50',
                 )}
               />
@@ -331,19 +331,26 @@ function SelectOptionsEditor({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-muted-foreground hover:text-destructive"
+                className="octo-button--icon-sm octo-button--danger-ghost"
                 onClick={() => remove(i)}
                 disabled={disabled}
                 aria-label="Remove option"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2 className="octo-icon-sm" />
               </Button>
             </div>
           ))
         )}
       </div>
-      <Button type="button" variant="outline" size="sm" onClick={add} disabled={disabled} className="h-7 text-xs">
-        <Plus className="mr-1 h-3 w-3" /> Add option
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={add}
+        disabled={disabled}
+        className="octo-button--icon-xs"
+      >
+        <Plus className="octo-icon-xs" /> Add option
       </Button>
       {valueDuplicates.size > 0 ? <p className="octo-dialog-field__error-xs">Option values must be unique.</p> : null}
     </div>
@@ -371,7 +378,7 @@ function StringListEditor({
       <div className="octo-string-list__tags">
         {value.map((v) => (
           <span key={v} className="octo-string-list__tag">
-            <code className="font-mono">{v}</code>
+            <code className="octo-u-mono">{v}</code>
             <button
               type="button"
               onClick={() => onChange(value.filter((x) => x !== v))}
@@ -396,7 +403,7 @@ function StringListEditor({
           }}
           placeholder="Press Enter to add"
           disabled={disabled}
-          className="h-9 flex-1"
+          className="octo-u-flex-1"
         />
         <Button type="button" variant="outline" size="sm" onClick={commit} disabled={disabled || !draft.trim()}>
           Add

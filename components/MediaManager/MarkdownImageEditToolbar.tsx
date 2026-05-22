@@ -66,7 +66,7 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
         }}
         className="octo-markdown-img-toolbar__btn octo-markdown-img-toolbar__btn--delete"
       >
-        <Trash2 className="h-3.5 w-3.5" />
+        <Trash2 className="octo-icon-sm" />
       </button>
       <button
         type="button"
@@ -86,11 +86,11 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
         }}
         className="octo-markdown-img-toolbar__btn octo-markdown-img-toolbar__btn--edit"
       >
-        <Pencil className="h-3.5 w-3.5" />
+        <Pencil className="octo-icon-sm" />
       </button>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="octo-dialog-content--md">
           <DialogHeader>
             <DialogTitle>Delete this image?</DialogTitle>
             <DialogDescription>

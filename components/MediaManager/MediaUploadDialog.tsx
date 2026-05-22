@@ -78,7 +78,7 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
 
   return (
     <Dialog open={files !== null} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="flex max-h-[85vh] max-w-lg flex-col">
+      <DialogContent className="octo-dialog-content--lg octo-dialog-content--vh-85 octo-dialog-content--flex-col">
         <DialogHeader>
           <DialogTitle>Set title for each image</DialogTitle>
           <DialogDescription>
@@ -89,7 +89,7 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
           {rows.map((row, i) => (
             <div key={`${row.file.name}-${i}`} className="octo-upload-dialog__row">
               <p className="octo-upload-dialog__filename">{row.file.name}</p>
-              <Label className="text-xs font-medium text-foreground" htmlFor={`upload-title-${i}`}>
+              <Label className="octo-field-label" htmlFor={`upload-title-${i}`}>
                 Title
               </Label>
               <input

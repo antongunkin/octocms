@@ -110,17 +110,18 @@ export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="octo-dialog-content--2xl">
         <DialogHeader>
           <DialogTitle>Delete field</DialogTitle>
           <DialogDescription>
-            Permanently remove <strong>{field.label}</strong> (<code className="font-mono text-xs">{fieldKey}</code>)
-            from <strong>{collection.label}</strong>.
+            Permanently remove <strong>{field.label}</strong> (
+            <code className="octo-u-mono octo-u-text-xs">{fieldKey}</code>) from <strong>{collection.label}</strong>.
             {hasCompanionFiles ? (
               <>
                 {' '}
-                The companion <code className="font-mono text-xs">{field.format === 'markdown' ? '.md' : '.mdx'}</code>{' '}
-                file for every entry will be deleted in the same commit.
+                The companion{' '}
+                <code className="octo-u-mono octo-u-text-xs">{field.format === 'markdown' ? '.md' : '.mdx'}</code> file
+                for every entry will be deleted in the same commit.
               </>
             ) : null}
           </DialogDescription>
@@ -147,7 +148,8 @@ export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fi
             ) : (
               <>
                 <p className="octo-dialog-field__hint">
-                  Any value stored in <code className="font-mono">{fieldKey}</code> on these entries will be discarded.
+                  Any value stored in <code className="octo-u-mono">{fieldKey}</code> on these entries will be
+                  discarded.
                 </p>
                 <SchemaImpactList
                   tone="amber"
@@ -159,14 +161,14 @@ export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fi
 
             <div className="octo-confirm-box">
               <label htmlFor="field-confirm" className="octo-confirm-box__label">
-                Type <code className="font-mono">{fieldKey}</code> to confirm
+                Type <code className="octo-u-mono">{fieldKey}</code> to confirm
               </label>
               <Input
                 id="field-confirm"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 disabled={busy}
-                className="font-mono text-sm"
+                className="octo-u-mono"
                 autoComplete="off"
               />
             </div>

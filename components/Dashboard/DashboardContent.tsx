@@ -182,7 +182,7 @@ function AddEntryButton({ collections }: { collections: string[] }) {
       <DropdownMenuContent align="end">
         {collections.map((c) => (
           <DropdownMenuItem key={c} onSelect={() => handleCreate(c)}>
-            <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+            <FileText className="octo-icon-md octo-u-text-muted" />
             {config.collections[c as keyof typeof config.collections]?.label ?? c}
           </DropdownMenuItem>
         ))}

@@ -80,7 +80,7 @@ export function MediaListTable({ files, onPickFile, selectedId }: MediaListTable
                     style={{ fontFamily: 'var(--ft-mono)', fontSize: '12px' }}
                   >
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                      <ImageIcon className="h-3.5 w-3.5 shrink-0" style={{ opacity: 0.6 }} />
+                      <ImageIcon className="octo-icon-sm octo-u-shrink-0" style={{ opacity: 0.6 }} />
                       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {file.originalName}
                       </span>

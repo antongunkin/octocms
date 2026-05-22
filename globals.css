@@ -4796,6 +4796,92 @@ html {
   }
 }
 
+/* ----- Button finishing-pass extras ----- */
+/* Back-button shape: ghost icon btn with -8px left margin, 28×28, muted color */
+.octo-btn-back {
+  margin-left: -8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+/* Action button: dark bg / light text (for "Add field", "Create", primary CTAs) */
+.octo-button--action {
+  background: var(--text);
+  color: var(--bg);
+  gap: 6px;
+}
+.octo-button--action:hover { opacity: 0.88; }
+/* Danger ghost button */
+.octo-button--danger-ghost {
+  color: var(--danger);
+  gap: 6px;
+}
+.octo-button--danger-ghost:hover { background: color-mix(in oklab, var(--danger) 10%, transparent); color: var(--danger); }
+/* Icon button size overrides */
+.octo-button--icon-sm { height: 28px; width: 28px; padding: 0; gap: 0; }
+.octo-button--icon-xs { height: 24px; width: 24px; padding: 0; gap: 0; }
+/* w-full button */
+.octo-button--w-full { width: 100%; }
+/* Danger menu item */
+.octo-menu-item--danger { color: var(--danger); }
+.octo-menu-item--danger:focus { color: var(--danger); }
+
+/* ----- Table BEM finishing extras ----- */
+.octo-table-row--no-hover:hover { background: transparent; }
+.octo-table-cell--drag { cursor: grab; color: var(--muted); }
+.octo-table-cell--mono { font-family: var(--ft-mono); font-size: 12px; color: var(--muted); }
+.octo-table-cell--muted { color: var(--muted); font-size: 14px; }
+.octo-table-cell--empty { height: 128px; text-align: center; font-size: 14px; color: var(--muted); }
+.octo-table-cell--right { text-align: right; }
+.octo-table-cell--w8 { width: 32px; }
+.octo-table-cell--w20 { width: 80px; }
+.octo-table-head--muted { font-weight: 500; color: var(--muted); }
+.octo-table-head--right { text-align: right; }
+.octo-table-head--w20 { width: 80px; }
+
+/* ----- Table hover-group pattern (show action buttons on row hover) ----- */
+.octo-btn-row-action { opacity: 0; transition: opacity 0.1s; }
+.octo-table-row--hover-group:hover .octo-btn-row-action { opacity: 1; }
+.octo-table-row--hover-group [data-state=open] .octo-btn-row-action { opacity: 1; }
+.octo-table-row--hover-group:has([data-state=open]) .octo-btn-row-action { opacity: 1; }
+
+/* ----- Tabs flex helpers ----- */
+.octo-tabs--flex-col { display: flex; flex-direction: column; flex: 1; }
+.octo-tabs-content--mt { margin-top: 16px; flex: 1; }
+
+/* ----- Card no-padding ----- */
+.octo-card--no-padding { padding: 0; }
+
+/* ----- Dialog header with border ----- */
+.octo-dialog-header--bordered { border-bottom: 1px solid var(--border); padding: 16px 24px; }
+
+/* ----- Media asset input ----- */
+.octo-media-asset__input {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  line-height: 1.4;
+}
+.octo-media-asset__input:focus { outline: none; border-color: var(--ring); box-shadow: 0 0 0 1px var(--ring); }
+.octo-media-asset__input:disabled { opacity: 0.5; }
+
+/* ----- Inline label helper (field label above input, not inside octo-field) ----- */
+.octo-field-label-hint { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.octo-field-label { display: block; font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+
+/* ----- Select trigger size modifiers (for sub-md form selects) ----- */
+.octo-select__trigger--sm { height: 30px; font-size: 12px; }
+.octo-select__trigger--xs { height: 28px; font-size: 11px; }
+
+/* ----- Star fill for entry-title field ----- */
+.octo-field-table__star--filled { fill: #f59e0b; color: #d97706; }
+
 /* ============================================================
    8. MDXEditor overrides
    ============================================================ */

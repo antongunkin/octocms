@@ -28,7 +28,9 @@ export function Message({ entry, proposals, onAcceptProposal, onRejectProposal }
   const isUser = entry.kind === 'user';
   return (
     <div className={cn('octo-chat-msg', isUser ? 'octo-chat-msg--user' : 'octo-chat-msg--assistant')}>
-      <div className="octo-chat-msg__avatar">{isUser ? <User className="octo-icon-md" /> : <Bot className="octo-icon-md" />}</div>
+      <div className="octo-chat-msg__avatar">
+        {isUser ? <User className="octo-icon-md" /> : <Bot className="octo-icon-md" />}
+      </div>
       <div className={cn('octo-chat-msg__body', isUser && 'octo-chat-msg__body--user')}>
         <div
           className={cn(

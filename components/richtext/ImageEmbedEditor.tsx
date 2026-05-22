@@ -149,23 +149,32 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           }
         }}
       >
-        <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
+        <DialogContent className="octo-dialog-content--5xl octo-dialog-content--vh-80 octo-dialog-content--flex-col">
           <DialogHeader>
             <DialogTitle>Select or upload image</DialogTitle>
           </DialogHeader>
-          <div className="border-2 border-dashed border-border rounded-lg p-4 flex flex-col gap-3">
+          <div
+            style={{
+              border: '2px dashed var(--border)',
+              borderRadius: 8,
+              padding: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}
+          >
             <input
               ref={uploadInputRef}
               type="file"
               accept={config.mediaAllowedFormats.map((f) => `.${f}`).join(',')}
-              className="hidden"
+              className="octo-u-hidden"
               onChange={(e) => {
                 if (e.target.files) stageFileFromList(e.target.files);
                 e.target.value = '';
               }}
             />
             {!stagedFile ? (
-              <div className="flex items-center justify-center gap-3">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
                 <Button
                   type="button"
                   variant="outline"
@@ -173,28 +182,29 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                   onClick={() => uploadInputRef.current?.click()}
                   disabled={isPending}
                 >
-                  <Upload className="w-4 h-4" />
+                  <Upload className="octo-icon-md" />
                   Choose file to upload
                 </Button>
               </div>
             ) : (
-              <div className="space-y-3 max-w-md">
-                <p className="text-sm text-muted-foreground break-all">{stagedFile.name}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 448 }}>
+                <p style={{ fontSize: 14, color: 'var(--muted)', wordBreak: 'break-all' }}>{stagedFile.name}</p>
                 <div>
-                  <Label htmlFor="richtext-image-upload-title" className="text-sm">
-                    Title <span className="text-destructive">*</span>
+                  <Label htmlFor="richtext-image-upload-title" className="octo-field-label">
+                    Title <span style={{ color: 'var(--danger)' }}>*</span>
                   </Label>
                   <input
                     id="richtext-image-upload-title"
                     type="text"
                     value={uploadTitle}
                     onChange={(e) => setUploadTitle(e.target.value)}
-                    className="mt-1 w-full text-sm px-2 py-1.5 rounded border border-border bg-layout-bg"
+                    className="octo-media-asset__input"
+                    style={{ marginTop: 4 }}
                     placeholder="Shown as default alt text when this image is used"
                     disabled={isPending}
                   />
                 </div>
-                <div className="flex gap-2">
+                <div style={{ display: 'flex', gap: 8 }}>
                   <Button type="button" size="sm" onClick={confirmStagedUpload} disabled={isPending}>
                     Upload
                   </Button>
@@ -213,15 +223,34 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                 </div>
               </div>
             )}
-            {isPending && <span className="text-xs text-muted-foreground">Uploading...</span>}
+            {isPending && <span style={{ fontSize: 11, color: 'var(--muted)' }}>Uploading...</span>}
           </div>
-          <div className="flex gap-4 flex-1 min-h-0 overflow-hidden">
+          <div style={{ display: 'flex', gap: 16, flex: 1, minHeight: 0, overflow: 'hidden' }}>
             {folders.length > 1 && (
-              <div className="w-36 flex-none overflow-y-auto border-r border-border pr-2">
+              <div
+                style={{
+                  width: 144,
+                  flexShrink: 0,
+                  overflowY: 'auto',
+                  borderRight: '1px solid var(--border)',
+                  paddingRight: 8,
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => setSelectedFolder(null)}
-                  className={`block w-full text-left px-2 py-1.5 rounded text-sm ${selectedFolder === null ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '6px 8px',
+                    borderRadius: 6,
+                    fontSize: 14,
+                    border: 0,
+                    cursor: 'pointer',
+                    background: selectedFolder === null ? 'var(--brand)' : 'transparent',
+                    color: selectedFolder === null ? 'var(--bg)' : 'var(--text)',
+                  }}
                 >
                   All
                 </button>
@@ -230,15 +259,26 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                     key={folder}
                     type="button"
                     onClick={() => setSelectedFolder(folder)}
-                    className={`block w-full text-left px-2 py-1.5 rounded text-sm ${selectedFolder === folder ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '6px 8px',
+                      borderRadius: 6,
+                      fontSize: 14,
+                      border: 0,
+                      cursor: 'pointer',
+                      background: selectedFolder === folder ? 'var(--brand)' : 'transparent',
+                      color: selectedFolder === folder ? 'var(--bg)' : 'var(--text)',
+                    }}
                   >
                     {folder === '/' ? 'Root' : folder}
                   </button>
                 ))}
               </div>
             )}
-            <div className="flex-1 overflow-y-auto">
-              <div className="grid grid-cols-3 gap-3">
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                 {filteredEntries.map((entry) => {
                   const isSelected = currentMediaId === entry.id;
                   return (
@@ -246,21 +286,51 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                       key={entry.id}
                       type="button"
                       onClick={() => handleSelect(entry)}
-                      className={`group relative aspect-square rounded-lg overflow-hidden border-2 transition-colors ${isSelected ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-primary/50'}`}
+                      style={{
+                        position: 'relative',
+                        aspectRatio: '1',
+                        borderRadius: 8,
+                        overflow: 'hidden',
+                        border: isSelected ? '2px solid var(--brand)' : '2px solid var(--border)',
+                        cursor: 'pointer',
+                        padding: 0,
+                        background: 'transparent',
+                      }}
                     >
                       <img
                         src={entry.publicUrl}
                         alt={entry.title || entry.originalName}
-                        className="w-full h-full object-cover"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
-                      <div className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1">
-                        <span className="text-xs text-white truncate block">{entry.title || entry.originalName}</span>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: '0 0 auto',
+                          bottom: 0,
+                          background: 'rgba(0,0,0,0.6)',
+                          padding: '4px 8px',
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: '#fff',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            display: 'block',
+                          }}
+                        >
+                          {entry.title || entry.originalName}
+                        </span>
                       </div>
                     </button>
                   );
                 })}
                 {filteredEntries.length === 0 && (
-                  <div className="col-span-3 text-center py-12 text-muted-foreground">No images found</div>
+                  <div style={{ gridColumn: 'span 3', textAlign: 'center', padding: '48px 0', color: 'var(--muted)' }}>
+                    No images found
+                  </div>
                 )}
               </div>
             </div>

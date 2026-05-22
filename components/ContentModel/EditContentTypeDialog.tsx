@@ -141,12 +141,12 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="octo-dialog-content--2xl">
         <DialogHeader>
           <DialogTitle>Edit content type</DialogTitle>
           <DialogDescription>
             Rename the content type, change its API identifier, or switch its cardinality. Renames move all entry files
-            (and companion <code className="font-mono text-xs">.md</code> files) in a single commit.
+            (and companion <code className="octo-u-mono octo-u-text-xs">.md</code> files) in a single commit.
           </DialogDescription>
         </DialogHeader>
 
@@ -174,7 +174,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
               value={key}
               maxLength={KEY_LIMIT}
               onChange={(e) => setKey(e.target.value)}
-              className="font-mono text-sm"
+              className="octo-u-mono"
               disabled={busy}
               aria-invalid={Boolean(keyError || duplicateKey)}
             />
@@ -191,8 +191,8 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
                 <AlertTriangle className="octo-inline-warn__icon" />
                 <span>
                   {entryCount} {entryCount === 1 ? 'entry' : 'entries'} will be renamed from{' '}
-                  <code className="font-mono">cms/content/{type}/</code> to{' '}
-                  <code className="font-mono">cms/content/{trimmedKey}/</code>.
+                  <code className="octo-u-mono">cms/content/{type}/</code> to{' '}
+                  <code className="octo-u-mono">cms/content/{trimmedKey}/</code>.
                 </span>
               </div>
             ) : null}
@@ -205,7 +205,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
                 active={hasMany}
                 disabled={busy || cardinalityLocked}
                 onClick={() => setHasMany(true)}
-                icon={<Layers className="h-4 w-4" />}
+                icon={<Layers className="octo-icon-md" />}
                 title="Many entries"
                 description="Multiple entries in this collection."
               />
@@ -213,7 +213,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
                 active={!hasMany}
                 disabled={busy || cardinalityLocked}
                 onClick={() => setHasMany(false)}
-                icon={<FileText className="h-4 w-4" />}
+                icon={<FileText className="octo-icon-md" />}
                 title="Singleton"
                 description="A single entry."
               />

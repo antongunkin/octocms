@@ -73,12 +73,8 @@ export default function ContentModelList() {
               Content types
               <span className="octo-hdr-right__mono">{rows.length}</span>
             </span>
-            <Button
-              size="sm"
-              className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
-              onClick={() => setCreateOpen(true)}
-            >
-              <Plus className="h-4 w-4" />
+            <Button size="sm" className="octo-button--action" onClick={() => setCreateOpen(true)}>
+              <Plus className="octo-icon-md" />
               Create content type
             </Button>
           </div>
@@ -141,7 +137,11 @@ export default function ContentModelList() {
                             <td className="octo-schema-list__td">
                               <span className="octo-schema-list__name">
                                 <span className="octo-schema-list__name-icon">
-                                  {r.hasMany ? <Layers className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+                                  {r.hasMany ? (
+                                    <Layers className="octo-icon-md" />
+                                  ) : (
+                                    <FileText className="octo-icon-md" />
+                                  )}
                                 </span>
                                 {r.label}
                               </span>
@@ -154,7 +154,7 @@ export default function ContentModelList() {
                             <td className="octo-schema-list__td octo-schema-list__count">{r.entryCount}</td>
                             <td className="octo-schema-list__td octo-schema-list__th--icon">
                               <div className="octo-schema-list__chevron">
-                                <ChevronRight className="h-4 w-4" />
+                                <ChevronRight className="octo-icon-md" />
                               </div>
                             </td>
                           </tr>

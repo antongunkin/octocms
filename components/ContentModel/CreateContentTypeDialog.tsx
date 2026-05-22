@@ -96,12 +96,12 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="octo-dialog-content--2xl">
         <DialogHeader>
           <DialogTitle>Create new content type</DialogTitle>
           <DialogDescription>
-            Define a new content type. A default <code className="font-mono text-xs">title</code> field is added so you
-            can save and start editing — you can rename it or add more fields right after.
+            Define a new content type. A default <code className="octo-u-mono octo-u-text-xs">title</code> field is
+            added so you can save and start editing — you can rename it or add more fields right after.
           </DialogDescription>
         </DialogHeader>
 
@@ -139,7 +139,7 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
                 setKeyTouched(true);
               }}
               placeholder="e.g. recipe"
-              className="font-mono text-sm"
+              className="octo-u-mono"
               disabled={busy}
               aria-invalid={Boolean(keyError || duplicateKey)}
             />
@@ -167,7 +167,7 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
                 active={hasMany}
                 disabled={busy}
                 onClick={() => setHasMany(true)}
-                icon={<Layers className="h-4 w-4" />}
+                icon={<Layers className="octo-icon-md" />}
                 title="Many entries"
                 description="A collection of entries (e.g. blog posts, products)."
               />
@@ -175,7 +175,7 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
                 active={!hasMany}
                 disabled={busy}
                 onClick={() => setHasMany(false)}
-                icon={<FileText className="h-4 w-4" />}
+                icon={<FileText className="octo-icon-md" />}
                 title="Singleton"
                 description="A single entry (e.g. home page, site settings)."
               />

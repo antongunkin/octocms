@@ -119,7 +119,7 @@ export default function ConditionalBranchesEditor({
                 className="octo-branch-card"
               >
                 <div className="octo-branch-card__header">
-                  <GripVertical className="octo-branch-card__grip h-3.5 w-3.5" />
+                  <GripVertical className="octo-branch-card__grip octo-icon-sm" />
                   <div className="octo-branch-card__body">
                     <div className="octo-branch-card__grid">
                       <div className="octo-branch-card__field">
@@ -128,7 +128,7 @@ export default function ConditionalBranchesEditor({
                           value={branch.label}
                           onChange={(e) => updateBranch(idx, { label: e.target.value })}
                           disabled={disabled}
-                          className="h-8 text-sm"
+                          className="octo-select__trigger--sm"
                         />
                       </div>
                       <div className="octo-branch-card__field">
@@ -137,7 +137,10 @@ export default function ConditionalBranchesEditor({
                           value={branch.key}
                           onChange={(e) => updateBranch(idx, { key: e.target.value })}
                           disabled={disabled}
-                          className={cn('h-8 font-mono text-xs', (keyInvalid || duplicate) && 'border-destructive/50')}
+                          className={cn(
+                            'octo-u-mono octo-select__trigger--xs',
+                            (keyInvalid || duplicate) && 'border-destructive/50',
+                          )}
                         />
                       </div>
                     </div>
@@ -177,13 +180,13 @@ export default function ConditionalBranchesEditor({
                           }
                           disabled={disabled}
                         >
-                          <SelectTrigger className="h-8 text-sm">
+                          <SelectTrigger className="octo-select__trigger--sm">
                             <SelectValue placeholder="Pick a collection…" />
                           </SelectTrigger>
                           <SelectContent>
                             {availableCollections.map((c) => (
                               <SelectItem key={c} value={c}>
-                                <code className="font-mono">{c}</code>
+                                <code className="octo-u-mono">{c}</code>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -210,12 +213,12 @@ export default function ConditionalBranchesEditor({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    className="octo-button--icon-sm octo-button--danger-ghost"
                     onClick={() => removeBranch(idx)}
                     disabled={disabled}
                     aria-label="Remove branch"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="octo-icon-sm" />
                   </Button>
                 </div>
               </div>
@@ -224,8 +227,8 @@ export default function ConditionalBranchesEditor({
         )}
       </div>
 
-      <Button type="button" variant="outline" size="sm" onClick={addBranch} disabled={disabled} className="h-8">
-        <Plus className="mr-1 h-3.5 w-3.5" /> Add branch
+      <Button type="button" variant="outline" size="sm" onClick={addBranch} disabled={disabled}>
+        <Plus className="octo-icon-sm" /> Add branch
       </Button>
 
       {branches.some((b) => !b.key) ||
@@ -296,23 +299,23 @@ function NestedFieldList({
               type="button"
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
+              className="octo-button--icon-xs"
               onClick={() => onEdit(key, field)}
               disabled={disabled}
               aria-label="Edit nested field"
             >
-              <Pencil className="h-3 w-3" />
+              <Pencil className="octo-icon-xs" />
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-muted-foreground hover:text-destructive"
+              className="octo-button--icon-xs octo-button--danger-ghost"
               onClick={() => remove(key)}
               disabled={disabled}
               aria-label="Remove nested field"
             >
-              <Trash2 className="h-3 w-3" />
+              <Trash2 className="octo-icon-xs" />
             </Button>
           </div>
         ))
@@ -321,11 +324,11 @@ function NestedFieldList({
         type="button"
         variant="outline"
         size="sm"
-        className="h-7 text-xs"
+        className="octo-button--icon-xs"
         onClick={() => onEdit(null, null)}
         disabled={disabled}
       >
-        <Plus className="mr-1 h-3 w-3" /> Add field
+        <Plus className="octo-icon-xs" /> Add field
       </Button>
     </div>
   );

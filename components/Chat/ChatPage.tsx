@@ -97,7 +97,13 @@ export function ChatPage({ initialMeta, attachmentLimits }: Props) {
               Stop
             </Button>
           ) : (
-            <Button variant="outline" size="sm" onClick={reset} disabled={entries.length === 0} className="octo-u-gap-1-5">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={reset}
+              disabled={entries.length === 0}
+              className="octo-u-gap-1-5"
+            >
               <RefreshCw className="octo-icon-sm" />
               New conversation
             </Button>
