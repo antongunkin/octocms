@@ -23,7 +23,7 @@ const PROVIDER_LABEL: Record<'anthropic' | 'openai' | 'local', string> = {
   local: 'Local',
 };
 
-export function ChatPage({ initialMeta, attachmentLimits }: Props) {
+export default function ChatPage({ initialMeta, attachmentLimits }: Props) {
   const {
     entries,
     meta,

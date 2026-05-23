@@ -21,7 +21,7 @@ export type MediaAssetProps = {
   id: string;
 };
 
-export function MediaAsset({ id }: MediaAssetProps) {
+export default function MediaAsset({ id }: MediaAssetProps) {
   const router = useRouter();
   const { asset: file, allFiles, isLoading } = useMediaAsset(id);
   const updateMetadataMutation = useUpdateMediaMetadata();

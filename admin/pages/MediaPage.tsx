@@ -1,9 +1,14 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 
-import MediaManager from '../../components/MediaManager/MediaManager';
+import { MediaManagerSkeleton } from '../../components/MediaManager/MediaManager.skeleton';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
 import { authOptions } from '../auth';
+
+const MediaManager = dynamic(() => import('../../components/MediaManager/MediaManager'), {
+  loading: () => <MediaManagerSkeleton />,
+});
 
 /**
  * Auth-gated thin shell. `MediaManager` fetches its own data via TanStack

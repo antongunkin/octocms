@@ -1,9 +1,14 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 
+import { MediaAssetSkeleton } from '../../components/MediaAsset/MediaAsset.skeleton';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
-import { MediaAsset } from '../../components/MediaAsset/MediaAsset';
 import { authOptions } from '../auth';
+
+const MediaAsset = dynamic(() => import('../../components/MediaAsset/MediaAsset'), {
+  loading: () => <MediaAssetSkeleton />,
+});
 
 /**
  * Auth-gated thin shell. `MediaAsset` fetches the media list via

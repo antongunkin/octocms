@@ -1,9 +1,13 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 
-import { ChatPage as ChatPageClient } from '../../components/Chat/ChatPage';
 import { getAgentConfig } from '../../agent/configStore';
 import { isAgentEnabled } from '../../agent/featureFlag';
+
+const ChatPageClient = dynamic(() => import('../../components/Chat/ChatPage'), {
+  loading: () => null,
+});
 
 /**
  * Server component wrapper for the chat page.

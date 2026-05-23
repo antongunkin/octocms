@@ -1,8 +1,13 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 
-import ContentModelList from '../../components/ContentModel/ContentModelList';
+import { ContentModelListSkeleton } from '../../components/ContentModel/ContentModelList.skeleton';
 import { authOptions } from '../auth';
+
+const ContentModelList = dynamic(() => import('../../components/ContentModel/ContentModelList'), {
+  loading: () => <ContentModelListSkeleton />,
+});
 
 /**
  * Auth-gated thin shell. `ContentModelList` fetches its own data via

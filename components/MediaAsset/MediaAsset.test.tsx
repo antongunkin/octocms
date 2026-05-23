@@ -3,7 +3,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MediaFile } from '../../types';
-import { MediaAsset } from './MediaAsset';
+import MediaAsset from './MediaAsset';
 import { queryKeys } from '../../admin/query/keys';
 import { createTestQueryClient, renderWithQuery } from '../../admin/query/test/renderWithQuery';
 

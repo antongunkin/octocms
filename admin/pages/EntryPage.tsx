@@ -1,11 +1,16 @@
 import { redirect } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 import React from 'react';
 
-import EditPost from '../../components/EditPost/EditPost';
+import { EditPostSkeleton } from '../../components/EditPost/EditPost.skeleton';
 import { FileContextProvider } from '../../hooks/useFileState';
 import { getConfig } from '../../lib/configStore';
 import { authOptions } from '../auth';
+
+const EditPost = dynamic(() => import('../../components/EditPost/EditPost'), {
+  loading: () => <EditPostSkeleton />,
+});
 
 /**
  * Auth-gated thin shell. `EditPost` resolves the entry's file path from
