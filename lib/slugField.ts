@@ -35,7 +35,7 @@ export function sanitizeSlugFieldInputValue(raw: string): string {
  */
 export function slugifyForUrl(input: string): string {
   const trimmed = String(input).trim();
-  const preprocessed = trimmed.replace(/_+/g, ' ').replace(/\s+/g, ' ').trim();
+  const preprocessed = trimmed.replace(/&/g, ' and ').replace(/_+/g, ' ').replace(/\s+/g, ' ').trim();
   if (!preprocessed) {
     return '';
   }
