@@ -58,7 +58,6 @@ const REQUIRED_PEER_DEPS: readonly string[] = [
   'remark-gfm',
   'remark-mdx',
   'sharp',
-  'slugify',
   'zod',
 ];
 

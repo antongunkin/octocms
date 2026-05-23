@@ -467,7 +467,7 @@ Built with [OctoCMS](https://octocms.com) — a file-based CMS on Next.js.
 npm install octocms next-auth @tanstack/react-query @mdxeditor/editor \\
   minisearch octokit \\
   react-markdown rehype-sanitize remark-gfm remark-mdx \\
-  sharp slugify zod
+  sharp zod
 \`\`\`
 
 > The exact list (with the right \`octocms\` version pin) is also printed by \`npx octocms init\` — copy it from there.

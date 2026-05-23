@@ -47,7 +47,6 @@ const external = [
   'rehype-sanitize',
   'remark-gfm',
   'remark-mdx',
-  'slugify',
   // Optional peer deps for the chat agent — kept external so absence at install time is fine
   '@anthropic-ai/sdk',
   '@huggingface/transformers',
