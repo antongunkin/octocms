@@ -141,7 +141,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="octo-dialog-content--2xl">
+      <DialogContent className="octo-dialog-content octo-dialog-content--2xl">
         <DialogHeader>
           <DialogTitle>Edit content type</DialogTitle>
           <DialogDescription>
@@ -179,7 +179,10 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
               aria-invalid={Boolean(keyError || duplicateKey)}
             />
             <p
-              className={cn('octo-dialog-field__hint', (keyError || duplicateKey) && 'octo-dialog-field__hint--error')}
+              className={cn(
+                'octo-dialog-field__hint',
+                (keyError || duplicateKey) && 'octo-dialog-field__hint octo-dialog-field__hint--error',
+              )}
             >
               {duplicateKey
                 ? `A content type with key "${trimmedKey}" already exists.`
@@ -285,7 +288,7 @@ function CardinalityOption({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={cn('octo-cardinality-option', active && 'octo-cardinality-option--active')}
+      className={cn('octo-cardinality-option', active && 'octo-cardinality-option octo-cardinality-option--active')}
     >
       <span className="octo-cardinality-option__title">
         {icon}

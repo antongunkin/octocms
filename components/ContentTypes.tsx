@@ -92,7 +92,7 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter entries…"
-              className="octo-search-input--icon-padded"
+              className="octo-search-input octo-search-input--icon-padded"
             />
           </div>
         </div>
@@ -102,9 +102,9 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="octo-table-head--muted">Name</TableHead>
-                <TableHead className="octo-table-head--muted">Updated</TableHead>
-                <TableHead className="octo-table-head--muted">Status</TableHead>
+                <TableHead className="octo-table-head octo-table-head--muted">Name</TableHead>
+                <TableHead className="octo-table-head octo-table-head--muted">Updated</TableHead>
+                <TableHead className="octo-table-head octo-table-head--muted">Status</TableHead>
                 <TableHead style={{ width: 40 }} />
               </TableRow>
             </TableHeader>
@@ -119,7 +119,10 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
                 filteredEntries.map((entry) => (
                   <TableRow
                     key={entry.path}
-                    className={cn('octo-content-row', entry.status === 'archived' && 'octo-content-row--archived')}
+                    className={cn(
+                      'octo-content-row',
+                      entry.status === 'archived' && 'octo-content-row octo-content-row--archived',
+                    )}
                     onClick={() => {
                       onFileClick(entry);
                       router.push(`/cms/content/${entry.type}/${entry.id}`);

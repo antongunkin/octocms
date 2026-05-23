@@ -16,7 +16,13 @@ type FieldShellProps = {
  *  come from the `.field-shell` selector in globals.css. */
 export function FieldShell({ error, className, prefix, suffix, children }: FieldShellProps) {
   return (
-    <div className={cn('field-shell octo-input--shell', error && 'octo-input--shell--error', className)}>
+    <div
+      className={cn(
+        'field-shell octo-input octo-input--shell',
+        error && 'octo-input--shell octo-input--shell--error',
+        className,
+      )}
+    >
       {prefix ? <span className="octo-input__affix">{prefix}</span> : null}
       <div className="octo-input__inner-wrap octo-u-flex-1 octo-u-min-w-0">{children}</div>
       {suffix ? <span className="octo-input__affix">{suffix}</span> : null}

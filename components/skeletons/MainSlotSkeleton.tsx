@@ -12,7 +12,12 @@ import { cn } from '../../lib/utils';
 export function MainSlotSkeleton({ className }: { className?: string }) {
   return (
     <div
-      className={cn('octo-page-shell', 'octo-page-shell--skel-overflow', 'octo-content-area', className)}
+      className={cn(
+        'octo-page-shell',
+        'octo-page-shell octo-page-shell--skel-overflow',
+        'octo-content-area',
+        className,
+      )}
       role="status"
       aria-label="Loading page"
     >

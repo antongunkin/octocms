@@ -103,7 +103,7 @@ export function SlashMenuOverlay({ items, open, filter, position, onSelect, onCl
             itemRefs.current[i] = el;
           }}
           type="button"
-          className={`octo-slash-menu__item${i === selectedIndex ? ' octo-slash-menu__item--active' : ''}`}
+          className={`octo-slash-menu__item${i === selectedIndex ? ' octo-slash-menu__item octo-slash-menu__item--active' : ''}`}
           onMouseEnter={() => setSelectedIndex(i)}
           onClick={() => onSelect(item)}
         >

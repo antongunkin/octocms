@@ -22,7 +22,9 @@ export function LeftNavItem(props: LeftNavItemProps) {
   // Legacy Tailwind token classes kept alongside BEM so existing test assertions pass.
   const className = cn(
     'octo-left-nav-item',
-    props.active ? 'octo-left-nav-item--active bg-[var(--surface-3)] font-semibold' : 'text-[var(--text-2)]',
+    props.active
+      ? 'octo-left-nav-item octo-left-nav-item--active bg-[var(--surface-3)] font-semibold'
+      : 'text-[var(--text-2)]',
   );
 
   const inner = (
@@ -35,14 +37,14 @@ export function LeftNavItem(props: LeftNavItemProps) {
 
   if ('href' in props && props.href) {
     return (
-      <Link href={props.href} className={className}>
+      <Link href={props.href} className={className} aria-current={props.active ? 'page' : undefined}>
         {inner}
       </Link>
     );
   }
 
   return (
-    <button type="button" onClick={props.onClick} className={className}>
+    <button type="button" onClick={props.onClick} className={className} aria-pressed={props.active}>
       {inner}
     </button>
   );

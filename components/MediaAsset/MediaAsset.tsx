@@ -162,7 +162,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="octo-button--danger-ghost"
+            className="octo-button octo-button--danger-ghost"
             onClick={() => setConfirmDelete(true)}
             disabled={isPending}
           >
@@ -198,7 +198,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
                 type="button"
                 size="sm"
                 variant="secondary"
-                className="octo-button--w-full"
+                className="octo-button octo-button--w-full"
                 onClick={handleSaveTitle}
                 disabled={isPending || titleDraft.trim() === file.title}
               >
@@ -226,7 +226,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
                 type="button"
                 size="sm"
                 variant="secondary"
-                className="octo-button--w-full"
+                className="octo-button octo-button--w-full"
                 onClick={handleSaveFolder}
                 disabled={isPending || folderDraft === file.folder}
               >
@@ -279,7 +279,12 @@ function DetailRow({ label, value, mono }: { label: string; value: string; mono?
   return (
     <div className="octo-media-asset__detail">
       <span className="octo-media-asset__detail-label">{label}</span>
-      <span className={cn('octo-media-asset__detail-value', mono && 'octo-media-asset__detail-value--mono')}>
+      <span
+        className={cn(
+          'octo-media-asset__detail-value',
+          mono && 'octo-media-asset__detail-value octo-media-asset__detail-value--mono',
+        )}
+      >
         {value}
       </span>
     </div>

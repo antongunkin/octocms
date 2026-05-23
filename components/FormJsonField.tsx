@@ -46,13 +46,13 @@ const FormJsonField = ({ label, name, value, required, hint, error, onClearError
 
   const statusLine =
     status === 'empty' ? (
-      <span className="octo-ff-json__status--empty">
+      <span className="octo-ff-json__status octo-ff-json__status--empty">
         {required ? 'Enter JSON…' : 'Optional — leave empty for no value'}
       </span>
     ) : status === 'valid' ? (
-      <span className="octo-ff-json__status--valid">Valid JSON</span>
+      <span className="octo-ff-json__status octo-ff-json__status--valid">Valid JSON</span>
     ) : (
-      <span className="octo-ff-json__status--invalid">Invalid JSON</span>
+      <span className="octo-ff-json__status octo-ff-json__status--invalid">Invalid JSON</span>
     );
 
   return (
@@ -60,7 +60,7 @@ const FormJsonField = ({ label, name, value, required, hint, error, onClearError
       <FieldLabel label={label} htmlFor={name} type="json" required={required} />
       <textarea
         id={name}
-        className={cn(FIELD_TEXTAREA_CLASS, 'octo-ff-json__textarea', error && 'octo-textarea--error')}
+        className={cn(FIELD_TEXTAREA_CLASS, 'octo-ff-json__textarea', error && 'octo-textarea octo-textarea--error')}
         name={name}
         value={text}
         onChange={handleChange}

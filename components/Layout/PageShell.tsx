@@ -33,7 +33,13 @@ type PageShellBodyProps = {
 
 function PageShellBody({ className, unpadded, centered, children }: PageShellBodyProps) {
   return (
-    <main className={cn('octo-page-shell__body octo-scroll', unpadded && 'octo-page-shell__body--unpadded', className)}>
+    <main
+      className={cn(
+        'octo-page-shell__body octo-scroll',
+        unpadded && 'octo-page-shell__body octo-page-shell__body--unpadded',
+        className,
+      )}
+    >
       {centered ? <div className="octo-page-shell__centered">{children}</div> : children}
     </main>
   );

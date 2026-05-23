@@ -78,7 +78,7 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
 
   return (
     <Dialog open={files !== null} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="octo-dialog-content--lg octo-dialog-content--vh-85 octo-dialog-content--flex-col">
+      <DialogContent className="octo-dialog-content octo-dialog-content--lg octo-dialog-content--vh-85 octo-dialog-content--flex-col">
         <DialogHeader>
           <DialogTitle>Set title for each image</DialogTitle>
           <DialogDescription>

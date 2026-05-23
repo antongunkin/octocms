@@ -368,7 +368,7 @@ function ContentTable({
             </div>
             {!lockedType && (
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="octo-select__trigger--pill">
+                <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
                   <SelectValue placeholder="Any type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -382,7 +382,7 @@ function ContentTable({
               </Select>
             )}
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="octo-select__trigger--pill">
+              <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
                 <SelectValue placeholder="Any status" />
               </SelectTrigger>
               <SelectContent>
@@ -396,7 +396,7 @@ function ContentTable({
             </Select>
             <div className="octo-content-sort">
               <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as 'newest' | 'oldest')}>
-                <SelectTrigger className="octo-select__trigger--pill">
+                <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -542,7 +542,7 @@ function EntryRow({
   return (
     <tr
       tabIndex={0}
-      className={cn('octo-content-row', entry.status === 'archived' && 'octo-content-row--archived')}
+      className={cn('octo-content-row', entry.status === 'archived' && 'octo-content-row octo-content-row--archived')}
       onClick={onClick}
       onKeyDown={(e) => {
         if (!entryRowActivateKey(e)) return;

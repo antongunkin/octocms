@@ -128,7 +128,7 @@ export default function ConditionalBranchesEditor({
                           value={branch.label}
                           onChange={(e) => updateBranch(idx, { label: e.target.value })}
                           disabled={disabled}
-                          className="octo-select__trigger--sm"
+                          className="octo-select__trigger octo-select__trigger--sm"
                         />
                       </div>
                       <div className="octo-branch-card__field">
@@ -138,8 +138,8 @@ export default function ConditionalBranchesEditor({
                           onChange={(e) => updateBranch(idx, { key: e.target.value })}
                           disabled={disabled}
                           className={cn(
-                            'octo-u-mono octo-select__trigger--xs',
-                            (keyInvalid || duplicate) && 'octo-input--invalid',
+                            'octo-u-mono octo-select__trigger octo-select__trigger--xs',
+                            (keyInvalid || duplicate) && 'octo-input octo-input--invalid',
                           )}
                         />
                       </div>
@@ -180,7 +180,7 @@ export default function ConditionalBranchesEditor({
                           }
                           disabled={disabled}
                         >
-                          <SelectTrigger className="octo-select__trigger--sm">
+                          <SelectTrigger className="octo-select__trigger octo-select__trigger--sm">
                             <SelectValue placeholder="Pick a collection…" />
                           </SelectTrigger>
                           <SelectContent>
@@ -213,7 +213,7 @@ export default function ConditionalBranchesEditor({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="octo-button--icon-sm octo-button--danger-ghost"
+                    className="octo-button octo-button--icon-sm octo-button--danger-ghost"
                     onClick={() => removeBranch(idx)}
                     disabled={disabled}
                     aria-label="Remove branch"
@@ -257,7 +257,7 @@ function BranchKindPill({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={cn('octo-branch-kind-pill', active && 'octo-branch-kind-pill--active')}
+      className={cn('octo-branch-kind-pill', active && 'octo-branch-kind-pill octo-branch-kind-pill--active')}
     >
       {label}
     </button>
@@ -299,7 +299,7 @@ function NestedFieldList({
               type="button"
               variant="ghost"
               size="icon"
-              className="octo-button--icon-xs"
+              className="octo-button octo-button--icon-xs"
               onClick={() => onEdit(key, field)}
               disabled={disabled}
               aria-label="Edit nested field"
@@ -310,7 +310,7 @@ function NestedFieldList({
               type="button"
               variant="ghost"
               size="icon"
-              className="octo-button--icon-xs octo-button--danger-ghost"
+              className="octo-button octo-button--icon-xs octo-button--danger-ghost"
               onClick={() => remove(key)}
               disabled={disabled}
               aria-label="Remove nested field"
@@ -324,7 +324,7 @@ function NestedFieldList({
         type="button"
         variant="outline"
         size="sm"
-        className="octo-button--icon-xs"
+        className="octo-button octo-button--icon-xs"
         onClick={() => onEdit(null, null)}
         disabled={disabled}
       >

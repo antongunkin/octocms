@@ -149,7 +149,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           }
         }}
       >
-        <DialogContent className="octo-dialog-content--5xl octo-dialog-content--vh-80 octo-dialog-content--flex-col">
+        <DialogContent className="octo-dialog-content octo-dialog-content--5xl octo-dialog-content--vh-80 octo-dialog-content--flex-col">
           <DialogHeader>
             <DialogTitle>Select or upload image</DialogTitle>
           </DialogHeader>

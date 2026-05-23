@@ -96,7 +96,7 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="octo-dialog-content--2xl">
+      <DialogContent className="octo-dialog-content octo-dialog-content--2xl">
         <DialogHeader>
           <DialogTitle>Create new content type</DialogTitle>
           <DialogDescription>
@@ -147,7 +147,7 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
               <span
                 className={cn(
                   'octo-dialog-field__hint',
-                  (keyError || duplicateKey) && 'octo-dialog-field__hint--error',
+                  (keyError || duplicateKey) && 'octo-dialog-field__hint octo-dialog-field__hint--error',
                 )}
               >
                 {duplicateKey
@@ -217,7 +217,7 @@ function CardinalityOption({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={cn('octo-cardinality-option', active && 'octo-cardinality-option--active')}
+      className={cn('octo-cardinality-option', active && 'octo-cardinality-option octo-cardinality-option--active')}
     >
       <span className="octo-cardinality-option__title">
         {icon}

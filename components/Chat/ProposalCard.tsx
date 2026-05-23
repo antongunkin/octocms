@@ -30,9 +30,9 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
     <div
       className={cn(
         'octo-proposal-card',
-        status.kind === 'error' && 'octo-proposal-card--error',
-        status.kind === 'accepted' && 'octo-proposal-card--accepted',
-        status.kind === 'rejected' && 'octo-proposal-card--rejected',
+        status.kind === 'error' && 'octo-proposal-card octo-proposal-card--error',
+        status.kind === 'accepted' && 'octo-proposal-card octo-proposal-card--accepted',
+        status.kind === 'rejected' && 'octo-proposal-card octo-proposal-card--rejected',
       )}
     >
       <div className="octo-proposal-card__header">

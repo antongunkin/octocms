@@ -99,8 +99,8 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="octo-dialog-content--5xl octo-dialog-content--vh-80 octo-dialog-content--flex-col octo-dialog-content--overflow-hidden octo-dialog-content--no-padding">
-        <DialogHeader className="octo-dialog-header--bordered">
+      <DialogContent className="octo-dialog-content octo-dialog-content--5xl octo-dialog-content--vh-80 octo-dialog-content--flex-col octo-dialog-content--overflow-hidden octo-dialog-content--no-padding">
+        <DialogHeader className="octo-dialog-header octo-dialog-header--bordered">
           <DialogTitle>Select an image</DialogTitle>
         </DialogHeader>
 
@@ -155,7 +155,10 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
                         key={file.id}
                         type="button"
                         onClick={() => handlePick(file)}
-                        className={cn('octo-media-grid__card', isSelected && 'octo-media-grid__card--selected')}
+                        className={cn(
+                          'octo-media-grid__card',
+                          isSelected && 'octo-media-grid__card octo-media-grid__card--selected',
+                        )}
                       >
                         <div className="octo-media-grid__img-wrap">
                           <img
@@ -196,7 +199,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         aria-selected={value === 'grid'}
         aria-label="Grid view"
         onClick={() => onChange('grid')}
-        className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn--active')}
+        className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn octo-media-view-btn--active')}
       >
         <LayoutGrid className="octo-icon-sm" />
       </button>
@@ -206,7 +209,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         aria-selected={value === 'list'}
         aria-label="List view"
         onClick={() => onChange('list')}
-        className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn--active')}
+        className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn octo-media-view-btn--active')}
       >
         <List className="octo-icon-sm" />
       </button>

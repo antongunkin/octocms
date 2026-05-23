@@ -109,7 +109,7 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       <div
         ref={ref}
         role="tablist"
-        className={cn('octo-tabs__list', variant === 'pill' && 'octo-tabs__list--pill', className)}
+        className={cn('octo-tabs__list', variant === 'pill' && 'octo-tabs__list octo-tabs__list--pill', className)}
         onKeyDown={handleKeyDown}
         {...props}
       />
@@ -141,7 +141,11 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
         data-value={value}
         disabled={disabled}
         {...(disabled ? { 'data-disabled': '' } : {})}
-        className={cn('octo-tabs__trigger', variant === 'pill' && 'octo-tabs__trigger--pill', className)}
+        className={cn(
+          'octo-tabs__trigger',
+          variant === 'pill' && 'octo-tabs__trigger octo-tabs__trigger--pill',
+          className,
+        )}
         onClick={(e) => {
           setActiveValue(value);
           onClick?.(e);

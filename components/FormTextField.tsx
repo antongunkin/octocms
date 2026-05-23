@@ -36,7 +36,7 @@ const FormTextField = ({
       <FieldLabel label={label} htmlFor={name} type="text" required={required} />
       <textarea
         id={name}
-        className={cn(FIELD_TEXTAREA_CLASS, error && 'octo-textarea--error')}
+        className={cn(FIELD_TEXTAREA_CLASS, error && 'octo-textarea octo-textarea--error')}
         name={name}
         rows={rows}
         defaultValue={value}

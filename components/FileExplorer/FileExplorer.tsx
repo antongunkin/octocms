@@ -41,7 +41,7 @@ const FileExplorer = ({ files = [], folders = [] }: FileExplorerProps) => {
               <button
                 key={folder}
                 type="button"
-                className={`octo-file-explorer__item${selectedType === folder ? ' octo-file-explorer__item--active' : ''}`}
+                className={`octo-file-explorer__item${selectedType === folder ? ' octo-file-explorer__item octo-file-explorer__item--active' : ''}`}
                 onClick={() => onTypeClick(folder)}
               >
                 {folder !== '/' && '/'}
@@ -68,7 +68,7 @@ const FileExplorer = ({ files = [], folders = [] }: FileExplorerProps) => {
               <Link
                 key={i}
                 href={`/cms/media/${file.type === '/' ? '' : file.type + '/'}${file.id}`}
-                className={`octo-file-explorer__item${selectedFile?.path === file.path ? ' octo-file-explorer__item--active' : ''}`}
+                className={`octo-file-explorer__item${selectedFile?.path === file.path ? ' octo-file-explorer__item octo-file-explorer__item--active' : ''}`}
                 onClick={() => onFileClick(file)}
               >
                 {file.id}

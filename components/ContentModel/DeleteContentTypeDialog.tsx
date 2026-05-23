@@ -94,7 +94,7 @@ export default function DeleteContentTypeDialog({ open, onOpenChange, schema, ty
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="octo-dialog-content--2xl">
+      <DialogContent className="octo-dialog-content octo-dialog-content--2xl">
         <DialogHeader>
           <DialogTitle>Delete content type</DialogTitle>
           <DialogDescription>

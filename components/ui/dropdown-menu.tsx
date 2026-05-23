@@ -216,7 +216,7 @@ const DropdownMenuItem = React.forwardRef<HTMLButtonElement, DropdownMenuItemPro
         role="menuitem"
         type="button"
         data-disabled={disabled || undefined}
-        className={cn('octo-dropdown__item', inset && 'octo-dropdown__item--inset', className)}
+        className={cn('octo-dropdown__item', inset && 'octo-dropdown__item octo-dropdown__item--inset', className)}
         onClick={handleClick}
         tabIndex={-1}
         {...props}
@@ -251,7 +251,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<HTMLButtonElement, DropdownMen
         type="button"
         aria-checked={checked}
         data-state={checked ? 'checked' : 'unchecked'}
-        className={cn('octo-dropdown__item', 'octo-dropdown__item--checkable', className)}
+        className={cn('octo-dropdown__item', 'octo-dropdown__item octo-dropdown__item--checkable', className)}
         onClick={handleClick}
         tabIndex={-1}
         {...props}
@@ -307,7 +307,7 @@ const DropdownMenuRadioItem = React.forwardRef<HTMLButtonElement, DropdownMenuRa
         type="button"
         aria-checked={checked}
         data-state={checked ? 'checked' : 'unchecked'}
-        className={cn('octo-dropdown__item', 'octo-dropdown__item--checkable', className)}
+        className={cn('octo-dropdown__item', 'octo-dropdown__item octo-dropdown__item--checkable', className)}
         onClick={handleClick}
         tabIndex={-1}
         {...props}
@@ -334,7 +334,7 @@ const DropdownMenuLabel = React.forwardRef<HTMLDivElement, DropdownMenuLabelProp
   ({ className, inset, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('octo-dropdown__label', inset && 'octo-dropdown__label--inset', className)}
+      className={cn('octo-dropdown__label', inset && 'octo-dropdown__label octo-dropdown__label--inset', className)}
       {...props}
     />
   ),
@@ -384,7 +384,7 @@ const DropdownMenuSubTrigger = React.forwardRef<HTMLButtonElement, DropdownMenuS
     <button
       ref={ref}
       type="button"
-      className={cn('octo-dropdown__sub-trigger', inset && 'octo-dropdown__item--inset', className)}
+      className={cn('octo-dropdown__sub-trigger', inset && 'octo-dropdown__item octo-dropdown__item--inset', className)}
       {...props}
     >
       {children}

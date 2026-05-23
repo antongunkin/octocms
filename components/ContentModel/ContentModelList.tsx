@@ -73,7 +73,7 @@ export default function ContentModelList() {
               Content types
               <span className="octo-hdr-right__mono">{rows.length}</span>
             </span>
-            <Button size="sm" className="octo-button--action" onClick={() => setCreateOpen(true)}>
+            <Button size="sm" className="octo-button octo-button--action" onClick={() => setCreateOpen(true)}>
               <Plus className="octo-icon-md" />
               Create content type
             </Button>
@@ -152,7 +152,7 @@ export default function ContentModelList() {
                             </td>
                             <td className="octo-schema-list__td octo-schema-list__count">{r.fieldCount}</td>
                             <td className="octo-schema-list__td octo-schema-list__count">{r.entryCount}</td>
-                            <td className="octo-schema-list__td octo-schema-list__th--icon">
+                            <td className="octo-schema-list__td octo-schema-list__th octo-schema-list__th--icon">
                               <div className="octo-schema-list__chevron">
                                 <ChevronRight className="octo-icon-md" />
                               </div>

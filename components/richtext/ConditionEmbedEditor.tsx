@@ -184,7 +184,7 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
             key={branch.key}
             type="button"
             onClick={() => setActiveTab(branch.key)}
-            className={`octo-embed-editor__tab${activeTab === branch.key ? ' octo-embed-editor__tab--active' : ''}`}
+            className={`octo-embed-editor__tab${activeTab === branch.key ? ' octo-embed-editor__tab octo-embed-editor__tab--active' : ''}`}
           >
             {branch.key}
           </button>

@@ -104,7 +104,11 @@ export const BranchChip = React.forwardRef<HTMLButtonElement, BranchChipProps>(
         ref={ref}
         type="button"
         disabled={disabled}
-        className={cn('octo-button octo-button--branch', !isFeature && 'octo-button--branch-disabled', className)}
+        className={cn(
+          'octo-button octo-button--branch',
+          !isFeature && 'octo-button octo-button--branch-disabled',
+          className,
+        )}
         {...props}
       >
         <GitBranch size={13} style={{ color: isFeature ? 'var(--brand-strong)' : undefined }} />

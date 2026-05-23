@@ -90,7 +90,7 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
       </button>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="octo-dialog-content--md">
+        <DialogContent className="octo-dialog-content octo-dialog-content--md">
           <DialogHeader>
             <DialogTitle>Delete this image?</DialogTitle>
             <DialogDescription>

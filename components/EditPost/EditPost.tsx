@@ -318,7 +318,10 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
                 role="tab"
                 aria-selected={viewMode === 'edit'}
                 onClick={() => setViewMode('edit')}
-                className={cn('octo-edit-post__view-btn', viewMode === 'edit' && 'octo-edit-post__view-btn--active')}
+                className={cn(
+                  'octo-edit-post__view-btn',
+                  viewMode === 'edit' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
+                )}
               >
                 Edit
               </button>
@@ -327,7 +330,10 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
                 role="tab"
                 aria-selected={viewMode === 'diff'}
                 onClick={() => setViewMode('diff')}
-                className={cn('octo-edit-post__view-btn', viewMode === 'diff' && 'octo-edit-post__view-btn--active')}
+                className={cn(
+                  'octo-edit-post__view-btn',
+                  viewMode === 'diff' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
+                )}
               >
                 Diff
               </button>

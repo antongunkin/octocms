@@ -15,7 +15,7 @@ type ChipProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
   ({ className, children, removable, mono, onRemove, ...props }, ref) => (
-    <span ref={ref} className={cn('octo-chip', mono && 'octo-chip--mono', className)} {...props}>
+    <span ref={ref} className={cn('octo-chip', mono && 'octo-chip octo-chip--mono', className)} {...props}>
       {children}
       {removable && (
         <button type="button" onClick={onRemove} aria-label="Remove" className="octo-chip__remove">
@@ -89,7 +89,7 @@ export function StatusBadge({ status, variant = 'badge', size = 'md', className 
     <span
       className={cn(
         'octo-chip octo-chip--status',
-        size === 'sm' ? 'octo-chip--status-sm' : 'octo-chip--status-md',
+        size === 'sm' ? 'octo-chip octo-chip--status-sm' : 'octo-chip octo-chip--status-md',
         className,
       )}
       style={{

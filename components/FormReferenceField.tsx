@@ -172,7 +172,7 @@ const AddExistingModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="octo-dialog-content--2xl octo-dialog-content--vh-80 octo-dialog-content--flex-col">
+      <DialogContent className="octo-dialog-content octo-dialog-content--2xl octo-dialog-content--vh-80 octo-dialog-content--flex-col">
         <DialogHeader>
           <DialogTitle>Add existing content</DialogTitle>
         </DialogHeader>
@@ -224,8 +224,10 @@ const AddExistingModal = ({
                     key={entry.path}
                     className={cn(
                       'octo-ff-reference__modal-row',
-                      alreadyAdded && 'octo-ff-reference__modal-row--disabled',
-                      isChecked && !alreadyAdded && 'octo-ff-reference__modal-row--checked',
+                      alreadyAdded && 'octo-ff-reference__modal-row octo-ff-reference__modal-row--disabled',
+                      isChecked &&
+                        !alreadyAdded &&
+                        'octo-ff-reference__modal-row octo-ff-reference__modal-row--checked',
                     )}
                   >
                     <input
@@ -310,7 +312,7 @@ const CreateNewModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="octo-dialog-content--md">
+      <DialogContent className="octo-dialog-content octo-dialog-content--md">
         <DialogHeader>
           <DialogTitle>Create new entry</DialogTitle>
         </DialogHeader>

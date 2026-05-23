@@ -58,7 +58,10 @@ export function MediaListTable({ files, onPickFile, selectedId }: MediaListTable
                     e.preventDefault();
                     activate(file);
                   }}
-                  className={cn('octo-content-row', selectedId === file.id && 'octo-content-row--selected')}
+                  className={cn(
+                    'octo-content-row',
+                    selectedId === file.id && 'octo-content-row octo-content-row--selected',
+                  )}
                 >
                   <td className="octo-content-row__td">
                     <span className="octo-content-row__thumb-wrap">

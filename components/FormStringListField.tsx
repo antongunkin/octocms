@@ -150,7 +150,7 @@ const FormStringListField = ({ label, name, value, required, hint, error, onClea
       </div>
       <input
         id={inputId}
-        className={cn('octo-ff-list__add-input', error && 'octo-ff-list__add-input--error')}
+        className={cn('octo-ff-list__add-input', error && 'octo-ff-list__add-input octo-ff-list__add-input--error')}
         type="text"
         value={draft}
         onChange={(e) => setDraft(e.target.value)}

@@ -13,7 +13,7 @@ import { LeftPanelSkeleton } from './LeftPanelSkeleton';
  */
 export function ContentPageChromeSkeleton() {
   return (
-    <div className="octo-page-chrome--skel">
+    <div className="octo-page-chrome octo-page-chrome--skel">
       <div className="octo-page-chrome">
         <div className="octo-page-chrome__title-area">
           <div className="octo-page-chrome__breadcrumb">

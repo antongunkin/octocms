@@ -89,7 +89,7 @@ export function Composer({
 
   return (
     <div
-      className={`octo-chat-composer${dragOver ? ' octo-chat-composer--dragover' : ''}`}
+      className={`octo-chat-composer${dragOver ? ' octo-chat-composer octo-chat-composer--dragover' : ''}`}
       onDragOver={(e) => {
         e.preventDefault();
         if (!disabled) setDragOver(true);

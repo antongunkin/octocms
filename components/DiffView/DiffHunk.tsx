@@ -27,7 +27,11 @@ export function DiffHunk({ before, after, showLineNumbers = false, className }: 
   const lines = useMemo(() => buildLines(before, after), [before, after]);
 
   if (lines.length === 0) {
-    return <div className={`octo-diff-hunk__lines--empty${className ? ` ${className}` : ''}`}>No content</div>;
+    return (
+      <div className={`octo-diff-hunk__lines octo-diff-hunk__lines--empty${className ? ` ${className}` : ''}`}>
+        No content
+      </div>
+    );
   }
 
   return (

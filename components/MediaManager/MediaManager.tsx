@@ -317,7 +317,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         aria-selected={value === 'grid'}
         aria-label="Grid view"
         onClick={() => onChange('grid')}
-        className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn--active')}
+        className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn octo-media-view-btn--active')}
       >
         <LayoutGrid className="octo-icon-sm" />
       </button>
@@ -327,7 +327,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         aria-selected={value === 'list'}
         aria-label="List view"
         onClick={() => onChange('list')}
-        className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn--active')}
+        className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn octo-media-view-btn--active')}
       >
         <List className="octo-icon-sm" />
       </button>

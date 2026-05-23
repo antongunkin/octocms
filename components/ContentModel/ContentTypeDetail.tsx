@@ -214,13 +214,18 @@ export default function ContentTypeDetail({ type }: Props) {
         </div>
         <div className="octo-page-chrome__right">
           <div className="octo-hdr-right">
-            <Button size="sm" className="octo-button--action" onClick={() => setAddFieldOpen(true)}>
+            <Button size="sm" className="octo-button octo-button--action" onClick={() => setAddFieldOpen(true)}>
               <Plus className="octo-icon-md" />
               Add field
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="outline" aria-label="More actions" className="octo-button--icon-sm">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  aria-label="More actions"
+                  className="octo-button octo-button--icon-sm"
+                >
                   <MoreHorizontal className="octo-icon-md" />
                 </Button>
               </DropdownMenuTrigger>
@@ -230,7 +235,10 @@ export default function ContentTypeDetail({ type }: Props) {
                   Edit content type
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="octo-menu-item--danger">
+                <DropdownMenuItem
+                  onSelect={() => setDeleteOpen(true)}
+                  className="octo-menu-item octo-menu-item--danger"
+                >
                   <Trash2 className="octo-icon-sm" />
                   Delete content type
                 </DropdownMenuItem>
@@ -275,32 +283,32 @@ export default function ContentTypeDetail({ type }: Props) {
       <div className="octo-schema-detail">
         {/* Main content column — independently scrollable */}
         <div className="octo-schema-detail__main">
-          <Tabs defaultValue="fields" className="octo-tabs--flex-col">
+          <Tabs defaultValue="fields" className="octo-tabs octo-tabs--flex-col">
             <TabsList className="octo-u-self-start">
               <TabsTrigger value="fields">Fields</TabsTrigger>
               <TabsTrigger value="json">JSON</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="fields" className="octo-tabs-content--mt">
-              <Card className="octo-card--no-padding">
+            <TabsContent value="fields" className="octo-tabs-content octo-tabs-content--mt">
+              <Card className="octo-card octo-card--no-padding">
                 <Table>
                   <TableHeader>
-                    <TableRow className="octo-table-row--no-hover">
-                      <TableHead className="octo-table-cell--w8" />
-                      <TableHead className="octo-table-head--muted">Field</TableHead>
-                      <TableHead className="octo-table-head--muted">Key</TableHead>
-                      <TableHead className="octo-table-head--muted">Type</TableHead>
-                      <TableHead className="octo-table-head--muted">Flags</TableHead>
-                      <TableHead className="octo-table-head--muted octo-table-head--right octo-table-head--w20">
+                    <TableRow className="octo-table-row octo-table-row--no-hover">
+                      <TableHead className="octo-table-cell octo-table-cell--w8" />
+                      <TableHead className="octo-table-head octo-table-head--muted">Field</TableHead>
+                      <TableHead className="octo-table-head octo-table-head--muted">Key</TableHead>
+                      <TableHead className="octo-table-head octo-table-head--muted">Type</TableHead>
+                      <TableHead className="octo-table-head octo-table-head--muted">Flags</TableHead>
+                      <TableHead className="octo-table-head octo-table-head--muted octo-table-head--right octo-table-head--w20">
                         Title
                       </TableHead>
-                      <TableHead className="octo-table-head--w20" />
+                      <TableHead className="octo-table-head octo-table-head--w20" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {fields.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} className="octo-table-cell--empty">
+                        <TableCell colSpan={7} className="octo-table-cell octo-table-cell--empty">
                           No fields configured. Click <strong>Add field</strong> to get started.
                         </TableCell>
                       </TableRow>
@@ -313,7 +321,10 @@ export default function ContentTypeDetail({ type }: Props) {
                         return (
                           <TableRow
                             key={key}
-                            className={cn('octo-table-row--hover-group', dragKey === key && 'octo-u-opacity-50')}
+                            className={cn(
+                              'octo-table-row octo-table-row--hover-group',
+                              dragKey === key && 'octo-u-opacity-50',
+                            )}
                             draggable
                             onDragStart={() => setDragKey(key)}
                             onDragOver={(e) => e.preventDefault()}
@@ -340,7 +351,7 @@ export default function ContentTypeDetail({ type }: Props) {
                               void reorderTo(nextOrder);
                             }}
                           >
-                            <TableCell className="octo-table-cell--drag" aria-label="Drag to reorder">
+                            <TableCell className="octo-table-cell octo-table-cell--drag" aria-label="Drag to reorder">
                               <GripVertical className="octo-icon-sm" />
                             </TableCell>
                             <TableCell>
@@ -353,14 +364,14 @@ export default function ContentTypeDetail({ type }: Props) {
                                 {field.hint ? <span className="octo-field-table__label-hint">{field.hint}</span> : null}
                               </button>
                             </TableCell>
-                            <TableCell className="octo-table-cell--mono">{key}</TableCell>
+                            <TableCell className="octo-table-cell octo-table-cell--mono">{key}</TableCell>
                             <TableCell>
                               <FormatBadge field={field} />
                             </TableCell>
                             <TableCell>
                               <FieldFlags field={field} />
                             </TableCell>
-                            <TableCell className="octo-table-cell--right">
+                            <TableCell className="octo-table-cell octo-table-cell--right">
                               <button
                                 type="button"
                                 title={
@@ -375,26 +386,29 @@ export default function ContentTypeDetail({ type }: Props) {
                                 className={cn(
                                   'octo-field-table__star',
                                   field.entryTitle
-                                    ? 'octo-field-table__star--active'
+                                    ? 'octo-field-table__star octo-field-table__star--active'
                                     : titleAllowed
-                                      ? 'octo-field-table__star--allowed'
-                                      : 'octo-field-table__star--disabled',
+                                      ? 'octo-field-table__star octo-field-table__star--allowed'
+                                      : 'octo-field-table__star octo-field-table__star--disabled',
                                 )}
                                 aria-pressed={field.entryTitle === true}
                                 aria-label={field.entryTitle ? 'Current entry title' : 'Set as entry title'}
                               >
                                 <Star
-                                  className={cn('octo-icon-sm', field.entryTitle && 'octo-field-table__star--filled')}
+                                  className={cn(
+                                    'octo-icon-sm',
+                                    field.entryTitle && 'octo-field-table__star octo-field-table__star--filled',
+                                  )}
                                 />
                               </button>
                             </TableCell>
-                            <TableCell className="octo-table-cell--right">
+                            <TableCell className="octo-table-cell octo-table-cell--right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button
                                     size="icon"
                                     variant="ghost"
-                                    className="octo-button--icon-sm octo-btn-row-action"
+                                    className="octo-button octo-button--icon-sm octo-btn-row-action"
                                     aria-label={`Actions for ${field.label}`}
                                   >
                                     <MoreHorizontal className="octo-icon-md" />
@@ -408,7 +422,7 @@ export default function ContentTypeDetail({ type }: Props) {
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem
                                     onSelect={() => setDeleteFieldKey(key)}
-                                    className="octo-menu-item--danger"
+                                    className="octo-menu-item octo-menu-item--danger"
                                   >
                                     <Trash2 className="octo-icon-sm" />
                                     Delete field
@@ -425,8 +439,8 @@ export default function ContentTypeDetail({ type }: Props) {
               </Card>
             </TabsContent>
 
-            <TabsContent value="json" className="octo-tabs-content--mt">
-              <Card className="octo-card--no-padding octo-u-overflow-hidden">
+            <TabsContent value="json" className="octo-tabs-content octo-tabs-content--mt">
+              <Card className="octo-card octo-card--no-padding octo-u-overflow-hidden">
                 <pre className="octo-field-table__json-pre">
                   <code>{collectionJson}</code>
                 </pre>
@@ -456,7 +470,9 @@ export default function ContentTypeDetail({ type }: Props) {
                 <span className="octo-schema-detail__detail-key">Entry title</span>
                 <span className="octo-schema-detail__detail-val">
                   {entryTitleKey ? (
-                    <code className="octo-schema-detail__detail-val--mono">{entryTitleKey}</code>
+                    <code className="octo-schema-detail__detail-val octo-schema-detail__detail-val--mono">
+                      {entryTitleKey}
+                    </code>
                   ) : (
                     <span className="octo-u-text-muted">— not set —</span>
                   )}
@@ -551,7 +567,10 @@ function FieldFlags({ field }: { field: CollectionField }) {
       {flags.map((flag, i) => (
         <span
           key={i}
-          className={cn('octo-field-table__flag', flag === 'required' && 'octo-field-table__flag--required')}
+          className={cn(
+            'octo-field-table__flag',
+            flag === 'required' && 'octo-field-table__flag octo-field-table__flag--required',
+          )}
         >
           {flag}
         </span>

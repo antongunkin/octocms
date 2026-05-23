@@ -19,10 +19,13 @@ export function ToolCallCard({ call }: Props) {
   const resultPreview = call.result ? truncate(call.result.content, 280) : 'Running…';
 
   return (
-    <div className={cn('octo-tool-call-card', status === 'error' && 'octo-tool-call-card--error')}>
+    <div className={cn('octo-tool-call-card', status === 'error' && 'octo-tool-call-card octo-tool-call-card--error')}>
       <button type="button" onClick={() => setExpanded((v) => !v)} className="octo-tool-call-card__toggle">
         <ChevronRight
-          className={cn('octo-tool-call-card__chevron octo-icon-xs', expanded && 'octo-tool-call-card__chevron--open')}
+          className={cn(
+            'octo-tool-call-card__chevron octo-icon-xs',
+            expanded && 'octo-tool-call-card__chevron octo-tool-call-card__chevron--open',
+          )}
         />
         <Wrench className="octo-tool-call-card__icon octo-icon-xs" />
         <span className="octo-tool-call-card__name">{call.name}</span>

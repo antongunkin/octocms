@@ -110,7 +110,7 @@ export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="octo-dialog-content--2xl">
+      <DialogContent className="octo-dialog-content octo-dialog-content--2xl">
         <DialogHeader>
           <DialogTitle>Delete field</DialogTitle>
           <DialogDescription>

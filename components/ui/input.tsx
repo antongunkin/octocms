@@ -11,7 +11,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, inputPrefix, inputSuffix, ...props }, ref) => {
     if (inputPrefix || inputSuffix) {
       return (
-        <div className={cn('octo-input--shell field-shell', className)}>
+        <div className={cn('octo-input octo-input--shell field-shell', className)}>
           {inputPrefix ? <span className="octo-input__affix">{inputPrefix}</span> : null}
           <input type={type} className="octo-input__inner" ref={ref} {...props} />
           {inputSuffix ? <span className="octo-input__affix">{inputSuffix}</span> : null}

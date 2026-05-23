@@ -79,7 +79,7 @@ export function MediaLeftPanel({
                 {canDelete && (
                   <>
                     <span
-                      className={`octo-media-left-panel__folder-count ${active ? 'octo-media-left-panel__folder-count--active' : 'octo-media-left-panel__folder-count--normal'}`}
+                      className={`octo-media-left-panel__folder-count ${active ? 'octo-media-left-panel__folder-count octo-media-left-panel__folder-count--active' : 'octo-media-left-panel__folder-count octo-media-left-panel__folder-count--normal'}`}
                     >
                       {count}
                     </span>

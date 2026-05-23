@@ -174,7 +174,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           }
         }}
       >
-        <DialogContent className="octo-dialog-content--3xl octo-dialog-content--vh-80 octo-dialog-content--flex-col">
+        <DialogContent className="octo-dialog-content octo-dialog-content--3xl octo-dialog-content--vh-80 octo-dialog-content--flex-col">
           <DialogHeader>
             <DialogTitle>Select entry to embed</DialogTitle>
           </DialogHeader>

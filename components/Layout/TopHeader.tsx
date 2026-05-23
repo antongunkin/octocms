@@ -177,7 +177,11 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
             <Link
               key={n.id}
               href={n.href}
-              className={cn('octo-top-header__nav-link', isActive && 'octo-top-header__nav-link--active')}
+              aria-current={isActive ? 'page' : undefined}
+              className={cn(
+                'octo-top-header__nav-link',
+                isActive && 'octo-top-header__nav-link octo-top-header__nav-link--active',
+              )}
             >
               {n.label}
             </Link>

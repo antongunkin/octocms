@@ -49,7 +49,10 @@ export function MediaUploadBar({ allowedFormats, onFiles, disabled }: MediaUploa
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className={cn('octo-media-upload-bar__btn', isDragging && 'octo-media-upload-bar__btn--dragging')}
+        className={cn(
+          'octo-media-upload-bar__btn',
+          isDragging && 'octo-media-upload-bar__btn octo-media-upload-bar__btn--dragging',
+        )}
       >
         <CloudUpload className="octo-media-upload-bar__icon h-5 w-5" />
         <span>

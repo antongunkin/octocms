@@ -105,14 +105,14 @@ function ImpactRow({ item, asLink }: { item: SchemaImpactItem; asLink: boolean }
 function DataLossBadge({ dataLoss }: { dataLoss: boolean }) {
   if (dataLoss) {
     return (
-      <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge--loss')}>
+      <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge octo-schema-impact__badge--loss')}>
         <ShieldAlert className="octo-icon-xs" />
         Data loss
       </span>
     );
   }
   return (
-    <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge--ok')}>
+    <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge octo-schema-impact__badge--ok')}>
       <ShieldCheck className="octo-icon-xs" />
       Preserved
     </span>

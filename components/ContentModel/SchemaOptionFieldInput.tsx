@@ -71,7 +71,7 @@ function renderControl({
             onValueChange={(v) => onChange(v === '__none__' ? undefined : v)}
             disabled={disabled}
           >
-            <SelectTrigger className="octo-select__trigger--sm">
+            <SelectTrigger className="octo-select__trigger octo-select__trigger--sm">
               <SelectValue placeholder="No default" />
             </SelectTrigger>
             <SelectContent>
@@ -114,7 +114,7 @@ function renderControl({
     case 'enum':
       return (
         <Select value={typeof value === 'string' ? value : ''} onValueChange={(v) => onChange(v)} disabled={disabled}>
-          <SelectTrigger className="octo-select__trigger--sm">
+          <SelectTrigger className="octo-select__trigger octo-select__trigger--sm">
             <SelectValue placeholder="Select…" />
           </SelectTrigger>
           <SelectContent>
@@ -188,7 +188,7 @@ function BooleanToggle({
       onClick={() => onChange(!value)}
       disabled={disabled}
       aria-pressed={value}
-      className={cn('octo-bool-toggle', value && 'octo-bool-toggle--on')}
+      className={cn('octo-bool-toggle', value && 'octo-bool-toggle octo-bool-toggle--on')}
     >
       <span className="octo-bool-toggle__track">
         <span className="octo-bool-toggle__thumb" />
@@ -217,7 +217,13 @@ function CollectionsCheckboxList({
   return (
     <div className="octo-checkbox-list">
       {available.map((c) => (
-        <label key={c} className={cn('octo-checkbox-list__item', disabled && 'octo-checkbox-list__item--disabled')}>
+        <label
+          key={c}
+          className={cn(
+            'octo-checkbox-list__item',
+            disabled && 'octo-checkbox-list__item octo-checkbox-list__item--disabled',
+          )}
+        >
           <input
             type="checkbox"
             disabled={disabled}
@@ -258,7 +264,10 @@ function DefaultOptionsCheckboxList({
       {options.map((o) => (
         <label
           key={o.value}
-          className={cn('octo-checkbox-list__item', disabled && 'octo-checkbox-list__item--disabled')}
+          className={cn(
+            'octo-checkbox-list__item',
+            disabled && 'octo-checkbox-list__item octo-checkbox-list__item--disabled',
+          )}
         >
           <input
             type="checkbox"
@@ -323,15 +332,15 @@ function SelectOptionsEditor({
                 onChange={(e) => update(i, { value: e.target.value })}
                 disabled={disabled}
                 className={cn(
-                  'octo-u-flex-1 octo-u-mono octo-select__trigger--xs',
-                  (o.value === '' || valueDuplicates.has(o.value)) && 'octo-input--invalid',
+                  'octo-u-flex-1 octo-u-mono octo-select__trigger octo-select__trigger--xs',
+                  (o.value === '' || valueDuplicates.has(o.value)) && 'octo-input octo-input--invalid',
                 )}
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="octo-button--icon-sm octo-button--danger-ghost"
+                className="octo-button octo-button--icon-sm octo-button--danger-ghost"
                 onClick={() => remove(i)}
                 disabled={disabled}
                 aria-label="Remove option"
@@ -348,7 +357,7 @@ function SelectOptionsEditor({
         size="sm"
         onClick={add}
         disabled={disabled}
-        className="octo-button--icon-xs"
+        className="octo-button octo-button--icon-xs"
       >
         <Plus className="octo-icon-xs" /> Add option
       </Button>

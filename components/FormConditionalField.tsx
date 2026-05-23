@@ -95,7 +95,10 @@ const FormConditionalField = ({
               <TabsTrigger
                 key={branch.key}
                 value={branch.key}
-                className={cn('octo-ff-conditional__tab', hasBranchError && 'octo-ff-conditional__tab--error')}
+                className={cn(
+                  'octo-ff-conditional__tab',
+                  hasBranchError && 'octo-ff-conditional__tab octo-ff-conditional__tab--error',
+                )}
               >
                 {branch.label}
                 <span className="octo-ff-conditional__tab-key">{branch.key}</span>

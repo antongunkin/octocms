@@ -211,12 +211,21 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
         id={contentId}
         role="listbox"
         data-state="open"
-        className={cn('octo-select__content', position === 'popper' && 'octo-select__content--popper', className)}
+        className={cn(
+          'octo-select__content',
+          position === 'popper' && 'octo-select__content octo-select__content--popper',
+          className,
+        )}
         style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0 }}
         onKeyDown={handleKeyDown}
         {...props}
       >
-        <div className={cn('octo-select__viewport', position === 'popper' && 'octo-select__viewport--popper')}>
+        <div
+          className={cn(
+            'octo-select__viewport',
+            position === 'popper' && 'octo-select__viewport octo-select__viewport--popper',
+          )}
+        >
           {children}
         </div>
       </div>

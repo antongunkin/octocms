@@ -48,8 +48,8 @@ const Toast = React.forwardRef<HTMLLIElement, ToastProps>(
       data-state={open ? 'open' : 'closed'}
       className={cn(
         'octo-toast',
-        variant === 'destructive' && 'octo-toast--destructive',
-        variant === 'success' && 'octo-toast--success',
+        variant === 'destructive' && 'octo-toast octo-toast--destructive',
+        variant === 'success' && 'octo-toast octo-toast--success',
         className,
       )}
       {...props}

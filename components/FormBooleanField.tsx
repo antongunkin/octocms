@@ -40,20 +40,26 @@ const FormBooleanField = ({
       <div className="octo-ff-boolean__track">
         <button
           type="button"
+          aria-pressed={checked}
           onClick={() => setChecked(true)}
           className={cn(
             'octo-ff-boolean__seg',
-            checked ? 'octo-ff-boolean__seg--active' : 'octo-ff-boolean__seg--inactive',
+            checked
+              ? 'octo-ff-boolean__seg octo-ff-boolean__seg--active'
+              : 'octo-ff-boolean__seg octo-ff-boolean__seg--inactive',
           )}
         >
           {trueLabel}
         </button>
         <button
           type="button"
+          aria-pressed={!checked}
           onClick={() => setChecked(false)}
           className={cn(
             'octo-ff-boolean__seg',
-            !checked ? 'octo-ff-boolean__seg--active' : 'octo-ff-boolean__seg--inactive',
+            !checked
+              ? 'octo-ff-boolean__seg octo-ff-boolean__seg--active'
+              : 'octo-ff-boolean__seg octo-ff-boolean__seg--inactive',
           )}
         >
           {falseLabel}

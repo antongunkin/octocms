@@ -253,7 +253,7 @@ export default function FieldDialog(props: Props) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="octo-dialog-content--3xl octo-dialog-content--vh-88 octo-dialog-content--overflow-y-auto">
+        <DialogContent className="octo-dialog-content octo-dialog-content--3xl octo-dialog-content--vh-88 octo-dialog-content--overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>
@@ -288,7 +288,7 @@ export default function FieldDialog(props: Props) {
                     variant="ghost"
                     size="sm"
                     onClick={() => setStep('format')}
-                    className="octo-button--icon-xs"
+                    className="octo-button octo-button--icon-xs"
                   >
                     <ArrowLeft className="octo-icon-xs" /> Change type
                   </Button>
@@ -339,7 +339,7 @@ export default function FieldDialog(props: Props) {
                   <p
                     className={cn(
                       'octo-dialog-field__hint-xs',
-                      (keyError || duplicateKey) && 'octo-dialog-field__hint--error',
+                      (keyError || duplicateKey) && 'octo-dialog-field__hint octo-dialog-field__hint--error',
                     )}
                   >
                     {duplicateKey
@@ -553,7 +553,7 @@ function FormatPicker({
             key={fmt}
             type="button"
             onClick={() => onPick(fmt)}
-            className={cn('octo-format-card', active && 'octo-format-card--active')}
+            className={cn('octo-format-card', active && 'octo-format-card octo-format-card--active')}
           >
             <span className="octo-format-card__label">{meta.label}</span>
             <code className="octo-format-card__code">{fmt}</code>
@@ -579,7 +579,7 @@ function ChangeTypeMenu({
         type="button"
         variant="ghost"
         size="sm"
-        className="octo-button--icon-xs"
+        className="octo-button octo-button--icon-xs"
         onClick={() => setOpenPicker((v) => !v)}
       >
         Change type
@@ -594,7 +594,10 @@ function ChangeTypeMenu({
                 <button
                   key={fmt}
                   type="button"
-                  className={cn('octo-change-type-item', active && 'octo-change-type-item--active')}
+                  className={cn(
+                    'octo-change-type-item',
+                    active && 'octo-change-type-item octo-change-type-item--active',
+                  )}
                   onClick={() => {
                     if (!active) onChange(fmt);
                     setOpenPicker(false);
@@ -626,7 +629,7 @@ function ToggleCheckbox({
   disabled?: boolean;
 }) {
   return (
-    <label className={cn('octo-field-toggle', disabled && 'octo-field-toggle--disabled')}>
+    <label className={cn('octo-field-toggle', disabled && 'octo-field-toggle octo-field-toggle--disabled')}>
       <input
         type="checkbox"
         className="octo-u-mt-0-5"
@@ -663,8 +666,8 @@ function EntryTitleToggle({
       aria-label="Entry title"
       className={cn(
         'octo-field-toggle',
-        checked && 'octo-field-toggle--star-active',
-        (disabled || !allowed) && 'octo-field-toggle--disabled',
+        checked && 'octo-field-toggle octo-field-toggle--star-active',
+        (disabled || !allowed) && 'octo-field-toggle octo-field-toggle--disabled',
       )}
       title={allowed ? '' : 'Entry title must be a non-list string, text, or slug field.'}
     >
@@ -677,7 +680,12 @@ function EntryTitleToggle({
       />
       <span className="octo-field-toggle__text">
         <span className="octo-field-toggle__label octo-u-row octo-u-gap-1">
-          <Icon className={cn('octo-icon-sm', checked ? 'octo-field-table__star--filled' : 'octo-u-text-muted')} />
+          <Icon
+            className={cn(
+              'octo-icon-sm',
+              checked ? 'octo-field-table__star octo-field-table__star--filled' : 'octo-u-text-muted',
+            )}
+          />
           Entry title
         </span>
         <span className="octo-field-toggle__desc">Use as display title in entry lists.</span>

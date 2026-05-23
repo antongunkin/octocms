@@ -109,7 +109,7 @@ const FormSelectField = ({
           setSingle(v === EMPTY_VALUE ? '' : v);
         }}
       >
-        <SelectTrigger className="field-shell octo-input--shell" aria-invalid={error ? true : undefined}>
+        <SelectTrigger className="field-shell octo-input octo-input--shell" aria-invalid={error ? true : undefined}>
           <SelectValue placeholder={allowEmpty ? '—' : 'Choose…'} />
         </SelectTrigger>
         <SelectContent>

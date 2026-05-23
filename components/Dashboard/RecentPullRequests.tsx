@@ -47,10 +47,10 @@ export function RecentPullRequestsView() {
 function PullRequestRow({ pr, isLast: _isLast }: { pr: RecentCMSPullRequest; isLast: boolean }) {
   const tileVariant =
     pr.state === 'merged'
-      ? 'octo-pr-row__tile--merged'
+      ? 'octo-pr-row__tile octo-pr-row__tile--merged'
       : pr.state === 'closed'
-        ? 'octo-pr-row__tile--closed'
-        : 'octo-pr-row__tile--open';
+        ? 'octo-pr-row__tile octo-pr-row__tile--closed'
+        : 'octo-pr-row__tile octo-pr-row__tile--open';
   return (
     <div className="octo-pr-row">
       <span className={cn('octo-pr-row__tile', tileVariant)}>
@@ -79,10 +79,10 @@ function PullRequestRow({ pr, isLast: _isLast }: { pr: RecentCMSPullRequest; isL
 function PRStateBadge({ state }: { state: RecentCMSPullRequest['state'] }) {
   const { label, variant } =
     state === 'merged'
-      ? { label: 'Merged', variant: 'octo-pr-badge--merged' }
+      ? { label: 'Merged', variant: 'octo-pr-badge octo-pr-badge--merged' }
       : state === 'closed'
-        ? { label: 'Closed', variant: 'octo-pr-badge--closed' }
-        : { label: 'Open', variant: 'octo-pr-badge--open' };
+        ? { label: 'Closed', variant: 'octo-pr-badge octo-pr-badge--closed' }
+        : { label: 'Open', variant: 'octo-pr-badge octo-pr-badge--open' };
   return <span className={cn('octo-pr-badge', variant)}>{label}</span>;
 }
 

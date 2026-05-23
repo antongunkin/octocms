@@ -29,13 +29,15 @@ export type RowItemProps = {
 };
 
 export function RowItem({ icon, title, sub, badge, kbd, mono, active, href, onMouseEnter, onClick }: RowItemProps) {
-  const className = `octo-cmdk__item${active ? ' octo-cmdk__item--active' : ''}`;
+  const className = `octo-cmdk__item${active ? ' octo-cmdk__item octo-cmdk__item--active' : ''}`;
 
   const inner = (
     <>
       <span className="octo-cmdk__item-icon">{icon}</span>
       <div className="octo-cmdk__item-body">
-        <div className={`octo-cmdk__item-label${mono ? ' octo-cmdk__item-label--mono' : ''}`}>{title}</div>
+        <div className={`octo-cmdk__item-label${mono ? ' octo-cmdk__item-label octo-cmdk__item-label--mono' : ''}`}>
+          {title}
+        </div>
         {sub && <div className="octo-cmdk__item-meta">{sub}</div>}
       </div>
       {badge && <span className="octo-cmdk__item-badge">{badge}</span>}

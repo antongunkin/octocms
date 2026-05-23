@@ -193,7 +193,7 @@ export default function SearchBox({ placeholder = 'Search...', className = '' }:
                 <li
                   key={result.id}
                   data-result-item
-                  className={`octo-search-box__result${index === selectedIndex ? ' octo-search-box__result--active' : ''}`}
+                  className={`octo-search-box__result${index === selectedIndex ? ' octo-search-box__result octo-search-box__result--active' : ''}`}
                 >
                   <button
                     type="button"

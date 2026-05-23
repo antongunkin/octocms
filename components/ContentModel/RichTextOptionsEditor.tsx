@@ -69,7 +69,10 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
             return (
               <label
                 key={String(key)}
-                className={cn('octo-richtext-toolbar-item', disabled && 'octo-richtext-toolbar-item--disabled')}
+                className={cn(
+                  'octo-richtext-toolbar-item',
+                  disabled && 'octo-richtext-toolbar-item octo-richtext-toolbar-item--disabled',
+                )}
               >
                 <input type="checkbox" checked={on} disabled={disabled} onChange={() => setToolbar(key, !on)} />
                 <span>{label}</span>
@@ -103,7 +106,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
                   }
                   disabled={disabled}
                 >
-                  <SelectTrigger className="octo-select__trigger--xs">
+                  <SelectTrigger className="octo-select__trigger octo-select__trigger--xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -141,7 +144,7 @@ export default function RichTextOptionsEditor({ value, onChange, availableCollec
                           }}
                           className={cn(
                             'octo-richtext-collection-pill',
-                            selected && 'octo-richtext-collection-pill--selected',
+                            selected && 'octo-richtext-collection-pill octo-richtext-collection-pill--selected',
                           )}
                         >
                           {c}
@@ -227,7 +230,7 @@ function VariablesEditor({
     setDraft('');
   };
   return (
-    <div className="octo-rt-opts__group--sm">
+    <div className="octo-rt-opts__group octo-rt-opts__group--sm">
       <div className="octo-rt-opts__chip-row">
         {value.map((v) => (
           <span key={v} className="octo-string-list__tag octo-rt-opts__mono-tag">
@@ -256,7 +259,7 @@ function VariablesEditor({
           }}
           placeholder="user.firstName"
           disabled={disabled}
-          className="octo-u-flex-1 octo-u-mono octo-select__trigger--xs"
+          className="octo-u-flex-1 octo-u-mono octo-select__trigger octo-select__trigger--xs"
         />
         <Button type="button" variant="outline" size="sm" onClick={commit} disabled={disabled || !draft.trim()}>
           Add
@@ -299,12 +302,12 @@ function ComponentsEditor({
   };
 
   return (
-    <div className="octo-rt-opts__group--sm">
+    <div className="octo-rt-opts__group octo-rt-opts__group--sm">
       {entries.length === 0 ? (
         <p className="octo-checkbox-list__empty">No custom components defined.</p>
       ) : (
         entries.map(([name, def]) => (
-          <div key={name} className="octo-branch-card octo-rt-opts__group--sm">
+          <div key={name} className="octo-branch-card octo-rt-opts__group octo-rt-opts__group--sm">
             <div className="octo-branch-card__grid">
               <div className="octo-branch-card__field">
                 <span className="octo-branch-card__field-label">Name (PascalCase)</span>
@@ -312,7 +315,7 @@ function ComponentsEditor({
                   value={name}
                   onChange={(e) => renameComponent(name, e.target.value)}
                   disabled={disabled}
-                  className="octo-u-mono octo-select__trigger--xs"
+                  className="octo-u-mono octo-select__trigger octo-select__trigger--xs"
                 />
               </div>
               <div className="octo-branch-card__field">
@@ -321,7 +324,7 @@ function ComponentsEditor({
                   value={def.label}
                   onChange={(e) => updateComponent(name, { label: e.target.value })}
                   disabled={disabled}
-                  className="octo-select__trigger--sm"
+                  className="octo-select__trigger octo-select__trigger--sm"
                 />
               </div>
             </div>
@@ -332,7 +335,7 @@ function ComponentsEditor({
                 onValueChange={(v) => updateComponent(name, { kind: v as 'inline' | 'block' })}
                 disabled={disabled}
               >
-                <SelectTrigger className="octo-select__trigger--xs">
+                <SelectTrigger className="octo-select__trigger octo-select__trigger--xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -356,7 +359,7 @@ function ComponentsEditor({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="octo-button--icon-xs octo-button--danger-ghost"
+                className="octo-button octo-button--icon-xs octo-button--danger-ghost"
                 onClick={() => removeComponent(name)}
                 disabled={disabled}
               >
@@ -395,14 +398,14 @@ function PropsEditor({
         size="sm"
         onClick={add}
         disabled={disabled}
-        className="octo-button--icon-xs"
+        className="octo-button octo-button--icon-xs"
       >
         <Plus className="octo-icon-xs" /> Add prop
       </Button>
     );
   }
   return (
-    <div className="octo-rt-opts__group--xs">
+    <div className="octo-rt-opts__group octo-rt-opts__group--xs">
       {value.map((p, i) => (
         <div key={i} className="octo-richtext-props-grid">
           <Input
@@ -410,21 +413,21 @@ function PropsEditor({
             value={p.name}
             onChange={(e) => update(i, { name: e.target.value })}
             disabled={disabled}
-            className="octo-u-mono octo-select__trigger--xs"
+            className="octo-u-mono octo-select__trigger octo-select__trigger--xs"
           />
           <Input
             placeholder="Label"
             value={p.label}
             onChange={(e) => update(i, { label: e.target.value })}
             disabled={disabled}
-            className="octo-select__trigger--xs"
+            className="octo-select__trigger octo-select__trigger--xs"
           />
           <Select
             value={p.type}
             onValueChange={(v) => update(i, { type: v as RichTextComponentProp['type'] })}
             disabled={disabled}
           >
-            <SelectTrigger className="octo-select__trigger--xs">
+            <SelectTrigger className="octo-select__trigger octo-select__trigger--xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -439,7 +442,7 @@ function PropsEditor({
             type="button"
             variant="ghost"
             size="icon"
-            className="octo-button--icon-xs octo-button--danger-ghost"
+            className="octo-button octo-button--icon-xs octo-button--danger-ghost"
             onClick={() => remove(i)}
             disabled={disabled}
             aria-label="Remove prop"
@@ -454,7 +457,7 @@ function PropsEditor({
         size="sm"
         onClick={add}
         disabled={disabled}
-        className="octo-button--icon-xs"
+        className="octo-button octo-button--icon-xs"
       >
         <Plus className="octo-icon-xs" /> Add prop
       </Button>
