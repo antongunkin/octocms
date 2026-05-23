@@ -11,7 +11,8 @@
      6. BEM feature blocks (octo-layout, octo-dashboard, …)
      7. Reset (@layer base)
      8. MDXEditor overrides
-   Chrome 112+ minimum — CSS nesting for modifiers/pseudos; element selectors stay flat.
+   Chrome 114+ minimum. Native CSS: @layer, nesting (&:pseudo, & descendant), :is(), color-mix().
+   No preprocessor. BEM modifiers are flat siblings — &--modifier is Sass syntax, not native CSS.
    ============================================================ */
 
 @layer tokens {
@@ -218,7 +219,6 @@
     --input: var(--surface-1);
     --color-layout-bg: var(--bg);
   }
-
 }
 
 @layer base {
@@ -387,7 +387,6 @@
     }
   }
 
-
   /* ============================================================
      7. Reset (@layer base)
      Reset CSS — wrapped in @layer base so plain CSS utilities
@@ -523,147 +522,145 @@
       pointer-events: none;
       flex-shrink: 0;
     }
+  }
 
-    &--default,
-    &--primary {
-      background: var(--primary);
-      color: var(--primary-fg);
+  .octo-button--default,
+  .octo-button--primary {
+    background: var(--primary);
+    color: var(--primary-fg);
 
-      &:hover {
-        opacity: 0.9;
-      }
-    }
-
-    &--destructive {
-      background: var(--destructive);
-      color: var(--destructive-foreground);
-
-      &:hover {
-        opacity: 0.9;
-      }
-    }
-
-    &--outline {
-      border-color: var(--border-strong);
-      background: transparent;
-      color: var(--text);
-
-      &:hover {
-        background: var(--surface-2);
-      }
-    }
-
-    &--secondary {
-      border-color: var(--border);
-      background: var(--surface-1);
-      color: var(--text);
-
-      &:hover {
-        background: var(--surface-2);
-      }
-    }
-
-    &--ghost {
-      background: transparent;
-      color: var(--text);
-      border-color: transparent;
-
-      &:hover {
-        background: var(--surface-2);
-      }
-    }
-
-    &--link {
-      background: transparent;
-      color: var(--primary);
-      border-color: transparent;
-      text-underline-offset: 4px;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
-    &--brand {
-      background: var(--brand);
-      color: var(--brand-fg);
-
-      &:hover {
-        opacity: 0.9;
-      }
-    }
-
-    &--sm {
-      height: 30px;
-      padding: 0 12px;
-      gap: 6px;
-      font-size: 14px;
-    }
-
-    &--md {
-      height: 36px;
-      padding: 0 16px;
-      gap: 8px;
-      font-size: 14px;
-    }
-
-    &--lg {
-      height: 44px;
-      padding: 0 20px;
-      gap: 8px;
-      font-size: 15px;
-    }
-
-    &--icon {
-      height: 36px;
-      width: 36px;
-      padding: 0;
-      gap: 0;
-    }
-
-    &--icon.octo-button--sm {
-      height: 30px;
-      width: 30px;
-    }
-
-    &--publish {
-      background: var(--brand);
-      color: #003d29;
-      border-color: transparent;
-      box-shadow:
-        0 1px 0 rgb(0 0 0 / 4%),
-        inset 0 1px 0 rgb(255 255 255 / 20%);
-      font-size: 12px;
-      font-weight: 600;
-      height: 30px;
-      padding: 0 16px;
-
-      &:hover {
-        opacity: 0.9;
-      }
-    }
-
-    &--branch {
-      height: 32px;
-      padding: 0 12px;
-      gap: 8px;
-      font-family: var(--ft-mono);
-      font-size: 12px;
-      font-weight: 500;
-      border-color: var(--border);
-      background: var(--surface-1);
-      color: var(--text);
-      border-radius: 9999px;
-    }
-
-    &--branch-disabled {
-      cursor: default;
-      color: var(--muted);
-      opacity: 0.6;
+    &:hover {
+      opacity: 0.9;
     }
   }
 
+  .octo-button--destructive {
+    background: var(--destructive);
+    color: var(--destructive-foreground);
 
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .octo-button--outline {
+    border-color: var(--border-strong);
+    background: transparent;
+    color: var(--text);
+
+    &:hover {
+      background: var(--surface-2);
+    }
+  }
+
+  .octo-button--secondary {
+    border-color: var(--border);
+    background: var(--surface-1);
+    color: var(--text);
+
+    &:hover {
+      background: var(--surface-2);
+    }
+  }
+
+  .octo-button--ghost {
+    background: transparent;
+    color: var(--text);
+    border-color: transparent;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+  }
+
+  .octo-button--link {
+    background: transparent;
+    color: var(--primary);
+    border-color: transparent;
+    text-underline-offset: 4px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .octo-button--brand {
+    background: var(--brand);
+    color: var(--brand-fg);
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .octo-button--sm {
+    height: 30px;
+    padding: 0 12px;
+    gap: 6px;
+    font-size: 14px;
+  }
+
+  .octo-button--md {
+    height: 36px;
+    padding: 0 16px;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .octo-button--lg {
+    height: 44px;
+    padding: 0 20px;
+    gap: 8px;
+    font-size: 15px;
+  }
+
+  .octo-button--icon {
+    height: 36px;
+    width: 36px;
+    padding: 0;
+    gap: 0;
+  }
+
+  .octo-button--icon.octo-button--sm {
+    height: 30px;
+    width: 30px;
+  }
+
+  .octo-button--publish {
+    background: var(--brand);
+    color: #003d29;
+    border-color: transparent;
+    box-shadow:
+      0 1px 0 rgb(0 0 0 / 4%),
+      inset 0 1px 0 rgb(255 255 255 / 20%);
+    font-size: 12px;
+    font-weight: 600;
+    height: 30px;
+    padding: 0 16px;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .octo-button--branch {
+    height: 32px;
+    padding: 0 12px;
+    gap: 8px;
+    font-family: var(--ft-mono);
+    font-size: 12px;
+    font-weight: 500;
+    border-color: var(--border);
+    background: var(--surface-1);
+    color: var(--text);
+    border-radius: 9999px;
+  }
+
+  .octo-button--branch-disabled {
+    cursor: default;
+    color: var(--muted);
+    opacity: 0.6;
+  }
 
   .octo-button__icon {
     display: inline-flex;
@@ -671,7 +668,6 @@
   }
 
   /* variants */
-
 
   .octo-button__publish-count {
     border-radius: 4px;
@@ -683,7 +679,6 @@
   }
 
   /* branch chip */
-
 
   .octo-button__branch-name {
     max-width: 200px;
@@ -714,50 +709,50 @@
     background: var(--surface-1);
     color: var(--text);
     overflow: hidden;
+  }
 
-    &--banner {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-    }
+  .octo-card--banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+  }
 
-    &--banner-info {
-      border-color: var(--border-strong);
-      background: var(--surface-2);
-      color: var(--text);
-    }
+  .octo-card--banner-info {
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+    color: var(--text);
+  }
 
-    &--banner-warn {
-      border-color: var(--st-changed-bd);
-      background: var(--st-changed-bg);
-      color: var(--st-changed);
-    }
+  .octo-card--banner-warn {
+    border-color: var(--st-changed-bd);
+    background: var(--st-changed-bg);
+    color: var(--st-changed);
+  }
 
-    &--banner-success {
-      border-color: var(--ok-bd);
-      background: var(--ok-bg);
-      color: var(--ok);
-    }
+  .octo-card--banner-success {
+    border-color: var(--ok-bd);
+    background: var(--ok-bg);
+    color: var(--ok);
+  }
 
-    &--banner-danger {
-      border-color: var(--danger-bd);
-      background: var(--danger-bg);
-      color: var(--danger);
-    }
+  .octo-card--banner-danger {
+    border-color: var(--danger-bd);
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
 
-    &--banner-brand {
-      border-color: var(--brand);
-      background: var(--brand-bg);
-      color: var(--brand-fg);
-    }
+  .octo-card--banner-brand {
+    border-color: var(--brand);
+    background: var(--brand-bg);
+    color: var(--brand-fg);
+  }
 
-    &--empty {
-      border-radius: 12px;
-      border-style: dashed;
-      padding: 44px 24px;
-      text-align: center;
-    }
+  .octo-card--empty {
+    border-radius: 12px;
+    border-style: dashed;
+    padding: 44px 24px;
+    text-align: center;
   }
 
   .octo-card__header {
@@ -779,7 +774,6 @@
   }
 
   /* Banner variant */
-
 
   .octo-card__banner-icon {
     display: inline-flex;
@@ -804,7 +798,6 @@
   }
 
   /* Empty variant */
-
 
   .octo-card__empty-icon {
     display: inline-grid;
@@ -842,64 +835,62 @@
     padding: 4px 10px;
     font-size: 12px;
     color: var(--text-2);
-
-    &--mono {
-      font-family: var(--ft-mono);
-    }
-
-    &--kbd {
-      min-width: 18px;
-      justify-content: center;
-      border-radius: 4px;
-      padding: 0 6px;
-      font-family: var(--ft-mono);
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--muted);
-      background: var(--surface-2);
-    }
-
-    &--status {
-      border-radius: 9999px;
-      padding: 4px 10px;
-      font-weight: 500;
-      line-height: 1.25;
-      border-width: 1px;
-      border-style: solid;
-    }
-
-    &--status-sm {
-      padding: 2px 8px;
-      font-size: 11px;
-    }
-
-    &--status-md {
-      padding: 4px 10px;
-      font-size: 12px;
-    }
-
-    &--status-dot {
-      background: transparent;
-      border: none;
-      color: var(--text-2);
-      padding: 0;
-    }
-
-    &--avatar {
-      position: relative;
-      flex-shrink: 0;
-      overflow: hidden;
-      border-radius: 9999px;
-      height: 32px;
-      width: 32px;
-      border: none;
-      background: transparent;
-      padding: 0;
-      gap: 0;
-    }
   }
 
+  .octo-chip--mono {
+    font-family: var(--ft-mono);
+  }
 
+  .octo-chip--kbd {
+    min-width: 18px;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 0 6px;
+    font-family: var(--ft-mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--surface-2);
+  }
+
+  .octo-chip--status {
+    border-radius: 9999px;
+    padding: 4px 10px;
+    font-weight: 500;
+    line-height: 1.25;
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  .octo-chip--status-sm {
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+
+  .octo-chip--status-md {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .octo-chip--status-dot {
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    padding: 0;
+  }
+
+  .octo-chip--avatar {
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 9999px;
+    height: 32px;
+    width: 32px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    gap: 0;
+  }
 
   .octo-chip__remove {
     cursor: pointer;
@@ -914,7 +905,6 @@
 
   /* Kbd */
 
-
   .octo-chip__status-dot {
     border-radius: 9999px;
     width: 6px;
@@ -923,7 +913,6 @@
   }
 
   /* Avatar */
-
 
   .octo-chip__avatar-img {
     aspect-ratio: 1;
@@ -1066,46 +1055,44 @@
       cursor: not-allowed;
       opacity: 0.5;
     }
+  }
 
-    &--shell {
-      display: flex;
-      height: 40px;
-      width: 100%;
-      align-items: center;
-      gap: 8px;
-      border-radius: 9999px;
-      border: 1px solid var(--border);
-      background: var(--surface-1);
-      padding: 0 12px;
-      font-size: 14px;
-      color: var(--text);
-      box-shadow: var(--shadow-1);
-      transition:
-        border-color 120ms,
-        box-shadow 120ms;
+  .octo-input--shell {
+    display: flex;
+    height: 40px;
+    width: 100%;
+    align-items: center;
+    gap: 8px;
+    border-radius: 9999px;
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    padding: 0 12px;
+    font-size: 14px;
+    color: var(--text);
+    box-shadow: var(--shadow-1);
+    transition:
+      border-color 120ms,
+      box-shadow 120ms;
 
-      &:hover {
-        border-color: var(--border-strong);
-      }
-
-      &:has(input:focus),
-      &:has(input:focus-visible) {
-        border-color: var(--ring);
-        box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
-      }
-
-      &:has(input:disabled) {
-        cursor: not-allowed;
-        opacity: 0.5;
-      }
+    &:hover {
+      border-color: var(--border-strong);
     }
 
-    &--shell--error {
-      border-color: var(--danger);
+    &:has(input:focus),
+    &:has(input:focus-visible) {
+      border-color: var(--ring);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
+    }
+
+    &:has(input:disabled) {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
   }
 
-
+  .octo-input--shell--error {
+    border-color: var(--danger);
+  }
 
   .octo-input__affix {
     display: inline-flex;
@@ -1162,13 +1149,11 @@
       cursor: not-allowed;
       opacity: 0.5;
     }
-
-    &--error {
-      border-color: var(--danger);
-    }
   }
 
-
+  .octo-textarea--error {
+    border-color: var(--danger);
+  }
 
   /* ── octo-label ── */
   .octo-label {
@@ -1182,8 +1167,6 @@
       opacity: 0.7;
     }
   }
-
-
 
   /* ── octo-dialog ── */
   @keyframes octo-overlay-show {
@@ -1813,28 +1796,26 @@
     &[data-swipe='end'] {
       animation: octo-toast-swipe-out 100ms ease forwards;
     }
-
-    &--default {
-      /* default — base .octo-toast styles apply */
-    }
-
-    &--destructive {
-      border-color: var(--danger);
-      background: var(--danger-bg, var(--surface-1));
-    }
-
-    &--success {
-      border-color: var(--ok, #22c55e);
-    }
-
-    &--destructive {
-      .octo-toast__action {
-        border-color: var(--danger);
-      }
-    }
   }
 
+  .octo-toast--default {
+    /* default — base .octo-toast styles apply */
+  }
 
+  .octo-toast--destructive {
+    border-color: var(--danger);
+    background: var(--danger-bg, var(--surface-1));
+  }
+
+  .octo-toast--success {
+    border-color: var(--ok, #22c55e);
+  }
+
+  .octo-toast--destructive {
+    .octo-toast__action {
+      border-color: var(--danger);
+    }
+  }
 
   .octo-toast__title {
     font-size: 14px;
@@ -1907,8 +1888,6 @@
     opacity: 0.5;
   }
 
-
-
   @keyframes octo-toast-in {
     from {
       transform: translateY(100%);
@@ -1957,89 +1936,89 @@
     background: var(--surface-1);
     padding: 12px 12px 12px 14px;
     box-shadow: var(--shadow-2);
+  }
 
-    &--default {
-      .octo-toast-card__rail {
-        background: var(--border-strong);
-      }
+  .octo-toast-card--default {
+    .octo-toast-card__rail {
+      background: var(--border-strong);
     }
+  }
 
-    &--default {
-      .octo-toast-card__icon {
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        color: var(--text-2);
-      }
+  .octo-toast-card--default {
+    .octo-toast-card__icon {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-2);
     }
+  }
 
-    &--success {
-      .octo-toast-card__rail {
-        background: var(--ok);
-      }
+  .octo-toast-card--success {
+    .octo-toast-card__rail {
+      background: var(--ok);
     }
+  }
 
-    &--success {
-      .octo-toast-card__icon {
-        background: var(--ok-bg);
-        border: 1px solid var(--ok-bd);
-        color: var(--ok);
-      }
+  .octo-toast-card--success {
+    .octo-toast-card__icon {
+      background: var(--ok-bg);
+      border: 1px solid var(--ok-bd);
+      color: var(--ok);
     }
+  }
 
-    &--error {
-      .octo-toast-card__rail {
-        background: var(--danger);
-      }
+  .octo-toast-card--error {
+    .octo-toast-card__rail {
+      background: var(--danger);
     }
+  }
 
-    &--error {
-      .octo-toast-card__icon {
-        background: var(--danger-bg);
-        border: 1px solid var(--danger-bd);
-        color: var(--danger);
-      }
+  .octo-toast-card--error {
+    .octo-toast-card__icon {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-bd);
+      color: var(--danger);
     }
+  }
 
-    &--warn {
-      .octo-toast-card__rail {
-        background: var(--st-changed);
-      }
+  .octo-toast-card--warn {
+    .octo-toast-card__rail {
+      background: var(--st-changed);
     }
+  }
 
-    &--warn {
-      .octo-toast-card__icon {
-        background: var(--st-changed-bg);
-        border: 1px solid var(--st-changed-bd);
-        color: var(--st-changed);
-      }
+  .octo-toast-card--warn {
+    .octo-toast-card__icon {
+      background: var(--st-changed-bg);
+      border: 1px solid var(--st-changed-bd);
+      color: var(--st-changed);
     }
+  }
 
-    &--info {
-      .octo-toast-card__rail {
-        background: var(--accent);
-      }
+  .octo-toast-card--info {
+    .octo-toast-card__rail {
+      background: var(--accent);
     }
+  }
 
-    &--info {
-      .octo-toast-card__icon {
-        background: var(--accent-bg);
-        border: 1px solid var(--border);
-        color: var(--accent-fg);
-      }
+  .octo-toast-card--info {
+    .octo-toast-card__icon {
+      background: var(--accent-bg);
+      border: 1px solid var(--border);
+      color: var(--accent-fg);
     }
+  }
 
-    &--brand {
-      .octo-toast-card__rail {
-        background: var(--brand);
-      }
+  .octo-toast-card--brand {
+    .octo-toast-card__rail {
+      background: var(--brand);
     }
+  }
 
-    &--brand {
-      .octo-toast-card__icon {
-        background: var(--brand-bg);
-        border: 1px solid var(--brand);
-        color: var(--brand-strong);
-      }
+  .octo-toast-card--brand {
+    .octo-toast-card__icon {
+      background: var(--brand-bg);
+      border: 1px solid var(--brand);
+      color: var(--brand-strong);
     }
   }
 
@@ -2158,8 +2137,6 @@
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
-
-
 
   /* ── octo-table ── */
   .octo-table__wrapper {
@@ -2655,38 +2632,34 @@
       outline-offset: 2px;
       border-radius: 8px;
     }
+  }
 
-    &--active {
+  .octo-left-nav-item--active {
+    background: var(--surface-3);
+    font-weight: 600;
+    color: var(--text);
+
+    &:hover {
       background: var(--surface-3);
-      font-weight: 600;
-      color: var(--text);
-
-      &:hover {
-        background: var(--surface-3);
-      }
-    }
-
-    &--active {
-      .octo-left-nav-item__icon {
-        color: var(--text);
-      }
-    }
-
-    &--active {
-      .octo-left-nav-item__count {
-        color: var(--text-2);
-      }
     }
   }
 
+  .octo-left-nav-item--active {
+    .octo-left-nav-item__icon {
+      color: var(--text);
+    }
+  }
 
+  .octo-left-nav-item--active {
+    .octo-left-nav-item__count {
+      color: var(--text-2);
+    }
+  }
 
   .octo-left-nav-item__icon {
     flex-shrink: 0;
     color: var(--muted);
   }
-
-
 
   .octo-left-nav-item__label {
     flex: 1;
@@ -2700,8 +2673,6 @@
     font-variant-numeric: tabular-nums;
     color: var(--muted);
   }
-
-
 
   /* ── octo-page-bar ── */
   .octo-page-bar {
@@ -2828,14 +2799,14 @@
     border-bottom: 1px solid var(--border);
     background: var(--bg);
     padding: 12px 24px;
+  }
 
-    &--skel {
-      display: flex;
-      min-height: 0;
-      flex: 1;
-      flex-direction: column;
-      overflow: hidden;
-    }
+  .octo-page-chrome--skel {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .octo-page-chrome__title-area {
@@ -2875,7 +2846,6 @@
   }
 
   /* ─── Page chrome skeleton ───────────────────────────── */
-
 
   .octo-page-chrome__skel-content {
     display: flex;
@@ -2935,10 +2905,10 @@
     overflow-y: auto;
     border-right: 1px solid var(--border);
     background: var(--surface-2);
+  }
 
-    &--w-240 {
-      width: 240px;
-    }
+  .octo-left-panel--w-240 {
+    width: 240px;
   }
 
   .octo-left-panel__section {
@@ -2975,8 +2945,6 @@
     flex-direction: column;
     gap: 8px;
   }
-
-
 
   /* ── octo-content-area ── */
   .octo-content-area {
@@ -3161,17 +3129,15 @@
     &:hover {
       background: var(--surface-2);
     }
-
-    &--archived {
-      opacity: 0.6;
-    }
-
-    &--selected {
-      background: var(--surface-2);
-    }
   }
 
+  .octo-content-row--archived {
+    opacity: 0.6;
+  }
 
+  .octo-content-row--selected {
+    background: var(--surface-2);
+  }
 
   .octo-content-row__td {
     padding: 12px 16px;
@@ -3324,8 +3290,6 @@
     }
   }
 
-
-
   .octo-pr-row__tile {
     display: grid;
     height: 28px;
@@ -3393,27 +3357,25 @@
     font-size: 10px;
     font-weight: 600;
     line-height: 16px;
-
-    &--open {
-      background: var(--brand-bg);
-      color: var(--brand-strong);
-      border-color: var(--brand);
-    }
-
-    &--merged {
-      background: var(--st-merged-bg);
-      color: var(--st-merged);
-      border-color: var(--st-merged-bd);
-    }
-
-    &--closed {
-      background: var(--surface-2);
-      color: var(--muted);
-      border-color: var(--border);
-    }
   }
 
+  .octo-pr-badge--open {
+    background: var(--brand-bg);
+    color: var(--brand-strong);
+    border-color: var(--brand);
+  }
 
+  .octo-pr-badge--merged {
+    background: var(--st-merged-bg);
+    color: var(--st-merged);
+    border-color: var(--st-merged-bd);
+  }
+
+  .octo-pr-badge--closed {
+    background: var(--surface-2);
+    color: var(--muted);
+    border-color: var(--border);
+  }
 
   .octo-pr-empty {
     display: flex;
@@ -3588,13 +3550,11 @@
   /* ── octo-form-field (generic wrapper used by all field types) ── */
   .octo-form-field {
     margin-bottom: 20px;
-
-    &--lg {
-      margin-bottom: 24px;
-    }
   }
 
-
+  .octo-form-field--lg {
+    margin-bottom: 24px;
+  }
 
   /* ── octo-field-label (label row with type badge + right slot) ── */
   .octo-field-label {
@@ -4706,31 +4666,29 @@
       background-color 120ms,
       color 120ms;
 
-    &--active {
-      background: var(--surface-3);
-      color: var(--text);
-    }
-
     &:not(.octo-media-view-btn--active):hover {
       color: var(--text);
     }
   }
 
-
+  .octo-media-view-btn--active {
+    background: var(--surface-3);
+    color: var(--text);
+  }
 
   /* ── octo-media-grid ── */
   .octo-media-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 16px;
+  }
 
-    &--auto {
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    }
+  .octo-media-grid--auto {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
 
-    &--skel {
-      padding: 0 24px 24px;
-    }
+  .octo-media-grid--skel {
+    padding: 0 24px 24px;
   }
 
   .octo-media-grid__card {
@@ -4791,8 +4749,6 @@
     color: var(--muted);
   }
 
-
-
   /* ─── MediaManager skeleton ──────────────────────────── */
   .octo-media-manager__skel-header {
     padding: 16px 24px 0;
@@ -4811,8 +4767,6 @@
     flex-direction: column;
     gap: 8px;
   }
-
-
 
   /* ── octo-media-upload-bar ── */
   .octo-media-upload-bar {
@@ -4882,10 +4836,10 @@
     overflow-y: auto;
     border-right: 1px solid var(--border);
     background: var(--surface-2);
+  }
 
-    &--skel {
-      padding: 12px;
-    }
+  .octo-media-left-panel--skel {
+    padding: 12px;
   }
 
   .octo-media-left-panel__all-nav {
@@ -4990,8 +4944,6 @@
     background: var(--surface-1);
     color: var(--danger);
   }
-
-
 
   .octo-media-left-panel__skel-inner {
     padding: 12px 12px 16px;
@@ -5702,27 +5654,25 @@
     border: 1px solid;
     padding: 12px;
     font-size: 12px;
-
-    &--amber {
-      border-color: #78350f;
-      background: #1c1005;
-      color: #fde68a;
-    }
-
-    &--destructive {
-      border-color: color-mix(in oklab, var(--danger) 30%, transparent);
-      background: color-mix(in oklab, var(--danger) 5%, transparent);
-      color: var(--danger);
-    }
-
-    &--muted {
-      border-color: var(--border);
-      background: color-mix(in oklab, var(--surface-2) 30%, transparent);
-      color: var(--text);
-    }
   }
 
+  .octo-schema-impact--amber {
+    border-color: #78350f;
+    background: #1c1005;
+    color: #fde68a;
+  }
 
+  .octo-schema-impact--destructive {
+    border-color: color-mix(in oklab, var(--danger) 30%, transparent);
+    background: color-mix(in oklab, var(--danger) 5%, transparent);
+    color: var(--danger);
+  }
+
+  .octo-schema-impact--muted {
+    border-color: var(--border);
+    background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+    color: var(--text);
+  }
 
   .octo-schema-impact__title {
     display: flex;
@@ -5862,19 +5812,17 @@
       background: color-mix(in oklab, var(--surface-2) 50%, transparent);
     }
 
-    &--active {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
-    }
-
     &:disabled {
       cursor: not-allowed;
       opacity: 0.5;
     }
   }
 
-
+  .octo-cardinality-option--active {
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+  }
 
   .octo-cardinality-option__title {
     display: flex;
@@ -5959,19 +5907,17 @@
     padding: 10px;
     font-size: 12px;
     transition: background-color 120ms;
-
-    &--disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-
-    &--star-active {
-      border-color: #78350f;
-      background: #1c1005;
-    }
   }
 
+  .octo-field-toggle--disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 
+  .octo-field-toggle--star-active {
+    border-color: #78350f;
+    background: #1c1005;
+  }
 
   .octo-field-toggle__text {
     display: flex;
@@ -5990,8 +5936,6 @@
     font-size: 11px;
     color: var(--muted);
   }
-
-
 
   .octo-format-picker {
     display: grid;
@@ -6016,15 +5960,13 @@
     &:hover {
       background: color-mix(in oklab, var(--surface-2) 50%, transparent);
     }
-
-    &--active {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
-    }
   }
 
-
+  .octo-format-card--active {
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+  }
 
   .octo-format-card__label {
     font-size: 13px;
@@ -6083,14 +6025,12 @@
     &:hover {
       background: color-mix(in oklab, var(--surface-2) 50%, transparent);
     }
-
-    &--active {
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
-    }
   }
 
-
+  .octo-change-type-item--active {
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+  }
 
   .octo-change-type-item__label {
     font-weight: 500;
@@ -6118,31 +6058,29 @@
       background-color 120ms,
       border-color 120ms;
 
-    &--on {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      color: var(--text);
-    }
-
     &:disabled {
       cursor: not-allowed;
       opacity: 0.5;
     }
+  }
 
-    &--on {
-      .octo-bool-toggle__track {
-        background: var(--primary);
-      }
-    }
+  .octo-bool-toggle--on {
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+    color: var(--text);
+  }
 
-    &--on {
-      .octo-bool-toggle__thumb {
-        transform: translateX(12px);
-      }
+  .octo-bool-toggle--on {
+    .octo-bool-toggle__track {
+      background: var(--primary);
     }
   }
 
-
+  .octo-bool-toggle--on {
+    .octo-bool-toggle__thumb {
+      transform: translateX(12px);
+    }
+  }
 
   .octo-bool-toggle__track {
     display: inline-block;
@@ -6154,8 +6092,6 @@
     transition: background-color 120ms;
   }
 
-
-
   .octo-bool-toggle__thumb {
     display: block;
     height: 12px;
@@ -6165,8 +6101,6 @@
     box-shadow: 0 1px 2px rgb(0 0 0 / 30%);
     transition: transform 120ms;
   }
-
-
 
   /* ── octo-branch-kind-pill (ConditionalBranchesEditor) ── */
   .octo-branch-kind-pill {
@@ -6182,19 +6116,17 @@
       background: color-mix(in oklab, var(--surface-2) 50%, transparent);
     }
 
-    &--active {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      color: var(--text);
-    }
-
     &:disabled {
       cursor: not-allowed;
       opacity: 0.5;
     }
   }
 
-
+  .octo-branch-kind-pill--active {
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+    color: var(--text);
+  }
 
   /* ── octo-checkbox-list (CollectionsCheckboxList, DefaultOptionsCheckboxList) ── */
   .octo-checkbox-list {
@@ -6472,14 +6404,12 @@
     &:hover {
       background: color-mix(in oklab, var(--surface-2) 50%, transparent);
     }
-
-    &--disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
   }
 
-
+  .octo-richtext-toolbar-item--disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 
   .octo-richtext-embed-options {
     border-radius: 6px;
@@ -6500,15 +6430,13 @@
     font-size: 11px;
     cursor: pointer;
     transition: background-color 120ms;
-
-    &--selected {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      color: var(--text);
-    }
   }
 
-
+  .octo-richtext-collection-pill--selected {
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+    color: var(--text);
+  }
 
   .octo-richtext-props-grid {
     display: grid;
@@ -6798,39 +6726,37 @@
     display: flex;
     gap: 12px;
     padding: 12px 0;
+  }
 
-    &--user {
-      flex-direction: row-reverse;
-    }
+  .octo-chat-msg--user {
+    flex-direction: row-reverse;
+  }
 
-    &--assistant {
-      flex-direction: row;
-    }
+  .octo-chat-msg--assistant {
+    flex-direction: row;
+  }
 
-    &--user {
-      .octo-chat-msg__body {
-        text-align: right;
-      }
-    }
-
-    &--user {
-      .octo-chat-msg__bubble {
-        background: #2563eb;
-        color: #fff;
-        text-align: left;
-      }
-    }
-
-    &--assistant {
-      .octo-chat-msg__bubble {
-        background: var(--surface-2);
-        color: var(--text);
-        border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
-      }
+  .octo-chat-msg--user {
+    .octo-chat-msg__body {
+      text-align: right;
     }
   }
 
+  .octo-chat-msg--user {
+    .octo-chat-msg__bubble {
+      background: #2563eb;
+      color: #fff;
+      text-align: left;
+    }
+  }
 
+  .octo-chat-msg--assistant {
+    .octo-chat-msg__bubble {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    }
+  }
 
   .octo-chat-msg__avatar {
     margin-top: 2px;
@@ -6850,8 +6776,6 @@
     max-width: 760px;
   }
 
-
-
   .octo-chat-msg__bubble {
     display: inline-block;
     border-radius: 16px;
@@ -6860,8 +6784,6 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-
-
 
   .octo-chat-msg__content {
     display: flex;
@@ -6920,13 +6842,11 @@
   .octo-chat-composer {
     border-top: 1px solid var(--border);
     background: var(--bg);
-
-    &--dragging {
-      box-shadow: inset 0 0 0 2px var(--ring);
-    }
   }
 
-
+  .octo-chat-composer--dragging {
+    box-shadow: inset 0 0 0 2px var(--ring);
+  }
 
   .octo-chat-composer__attachments {
     display: flex;
@@ -7016,21 +6936,19 @@
     border: 1px solid var(--border);
     background: var(--surface-1);
     color: var(--text);
-
-    &--error {
-      border-color: color-mix(in oklab, var(--danger) 50%, transparent);
-    }
-
-    &--accepted {
-      opacity: 0.8;
-    }
-
-    &--rejected {
-      opacity: 0.6;
-    }
   }
 
+  .octo-proposal-card--error {
+    border-color: color-mix(in oklab, var(--danger) 50%, transparent);
+  }
 
+  .octo-proposal-card--accepted {
+    opacity: 0.8;
+  }
+
+  .octo-proposal-card--rejected {
+    opacity: 0.6;
+  }
 
   .octo-proposal-card__header {
     display: flex;
@@ -7282,13 +7200,11 @@
     border: 1px solid var(--border);
     background: color-mix(in oklab, var(--surface-2) 40%, transparent);
     font-size: 12px;
-
-    &--error {
-      border-color: color-mix(in oklab, var(--danger) 40%, transparent);
-    }
   }
 
-
+  .octo-tool-call-card--error {
+    border-color: color-mix(in oklab, var(--danger) 40%, transparent);
+  }
 
   .octo-tool-call-card__trigger {
     display: flex;
@@ -7431,14 +7347,12 @@
     border: 1px solid var(--border);
     background: var(--bg);
     padding: 16px;
-
-    &--schema {
-      padding: 0;
-      overflow: hidden;
-    }
   }
 
-
+  .octo-skeleton-table--schema {
+    padding: 0;
+    overflow: hidden;
+  }
 
   .octo-skeleton-table__header {
     border-bottom: 1px solid var(--border);
@@ -7841,14 +7755,12 @@
   .octo-chat-composer {
     border-top: 1px solid var(--border);
     background: var(--bg);
-
-    &--dragover {
-      outline: 2px solid var(--ring);
-      outline-offset: -2px;
-    }
   }
 
-
+  .octo-chat-composer--dragover {
+    outline: 2px solid var(--ring);
+    outline-offset: -2px;
+  }
 
   .octo-chat-composer__attachments {
     display: flex;
@@ -7940,30 +7852,28 @@
     display: flex;
     gap: 12px;
     padding: 12px 0;
-
-    &--user {
-      flex-direction: row-reverse;
-    }
-
-    &--assistant {
-      flex-direction: row;
-    }
-
-    &--system {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      margin: 12px 0;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: color-mix(in oklab, var(--surface-2) 30%, transparent);
-      padding: 8px 12px;
-      font-size: 12px;
-      color: var(--muted);
-    }
   }
 
+  .octo-chat-msg--user {
+    flex-direction: row-reverse;
+  }
 
+  .octo-chat-msg--assistant {
+    flex-direction: row;
+  }
+
+  .octo-chat-msg--system {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 12px 0;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--muted);
+  }
 
   .octo-chat-msg__system-icon {
     flex-shrink: 0;
@@ -9801,15 +9711,13 @@
     border: 1px solid var(--border);
     background: var(--surface-1);
     box-shadow: var(--shadow-3, 0 4px 16px rgb(0 0 0 / 30%));
-
-    &--empty {
-      padding: 8px 12px;
-      font-size: 13.5px;
-      color: var(--muted);
-    }
   }
 
-
+  .octo-slash-menu--empty {
+    padding: 8px 12px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
 
   .octo-slash-menu__item {
     display: flex;
@@ -9859,20 +9767,18 @@
     font-weight: 500;
     vertical-align: baseline;
     margin: 0 2px;
-
-    &--set {
-      background: #4c1d95;
-      color: #ede9fe;
-    }
-
-    &--unset {
-      background: transparent;
-      border: 1px dashed #6d28d9;
-      color: #a78bfa;
-    }
   }
 
+  .octo-var-embed--set {
+    background: #4c1d95;
+    color: #ede9fe;
+  }
 
+  .octo-var-embed--unset {
+    background: transparent;
+    border: 1px dashed #6d28d9;
+    color: #a78bfa;
+  }
 
   .light .octo-var-embed--set {
     background: #ede9fe;
@@ -10687,8 +10593,6 @@
     }
   }
 
-
-
   /* ----- Rich text inline custom-component dropdown wrapper ----- */
   .octo-richtext-toolbar-select-wrap {
     position: relative;
@@ -11020,7 +10924,6 @@
     justify-content: space-between;
   }
 
-
   /* ----- Button finishing-pass extras ----- */
 
   /* Back-button shape: ghost icon btn with -8px left margin, 28×28, muted color */
@@ -11263,10 +11166,10 @@
     fill: #f59e0b;
     color: #d97706;
   }
-
 }
 
-@layer utilities { }
+@layer utilities {
+}
 
 @layer overrides {
   /* ============================================================
@@ -11474,5 +11377,4 @@
   .editor-markdown--invalid.mdxeditor {
     border-color: var(--danger);
   }
-
 }
