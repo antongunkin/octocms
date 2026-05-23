@@ -74,7 +74,6 @@ export { Portal } from './Portal';
 export { Kbd } from './kbd';
 export { Chip } from './chip';
 export { StatusBadge, STATUSES } from './status-badge';
-export { AvatarStack } from './avatar-stack';
 export { BranchChip } from './branch-chip';
 export { PublishButton } from './publish-button';
 export { Field } from './field';

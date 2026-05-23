@@ -164,39 +164,3 @@ export const AvatarFallback = React.forwardRef<HTMLSpanElement, React.HTMLAttrib
   },
 );
 AvatarFallback.displayName = 'AvatarFallback';
-
-// ── AvatarStack ───────────────────────────────────────────────────────────────
-
-type Person = {
-  name?: string;
-  initials: string;
-  color: string;
-};
-
-type AvatarStackProps = {
-  people: Person[];
-  size?: number;
-  className?: string;
-};
-
-export function AvatarStack({ people, size = 24, className }: AvatarStackProps) {
-  return (
-    <div className={cn('octo-chip__stack', className)}>
-      {people.map((p, i) => (
-        <div key={`${p.initials}-${i}`} style={{ marginLeft: i ? -7 : 0 }} title={p.name ?? p.initials}>
-          <span
-            className="octo-chip__stack-item"
-            style={{
-              width: size,
-              height: size,
-              background: p.color,
-              fontSize: size <= 22 ? 10 : size <= 28 ? 11.5 : 13,
-            }}
-          >
-            {p.initials}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}

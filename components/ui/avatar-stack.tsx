@@ -1,1 +1,0 @@
-export { AvatarStack } from './chip';
