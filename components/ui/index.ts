@@ -56,9 +56,6 @@ export type { ToastProps } from './toast';
 
 export { Toaster } from './toaster';
 
-// Sonner-based toaster — use this in v0-generated components
-export { Toaster as SonnerToaster } from './sonner';
-
 export { Input } from './input';
 export type { InputProps } from './input';
 export { Textarea } from './textarea';
@@ -67,6 +64,11 @@ export type { TextareaProps } from './textarea';
 export { Card, CardHeader, CardTitle, CardContent } from './card';
 
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './table';
+
+// ─── Phase 0 foundation primitives ────────────────────────────────────────
+export { Slot } from './Slot';
+export type { SlotProps } from './Slot';
+export { Portal } from './Portal';
 
 // ─── Redesign v2 primitives ────────────────────────────────────────────
 export { Kbd } from './kbd';

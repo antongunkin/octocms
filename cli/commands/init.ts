@@ -49,14 +49,6 @@ import {
  */
 const REQUIRED_PEER_DEPS: readonly string[] = [
   '@mdxeditor/editor',
-  '@radix-ui/react-avatar',
-  '@radix-ui/react-dialog',
-  '@radix-ui/react-dropdown-menu',
-  '@radix-ui/react-label',
-  '@radix-ui/react-select',
-  '@radix-ui/react-slot',
-  '@radix-ui/react-tabs',
-  '@radix-ui/react-toast',
   '@tanstack/react-query',
   'minisearch',
   'next-auth',
@@ -67,7 +59,6 @@ const REQUIRED_PEER_DEPS: readonly string[] = [
   'remark-mdx',
   'sharp',
   'slugify',
-  'sonner',
   'zod',
 ];
 

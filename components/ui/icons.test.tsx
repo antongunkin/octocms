@@ -9,16 +9,6 @@ afterEach(() => {
 });
 
 describe('icons', () => {
-  it('renders svg output with default lucide classes', () => {
-    const { container } = render(<Search />);
-    const svg = container.querySelector('svg');
-
-    expect(svg).toBeTruthy();
-    expect(svg?.getAttribute('class')).toContain('lucide');
-    expect(svg?.getAttribute('class')).toContain('lucide-search');
-    expect(svg?.getAttribute('aria-hidden')).toBe('true');
-  });
-
   it('applies size, color, strokeWidth, and absoluteStrokeWidth', () => {
     const { container } = render(<Search size={32} color="tomato" strokeWidth={3} absoluteStrokeWidth />);
     const svg = container.querySelector('svg');

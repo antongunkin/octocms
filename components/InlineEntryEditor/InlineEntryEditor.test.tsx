@@ -100,7 +100,7 @@ vi.mock('../FormFields', () => ({
 vi.mock('../LinkedBySection/LinkedBySection', () => ({ default: () => null }));
 vi.mock('../CreateBranchDialog', () => ({ default: () => null }));
 
-// Render Dialog inline (bypass Radix portal) so getAllByRole finds the confirm button.
+// Render Dialog inline so getAllByRole finds the confirm button.
 vi.mock('../ui', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../ui')>();
   return {

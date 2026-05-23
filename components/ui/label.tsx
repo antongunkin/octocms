@@ -1,16 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import * as LabelPrimitive from '@radix-ui/react-label';
 
 import { cn } from '../../lib/utils';
 
-const Label = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <LabelPrimitive.Root ref={ref} className={cn('octo-label', className)} {...props} />
-));
-Label.displayName = LabelPrimitive.Root.displayName;
-
-export { Label };
+export const Label = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttributes<HTMLLabelElement>>(
+  // eslint-disable-next-line jsx-a11y/label-has-associated-control
+  ({ className, ...props }, ref) => <label ref={ref} className={cn('octo-label', className)} {...props} />,
+);
+Label.displayName = 'Label';

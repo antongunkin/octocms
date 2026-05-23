@@ -40,7 +40,7 @@ const external = [
   /^@radix-ui\//,
   '@tanstack/react-query',
   'octokit',
-  'sonner',
+
   'zod',
   'minisearch',
   'react-markdown',

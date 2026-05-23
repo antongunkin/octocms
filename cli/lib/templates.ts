@@ -465,12 +465,9 @@ Built with [OctoCMS](https://octocms.com) — a file-based CMS on Next.js.
 
 \`\`\`bash
 npm install octocms next-auth @tanstack/react-query @mdxeditor/editor \\
-  @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \\
-  @radix-ui/react-label @radix-ui/react-select @radix-ui/react-slot \\
-  @radix-ui/react-tabs @radix-ui/react-toast \\
   minisearch octokit \\
   react-markdown rehype-sanitize remark-gfm remark-mdx \\
-  sharp slugify sonner zod
+  sharp slugify zod
 \`\`\`
 
 > The exact list (with the right \`octocms\` version pin) is also printed by \`npx octocms init\` — copy it from there.

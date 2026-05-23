@@ -1244,7 +1244,7 @@ html {
 .octo-dropdown__content {
   z-index: 50;
   min-width: 8rem;
-  max-height: var(--radix-dropdown-menu-content-available-height);
+  max-height: 24rem;
   overflow: hidden auto;
   border-radius: 16px;
   border: 1px solid var(--border);
@@ -1252,7 +1252,6 @@ html {
   padding: 6px;
   color: var(--text);
   box-shadow: var(--shadow-2);
-  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
 }
 
 .octo-dropdown__content[data-state='open'] {
@@ -1266,6 +1265,7 @@ html {
 .octo-dropdown__item {
   position: relative;
   display: flex;
+  width: 100%;
   cursor: default;
   user-select: none;
   align-items: center;
@@ -1274,6 +1274,9 @@ html {
   padding: 8px 10px;
   font-size: 14px;
   color: var(--text);
+  background: none;
+  border: none;
+  text-align: left;
   outline: none;
   transition: background-color 80ms;
 }
@@ -1473,22 +1476,6 @@ html {
 
 .octo-select__content[data-state='closed'] {
   animation: octo-popup-out 150ms ease;
-}
-
-.octo-select__content--popper[data-side='bottom'] {
-  transform: translateY(4px);
-}
-
-.octo-select__content--popper[data-side='top'] {
-  transform: translateY(-4px);
-}
-
-.octo-select__content--popper[data-side='left'] {
-  transform: translateX(-4px);
-}
-
-.octo-select__content--popper[data-side='right'] {
-  transform: translateX(4px);
 }
 
 .octo-select__viewport {

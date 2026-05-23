@@ -103,7 +103,7 @@ function InsertNewImage({
     <Dialog
       open
       onOpenChange={(open) => {
-        // Radix only fires this on user-initiated close (X / Esc / overlay).
+        // Fires this on user-initiated close (X / Esc / overlay).
         if (!open) onCancel();
       }}
     >

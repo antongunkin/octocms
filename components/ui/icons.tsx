@@ -26,16 +26,11 @@ const DEFAULT_ATTRIBUTES = {
   strokeLinejoin: 'round',
 } as const;
 
-function joinClasses(...parts: Array<string | undefined>): string | undefined {
-  const value = parts.filter(Boolean).join(' ');
-  return value.length > 0 ? value : undefined;
-}
-
 function hasA11yProp(props: SVGProps<SVGSVGElement>): boolean {
   return 'aria-label' in props || 'aria-labelledby' in props || 'role' in props;
 }
 
-function createIcon(iconName: string, iconNode: IconNode) {
+function createIcon(_iconName: string, iconNode: IconNode) {
   const IconComponent = forwardRef<SVGSVGElement, IconProps>(
     ({ color, size, strokeWidth, absoluteStrokeWidth, className, children, ...rest }, ref) => {
       const resolvedSize = size ?? DEFAULT_ATTRIBUTES.width;
@@ -54,7 +49,7 @@ function createIcon(iconName: string, iconNode: IconNode) {
           height: resolvedSize,
           stroke: color ?? DEFAULT_ATTRIBUTES.stroke,
           strokeWidth: resolvedStrokeWidth,
-          className: joinClasses('lucide', 'lucide-' + iconName, className),
+          className: className || undefined,
           ...(!children && !hasA11yProp(rest) ? { 'aria-hidden': 'true' } : {}),
           ...rest,
         },
@@ -65,7 +60,7 @@ function createIcon(iconName: string, iconNode: IconNode) {
       );
     },
   );
-  IconComponent.displayName = iconName;
+  IconComponent.displayName = _iconName;
   return IconComponent;
 }
 

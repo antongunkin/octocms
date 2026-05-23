@@ -2,18 +2,19 @@
 
 import * as React from 'react';
 
-import type { ToastProps } from '../components/ui/toast';
-
 type ToastActionElement = React.ReactElement;
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000;
 
-type ToasterToast = ToastProps & {
+type ToasterToast = {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: ToastActionElement;
+  variant?: 'default' | 'destructive' | 'success';
+  open?: boolean;
+  dismiss?: () => void;
 };
 
 const actionTypes = {
@@ -152,9 +153,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
-      },
+      dismiss,
     },
   });
 
