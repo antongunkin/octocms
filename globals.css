@@ -1,7 +1,7 @@
 @layer tokens, base, components, utilities, overrides;
 
 /* ============================================================
-   OctoCMS global styles — plain CSS, no Tailwind directives.
+   OctoCMS global styles — plain modern CSS.
    Sections:
      1. Design tokens (:root dark + .light overrides)
      2. Scoped container + scrollbars
@@ -12,7 +12,6 @@
      7. Reset (@layer base)
      8. MDXEditor overrides
    Chrome 114+ minimum. Native CSS: @layer, nesting (&:pseudo, & descendant), :is(), color-mix().
-   No preprocessor. BEM modifiers are flat siblings — &--modifier is Sass syntax, not native CSS.
    ============================================================ */
 
 @layer tokens {
@@ -28,7 +27,7 @@
     --header-height: 56px;
     --header-backdrop-filter: none;
 
-    /* Typography — system fonts only (no Inter, no JetBrains Mono, no web fonts) */
+    /* Typography — system fonts only */
     --ft-ui:
       -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, helvetica, arial, sans-serif, 'Apple Color Emoji',
       'Segoe UI Emoji', 'Segoe UI Symbol';
