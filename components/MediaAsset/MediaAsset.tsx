@@ -221,6 +221,9 @@ export default function MediaAsset({ id }: MediaAssetProps) {
               {file.width != null && file.height != null && (
                 <DetailRow label="Dimensions" value={`${file.width} × ${file.height}`} />
               )}
+              {file.blurDataURL && (
+                <DetailRow label="Blur data URL" value={file.blurDataURL.slice(0, 13) + '...'} mono />
+              )}
               <DetailRow label="Path" value={file.publicUrl} mono />
               <DetailRow label="ID" value={file.id} mono />
             </div>
@@ -229,10 +232,19 @@ export default function MediaAsset({ id }: MediaAssetProps) {
       }
     >
       <div className="octo-media-asset__preview">
-        <div>
+        {file.hasBlurPlaceholder && file.blurDataURL && (
+          <div className="octo-media-asset__preview-blur">
+            <img
+              src={file.blurDataURL}
+              alt={file.title || file.originalName}
+              className="octo-media-asset__preview-blur-src"
+            />
+          </div>
+        )}
+        <div className="octo-media-asset__preview-inner">
           <img src={file.publicUrl} alt={file.title || file.originalName} className="octo-media-asset__preview-img" />
           <div className="octo-media-asset__preview-buttons">
-            <Button variant="outline" className="octo-u-gap-1-5" onClick={openInNewTab}>
+            <Button variant="link" className="octo-u-gap-1-5" onClick={openInNewTab}>
               <Icon.ExternalLink className="octo-icon-md" />
               Open in new tab
             </Button>

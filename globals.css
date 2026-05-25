@@ -4930,16 +4930,60 @@
   }
 
   .octo-media-asset__preview {
+    position: relative;
     display: flex;
     flex: 1;
     align-items: center;
     justify-content: center;
     overflow: auto;
+    padding: 30px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .octo-media-asset__preview-blur {
+    position: absolute;
+    top: -30px;
+    left: -30px;
+    right: -30px;
+    bottom: -30px;
+    z-index: 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+      background: radial-gradient(transparent 50%, var(--bg) 100%);
+    }
+  }
+
+  .octo-media-asset__preview-blur-src {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    pointer-events: none;
+    filter: blur(15px);
+    opacity: 0.2;
+  }
+
+  .octo-media-asset__preview-inner {
+    position: relative;
+    z-index: 2;
   }
 
   .octo-media-asset__preview-img {
     max-height: 100%;
-    max-width: 100%;
+    max-width: 640px;
     border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--bg);

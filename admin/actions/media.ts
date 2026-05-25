@@ -68,6 +68,7 @@ function contentToMediaFile(content: Record<string, unknown>): MediaFile | null 
   const width = typeof fields.width === 'number' && fields.width > 0 ? fields.width : null;
   const height = typeof fields.height === 'number' && fields.height > 0 ? fields.height : null;
   const blur = fields.blurDataURL;
+  const blurDataURL = typeof blur === 'string' && blur.length > 0 ? blur : null;
   const hasBlurPlaceholder = typeof blur === 'string' && blur.length > 0;
 
   return {
@@ -81,6 +82,7 @@ function contentToMediaFile(content: Record<string, unknown>): MediaFile | null 
     width,
     height,
     hasBlurPlaceholder,
+    blurDataURL,
   };
 }
 

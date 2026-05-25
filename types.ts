@@ -403,8 +403,10 @@ export type MediaFile = {
   extension: string;
   width: number | null;
   height: number | null;
-  /** True when the entry stores a blur placeholder (data URL omitted from list payloads). */
+  /** True when the entry stores a blur placeholder. */
   hasBlurPlaceholder: boolean;
+  /** Optional low-quality image placeholder encoded as a data URL. */
+  blurDataURL?: string | null;
   /**
    * ISO 8601 last-modified timestamp of the entry JSON file. Populated from
    * `fs.stat` mtime in dev mode; undefined in production. Used for the
