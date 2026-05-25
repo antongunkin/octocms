@@ -21,6 +21,8 @@ import { MediaGridSkeleton } from './skeletons/MediaGridSkeleton';
 import { MediaLeftPanelSkeleton } from './skeletons/MediaLeftPanelSkeleton';
 import { MediaListTableSkeleton } from './skeletons/MediaListTableSkeleton';
 
+import { PageBar } from '../Layout/PageBar';
+
 type ViewMode = 'grid' | 'list';
 
 const VIEW_MODE_KEY = 'octocms:media-view-mode';
@@ -148,40 +150,26 @@ const MediaManager = () => {
 
   return (
     <div className="octo-media-manager">
-      {/* Page header — mirrors DashboardContent */}
-      <div className="octo-page-chrome">
-        <div className="octo-page-chrome__title-area">
-          <div className="octo-page-chrome__breadcrumb">
-            <span className="octo-u-text-2">Media</span>
-            {selectedFolder !== null && (
-              <>
-                <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
-                <span className="octo-u-text-2">{selectedFolder === '/' ? 'Root' : selectedFolder}</span>
-              </>
-            )}
-          </div>
-          <div className="octo-page-chrome__title-row">
-            <h1 className="octo-page-chrome__title">{breadcrumbFolderLabel}</h1>
-          </div>
-        </div>
-        <div className="octo-page-chrome__right octo-u-row octo-u-gap-2">
-          <span className="octo-u-text-md octo-u-font-medium octo-u-text-2">
-            Assets
-            <span className="octo-u-mono octo-u-text-sm octo-u-text-muted" style={{ marginLeft: '6px' }}>
-              {filteredFiles.length}
-            </span>
-          </span>
-          <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
-          <Button
-            className="octo-u-gap-1-5 octo-btn-primary-fg"
-            onClick={() => document.getElementById('media-upload-bar-input')?.click()}
-            disabled={pendingUpload !== null}
-          >
-            <Icon.Upload className="octo-icon-md" />
-            Upload
-          </Button>
-        </div>
-      </div>
+      <PageBar
+        title={breadcrumbFolderLabel}
+        breadcrumbs={[
+          { label: 'Media', href: selectedFolder !== null ? '/cms/media' : undefined },
+          selectedFolder !== null && { label: selectedFolder === '/' ? 'Root' : selectedFolder },
+        ].filter((b): b is { label: string } => Boolean(b))}
+        actions={
+          <>
+            <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
+            <Button
+              className="octo-u-gap-1-5 octo-btn-primary-fg"
+              onClick={() => document.getElementById('media-upload-bar-input')?.click()}
+              disabled={pendingUpload !== null}
+            >
+              <Icon.Upload className="octo-icon-md" />
+              Upload
+            </Button>
+          </>
+        }
+      />
 
       <div className="octo-media-manager__body">
         {isLoadingFiles ? (

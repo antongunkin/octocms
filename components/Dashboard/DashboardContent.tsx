@@ -25,6 +25,8 @@ import { LeftPanelSkeleton } from './skeletons/LeftPanelSkeleton';
 import { RecentPullRequestsView } from './RecentPullRequests';
 import { useRecentCMSPullRequests } from '../../admin/query/hooks/useRecentCMSPullRequests';
 
+import { PageBar } from '../Layout/PageBar';
+
 const PAGE_SIZE = 20;
 const ALL_STATUSES: EntryStatus[] = ['draft', 'changed', 'published', 'merged', 'archived'];
 
@@ -81,20 +83,11 @@ export default function DashboardContent({ selectedType }: Props) {
 
   return (
     <div className="octo-page-shell">
-      {/* Page header */}
-      <div className="octo-page-chrome">
-        <div className="octo-page-chrome__title-area">
-          <div className="octo-page-chrome__breadcrumb">
-            <span className="octo-u-text-2">Content</span>
-          </div>
-          <div className="octo-page-chrome__title-row">
-            <h1 className="octo-page-chrome__title">{selectedTypeLabel ?? 'All content'}</h1>
-          </div>
-        </div>
-        <div className="octo-page-chrome__right">
-          <AddEntryButton collections={addCollections} />
-        </div>
-      </div>
+      <PageBar
+        title={selectedTypeLabel ?? 'All content'}
+        breadcrumbs={[{ label: 'Content' }]}
+        actions={<AddEntryButton collections={addCollections} />}
+      />
 
       {/* Body: left nav + right content */}
       <div className="octo-page-row">

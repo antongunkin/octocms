@@ -36,6 +36,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { toast } from '../../hooks/useToast';
 import CreateBranchDialog from '../CreateBranchDialog';
 
+import { PageBar } from '../Layout/PageBar';
+
 import { EntryFormSkeleton } from './skeletons/EntryFormSkeleton';
 import { EntrySidebarSkeleton } from './skeletons/EntrySidebarSkeleton';
 
@@ -287,82 +289,73 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
 
   return (
     <div className="octo-edit-post">
-      {/* Page header — same chrome as MediaAsset / DashboardContent */}
-      <div className="octo-page-chrome">
-        <div className="octo-page-chrome__title-area">
-          <div className="octo-u-row octo-u-gap-2">
-            <Button asChild variant="ghost" size="icon" className="octo-btn-back">
-              <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-                <Icon.ArrowLeft className="octo-icon-md" />
-              </Link>
-            </Button>
-            <div>
-              <div className="octo-page-chrome__breadcrumb">
-                <Link href="/cms/content" className="octo-u-text-2">
-                  Content
-                </Link>
-                <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
-                <span>{collectionLabel}</span>
+      <PageBar
+        title={entryTitle || collectionLabel}
+        breadcrumbs={[
+          {
+            label: 'Content',
+            href: '/cms/content',
+          },
+          {
+            label: collectionLabel,
+            href: `/cms/content/${type}`,
+          },
+        ]}
+        actions={
+          <>
+            {diffToggleVisible && (
+              <div role="tablist" aria-label="Edit or Diff view" className="octo-edit-post__view-toggle">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={viewMode === 'edit'}
+                  onClick={() => setViewMode('edit')}
+                  className={cn(
+                    'octo-edit-post__view-btn',
+                    viewMode === 'edit' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
+                  )}
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={viewMode === 'diff'}
+                  onClick={() => setViewMode('diff')}
+                  className={cn(
+                    'octo-edit-post__view-btn',
+                    viewMode === 'diff' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
+                  )}
+                >
+                  Diff
+                </button>
               </div>
-              <div className="octo-page-chrome__title-row">
-                <h1 className="octo-page-chrome__title">{entryTitle || collectionLabel}</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="octo-page-chrome__right octo-u-row octo-u-gap-2">
-          {diffToggleVisible && (
-            <div role="tablist" aria-label="Edit or Diff view" className="octo-edit-post__view-toggle">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={viewMode === 'edit'}
-                onClick={() => setViewMode('edit')}
-                className={cn(
-                  'octo-edit-post__view-btn',
-                  viewMode === 'edit' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
-                )}
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={viewMode === 'diff'}
-                onClick={() => setViewMode('diff')}
-                className={cn(
-                  'octo-edit-post__view-btn',
-                  viewMode === 'diff' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
-                )}
-              >
-                Diff
-              </button>
-            </div>
-          )}
-          {currentStatus === 'archived' ? (
-            <>
-              <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
-                Restore
+            )}
+            {currentStatus === 'archived' ? (
+              <>
+                <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
+                  Restore
+                </Button>
+                <Button variant="destructive" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
+                  Delete permanently
+                </Button>
+              </>
+            ) : (
+              <Button variant="outline" onClick={handleArchive} disabled={isSaving}>
+                Archive
               </Button>
-              <Button variant="destructive" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
-                Delete permanently
-              </Button>
-            </>
-          ) : (
-            <Button variant="outline" onClick={handleArchive} disabled={isSaving}>
-              Archive
+            )}
+            <Button
+              type="submit"
+              form="entry-form"
+              variant="default"
+              disabled={isSaving || Object.keys(fieldErrors).length > 0}
+            >
+              {isSaving ? 'Saving...' : 'Save'}
             </Button>
-          )}
-          <Button
-            type="submit"
-            form="entry-form"
-            variant="default"
-            disabled={isSaving || Object.keys(fieldErrors).length > 0}
-          >
-            {isSaving ? 'Saving...' : 'Save'}
-          </Button>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <form
         id="entry-form"

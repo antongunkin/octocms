@@ -13,6 +13,7 @@ import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { PageBar } from '../Layout/PageBar';
 
 import { MediaMetadataFormSkeleton } from './skeletons/MediaMetadataFormSkeleton';
 import { MediaPreviewSkeleton } from './skeletons/MediaPreviewSkeleton';
@@ -133,43 +134,36 @@ export default function MediaAsset({ id }: MediaAssetProps) {
 
   return (
     <div className="octo-media-asset">
-      {/* Page header — same chrome as content list */}
-      <div className="octo-page-chrome">
-        <div className="octo-page-chrome__title-area">
-          <div className="octo-u-row octo-u-gap-2">
-            <Button variant="ghost" size="icon" className="octo-btn-back" onClick={back} aria-label="Back to media">
-              <Icon.ArrowLeft className="octo-icon-md" />
+      <PageBar
+        title={file.title || file.originalName}
+        breadcrumbs={[
+          {
+            label: 'Media',
+            href: '/cms/media',
+          },
+          {
+            label: folderLabel,
+            href: `/cms/media?folder=${encodeURIComponent(file.folder)}`,
+          },
+        ]}
+        actions={
+          <>
+            <Button variant="outline" className="octo-u-gap-1-5" onClick={openInNewTab}>
+              <Icon.ExternalLink className="octo-icon-md" />
+              Open in new tab
             </Button>
-            <div>
-              <div className="octo-page-chrome__breadcrumb">
-                <button type="button" onClick={back} className="octo-btn-breadcrumb">
-                  Media
-                </button>
-                <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
-                <span className="octo-u-text-2">{folderLabel}</span>
-              </div>
-              <div className="octo-page-chrome__title-row">
-                <h1 className="octo-page-chrome__title">{file.title || file.originalName}</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="octo-page-chrome__right octo-u-row octo-u-gap-2">
-          <Button variant="outline" className="octo-u-gap-1-5" onClick={openInNewTab}>
-            <Icon.ExternalLink className="octo-icon-md" />
-            Open in new tab
-          </Button>
-          <Button
-            variant="ghost"
-            className="octo-button octo-button--danger-ghost"
-            onClick={() => setConfirmDelete(true)}
-            disabled={isPending}
-          >
-            <Icon.Trash2 className="octo-icon-md" />
-            Delete
-          </Button>
-        </div>
-      </div>
+            <Button
+              variant="ghost"
+              className="octo-button octo-button--danger-ghost"
+              onClick={() => setConfirmDelete(true)}
+              disabled={isPending}
+            >
+              <Icon.Trash2 className="octo-icon-md" />
+              Delete
+            </Button>
+          </>
+        }
+      />
 
       <div className="octo-media-asset__body">
         {/* Preview pane */}

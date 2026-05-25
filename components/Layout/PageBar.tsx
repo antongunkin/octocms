@@ -1,40 +1,47 @@
-// PageBar — secondary bar under TopHeader for page-level title + breadcrumb +
-// status badge + actions slot. Sticky directly below the TopHeader so it
-// never scrolls away. Used by pages that adopt PageShell.
 'use client';
 
+import Link from 'next/link';
 import * as React from 'react';
 import type { EntryStatus } from '../../types';
 import { StatusBadge } from '../ui';
 
-export type PageBarProps = {
-  title?: React.ReactNode;
-  breadcrumb?: React.ReactNode[];
+type PageBarProps = {
+  title: string;
+  breadcrumbs: { label: string; href?: string }[];
   status?: EntryStatus;
-  right?: React.ReactNode;
+  actions?: React.ReactNode;
 };
 
-export function PageBar({ title, breadcrumb, status, right }: PageBarProps) {
-  if (!title && !breadcrumb && !right) return null;
+export function PageBar({ title, breadcrumbs, status, actions }: PageBarProps) {
+  if (!title && !breadcrumbs && !actions) {
+    return null;
+  }
+
   return (
-    <div className="octo-page-bar">
-      <div className="octo-page-bar__title-area">
-        {breadcrumb && (
-          <div className="octo-page-bar__breadcrumb">
-            {breadcrumb.map((b, i) => (
-              <React.Fragment key={i}>
+    <div className="octo-page-chrome">
+      <div className="octo-page-chrome__title-area">
+        {breadcrumbs && (
+          <div className="octo-page-chrome__breadcrumb">
+            {breadcrumbs.map(({ label, href }, i) => (
+              <React.Fragment key={label}>
                 {i > 0 && <ChevronRightTiny />}
-                <span style={{ color: i === breadcrumb.length - 1 ? 'var(--text-2)' : 'var(--muted)' }}>{b}</span>
+                {href ? (
+                  <Link href={href} className="octo-page-chrome__breadcrumb">
+                    {label}
+                  </Link>
+                ) : (
+                  label
+                )}
               </React.Fragment>
             ))}
           </div>
         )}
-        <div className="octo-page-bar__title-row">
-          <h1 className="octo-page-bar__title">{title}</h1>
+        <div className="octo-page-chrome__title-row">
+          <h1 className="octo-page-chrome__title">{title}</h1>
           {status && <StatusBadge status={status} />}
         </div>
       </div>
-      {right && <div className="octo-page-bar__right">{right}</div>}
+      {actions && <div className="octo-page-chrome__right">{actions}</div>}
     </div>
   );
 }
