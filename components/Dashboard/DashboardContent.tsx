@@ -25,7 +25,7 @@ import { LeftPanelSkeleton } from './skeletons/LeftPanelSkeleton';
 import { RecentPullRequestsView } from './RecentPullRequests';
 import { useRecentCMSPullRequests } from '../../admin/query/hooks/useRecentCMSPullRequests';
 
-import { PageBar } from '../Layout/PageBar';
+import { Page } from '../Layout/Page';
 
 const PAGE_SIZE = 20;
 const ALL_STATUSES: EntryStatus[] = ['draft', 'changed', 'published', 'merged', 'archived'];
@@ -82,16 +82,12 @@ export default function DashboardContent({ selectedType }: Props) {
   }, [entries]);
 
   return (
-    <div className="octo-page-shell">
-      <PageBar
-        title={selectedTypeLabel ?? 'All content'}
-        breadcrumbs={[{ label: 'Content' }]}
-        actions={<AddEntryButton collections={addCollections} />}
-      />
-
-      {/* Body: left nav + right content */}
-      <div className="octo-page-row">
-        {isLoadingEntries ? (
+    <Page
+      title={selectedTypeLabel ?? 'All content'}
+      breadcrumbs={[{ label: 'Content' }]}
+      actions={<AddEntryButton collections={addCollections} />}
+      leftBar={
+        isLoadingEntries ? (
           <LeftPanelSkeleton />
         ) : (
           <LeftPanel
@@ -104,29 +100,29 @@ export default function DashboardContent({ selectedType }: Props) {
             isRecent={isRecent}
             selectedType={selectedType}
           />
-        )}
-
-        {isLoadingEntries ? (
-          <ContentTableSkeleton />
-        ) : isRecent ? (
-          <RecentPullRequestsView />
-        ) : isBranched ? (
-          <BranchedView
-            entries={branchedEntries}
-            collections={collections}
-            hasBranch={hasBranch}
-            activeBranch={activeBranch}
-          />
-        ) : (
-          <ContentTable
-            entries={visibleEntries}
-            collections={collections}
-            activeBranch={activeBranch}
-            lockedType={selectedType}
-          />
-        )}
-      </div>
-    </div>
+        )
+      }
+    >
+      {isLoadingEntries ? (
+        <ContentTableSkeleton />
+      ) : isRecent ? (
+        <RecentPullRequestsView />
+      ) : isBranched ? (
+        <BranchedView
+          entries={branchedEntries}
+          collections={collections}
+          hasBranch={hasBranch}
+          activeBranch={activeBranch}
+        />
+      ) : (
+        <ContentTable
+          entries={visibleEntries}
+          collections={collections}
+          activeBranch={activeBranch}
+          lockedType={selectedType}
+        />
+      )}
+    </Page>
   );
 }
 
@@ -199,55 +195,53 @@ function LeftPanel({
   const config = useConfig();
 
   return (
-    <aside className="octo-left-panel">
-      <div className="octo-left-panel__bar">
-        <div className="octo-left-panel__section">
-          <nav className="octo-left-panel__nav">
-            <LeftNavItem
-              href="/cms"
-              icon={<Icon.LayoutList className="octo-icon-md" />}
-              label="All content"
-              count={entries.length}
-              active={!isBranched && !isRecent && !selectedType}
-            />
-            <LeftNavItem
-              href="/cms?tab=branched"
-              icon={<Icon.GitBranch className="octo-icon-md" />}
-              label="Branched content"
-              count={branchedCount}
-              active={isBranched}
-            />
-            <LeftNavItem
-              href="/cms?tab=recent"
-              icon={<Icon.GitPullRequest className="octo-icon-md" />}
-              label="Recent PRs"
-              count={recentPRsCount}
-              active={isRecent}
-            />
+    <>
+      <div className="octo-page-sidebar__section">
+        <nav className="octo-page-sidebar__nav">
+          <LeftNavItem
+            href="/cms"
+            icon={<Icon.LayoutList className="octo-icon-md" />}
+            label="All content"
+            count={entries.length}
+            active={!isBranched && !isRecent && !selectedType}
+          />
+          <LeftNavItem
+            href="/cms?tab=branched"
+            icon={<Icon.GitBranch className="octo-icon-md" />}
+            label="Branched content"
+            count={branchedCount}
+            active={isBranched}
+          />
+          <LeftNavItem
+            href="/cms?tab=recent"
+            icon={<Icon.GitPullRequest className="octo-icon-md" />}
+            label="Recent PRs"
+            count={recentPRsCount}
+            active={isRecent}
+          />
+        </nav>
+      </div>
+      {collections.length > 0 && (
+        <div className="octo-page-sidebar__section">
+          <span className="octo-page-sidebar__section-label">Collections</span>
+          <nav className="octo-page-sidebar__nav">
+            {collections.map((c) => {
+              const label = config.collections[c as keyof typeof config.collections]?.label ?? c;
+              return (
+                <LeftNavItem
+                  key={c}
+                  href={`/cms/content/${c}`}
+                  icon={<Icon.FileText className="octo-icon-md" />}
+                  label={label}
+                  count={countByType[c] ?? 0}
+                  active={selectedType === c}
+                />
+              );
+            })}
           </nav>
         </div>
-        {collections.length > 0 && (
-          <div className="octo-left-panel__section">
-            <span className="octo-left-panel__section-label">Collections</span>
-            <nav className="octo-left-panel__nav">
-              {collections.map((c) => {
-                const label = config.collections[c as keyof typeof config.collections]?.label ?? c;
-                return (
-                  <LeftNavItem
-                    key={c}
-                    href={`/cms/content/${c}`}
-                    icon={<Icon.FileText className="octo-icon-md" />}
-                    label={label}
-                    count={countByType[c] ?? 0}
-                    active={selectedType === c}
-                  />
-                );
-              })}
-            </nav>
-          </div>
-        )}
-      </div>
-    </aside>
+      )}
+    </>
   );
 }
 
@@ -334,111 +328,109 @@ function ContentTable({
   const baseBranch = config.git.baseBranch;
 
   return (
-    <div className="octo-content-area">
-      <div className="octo-content-table-wrap">
-        <div className="octo-content-table-inner">
-          <div className="octo-content-filters">
-            <div className="octo-content-search">
-              <Icon.Search className="octo-content-search__icon octo-icon-md" />
-              <input
-                ref={searchRef}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Filter entries…"
-                className="octo-content-search__input"
-              />
-              <kbd className="octo-content-search__kbd">/</kbd>
-            </div>
-            {!lockedType && (
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
-                  <SelectValue placeholder="Any type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="any">Any type</SelectItem>
-                  {collections.map((collection) => (
-                    <SelectItem key={collection} value={collection}>
-                      {config.collections[collection as keyof typeof config.collections]?.label ?? collection}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+    <div className="octo-content-table-wrap">
+      <div className="octo-content-table-inner">
+        <div className="octo-content-filters">
+          <div className="octo-content-search">
+            <Icon.Search className="octo-content-search__icon octo-icon-md" />
+            <input
+              ref={searchRef}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Filter entries…"
+              className="octo-content-search__input"
+            />
+            <kbd className="octo-content-search__kbd">/</kbd>
+          </div>
+          {!lockedType && (
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
-                <SelectValue placeholder="Any status" />
+                <SelectValue placeholder="Any type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="any">Any status</SelectItem>
-                {ALL_STATUSES.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s.charAt(0).toUpperCase() + s.slice(1)}
+                <SelectItem value="any">Any type</SelectItem>
+                {collections.map((collection) => (
+                  <SelectItem key={collection} value={collection}>
+                    {config.collections[collection as keyof typeof config.collections]?.label ?? collection}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <div className="octo-content-sort">
-              <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as 'newest' | 'oldest')}>
-                <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Newest first</SelectItem>
-                  <SelectItem value="oldest">Oldest first</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          )}
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
+              <SelectValue placeholder="Any status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any status</SelectItem>
+              {ALL_STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="octo-content-sort">
+            <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as 'newest' | 'oldest')}>
+              <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest first</SelectItem>
+                <SelectItem value="oldest">Oldest first</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="octo-content-card">
+          <div className="octo-content-card__scroll">
+            <table className="octo-content-card__table">
+              <thead>
+                <tr className="octo-content-card__th-row">
+                  <th className="octo-content-card__th">Title</th>
+                  <th className="octo-content-card__th">Type</th>
+                  <th className="octo-content-card__th">Branch</th>
+                  <th className="octo-content-card__th">Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pageItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="octo-content-row__empty">
+                      No entries found.
+                    </td>
+                  </tr>
+                ) : (
+                  pageItems.map((entry) => (
+                    <EntryRow
+                      key={entry.path}
+                      entry={entry}
+                      activeBranch={activeBranch}
+                      baseBranch={baseBranch}
+                      onClick={() => router.push(entryEditUrl(entry))}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
 
-          <div className="octo-content-card">
-            <div className="octo-content-card__scroll">
-              <table className="octo-content-card__table">
-                <thead>
-                  <tr className="octo-content-card__th-row">
-                    <th className="octo-content-card__th">Title</th>
-                    <th className="octo-content-card__th">Type</th>
-                    <th className="octo-content-card__th">Branch</th>
-                    <th className="octo-content-card__th">Updated</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pageItems.length === 0 ? (
-                    <tr>
-                      <td colSpan={4} className="octo-content-row__empty">
-                        No entries found.
-                      </td>
-                    </tr>
-                  ) : (
-                    pageItems.map((entry) => (
-                      <EntryRow
-                        key={entry.path}
-                        entry={entry}
-                        activeBranch={activeBranch}
-                        baseBranch={baseBranch}
-                        onClick={() => router.push(entryEditUrl(entry))}
-                      />
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="octo-content-card__footer">
-              <span className="octo-content-card__footer-count">
-                {filtered.length === 0
-                  ? 'No entries'
-                  : `Showing ${startIdx}-${endIdx} of ${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'}`}
-              </span>
-              <div className="octo-content-card__footer-pages">
-                <Button variant="outline" onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
-                  <Icon.ChevronLeft className="octo-icon-sm" />
-                  Prev
-                </Button>
-                <Button variant="outline" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages - 1}>
-                  Next
-                  <Icon.ChevronRight className="octo-icon-sm" />
-                </Button>
-              </div>
+          <div className="octo-content-card__footer">
+            <span className="octo-content-card__footer-count">
+              {filtered.length === 0
+                ? 'No entries'
+                : `Showing ${startIdx}-${endIdx} of ${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'}`}
+            </span>
+            <div className="octo-content-card__footer-pages">
+              <Button variant="outline" onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
+                <Icon.ChevronLeft className="octo-icon-sm" />
+                Prev
+              </Button>
+              <Button variant="outline" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages - 1}>
+                Next
+                <Icon.ChevronRight className="octo-icon-sm" />
+              </Button>
             </div>
           </div>
         </div>

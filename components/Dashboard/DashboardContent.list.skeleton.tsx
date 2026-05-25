@@ -8,8 +8,8 @@ import { ShimmerBlock, ShimmerRow } from '../skeletons/primitives';
 export function DashboardListSkeleton({ rows = 8 }: { rows?: number }) {
   return (
     <div style={{ display: 'flex', flex: 1 }} role="status" aria-label="Loading content">
-      <aside className="octo-left-panel" style={{ width: 240 }}>
-        <div className="octo-left-panel__section">
+      <aside className="octo-page-sidebar" style={{ width: 240 }}>
+        <div className="octo-page-sidebar__section">
           <ShimmerBlock style={{ height: 16, width: 96, marginBottom: 16 }} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {Array.from({ length: 5 }, (_, i) => (

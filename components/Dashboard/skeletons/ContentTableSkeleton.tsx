@@ -9,7 +9,7 @@ import { ShimmerBlock, ShimmerRow } from '../../skeletons/primitives';
  */
 export function ContentTableSkeleton({ rows = 8 }: { rows?: number }) {
   return (
-    <div role="status" aria-label="Loading entries" className="octo-content-area">
+    <div role="status" aria-label="Loading entries">
       <div className="octo-content-table-wrap octo-scroll">
         <div className="octo-content-table-inner">
           <div className="octo-content-filters">

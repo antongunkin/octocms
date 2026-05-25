@@ -33,7 +33,7 @@ export function MediaLeftPanel({
 
   return (
     <aside className="octo-media-left-panel">
-      <nav className="octo-media-left-panel__all-nav octo-left-panel__nav">
+      <nav className="octo-media-left-panel__all-nav octo-page-sidebar__nav">
         <LeftNavItem
           icon={<Icon.Image className="octo-icon-md" />}
           label="All files"
@@ -55,7 +55,7 @@ export function MediaLeftPanel({
             <Icon.Plus className="octo-icon-xs" />
           </button>
         </div>
-        <nav className="octo-left-panel__nav">
+        <nav className="octo-page-sidebar__nav">
           {folders.map((folder) => {
             const label = folder === '/' ? 'Root' : folder;
             const active = selectedFolder === folder;
