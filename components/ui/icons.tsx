@@ -68,19 +68,19 @@ const ArrowLeftNode: IconNode = [
   ['path', { d: 'm12 19-7-7 7-7', key: '1l729n' }],
   ['path', { d: 'M19 12H5', key: 'x3x0zl' }],
 ] as const;
-export const ArrowLeft = createIcon('arrow-left', ArrowLeftNode);
+const ArrowLeft = createIcon('arrow-left', ArrowLeftNode);
 
 const ArrowRightNode: IconNode = [
   ['path', { d: 'M5 12h14', key: '1ays0h' }],
   ['path', { d: 'm12 5 7 7-7 7', key: 'xquz4c' }],
 ] as const;
-export const ArrowRight = createIcon('arrow-right', ArrowRightNode);
+const ArrowRight = createIcon('arrow-right', ArrowRightNode);
 
 const ArrowUpRightNode: IconNode = [
   ['path', { d: 'M7 7h10v10', key: '1tivn9' }],
   ['path', { d: 'M7 17 17 7', key: '1vkiza' }],
 ] as const;
-export const ArrowUpRight = createIcon('arrow-up-right', ArrowUpRightNode);
+const ArrowUpRight = createIcon('arrow-up-right', ArrowUpRightNode);
 
 const BellNode: IconNode = [
   ['path', { d: 'M10.268 21a2 2 0 0 0 3.464 0', key: 'vwvbt9' }],
@@ -92,7 +92,7 @@ const BellNode: IconNode = [
     },
   ],
 ] as const;
-export const Bell = createIcon('bell', BellNode);
+const Bell = createIcon('bell', BellNode);
 
 const BotNode: IconNode = [
   ['path', { d: 'M12 8V4H8', key: 'hb8ula' }],
@@ -102,72 +102,72 @@ const BotNode: IconNode = [
   ['path', { d: 'M15 13v2', key: '1xurst' }],
   ['path', { d: 'M9 13v2', key: 'rq6x2g' }],
 ] as const;
-export const Bot = createIcon('bot', BotNode);
+const Bot = createIcon('bot', BotNode);
 
 const CheckCheckNode: IconNode = [
   ['path', { d: 'M18 6 7 17l-5-5', key: '116fxf' }],
   ['path', { d: 'm22 10-7.5 7.5L13 16', key: 'ke71qq' }],
 ] as const;
-export const CheckCheck = createIcon('check-check', CheckCheckNode);
+const CheckCheck = createIcon('check-check', CheckCheckNode);
 
 const CheckNode: IconNode = [['path', { d: 'M20 6 9 17l-5-5', key: '1gmf2c' }]] as const;
-export const Check = createIcon('check', CheckNode);
+const Check = createIcon('check', CheckNode);
 
 const ChevronDownNode: IconNode = [['path', { d: 'm6 9 6 6 6-6', key: 'qrunsl' }]] as const;
-export const ChevronDown = createIcon('chevron-down', ChevronDownNode);
+const ChevronDown = createIcon('chevron-down', ChevronDownNode);
 
 const ChevronLeftNode: IconNode = [['path', { d: 'm15 18-6-6 6-6', key: '1wnfg3' }]] as const;
-export const ChevronLeft = createIcon('chevron-left', ChevronLeftNode);
+const ChevronLeft = createIcon('chevron-left', ChevronLeftNode);
 
 const ChevronRightNode: IconNode = [['path', { d: 'm9 18 6-6-6-6', key: 'mthhwq' }]] as const;
-export const ChevronRight = createIcon('chevron-right', ChevronRightNode);
+const ChevronRight = createIcon('chevron-right', ChevronRightNode);
 
 const ChevronUpNode: IconNode = [['path', { d: 'm18 15-6-6-6 6', key: '153udz' }]] as const;
-export const ChevronUp = createIcon('chevron-up', ChevronUpNode);
+const ChevronUp = createIcon('chevron-up', ChevronUpNode);
 
 const AlertCircleNode: IconNode = [
   ['circle', { cx: '12', cy: '12', r: '10', key: '1mglay' }],
   ['line', { x1: '12', x2: '12', y1: '8', y2: '12', key: '1pkeuh' }],
   ['line', { x1: '12', x2: '12.01', y1: '16', y2: '16', key: '4dfq90' }],
 ] as const;
-export const AlertCircle = createIcon('circle-alert', AlertCircleNode);
+const AlertCircle = createIcon('circle-alert', AlertCircleNode);
 
 const CircleCheckNode: IconNode = [
   ['circle', { cx: '12', cy: '12', r: '10', key: '1mglay' }],
   ['path', { d: 'm9 12 2 2 4-4', key: 'dzmm74' }],
 ] as const;
-export const CircleCheck = createIcon('circle-check', CircleCheckNode);
-export const CheckCircle2 = CircleCheck;
+const CircleCheck = createIcon('circle-check', CircleCheckNode);
+const CheckCircle2 = CircleCheck;
 
 const StopCircleNode: IconNode = [
   ['circle', { cx: '12', cy: '12', r: '10', key: '1mglay' }],
   ['rect', { x: '9', y: '9', width: '6', height: '6', rx: '1', key: '1ssd4o' }],
 ] as const;
-export const StopCircle = createIcon('circle-stop', StopCircleNode);
+const StopCircle = createIcon('circle-stop', StopCircleNode);
 
 const CircleNode: IconNode = [['circle', { cx: '12', cy: '12', r: '10', key: '1mglay' }]] as const;
-export const Circle = createIcon('circle', CircleNode);
+const Circle = createIcon('circle', CircleNode);
 
 const CloudUploadNode: IconNode = [
   ['path', { d: 'M12 13v8', key: '1l5pq0' }],
   ['path', { d: 'M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242', key: '1pljnt' }],
   ['path', { d: 'm8 17 4-4 4 4', key: '1quai1' }],
 ] as const;
-export const CloudUpload = createIcon('cloud-upload', CloudUploadNode);
+const CloudUpload = createIcon('cloud-upload', CloudUploadNode);
 
 const MoreHorizontalNode: IconNode = [
   ['circle', { cx: '12', cy: '12', r: '1', key: '41hilf' }],
   ['circle', { cx: '19', cy: '12', r: '1', key: '1wjl8i' }],
   ['circle', { cx: '5', cy: '12', r: '1', key: '1pcz8c' }],
 ] as const;
-export const MoreHorizontal = createIcon('ellipsis', MoreHorizontalNode);
+const MoreHorizontal = createIcon('ellipsis', MoreHorizontalNode);
 
 const ExternalLinkNode: IconNode = [
   ['path', { d: 'M15 3h6v6', key: '1q9fwt' }],
   ['path', { d: 'M10 14 21 3', key: 'gplh6r' }],
   ['path', { d: 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6', key: 'a6xqqp' }],
 ] as const;
-export const ExternalLink = createIcon('external-link', ExternalLinkNode);
+const ExternalLink = createIcon('external-link', ExternalLinkNode);
 
 const FileCode2Node: IconNode = [
   [
@@ -181,7 +181,7 @@ const FileCode2Node: IconNode = [
   ['path', { d: 'm5 16-3 3 3 3', key: '331omg' }],
   ['path', { d: 'm9 22 3-3-3-3', key: 'lsp7cz' }],
 ] as const;
-export const FileCode2 = createIcon('file-code-corner', FileCode2Node);
+const FileCode2 = createIcon('file-code-corner', FileCode2Node);
 
 const FilePenNode: IconNode = [
   [
@@ -200,7 +200,7 @@ const FilePenNode: IconNode = [
     },
   ],
 ] as const;
-export const FilePen = createIcon('file-pen', FilePenNode);
+const FilePen = createIcon('file-pen', FilePenNode);
 
 const FilePlusNode: IconNode = [
   [
@@ -214,7 +214,7 @@ const FilePlusNode: IconNode = [
   ['path', { d: 'M9 15h6', key: 'cctwl0' }],
   ['path', { d: 'M12 18v-6', key: '17g6i2' }],
 ] as const;
-export const FilePlus = createIcon('file-plus', FilePlusNode);
+const FilePlus = createIcon('file-plus', FilePlusNode);
 
 const FileTextNode: IconNode = [
   [
@@ -229,7 +229,7 @@ const FileTextNode: IconNode = [
   ['path', { d: 'M16 13H8', key: 't4e002' }],
   ['path', { d: 'M16 17H8', key: 'z1uh3a' }],
 ] as const;
-export const FileText = createIcon('file-text', FileTextNode);
+const FileText = createIcon('file-text', FileTextNode);
 
 const FolderOpenNode: IconNode = [
   [
@@ -240,21 +240,21 @@ const FolderOpenNode: IconNode = [
     },
   ],
 ] as const;
-export const FolderOpen = createIcon('folder-open', FolderOpenNode);
+const FolderOpen = createIcon('folder-open', FolderOpenNode);
 
 const GitBranchNode: IconNode = [
   ['path', { d: 'M15 6a9 9 0 0 0-9 9V3', key: '1cii5b' }],
   ['circle', { cx: '18', cy: '6', r: '3', key: '1h7g24' }],
   ['circle', { cx: '6', cy: '18', r: '3', key: 'fqmcym' }],
 ] as const;
-export const GitBranch = createIcon('git-branch', GitBranchNode);
+const GitBranch = createIcon('git-branch', GitBranchNode);
 
 const GitCommitNode: IconNode = [
   ['circle', { cx: '12', cy: '12', r: '3', key: '1v7zrd' }],
   ['line', { x1: '3', x2: '9', y1: '12', y2: '12', key: '1dyftd' }],
   ['line', { x1: '15', x2: '21', y1: '12', y2: '12', key: 'oup4p8' }],
 ] as const;
-export const GitCommit = createIcon('git-commit-horizontal', GitCommitNode);
+const GitCommit = createIcon('git-commit-horizontal', GitCommitNode);
 
 const GitPullRequestNode: IconNode = [
   ['circle', { cx: '18', cy: '18', r: '3', key: '1xkwt0' }],
@@ -262,7 +262,7 @@ const GitPullRequestNode: IconNode = [
   ['path', { d: 'M13 6h3a2 2 0 0 1 2 2v7', key: '1yeb86' }],
   ['line', { x1: '6', x2: '6', y1: '9', y2: '21', key: 'rroup' }],
 ] as const;
-export const GitPullRequest = createIcon('git-pull-request', GitPullRequestNode);
+const GitPullRequest = createIcon('git-pull-request', GitPullRequestNode);
 
 const GripVerticalNode: IconNode = [
   ['circle', { cx: '9', cy: '12', r: '1', key: '1vctgf' }],
@@ -272,7 +272,7 @@ const GripVerticalNode: IconNode = [
   ['circle', { cx: '15', cy: '5', r: '1', key: '19l28e' }],
   ['circle', { cx: '15', cy: '19', r: '1', key: 'f4zoj3' }],
 ] as const;
-export const GripVertical = createIcon('grip-vertical', GripVerticalNode);
+const GripVertical = createIcon('grip-vertical', GripVerticalNode);
 
 const ImagePlusNode: IconNode = [
   ['path', { d: 'M16 5h6', key: '1vod17' }],
@@ -281,22 +281,22 @@ const ImagePlusNode: IconNode = [
   ['path', { d: 'm21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21', key: '1xmnt7' }],
   ['circle', { cx: '9', cy: '9', r: '2', key: 'af1f0g' }],
 ] as const;
-export const ImagePlus = createIcon('image-plus', ImagePlusNode);
+const ImagePlus = createIcon('image-plus', ImagePlusNode);
 
 const ImageNode: IconNode = [
   ['rect', { width: '18', height: '18', x: '3', y: '3', rx: '2', ry: '2', key: '1m3agn' }],
   ['circle', { cx: '9', cy: '9', r: '2', key: 'af1f0g' }],
   ['path', { d: 'm21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21', key: '1xmnt7' }],
 ] as const;
-export const Image = createIcon('image', ImageNode);
-export const ImageIcon = Image;
+const Image = createIcon('image', ImageNode);
+const ImageIcon = Image;
 
 const InfoNode: IconNode = [
   ['circle', { cx: '12', cy: '12', r: '10', key: '1mglay' }],
   ['path', { d: 'M12 16v-4', key: '1dtifu' }],
   ['path', { d: 'M12 8h.01', key: 'e9boi3' }],
 ] as const;
-export const Info = createIcon('info', InfoNode);
+const Info = createIcon('info', InfoNode);
 
 const LayersNode: IconNode = [
   [
@@ -321,7 +321,7 @@ const LayersNode: IconNode = [
     },
   ],
 ] as const;
-export const Layers = createIcon('layers', LayersNode);
+const Layers = createIcon('layers', LayersNode);
 
 const LayoutGridNode: IconNode = [
   ['rect', { width: '7', height: '7', x: '3', y: '3', rx: '1', key: '1g98yp' }],
@@ -329,7 +329,7 @@ const LayoutGridNode: IconNode = [
   ['rect', { width: '7', height: '7', x: '14', y: '14', rx: '1', key: 'nxv5o0' }],
   ['rect', { width: '7', height: '7', x: '3', y: '14', rx: '1', key: '1bb6yr' }],
 ] as const;
-export const LayoutGrid = createIcon('layout-grid', LayoutGridNode);
+const LayoutGrid = createIcon('layout-grid', LayoutGridNode);
 
 const LayoutListNode: IconNode = [
   ['rect', { width: '7', height: '7', x: '3', y: '3', rx: '1', key: '1g98yp' }],
@@ -339,14 +339,14 @@ const LayoutListNode: IconNode = [
   ['path', { d: 'M14 15h7', key: '1mj8o2' }],
   ['path', { d: 'M14 20h7', key: '11slyb' }],
 ] as const;
-export const LayoutList = createIcon('layout-list', LayoutListNode);
+const LayoutList = createIcon('layout-list', LayoutListNode);
 
 const Link2Node: IconNode = [
   ['path', { d: 'M9 17H7A5 5 0 0 1 7 7h2', key: '8i5ue5' }],
   ['path', { d: 'M15 7h2a5 5 0 1 1 0 10h-2', key: '1b9ql8' }],
   ['line', { x1: '8', x2: '16', y1: '12', y2: '12', key: '1jonct' }],
 ] as const;
-export const Link2 = createIcon('link-2', Link2Node);
+const Link2 = createIcon('link-2', Link2Node);
 
 const ListNode: IconNode = [
   ['path', { d: 'M3 5h.01', key: '18ugdj' }],
@@ -356,31 +356,31 @@ const ListNode: IconNode = [
   ['path', { d: 'M8 12h13', key: '1za7za' }],
   ['path', { d: 'M8 19h13', key: 'm83p4d' }],
 ] as const;
-export const List = createIcon('list', ListNode);
+const List = createIcon('list', ListNode);
 
 const Loader2Node: IconNode = [['path', { d: 'M21 12a9 9 0 1 1-6.219-8.56', key: '13zald' }]] as const;
-export const Loader2 = createIcon('loader-circle', Loader2Node);
-export const LoaderCircle = Loader2;
+const Loader2 = createIcon('loader-circle', Loader2Node);
+const LoaderCircle = Loader2;
 
 const LockNode: IconNode = [
   ['rect', { width: '18', height: '11', x: '3', y: '11', rx: '2', ry: '2', key: '1w4ew1' }],
   ['path', { d: 'M7 11V7a5 5 0 0 1 10 0v4', key: 'fwvmzm' }],
 ] as const;
-export const Lock = createIcon('lock', LockNode);
+const Lock = createIcon('lock', LockNode);
 
 const LogInNode: IconNode = [
   ['path', { d: 'm10 17 5-5-5-5', key: '1bsop3' }],
   ['path', { d: 'M15 12H3', key: '6jk70r' }],
   ['path', { d: 'M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4', key: 'u53s6r' }],
 ] as const;
-export const LogIn = createIcon('log-in', LogInNode);
+const LogIn = createIcon('log-in', LogInNode);
 
 const MenuNode: IconNode = [
   ['path', { d: 'M4 5h16', key: '1tepv9' }],
   ['path', { d: 'M4 12h16', key: '1lakjw' }],
   ['path', { d: 'M4 19h16', key: '1djgab' }],
 ] as const;
-export const Menu = createIcon('menu', MenuNode);
+const Menu = createIcon('menu', MenuNode);
 
 const MoonNode: IconNode = [
   [
@@ -391,7 +391,7 @@ const MoonNode: IconNode = [
     },
   ],
 ] as const;
-export const Moon = createIcon('moon', MoonNode);
+const Moon = createIcon('moon', MoonNode);
 
 const OctagonXNode: IconNode = [
   ['path', { d: 'm15 9-6 6', key: '1uzhvr' }],
@@ -404,7 +404,7 @@ const OctagonXNode: IconNode = [
   ],
   ['path', { d: 'm9 9 6 6', key: 'z0biqf' }],
 ] as const;
-export const OctagonX = createIcon('octagon-x', OctagonXNode);
+const OctagonX = createIcon('octagon-x', OctagonXNode);
 
 const PaperclipNode: IconNode = [
   [
@@ -415,7 +415,7 @@ const PaperclipNode: IconNode = [
     },
   ],
 ] as const;
-export const Paperclip = createIcon('paperclip', PaperclipNode);
+const Paperclip = createIcon('paperclip', PaperclipNode);
 
 const PencilNode: IconNode = [
   [
@@ -427,13 +427,13 @@ const PencilNode: IconNode = [
   ],
   ['path', { d: 'm15 5 4 4', key: '1mk7zo' }],
 ] as const;
-export const Pencil = createIcon('pencil', PencilNode);
+const Pencil = createIcon('pencil', PencilNode);
 
 const PlusNode: IconNode = [
   ['path', { d: 'M5 12h14', key: '1ays0h' }],
   ['path', { d: 'M12 5v14', key: 's699le' }],
 ] as const;
-export const Plus = createIcon('plus', PlusNode);
+const Plus = createIcon('plus', PlusNode);
 
 const PuzzleNode: IconNode = [
   [
@@ -444,7 +444,7 @@ const PuzzleNode: IconNode = [
     },
   ],
 ] as const;
-export const Puzzle = createIcon('puzzle', PuzzleNode);
+const Puzzle = createIcon('puzzle', PuzzleNode);
 
 const RefreshCwNode: IconNode = [
   ['path', { d: 'M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8', key: 'v9h5vc' }],
@@ -452,13 +452,13 @@ const RefreshCwNode: IconNode = [
   ['path', { d: 'M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16', key: '3uifl3' }],
   ['path', { d: 'M8 16H3v5', key: '1cv678' }],
 ] as const;
-export const RefreshCw = createIcon('refresh-cw', RefreshCwNode);
+const RefreshCw = createIcon('refresh-cw', RefreshCwNode);
 
 const SearchNode: IconNode = [
   ['path', { d: 'm21 21-4.34-4.34', key: '14j7rj' }],
   ['circle', { cx: '11', cy: '11', r: '8', key: '4ej97u' }],
 ] as const;
-export const Search = createIcon('search', SearchNode);
+const Search = createIcon('search', SearchNode);
 
 const SendNode: IconNode = [
   [
@@ -470,7 +470,7 @@ const SendNode: IconNode = [
   ],
   ['path', { d: 'm21.854 2.147-10.94 10.939', key: '12cjpa' }],
 ] as const;
-export const Send = createIcon('send', SendNode);
+const Send = createIcon('send', SendNode);
 
 const ShieldAlertNode: IconNode = [
   [
@@ -483,7 +483,7 @@ const ShieldAlertNode: IconNode = [
   ['path', { d: 'M12 8v4', key: '1got3b' }],
   ['path', { d: 'M12 16h.01', key: '1drbdi' }],
 ] as const;
-export const ShieldAlert = createIcon('shield-alert', ShieldAlertNode);
+const ShieldAlert = createIcon('shield-alert', ShieldAlertNode);
 
 const ShieldCheckNode: IconNode = [
   [
@@ -495,7 +495,7 @@ const ShieldCheckNode: IconNode = [
   ],
   ['path', { d: 'm9 12 2 2 4-4', key: 'dzmm74' }],
 ] as const;
-export const ShieldCheck = createIcon('shield-check', ShieldCheckNode);
+const ShieldCheck = createIcon('shield-check', ShieldCheckNode);
 
 const ShieldNode: IconNode = [
   [
@@ -506,7 +506,7 @@ const ShieldNode: IconNode = [
     },
   ],
 ] as const;
-export const Shield = createIcon('shield', ShieldNode);
+const Shield = createIcon('shield', ShieldNode);
 
 const SparklesNode: IconNode = [
   [
@@ -520,7 +520,7 @@ const SparklesNode: IconNode = [
   ['path', { d: 'M22 4h-4', key: 'gwowj6' }],
   ['circle', { cx: '4', cy: '20', r: '2', key: '6kqj1y' }],
 ] as const;
-export const Sparkles = createIcon('sparkles', SparklesNode);
+const Sparkles = createIcon('sparkles', SparklesNode);
 
 const StarNode: IconNode = [
   [
@@ -531,7 +531,7 @@ const StarNode: IconNode = [
     },
   ],
 ] as const;
-export const Star = createIcon('star', StarNode);
+const Star = createIcon('star', StarNode);
 
 const SunNode: IconNode = [
   ['circle', { cx: '12', cy: '12', r: '4', key: '4exip2' }],
@@ -544,13 +544,13 @@ const SunNode: IconNode = [
   ['path', { d: 'm6.34 17.66-1.41 1.41', key: '1m8zz5' }],
   ['path', { d: 'm19.07 4.93-1.41 1.41', key: '1shlcs' }],
 ] as const;
-export const Sun = createIcon('sun', SunNode);
+const Sun = createIcon('sun', SunNode);
 
 const TerminalNode: IconNode = [
   ['path', { d: 'M12 19h8', key: 'baeox8' }],
   ['path', { d: 'm4 17 6-6-6-6', key: '1yngyt' }],
 ] as const;
-export const Terminal = createIcon('terminal', TerminalNode);
+const Terminal = createIcon('terminal', TerminalNode);
 
 const Trash2Node: IconNode = [
   ['path', { d: 'M10 11v6', key: 'nco0om' }],
@@ -559,7 +559,7 @@ const Trash2Node: IconNode = [
   ['path', { d: 'M3 6h18', key: 'd0wm0j' }],
   ['path', { d: 'M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2', key: 'e791ji' }],
 ] as const;
-export const Trash2 = createIcon('trash-2', Trash2Node);
+const Trash2 = createIcon('trash-2', Trash2Node);
 
 const AlertTriangleNode: IconNode = [
   [
@@ -572,21 +572,21 @@ const AlertTriangleNode: IconNode = [
   ['path', { d: 'M12 9v4', key: 'juzpu7' }],
   ['path', { d: 'M12 17h.01', key: 'p32p05' }],
 ] as const;
-export const AlertTriangle = createIcon('triangle-alert', AlertTriangleNode);
-export const TriangleAlert = AlertTriangle;
+const AlertTriangle = createIcon('triangle-alert', AlertTriangleNode);
+const TriangleAlert = AlertTriangle;
 
 const UploadNode: IconNode = [
   ['path', { d: 'M12 3v12', key: '1x0j5s' }],
   ['path', { d: 'm17 8-5-5-5 5', key: '7q97r8' }],
   ['path', { d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', key: 'ih7n3h' }],
 ] as const;
-export const Upload = createIcon('upload', UploadNode);
+const Upload = createIcon('upload', UploadNode);
 
 const UserNode: IconNode = [
   ['path', { d: 'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2', key: '975kel' }],
   ['circle', { cx: '12', cy: '7', r: '4', key: '17ys0d' }],
 ] as const;
-export const User = createIcon('user', UserNode);
+const User = createIcon('user', UserNode);
 
 const VariableNode: IconNode = [
   ['path', { d: 'M8 21s-4-3-4-9 4-9 4-9', key: 'uto9ud' }],
@@ -594,7 +594,7 @@ const VariableNode: IconNode = [
   ['line', { x1: '15', x2: '9', y1: '9', y2: '15', key: 'f7djnv' }],
   ['line', { x1: '9', x2: '15', y1: '9', y2: '15', key: '1shsy8' }],
 ] as const;
-export const Variable = createIcon('variable', VariableNode);
+const Variable = createIcon('variable', VariableNode);
 
 const WrenchNode: IconNode = [
   [
@@ -605,13 +605,13 @@ const WrenchNode: IconNode = [
     },
   ],
 ] as const;
-export const Wrench = createIcon('wrench', WrenchNode);
+const Wrench = createIcon('wrench', WrenchNode);
 
 const XNode: IconNode = [
   ['path', { d: 'M18 6 6 18', key: '1bl5f8' }],
   ['path', { d: 'm6 6 12 12', key: 'd8bk6v' }],
 ] as const;
-export const X = createIcon('x', XNode);
+const X = createIcon('x', XNode);
 
 const ZapNode: IconNode = [
   [
@@ -622,4 +622,74 @@ const ZapNode: IconNode = [
     },
   ],
 ] as const;
-export const Zap = createIcon('zap', ZapNode);
+const Zap = createIcon('zap', ZapNode);
+
+export const Icon = {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Bell,
+  Bot,
+  Check,
+  CheckCheck,
+  Circle,
+  CircleCheck,
+  CheckCircle2,
+  CloudUpload,
+  AlertCircle,
+  StopCircle,
+  FileCode2,
+  FilePen,
+  FilePlus,
+  FileText,
+  FolderOpen,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ExternalLink,
+  GitBranch,
+  GitCommit,
+  GitPullRequest,
+  GripVertical,
+  Image,
+  ImageIcon,
+  ImagePlus,
+  Info,
+  Layers,
+  LayoutGrid,
+  LayoutList,
+  Link2,
+  List,
+  Loader2,
+  LoaderCircle,
+  Lock,
+  LogIn,
+  Menu,
+  Moon,
+  MoreHorizontal,
+  OctagonX,
+  Paperclip,
+  Pencil,
+  Plus,
+  Puzzle,
+  RefreshCw,
+  Search,
+  Send,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Sun,
+  Terminal,
+  Trash2,
+  AlertTriangle,
+  TriangleAlert,
+  Upload,
+  User,
+  Variable,
+  Wrench,
+  X,
+  Zap,
+} as const;

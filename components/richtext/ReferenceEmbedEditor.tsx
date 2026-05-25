@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FileText, Link2, Search, X } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
@@ -106,7 +106,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
       {currentId && selectedEntry ? (
         <div className="octo-ref-embed__selected">
           <div className="octo-ref-embed__icon-wrap">
-            <FileText className="octo-icon-lg octo-u-text-brand" />
+            <Icon.FileText className="octo-icon-lg octo-u-text-brand" />
           </div>
           <div className="octo-ref-embed__info">
             <span className="octo-ref-embed__info-label">Reference embed · {currentDisplay}</span>
@@ -120,7 +120,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               className="octo-ref-embed__action-btn"
               title={`Switch to ${currentDisplay === 'inline' ? 'block' : 'inline'} display`}
             >
-              <Link2 className="octo-icon-sm" />
+              <Icon.Link2 className="octo-icon-sm" />
             </button>
             <Button type="button" variant="outline" onClick={() => setIsOpen(true)}>
               Change
@@ -131,14 +131,14 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               className="octo-ref-embed__action-btn octo-ref-embed__action-btn--danger"
               title="Remove reference"
             >
-              <X className="octo-icon-sm" />
+              <Icon.X className="octo-icon-sm" />
             </button>
           </div>
         </div>
       ) : currentId && !selectedEntry ? (
         <div className="octo-ref-embed__loading">
           <div className="octo-ref-embed__loading-icon">
-            <FileText className="octo-icon-lg octo-u-text-muted" />
+            <Icon.FileText className="octo-icon-lg octo-u-text-muted" />
           </div>
           <div className="octo-u-flex-1">
             <span className="octo-ref-embed__loading-text">
@@ -153,7 +153,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
       ) : (
         <div className="octo-ref-embed__empty-state">
           <div className="octo-ref-embed__loading-icon">
-            <FileText className="octo-icon-lg octo-u-text-muted" />
+            <Icon.FileText className="octo-icon-lg octo-u-text-muted" />
           </div>
           <div>
             <span className="octo-ref-embed__loading-text octo-u-mb-1">No entry selected</span>
@@ -182,7 +182,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           {/* Search + filter bar */}
           <div className="octo-ref-embed__search-row">
             <div className="octo-ref-embed__search-wrap">
-              <Search className="octo-icon-md octo-u-text-muted octo-ref-embed__search-icon" />
+              <Icon.Search className="octo-icon-md octo-u-text-muted octo-ref-embed__search-icon" />
               <input
                 type="text"
                 value={searchQuery}
@@ -235,7 +235,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                         borderBottom: '1px solid var(--border)',
                       }}
                     >
-                      <FileText className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
+                      <Icon.FileText className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
                       <div className="octo-ref-embed__entry-info">
                         <div className="octo-ref-embed__entry-title">{entry.title}</div>
                         <div className="octo-ref-embed__entry-meta">{getCollectionLabel(entry.type)}</div>

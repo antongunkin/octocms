@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ExternalLink } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { useEntryCommits } from '../../admin/query/hooks/useEntryCommits';
 import { queryKeys } from '../../admin/query/keys';
@@ -98,7 +98,7 @@ const HistorySection = ({ entryPath, flat }: HistorySectionProps) => {
       {showSeeAll && (
         <a href={seeAllUrl} target="_blank" rel="noreferrer" className="octo-history__see-all">
           See all commits
-          <ExternalLink className="octo-icon-xs" />
+          <Icon.ExternalLink className="octo-icon-xs" />
         </a>
       )}
     </>

@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { Plus, Trash2 } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import type { SchemaOptionField } from '../../schema/types';
 import type { SelectOption } from '../../types';
@@ -345,7 +345,7 @@ function SelectOptionsEditor({
                 disabled={disabled}
                 aria-label="Remove option"
               >
-                <Trash2 className="octo-icon-sm" />
+                <Icon.Trash2 className="octo-icon-sm" />
               </Button>
             </div>
           ))
@@ -358,7 +358,7 @@ function SelectOptionsEditor({
         disabled={disabled}
         className="octo-button octo-button--icon-xs"
       >
-        <Plus className="octo-icon-xs" /> Add option
+        <Icon.Plus className="octo-icon-xs" /> Add option
       </Button>
       {valueDuplicates.size > 0 ? <p className="octo-dialog-field__error-xs">Option values must be unique.</p> : null}
     </div>

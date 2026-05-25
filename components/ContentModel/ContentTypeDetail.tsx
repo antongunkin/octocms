@@ -3,18 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { keepPreviousData } from '@tanstack/react-query';
 import Link from 'next/link';
-import {
-  ArrowLeft,
-  ChevronRight,
-  FileText,
-  GripVertical,
-  Layers,
-  MoreHorizontal,
-  Pencil,
-  Plus,
-  Star,
-  Trash2,
-} from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
@@ -89,7 +78,7 @@ export default function ContentTypeDetail({ type }: Props) {
         <div className="octo-page-chrome">
           <Button asChild variant="ghost" size="icon" className="octo-btn-back">
             <Link href="/cms/model" aria-label="Back to Content Model">
-              <ArrowLeft className="octo-icon-md" />
+              <Icon.ArrowLeft className="octo-icon-md" />
             </Link>
           </Button>
         </div>
@@ -190,7 +179,7 @@ export default function ContentTypeDetail({ type }: Props) {
           <div className="octo-content-type-detail__header-row">
             <Button asChild variant="ghost" size="icon" className="octo-btn-back">
               <Link href="/cms/model" aria-label="Back to Content Model">
-                <ArrowLeft className="octo-icon-md" />
+                <Icon.ArrowLeft className="octo-icon-md" />
               </Link>
             </Button>
             <div className="octo-content-type-detail__title-col">
@@ -198,14 +187,14 @@ export default function ContentTypeDetail({ type }: Props) {
                 <Link href="/cms/model" className="octo-u-text-2">
                   Model
                 </Link>
-                <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
+                <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
                 <span className="octo-content-type-detail__type-badge">{type}</span>
               </div>
               <div className="octo-page-chrome__title-row">
                 {collection.hasMany ? (
-                  <Layers className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
+                  <Icon.Layers className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
                 ) : (
-                  <FileText className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
+                  <Icon.FileText className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
                 )}
                 <h1 className="octo-page-chrome__title">{collection.label}</h1>
               </div>
@@ -215,7 +204,7 @@ export default function ContentTypeDetail({ type }: Props) {
         <div className="octo-page-chrome__right">
           <div className="octo-hdr-right">
             <Button className="octo-button octo-button--action" onClick={() => setAddFieldOpen(true)}>
-              <Plus className="octo-icon-md" />
+              <Icon.Plus className="octo-icon-md" />
               Add field
             </Button>
             <DropdownMenu>
@@ -226,12 +215,12 @@ export default function ContentTypeDetail({ type }: Props) {
                   aria-label="More actions"
                   className="octo-button octo-button--icon-sm"
                 >
-                  <MoreHorizontal className="octo-icon-md" />
+                  <Icon.MoreHorizontal className="octo-icon-md" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onSelect={() => setEditOpen(true)}>
-                  <Pencil className="octo-icon-sm" />
+                  <Icon.Pencil className="octo-icon-sm" />
                   Edit content type
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -239,7 +228,7 @@ export default function ContentTypeDetail({ type }: Props) {
                   onSelect={() => setDeleteOpen(true)}
                   className="octo-menu-item octo-menu-item--danger"
                 >
-                  <Trash2 className="octo-icon-sm" />
+                  <Icon.Trash2 className="octo-icon-sm" />
                   Delete content type
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -352,7 +341,7 @@ export default function ContentTypeDetail({ type }: Props) {
                             }}
                           >
                             <TableCell className="octo-table-cell octo-table-cell--drag" aria-label="Drag to reorder">
-                              <GripVertical className="octo-icon-sm" />
+                              <Icon.GripVertical className="octo-icon-sm" />
                             </TableCell>
                             <TableCell>
                               <button
@@ -394,7 +383,7 @@ export default function ContentTypeDetail({ type }: Props) {
                                 aria-pressed={field.entryTitle === true}
                                 aria-label={field.entryTitle ? 'Current entry title' : 'Set as entry title'}
                               >
-                                <Star
+                                <Icon.Star
                                   className={cn(
                                     'octo-icon-sm',
                                     field.entryTitle && 'octo-field-table__star octo-field-table__star--filled',
@@ -411,12 +400,12 @@ export default function ContentTypeDetail({ type }: Props) {
                                     className="octo-button octo-button--icon-sm octo-btn-row-action"
                                     aria-label={`Actions for ${field.label}`}
                                   >
-                                    <MoreHorizontal className="octo-icon-md" />
+                                    <Icon.MoreHorizontal className="octo-icon-md" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onSelect={() => setEditFieldKey(key)}>
-                                    <Pencil className="octo-icon-sm" />
+                                    <Icon.Pencil className="octo-icon-sm" />
                                     Edit field
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
@@ -424,7 +413,7 @@ export default function ContentTypeDetail({ type }: Props) {
                                     onSelect={() => setDeleteFieldKey(key)}
                                     className="octo-menu-item octo-menu-item--danger"
                                   >
-                                    <Trash2 className="octo-icon-sm" />
+                                    <Icon.Trash2 className="octo-icon-sm" />
                                     Delete field
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>

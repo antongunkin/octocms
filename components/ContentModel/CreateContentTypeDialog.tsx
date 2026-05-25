@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileText, Layers } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import { toast } from '../../hooks/useToast';
@@ -167,7 +167,7 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
                 active={hasMany}
                 disabled={busy}
                 onClick={() => setHasMany(true)}
-                icon={<Layers className="octo-icon-md" />}
+                icon={<Icon.Layers className="octo-icon-md" />}
                 title="Many entries"
                 description="A collection of entries (e.g. blog posts, products)."
               />
@@ -175,7 +175,7 @@ export default function CreateContentTypeDialog({ open, onOpenChange, schema }: 
                 active={!hasMany}
                 disabled={busy}
                 onClick={() => setHasMany(false)}
-                icon={<FileText className="octo-icon-md" />}
+                icon={<Icon.FileText className="octo-icon-md" />}
                 title="Singleton"
                 description="A single entry (e.g. home page, site settings)."
               />

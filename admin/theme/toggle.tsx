@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Moon, Sun } from '../../components/ui/icons';
+import { Icon } from '../../components/ui/icons';
 
 import { DropdownMenuItem, DropdownMenuSeparator } from '../../components/ui';
 import type { Theme } from './types';
@@ -31,7 +31,7 @@ export function ThemeToggle({ initialTheme }: { initialTheme: Theme }) {
     <>
       <DropdownMenuSeparator />
       <DropdownMenuItem className="octo-theme-toggle__item" onSelect={toggle}>
-        {isLight ? <Moon className="octo-theme-toggle__icon" /> : <Sun className="octo-theme-toggle__icon" />}
+        {isLight ? <Icon.Moon className="octo-theme-toggle__icon" /> : <Icon.Sun className="octo-theme-toggle__icon" />}
         {isLight ? 'Dark mode' : 'Light mode'}
       </DropdownMenuItem>
     </>

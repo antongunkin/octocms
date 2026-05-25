@@ -6,7 +6,7 @@
 import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { Bot, FileText, GitBranch, Plus, Search } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { getEntryList } from '../../admin/actions/entries';
 import { getFile } from '../../admin/actions/files';
@@ -48,8 +48,8 @@ type Action = {
 };
 
 const ACTIONS: Action[] = [
-  { id: 'new-entry', label: 'New entry', icon: <Plus size={14} />, href: '/cms/content', kbd: ['⌘', 'N'] },
-  { id: 'agent', label: 'Ask the agent', icon: <Bot size={14} />, href: '/cms/chat', kbd: ['⌘', 'J'] },
+  { id: 'new-entry', label: 'New entry', icon: <Icon.Plus size={14} />, href: '/cms/content', kbd: ['⌘', 'N'] },
+  { id: 'agent', label: 'Ask the agent', icon: <Icon.Bot size={14} />, href: '/cms/chat', kbd: ['⌘', 'J'] },
 ];
 
 type Row =
@@ -193,7 +193,7 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
     >
       <div className="octo-cmdk__panel" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
         <div className="octo-cmdk__input-row">
-          <Search size={18} className="octo-cmdk__input-icon" />
+          <Icon.Search size={18} className="octo-cmdk__input-icon" />
           <input
             ref={inputRef}
             value={query}
@@ -215,7 +215,7 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
                 return (
                   <RowItem
                     key={`e-${r.id}`}
-                    icon={<FileText size={14} />}
+                    icon={<Icon.FileText size={14} />}
                     title={r.title}
                     sub={adminHref}
                     badge={r.typeLabel}
@@ -240,7 +240,7 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
                 return (
                   <RowItem
                     key={`b-${b.branch}`}
-                    icon={<GitBranch size={14} />}
+                    icon={<Icon.GitBranch size={14} />}
                     title={b.branch}
                     sub={b.isPublished ? 'Published · live' : b.prUrl ? 'Open PR' : 'Branch'}
                     mono

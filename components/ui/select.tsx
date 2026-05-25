@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import { cn } from '../../lib/utils';
-import { Check, ChevronDown, ChevronUp } from './icons';
+import { Icon } from './icons';
 import { useComposedRefs } from '../../hooks/useComposedRefs';
 import { useControllableState } from '../../hooks/useControllableState';
 import { usePopoverContent } from '../../hooks/usePopoverContent';
@@ -135,7 +135,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         {...props}
       >
         {children}
-        <ChevronDown className="octo-select__chevron" />
+        <Icon.ChevronDown className="octo-select__chevron" />
       </button>
     );
   },
@@ -289,7 +289,7 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
         tabIndex={-1}
         {...props}
       >
-        <span className="octo-select__item-indicator">{isSelected && <Check />}</span>
+        <span className="octo-select__item-indicator">{isSelected && <Icon.Check />}</span>
         {children}
       </div>
     );
@@ -323,7 +323,7 @@ SelectSeparator.displayName = 'SelectSeparator';
 const SelectScrollUpButton = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('octo-select__scroll-btn', className)} aria-hidden {...props}>
-      <ChevronUp />
+      <Icon.ChevronUp />
     </div>
   ),
 );
@@ -332,7 +332,7 @@ SelectScrollUpButton.displayName = 'SelectScrollUpButton';
 const SelectScrollDownButton = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('octo-select__scroll-btn', className)} aria-hidden {...props}>
-      <ChevronDown />
+      <Icon.ChevronDown />
     </div>
   ),
 );

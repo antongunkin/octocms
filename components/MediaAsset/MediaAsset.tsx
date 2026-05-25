@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, ChevronRight, ExternalLink, ImageIcon, Trash2 } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -103,7 +103,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
         <div className="octo-page-chrome">
           <div className="octo-u-row octo-u-gap-2">
             <Button variant="ghost" size="icon" className="octo-btn-back" onClick={back} aria-label="Back to media">
-              <ArrowLeft className="octo-icon-md" />
+              <Icon.ArrowLeft className="octo-icon-md" />
             </Button>
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
   if (!file) {
     return (
       <div className="octo-media-asset__not-found">
-        <ImageIcon className="octo-icon-2xl" />
+        <Icon.Image className="octo-icon-2xl" />
         <p className="octo-u-text-base">Asset not found.</p>
         <Button variant="outline" onClick={back}>
           Back to media
@@ -138,14 +138,14 @@ export default function MediaAsset({ id }: MediaAssetProps) {
         <div className="octo-page-chrome__title-area">
           <div className="octo-u-row octo-u-gap-2">
             <Button variant="ghost" size="icon" className="octo-btn-back" onClick={back} aria-label="Back to media">
-              <ArrowLeft className="octo-icon-md" />
+              <Icon.ArrowLeft className="octo-icon-md" />
             </Button>
             <div>
               <div className="octo-page-chrome__breadcrumb">
                 <button type="button" onClick={back} className="octo-btn-breadcrumb">
                   Media
                 </button>
-                <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
+                <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
                 <span className="octo-u-text-2">{folderLabel}</span>
               </div>
               <div className="octo-page-chrome__title-row">
@@ -156,7 +156,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
         </div>
         <div className="octo-page-chrome__right octo-u-row octo-u-gap-2">
           <Button variant="outline" className="octo-u-gap-1-5" onClick={openInNewTab}>
-            <ExternalLink className="octo-icon-md" />
+            <Icon.ExternalLink className="octo-icon-md" />
             Open in new tab
           </Button>
           <Button
@@ -165,7 +165,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
             onClick={() => setConfirmDelete(true)}
             disabled={isPending}
           >
-            <Trash2 className="octo-icon-md" />
+            <Icon.Trash2 className="octo-icon-md" />
             Delete
           </Button>
         </div>

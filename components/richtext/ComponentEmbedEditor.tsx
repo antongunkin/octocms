@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { Puzzle } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
@@ -48,7 +48,7 @@ const ComponentEmbedEditor: React.FC<
         style={{ background: '#78350f', color: '#fef3c7' }}
         contentEditable={false}
       >
-        <Puzzle className="octo-icon-xs octo-u-shrink-0" />
+        <Icon.Puzzle className="octo-icon-xs octo-u-shrink-0" />
         <span>{componentDef.label}</span>
         {componentDef.props.map((prop) => {
           const value = getAttrValue(prop.name);
@@ -68,7 +68,7 @@ const ComponentEmbedEditor: React.FC<
     <div className="octo-embed-editor" contentEditable={false}>
       <div className="octo-embed-editor__header">
         <div className="octo-embed-editor__icon octo-embed-editor__icon--component">
-          <Puzzle style={{ width: 16, height: 16, color: '#fcd34d' }} />
+          <Icon.Puzzle style={{ width: 16, height: 16, color: '#fcd34d' }} />
         </div>
         <div className="octo-embed-editor__title-wrap">
           <span className="octo-embed-editor__subtitle">Component</span>

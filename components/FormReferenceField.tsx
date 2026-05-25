@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { GripVertical, Pencil, Plus, Search, Trash2 } from './ui/icons';
+import { Icon } from './ui/icons';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { getEntryList } from '../admin/actions/entries';
@@ -66,16 +66,16 @@ const DraggableItem = ({
       onDrop={() => onDrop(index)}
       className="octo-ff-reference__item"
     >
-      <GripVertical className="octo-ff-reference__item-grip" />
+      <Icon.GripVertical className="octo-ff-reference__item-grip" />
       <button type="button" onClick={() => onEdit?.(item)} className="octo-ff-reference__item-body">
         <div className="octo-ff-reference__item-title">{item.title}</div>
         <div className="octo-ff-reference__item-type">{collectionLabel}</div>
       </button>
       <button type="button" onClick={() => onEdit?.(item)} className="octo-ff-reference__item-edit" title="Edit inline">
-        <Pencil className="octo-icon-sm" />
+        <Icon.Pencil className="octo-icon-sm" />
       </button>
       <button type="button" onClick={() => onRemove(index)} className="octo-ff-reference__item-remove">
-        <Trash2 className="octo-icon-sm" />
+        <Icon.Trash2 className="octo-icon-sm" />
       </button>
     </div>
   );
@@ -179,7 +179,7 @@ const AddExistingModal = ({
 
         <div className="octo-ff-reference__filter-row">
           <div className="octo-ff-reference__modal-search">
-            <Search className="octo-ff-reference__modal-search-icon" />
+            <Icon.Search className="octo-ff-reference__modal-search-icon" />
             <input
               ref={searchRef}
               type="text"
@@ -621,11 +621,11 @@ const FormReferenceField = ({
           {canAdd && (
             <div className="octo-ff-reference__add-row">
               <Button type="button" variant="outline" onClick={() => setIsExistingOpen(true)}>
-                <Plus className="octo-icon-md" />
+                <Icon.Plus className="octo-icon-md" />
                 Add existing
               </Button>
               <Button type="button" variant="outline" onClick={() => setIsCreateOpen(true)}>
-                <Plus className="octo-icon-md" />
+                <Icon.Plus className="octo-icon-md" />
                 Create new
               </Button>
             </div>

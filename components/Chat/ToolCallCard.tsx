@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronRight, Wrench, AlertCircle, CheckCircle2 } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { cn } from '../../lib/utils';
 
@@ -21,18 +21,20 @@ export function ToolCallCard({ call }: Props) {
   return (
     <div className={cn('octo-tool-call-card', status === 'error' && 'octo-tool-call-card octo-tool-call-card--error')}>
       <button type="button" onClick={() => setExpanded((v) => !v)} className="octo-tool-call-card__toggle">
-        <ChevronRight
+        <Icon.ChevronRight
           className={cn(
             'octo-tool-call-card__chevron octo-icon-xs',
             expanded && 'octo-tool-call-card__chevron octo-tool-call-card__chevron--open',
           )}
         />
-        <Wrench className="octo-tool-call-card__icon octo-icon-xs" />
+        <Icon.Wrench className="octo-tool-call-card__icon octo-icon-xs" />
         <span className="octo-tool-call-card__name">{call.name}</span>
         <span className="octo-tool-call-card__preview">{inputPreview}</span>
         {status === 'pending' && <span className="octo-tool-call-card__status">…</span>}
-        {status === 'ok' && <CheckCircle2 className="octo-icon-xs octo-tool-call-card__status octo-u-text-ok" />}
-        {status === 'error' && <AlertCircle className="octo-icon-xs octo-tool-call-card__status octo-u-text-danger" />}
+        {status === 'ok' && <Icon.CheckCircle2 className="octo-icon-xs octo-tool-call-card__status octo-u-text-ok" />}
+        {status === 'error' && (
+          <Icon.AlertCircle className="octo-icon-xs octo-tool-call-card__status octo-u-text-danger" />
+        )}
       </button>
       {expanded && (
         <div className="octo-tool-call-card__body">

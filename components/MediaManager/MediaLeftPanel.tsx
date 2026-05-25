@@ -1,6 +1,6 @@
 'use client';
 
-import { FolderOpen, ImageIcon, Plus, X } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import React from 'react';
 
 import { LeftNavItem } from '../Layout/LeftNavItem';
@@ -35,7 +35,7 @@ export function MediaLeftPanel({
     <aside className="octo-media-left-panel">
       <nav className="octo-media-left-panel__all-nav octo-left-panel__nav">
         <LeftNavItem
-          icon={<ImageIcon className="octo-icon-md" />}
+          icon={<Icon.Image className="octo-icon-md" />}
           label="All files"
           count={totalCount}
           active={isAllActive}
@@ -52,7 +52,7 @@ export function MediaLeftPanel({
             onClick={onAddFolder}
             aria-label="Add folder"
           >
-            <Plus className="octo-icon-xs" />
+            <Icon.Plus className="octo-icon-xs" />
           </button>
         </div>
         <nav className="octo-left-panel__nav">
@@ -70,7 +70,7 @@ export function MediaLeftPanel({
                   nest a button inside another button (invalid HTML).
                 */}
                 <LeftNavItem
-                  icon={<FolderOpen className="octo-icon-md" />}
+                  icon={<Icon.FolderOpen className="octo-icon-md" />}
                   label={label}
                   count={canDelete ? undefined : count}
                   active={active}
@@ -92,7 +92,7 @@ export function MediaLeftPanel({
                       aria-label={`Delete folder ${folder}`}
                       className="octo-media-left-panel__folder-del"
                     >
-                      <X className="octo-icon-sm" />
+                      <Icon.X className="octo-icon-sm" />
                     </button>
                   </>
                 )}

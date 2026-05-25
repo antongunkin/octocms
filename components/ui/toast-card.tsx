@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Bell, Check, GitCommit, Info, TriangleAlert, X } from './icons';
+import { Icon } from './icons';
 import { cn } from '../../lib/utils';
 
 export type ToastCardTone = 'default' | 'success' | 'error' | 'warn' | 'info' | 'brand';
@@ -18,12 +18,12 @@ type ToastCardProps = {
 };
 
 const defaultIcon: Record<ToastCardTone, React.ReactNode> = {
-  default: <Bell />,
-  success: <Check />,
-  error: <TriangleAlert />,
-  warn: <TriangleAlert />,
-  info: <Info />,
-  brand: <GitCommit />,
+  default: <Icon.Bell />,
+  success: <Icon.Check />,
+  error: <Icon.TriangleAlert />,
+  warn: <Icon.TriangleAlert />,
+  info: <Icon.Info />,
+  brand: <Icon.GitCommit />,
 };
 
 export function ToastCard({ tone = 'default', icon, title, body, action, time, onDismiss, className }: ToastCardProps) {
@@ -53,7 +53,7 @@ export function ToastCard({ tone = 'default', icon, title, body, action, time, o
         )}
       </div>
       <button type="button" title="Close" onClick={onDismiss} className="octo-toast-card__close">
-        <X />
+        <Icon.X />
       </button>
     </div>
   );

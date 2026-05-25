@@ -18,7 +18,7 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Star, Star as StarFilled } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { previewSchemaChange } from '../../admin/actions';
 import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
@@ -289,7 +289,7 @@ export default function FieldDialog(props: Props) {
                     onClick={() => setStep('format')}
                     className="octo-button octo-button--icon-xs"
                   >
-                    <ArrowLeft className="octo-icon-xs" /> Change type
+                    <Icon.ArrowLeft className="octo-icon-xs" /> Change type
                   </Button>
                 ) : (
                   <ChangeTypeMenu
@@ -658,7 +658,7 @@ function EntryTitleToggle({
 }) {
   // Entry title makes sense only for stringy non-list fields.
   const allowed = (format === 'string' && !list) || format === 'text' || format === 'slug';
-  const Icon = checked ? StarFilled : Star;
+  const StarIcon = Icon.Star;
   return (
     <label
       aria-label="Entry title"
@@ -678,7 +678,7 @@ function EntryTitleToggle({
       />
       <span className="octo-field-toggle__text">
         <span className="octo-field-toggle__label octo-u-row octo-u-gap-1">
-          <Icon
+          <StarIcon
             className={cn(
               'octo-icon-sm',
               checked ? 'octo-field-table__star octo-field-table__star--filled' : 'octo-u-text-muted',

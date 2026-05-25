@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageIcon, ChevronRight, LayoutGrid, List, Search, Upload } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -155,7 +155,7 @@ const MediaManager = () => {
             <span className="octo-u-text-2">Media</span>
             {selectedFolder !== null && (
               <>
-                <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
+                <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
                 <span className="octo-u-text-2">{selectedFolder === '/' ? 'Root' : selectedFolder}</span>
               </>
             )}
@@ -177,7 +177,7 @@ const MediaManager = () => {
             onClick={() => document.getElementById('media-upload-bar-input')?.click()}
             disabled={pendingUpload !== null}
           >
-            <Upload className="octo-icon-md" />
+            <Icon.Upload className="octo-icon-md" />
             Upload
           </Button>
         </div>
@@ -210,7 +210,7 @@ const MediaManager = () => {
           {/* Search bar */}
           <div className="octo-media-manager__search-bar">
             <div className="octo-media-manager__search-wrap">
-              <Search className="octo-media-manager__search-icon octo-icon-md" />
+              <Icon.Search className="octo-media-manager__search-icon octo-icon-md" />
               <input
                 ref={searchRef}
                 value={searchQuery}
@@ -231,7 +231,7 @@ const MediaManager = () => {
               )
             ) : filteredFiles.length === 0 ? (
               <div className="octo-media-manager__empty">
-                <ImageIcon className="octo-icon-2xl" />
+                <Icon.Image className="octo-icon-2xl" />
                 <p className="octo-u-text-base">
                   {searchQuery ? 'No assets match this search' : 'No files in this folder yet'}
                 </p>
@@ -318,7 +318,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         onClick={() => onChange('grid')}
         className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn octo-media-view-btn--active')}
       >
-        <LayoutGrid className="octo-icon-sm" />
+        <Icon.LayoutGrid className="octo-icon-sm" />
       </button>
       <button
         type="button"
@@ -328,7 +328,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         onClick={() => onChange('list')}
         className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn octo-media-view-btn--active')}
       >
-        <List className="octo-icon-sm" />
+        <Icon.List className="octo-icon-sm" />
       </button>
     </div>
   );

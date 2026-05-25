@@ -1,6 +1,6 @@
 'use client';
 
-import { GripVertical, X } from './ui/icons';
+import { Icon } from './ui/icons';
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { cn } from '../lib/utils';
@@ -51,7 +51,7 @@ const ListRow = ({
     className="octo-ff-list__item"
   >
     <span className="octo-ff-list__item-grip" aria-hidden>
-      <GripVertical className="octo-icon-md" />
+      <Icon.GripVertical className="octo-icon-md" />
     </span>
     <span className="octo-ff-list__item-value">{row.value}</span>
     <span className="octo-ff-list__item-sep" aria-hidden />
@@ -61,7 +61,7 @@ const ListRow = ({
       className="octo-ff-list__item-remove"
       aria-label={`Remove ${row.value}`}
     >
-      <X className="octo-icon-md" />
+      <Icon.X className="octo-icon-md" />
     </button>
   </div>
 );

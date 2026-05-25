@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Lock, X } from './icons';
+import { Icon } from './icons';
 import { cn } from '../../lib/utils';
 
 type FieldProps = {
@@ -39,7 +39,7 @@ export function Field({
         {schema && <code className="octo-field__schema">{schema}</code>}
         {locked && (
           <span title="Locked" className="octo-field__lock">
-            <Lock size={12} />
+            <Icon.Lock size={12} />
           </span>
         )}
         {dirty && <span className="octo-field__dirty">~ modified</span>}
@@ -50,7 +50,7 @@ export function Field({
       {children}
       {error && (
         <div className="octo-field__error">
-          <X size={11} />
+          <Icon.X size={11} />
           {error}
         </div>
       )}

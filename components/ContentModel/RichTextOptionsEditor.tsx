@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { Plus, Trash2 } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import type { RichTextComponentDef, RichTextComponentProp, RichTextFieldConfig } from '../../types';
 import { Button } from '../ui/button';
@@ -362,14 +362,14 @@ function ComponentsEditor({
                 onClick={() => removeComponent(name)}
                 disabled={disabled}
               >
-                <Trash2 className="octo-icon-xs" /> Remove component
+                <Icon.Trash2 className="octo-icon-xs" /> Remove component
               </Button>
             </div>
           </div>
         ))
       )}
       <Button type="button" variant="outline" onClick={addComponent} disabled={disabled}>
-        <Plus className="octo-icon-sm" /> Add component
+        <Icon.Plus className="octo-icon-sm" /> Add component
       </Button>
     </div>
   );
@@ -398,7 +398,7 @@ function PropsEditor({
         disabled={disabled}
         className="octo-button octo-button--icon-xs"
       >
-        <Plus className="octo-icon-xs" /> Add prop
+        <Icon.Plus className="octo-icon-xs" /> Add prop
       </Button>
     );
   }
@@ -445,7 +445,7 @@ function PropsEditor({
             disabled={disabled}
             aria-label="Remove prop"
           >
-            <Trash2 className="octo-icon-xs" />
+            <Icon.Trash2 className="octo-icon-xs" />
           </Button>
         </div>
       ))}
@@ -456,7 +456,7 @@ function PropsEditor({
         disabled={disabled}
         className="octo-button octo-button--icon-xs"
       >
-        <Plus className="octo-icon-xs" /> Add prop
+        <Icon.Plus className="octo-icon-xs" /> Add prop
       </Button>
     </div>
   );

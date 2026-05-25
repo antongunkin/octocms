@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageIcon, ImagePlus, Upload, X } from './ui/icons';
+import { Icon } from './ui/icons';
 import React, { useCallback, useRef, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
@@ -117,21 +117,21 @@ const FormImageField = ({
               className="octo-ff-image__clear"
               aria-label="Remove image"
             >
-              <X className="octo-icon-sm" />
+              <Icon.X className="octo-icon-sm" />
             </button>
           </div>
         ) : (
           <div className="octo-ff-image__empty">
-            <ImageIcon className="octo-icon-xl" />
+            <Icon.Image className="octo-icon-xl" />
           </div>
         )}
         <div className="octo-ff-image__actions">
           <Button type="button" variant="outline" onClick={() => uploadInputRef.current?.click()}>
-            <Upload className="octo-icon-md" />
+            <Icon.Upload className="octo-icon-md" />
             Upload new image
           </Button>
           <Button type="button" variant="outline" onClick={() => setShowSelectDialog(true)}>
-            <ImagePlus className="octo-icon-md" />
+            <Icon.ImagePlus className="octo-icon-md" />
             Select existing image
           </Button>
         </div>

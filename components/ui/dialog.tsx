@@ -5,7 +5,7 @@ import * as React from 'react';
 import { useComposedRefs } from '../../hooks/useComposedRefs';
 import { useControllableState } from '../../hooks/useControllableState';
 import { cn } from '../../lib/utils';
-import { X } from './icons';
+import { Icon } from './icons';
 import { Slot } from './Slot';
 
 // ── Context ───────────────────────────────────────────────────────────────────
@@ -152,7 +152,7 @@ const DialogContent = React.forwardRef<HTMLDialogElement, DialogContentProps>(
       >
         {children}
         <button type="button" className="octo-dialog__close" onClick={() => setOpen(false)} aria-label="Close">
-          <X />
+          <Icon.X />
           <span className="octo-sr-only">Close</span>
         </button>
       </dialog>

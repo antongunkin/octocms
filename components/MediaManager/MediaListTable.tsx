@@ -1,6 +1,6 @@
 'use client';
 
-import { Image as ImageIcon } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -80,7 +80,7 @@ export function MediaListTable({ files, onPickFile, selectedId }: MediaListTable
                   </td>
                   <td className="octo-content-row__td octo-content-row__meta octo-u-mono octo-u-text-sm">
                     <span className="octo-u-flex octo-u-gap-1-5">
-                      <ImageIcon className="octo-icon-sm octo-u-shrink-0 octo-u-opacity-60" />
+                      <Icon.Image className="octo-icon-sm octo-u-shrink-0 octo-u-opacity-60" />
                       <span className="octo-u-truncate">{file.originalName}</span>
                     </span>
                   </td>

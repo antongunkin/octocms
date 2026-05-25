@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import { cn } from '../../lib/utils';
-import { Check, ChevronRight } from './icons';
+import { Icon } from './icons';
 import { Slot } from './Slot';
 import { useComposedRefs } from '../../hooks/useComposedRefs';
 import { useControllableState } from '../../hooks/useControllableState';
@@ -256,7 +256,9 @@ const DropdownMenuCheckboxItem = React.forwardRef<HTMLButtonElement, DropdownMen
         tabIndex={-1}
         {...props}
       >
-        <span className="octo-dropdown__indicator">{checked && <Check className="octo-dropdown__check-icon" />}</span>
+        <span className="octo-dropdown__indicator">
+          {checked && <Icon.Check className="octo-dropdown__check-icon" />}
+        </span>
         {children}
       </button>
     );
@@ -388,7 +390,7 @@ const DropdownMenuSubTrigger = React.forwardRef<HTMLButtonElement, DropdownMenuS
       {...props}
     >
       {children}
-      <ChevronRight className="octo-dropdown__sub-chevron" />
+      <Icon.ChevronRight className="octo-dropdown__sub-chevron" />
     </button>
   ),
 );

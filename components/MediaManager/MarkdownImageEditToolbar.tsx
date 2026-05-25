@@ -18,7 +18,7 @@ import { openEditImageDialog$, parseImageDimension } from '@mdxeditor/editor';
 import { usePublisher } from '@mdxeditor/gurx';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNodeByKey } from 'lexical';
-import { Pencil, Trash2 } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import React, { useState } from 'react';
 
 import { Button } from '../ui/button';
@@ -66,7 +66,7 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
         }}
         className="octo-markdown-img-toolbar__btn octo-markdown-img-toolbar__btn--delete"
       >
-        <Trash2 className="octo-icon-sm" />
+        <Icon.Trash2 className="octo-icon-sm" />
       </button>
       <button
         type="button"
@@ -86,7 +86,7 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
         }}
         className="octo-markdown-img-toolbar__btn octo-markdown-img-toolbar__btn--edit"
       >
-        <Pencil className="octo-icon-sm" />
+        <Icon.Pencil className="octo-icon-sm" />
       </button>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>

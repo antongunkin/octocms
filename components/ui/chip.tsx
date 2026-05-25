@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { X } from './icons';
+import { Icon } from './icons';
 import { cn } from '../../lib/utils';
 import type { EntryStatus } from '../../types';
 
@@ -19,7 +19,7 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
       {children}
       {removable && (
         <button type="button" onClick={onRemove} aria-label="Remove" className="octo-chip__remove">
-          <X size={11} />
+          <Icon.X size={11} />
         </button>
       )}
     </span>

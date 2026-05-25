@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import { cn } from '../../lib/utils';
-import { X } from './icons';
+import { Icon } from './icons';
 import { Portal } from './Portal';
 
 // ── ToastProvider ─────────────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ const ToastClose = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttribute
       aria-label="Dismiss notification"
       {...props}
     >
-      <X />
+      <Icon.X />
     </button>
   ),
 );

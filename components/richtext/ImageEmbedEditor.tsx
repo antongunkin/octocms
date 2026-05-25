@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ImageIcon, Upload, X } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
@@ -114,7 +114,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               className="octo-image-embed__thumb"
             />
             <button type="button" onClick={() => updateMediaId('')} className="octo-image-embed__clear">
-              <X className="octo-icon-sm" />
+              <Icon.X className="octo-icon-sm" />
             </button>
           </div>
           <div className="octo-image-embed__info">
@@ -128,7 +128,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
       ) : (
         <div className="octo-image-embed__empty-state">
           <div className="octo-image-embed__placeholder">
-            <ImageIcon className="octo-image-embed__placeholder-icon octo-icon-24" />
+            <Icon.Image className="octo-image-embed__placeholder-icon octo-icon-24" />
           </div>
           <div>
             <span className="octo-image-embed__no-label">No image selected</span>
@@ -172,7 +172,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                   onClick={() => uploadInputRef.current?.click()}
                   disabled={isPending}
                 >
-                  <Upload className="octo-icon-md" />
+                  <Icon.Upload className="octo-icon-md" />
                   Choose file to upload
                 </Button>
               </div>

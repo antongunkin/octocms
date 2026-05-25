@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertTriangle, FileText, Layers } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { previewSchemaChange } from '../../admin/actions';
 import type { PreviewSchemaResult } from '../../admin/actions/schema';
@@ -191,7 +191,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
             </p>
             {keyChanged && entryCount > 0 && !keyError && !duplicateKey ? (
               <div className="octo-inline-warn">
-                <AlertTriangle className="octo-inline-warn__icon" />
+                <Icon.AlertTriangle className="octo-inline-warn__icon" />
                 <span>
                   {entryCount} {entryCount === 1 ? 'entry' : 'entries'} will be renamed from{' '}
                   <code className="octo-u-mono">cms/content/{type}/</code> to{' '}
@@ -208,7 +208,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
                 active={hasMany}
                 disabled={busy || cardinalityLocked}
                 onClick={() => setHasMany(true)}
-                icon={<Layers className="octo-icon-md" />}
+                icon={<Icon.Layers className="octo-icon-md" />}
                 title="Many entries"
                 description="Multiple entries in this collection."
               />
@@ -216,7 +216,7 @@ export default function EditContentTypeDialog({ open, onOpenChange, schema, type
                 active={!hasMany}
                 disabled={busy || cardinalityLocked}
                 onClick={() => setHasMany(false)}
-                icon={<FileText className="octo-icon-md" />}
+                icon={<Icon.FileText className="octo-icon-md" />}
                 title="Singleton"
                 description="A single entry."
               />

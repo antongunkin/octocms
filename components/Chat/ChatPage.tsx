@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Bot, CheckCheck, RefreshCw, StopCircle } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { Button } from '../ui/button';
 import { ErrorBoundary } from '../ErrorBoundary';
@@ -71,7 +71,7 @@ export default function ChatPage({ initialMeta, attachmentLimits }: Props) {
       {/* Top bar */}
       <div className="octo-chat__topbar">
         <div className="octo-chat__topbar-left">
-          <Bot className="octo-icon-md" />
+          <Icon.Bot className="octo-icon-md" />
           <span className="octo-chat__topbar-title">Chat</span>
           <span className="octo-chat__topbar-meta">
             · {PROVIDER_LABEL[provider]} · <span className="octo-chat__topbar-model">{model}</span>
@@ -92,12 +92,12 @@ export default function ChatPage({ initialMeta, attachmentLimits }: Props) {
               aria-label="Stop generating"
               title="Stop the assistant — keeps whatever it has streamed so far"
             >
-              <StopCircle className="octo-icon-sm" />
+              <Icon.StopCircle className="octo-icon-sm" />
               Stop
             </Button>
           ) : (
             <Button variant="outline" onClick={reset} disabled={entries.length === 0} className="octo-u-gap-1-5">
-              <RefreshCw className="octo-icon-sm" />
+              <Icon.RefreshCw className="octo-icon-sm" />
               New conversation
             </Button>
           )}
@@ -109,7 +109,7 @@ export default function ChatPage({ initialMeta, attachmentLimits }: Props) {
         <div className="octo-chat__transcript">
           {entries.length === 0 && (
             <div className="octo-chat__empty">
-              <Bot className="octo-chat__empty-icon octo-icon-xl" />
+              <Icon.Bot className="octo-chat__empty-icon octo-icon-xl" />
               <div className="octo-chat__empty-title">Ask your CMS anything.</div>
               <div className="octo-chat__empty-hint">
                 Try: <em>"show me posts about caching"</em> or <em>"fix the typo 'recieve' in any post"</em>.
@@ -136,7 +136,7 @@ export default function ChatPage({ initialMeta, attachmentLimits }: Props) {
                 onClick={() => latestAssistantId && acceptAllPending(latestAssistantId)}
                 className="octo-u-gap-1-5"
               >
-                <CheckCheck className="octo-icon-sm" />
+                <Icon.CheckCheck className="octo-icon-sm" />
                 Accept all pending
               </Button>
             </div>

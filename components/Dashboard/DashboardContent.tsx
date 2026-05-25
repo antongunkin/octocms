@@ -3,18 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { keepPreviousData } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  GitBranch,
-  GitPullRequest,
-  Image as ImageIcon,
-  LayoutList,
-  Plus,
-  Search,
-} from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import { useBranch } from '../../admin/query/hooks/useBranch';
@@ -174,15 +163,15 @@ function AddEntryButton({ collections }: { collections: string[] }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="default" disabled={creating}>
-          <Plus className="octo-icon-md" />
+          <Icon.Plus className="octo-icon-md" />
           Add content
-          <ChevronDown className="octo-icon-xs octo-u-opacity-70" />
+          <Icon.ChevronDown className="octo-icon-xs octo-u-opacity-70" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {collections.map((c) => (
           <DropdownMenuItem key={c} onSelect={() => handleCreate(c)}>
-            <FileText className="octo-icon-md octo-u-text-muted" />
+            <Icon.FileText className="octo-icon-md octo-u-text-muted" />
             {config.collections[c as keyof typeof config.collections]?.label ?? c}
           </DropdownMenuItem>
         ))}
@@ -223,21 +212,21 @@ function LeftPanel({
           <nav className="octo-left-panel__nav">
             <LeftNavItem
               href="/cms"
-              icon={<LayoutList className="octo-icon-md" />}
+              icon={<Icon.LayoutList className="octo-icon-md" />}
               label="All content"
               count={entries.length}
               active={!isBranched && !isRecent && !selectedType}
             />
             <LeftNavItem
               href="/cms?tab=branched"
-              icon={<GitBranch className="octo-icon-md" />}
+              icon={<Icon.GitBranch className="octo-icon-md" />}
               label="Branched content"
               count={branchedCount}
               active={isBranched}
             />
             <LeftNavItem
               href="/cms?tab=recent"
-              icon={<GitPullRequest className="octo-icon-md" />}
+              icon={<Icon.GitPullRequest className="octo-icon-md" />}
               label="Recent PRs"
               count={recentPRsCount}
               active={isRecent}
@@ -254,7 +243,7 @@ function LeftPanel({
                   <LeftNavItem
                     key={c}
                     href={`/cms/content/${c}`}
-                    icon={<FileText className="octo-icon-md" />}
+                    icon={<Icon.FileText className="octo-icon-md" />}
                     label={label}
                     count={countByType[c] ?? 0}
                     active={selectedType === c}
@@ -357,7 +346,7 @@ function ContentTable({
         <div className="octo-content-table-inner">
           <div className="octo-content-filters">
             <div className="octo-content-search">
-              <Search className="octo-content-search__icon octo-icon-md" />
+              <Icon.Search className="octo-content-search__icon octo-icon-md" />
               <input
                 ref={searchRef}
                 value={search}
@@ -449,12 +438,12 @@ function ContentTable({
               </span>
               <div className="octo-content-card__footer-pages">
                 <Button variant="outline" onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
-                  <ChevronLeft className="octo-icon-sm" />
+                  <Icon.ChevronLeft className="octo-icon-sm" />
                   Prev
                 </Button>
                 <Button variant="outline" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages - 1}>
                   Next
-                  <ChevronRight className="octo-icon-sm" />
+                  <Icon.ChevronRight className="octo-icon-sm" />
                 </Button>
               </div>
             </div>
@@ -485,7 +474,7 @@ function BranchedView({
       <div className="octo-branched-empty">
         <div className="octo-branched-empty__inner">
           <div className="octo-branched-empty__icon">
-            <GitBranch className="octo-icon-lg" />
+            <Icon.GitBranch className="octo-icon-lg" />
           </div>
           <p className="octo-branched-empty__title">No active branch</p>
           <p className="octo-branched-empty__text">
@@ -501,7 +490,7 @@ function BranchedView({
       <div className="octo-branched-empty">
         <div className="octo-branched-empty__inner">
           <div className="octo-branched-empty__icon">
-            <GitBranch className="octo-icon-lg" />
+            <Icon.GitBranch className="octo-icon-lg" />
           </div>
           <p className="octo-branched-empty__title">No changes on this branch yet</p>
           <p className="octo-branched-empty__text">Edits you make will appear here.</p>
@@ -552,7 +541,7 @@ function EntryRow({
             {entry.thumbnailUrl ? (
               <img src={entry.thumbnailUrl} alt="" loading="lazy" />
             ) : (
-              <ImageIcon className="octo-icon-sm octo-u-opacity-60" />
+              <Icon.Image className="octo-icon-sm octo-u-opacity-60" />
             )}
           </span>
           <span className="octo-content-row__title">{entry.title}</span>
@@ -567,7 +556,7 @@ function EntryRow({
           style={{ color: `var(--st-${entry.status})` }}
           title={entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
         >
-          <GitBranch className="octo-icon-sm octo-u-shrink-0" />
+          <Icon.GitBranch className="octo-icon-sm octo-u-shrink-0" />
           <span className="octo-content-row__branch-label">{branchLabel}</span>
         </span>
       </td>

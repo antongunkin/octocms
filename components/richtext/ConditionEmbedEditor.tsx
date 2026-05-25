@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { GitBranch, Plus, Trash2 } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
@@ -142,7 +142,7 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
       {/* Header */}
       <div className="octo-embed-editor__header">
         <div className="octo-embed-editor__icon octo-embed-editor__icon--condition">
-          <GitBranch style={{ width: 16, height: 16, color: '#5eead4' }} />
+          <Icon.GitBranch style={{ width: 16, height: 16, color: '#5eead4' }} />
         </div>
         <div className="octo-embed-editor__title-wrap">
           <span className="octo-embed-editor__subtitle">Condition embed</span>
@@ -190,7 +190,7 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           </button>
         ))}
         <button type="button" onClick={addBranch} className="octo-embed-editor__tab-add" title="Add branch">
-          <Plus className="octo-icon-sm" />
+          <Icon.Plus className="octo-icon-sm" />
         </button>
       </div>
 
@@ -217,7 +217,7 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                 style={{ height: 24, width: 24, padding: 0, color: 'var(--muted)' }}
                 title="Remove this branch"
               >
-                <Trash2 className="octo-icon-sm" />
+                <Icon.Trash2 className="octo-icon-sm" />
               </Button>
             )}
           </div>

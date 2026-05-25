@@ -9,7 +9,7 @@ import { useIsFetching, useIsMutating, useQueryClient } from '@tanstack/react-qu
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
-import { ExternalLink, Loader2, Plus, RefreshCw, Search, X } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 import { useAgentStatus } from '../../admin/query/hooks/useAgentStatus';
@@ -157,9 +157,9 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       >
         <span className="octo-top-header__logo-name">{projectName}</span>
         {isHeaderLoading ? (
-          <Loader2 size={12} className="octo-top-header__logo-spinner" aria-hidden />
+          <Icon.Loader2 size={12} className="octo-top-header__logo-spinner" aria-hidden />
         ) : (
-          <ExternalLink size={12} className="octo-top-header__logo-icon" aria-hidden />
+          <Icon.ExternalLink size={12} className="octo-top-header__logo-icon" aria-hidden />
         )}
       </a>
 
@@ -194,7 +194,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       {/* Search trigger — opens CommandK */}
       <button type="button" onClick={onCommandK} className="octo-top-header__search">
         <span className="octo-top-header__search-inner">
-          <Search size={13} className="octo-u-shrink-0" />
+          <Icon.Search size={13} className="octo-u-shrink-0" />
           <span className="octo-top-header__search-text">Search…</span>
         </span>
         <span className="octo-top-header__search-kbd">
@@ -220,7 +220,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
                 setCreateBranchOpen(true);
               }}
             >
-              <Plus className="octo-icon-md" />
+              <Icon.Plus className="octo-icon-md" />
               Create new branch
             </DropdownMenuItem>
 
@@ -228,7 +228,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
 
             {branchListLoading && (
               <div className="octo-top-header__branch-loading">
-                <RefreshCw className="octo-top-header__branch-spinner" />
+                <Icon.RefreshCw className="octo-top-header__branch-spinner" />
                 Loading…
               </div>
             )}
@@ -264,7 +264,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
                       onClick={(e) => e.stopPropagation()}
                       title="Open PR on GitHub"
                     >
-                      <ExternalLink className="octo-icon-xs" />
+                      <Icon.ExternalLink className="octo-icon-xs" />
                     </a>
                   )}
                 </div>
@@ -272,7 +272,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
 
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={handleClearBranch}>
-              <X className="octo-icon-md" />
+              <Icon.X className="octo-icon-md" />
               Back to main
             </DropdownMenuItem>
           </DropdownMenuContent>

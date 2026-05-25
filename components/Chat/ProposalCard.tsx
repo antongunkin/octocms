@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertCircle, Check, CheckCircle2, FilePen, FilePlus, Loader2, X } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { useEntry } from '../../admin/query/hooks/useEntry';
 import { useConfig } from '../../hooks/useConfig';
@@ -37,9 +37,9 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
     >
       <div className="octo-proposal-card__header">
         {isEdit ? (
-          <FilePen className="octo-icon-sm octo-proposal-card__header-icon" />
+          <Icon.FilePen className="octo-icon-sm octo-proposal-card__header-icon" />
         ) : (
-          <FilePlus className="octo-icon-sm octo-proposal-card__header-icon" />
+          <Icon.FilePlus className="octo-icon-sm octo-proposal-card__header-icon" />
         )}
         <span className="octo-proposal-card__kind">{isEdit ? 'Proposed edit' : 'Proposed new entry'}</span>
         <span className="octo-proposal-card__summary">{proposal.summary}</span>
@@ -70,7 +70,7 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
       {isPending && !showRejectInput && (
         <div className="octo-proposal-card__actions">
           <Button onClick={() => onAccept(proposal.id)} disabled={isBusy} className="octo-u-gap-1-5">
-            <Check className="octo-icon-sm" />
+            <Icon.Check className="octo-icon-sm" />
             Accept
           </Button>
           <Button
@@ -79,7 +79,7 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
             disabled={isBusy}
             className="octo-u-gap-1-5"
           >
-            <X className="octo-icon-sm" />
+            <Icon.X className="octo-icon-sm" />
             Reject
           </Button>
         </div>
@@ -117,7 +117,7 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
 
       {isBusy && (
         <div className="octo-proposal-card__busy">
-          <Loader2 className="octo-icon-sm octo-u-animate-spin" />
+          <Icon.Loader2 className="octo-icon-sm octo-u-animate-spin" />
           {status.kind === 'accepting' ? 'Saving entry...' : 'Rejecting...'}
         </div>
       )}
@@ -131,11 +131,11 @@ function StatusBadge({ status }: { status: ProposalUiState['status'] }) {
       return <span className="octo-proposal-card__status">Awaiting approval</span>;
     case 'accepting':
     case 'rejecting':
-      return <Loader2 className="octo-icon-sm octo-u-animate-spin octo-proposal-card__status" />;
+      return <Icon.Loader2 className="octo-icon-sm octo-u-animate-spin octo-proposal-card__status" />;
     case 'accepted':
       return (
         <span className="octo-proposal-card__status octo-proposal-card__status--accepted">
-          <CheckCircle2 className="octo-icon-sm" />
+          <Icon.CheckCircle2 className="octo-icon-sm" />
           Accepted
         </span>
       );
@@ -144,7 +144,7 @@ function StatusBadge({ status }: { status: ProposalUiState['status'] }) {
     case 'error':
       return (
         <span className="octo-proposal-card__status octo-proposal-card__status--error">
-          <AlertCircle className="octo-icon-sm" />
+          <Icon.AlertCircle className="octo-icon-sm" />
           Error
         </span>
       );

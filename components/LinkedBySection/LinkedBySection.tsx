@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { Link2 } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import React, { useEffect } from 'react';
 
 import { useEntryBacklinks } from '../../admin/query/hooks/useEntryBacklinks';
@@ -65,7 +65,7 @@ const LinkedBySection = ({ entryPath }: LinkedBySectionProps) => {
                 }
                 className="octo-linked-by__item"
               >
-                <Link2 className="octo-linked-by__item-icon" />
+                <Icon.Link2 className="octo-linked-by__item-icon" />
                 <div className="octo-linked-by__item-body">
                   <div className="octo-linked-by__item-title">{link.title}</div>
                   <div className="octo-linked-by__item-type">{linkCollectionLabel}</div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Bot, Info, Paperclip, User } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { cn } from '../../lib/utils';
 
@@ -20,7 +20,7 @@ export function Message({ entry, proposals, onAcceptProposal, onRejectProposal }
   if (entry.kind === 'system') {
     return (
       <div className="octo-chat-msg octo-chat-msg--system">
-        <Info className="octo-chat-msg__system-icon octo-icon-sm octo-u-shrink-0" />
+        <Icon.Info className="octo-chat-msg__system-icon octo-icon-sm octo-u-shrink-0" />
         <span className="octo-u-whitespace-pre-wrap">{entry.text}</span>
       </div>
     );
@@ -34,7 +34,7 @@ export function Message({ entry, proposals, onAcceptProposal, onRejectProposal }
       )}
     >
       <div className="octo-chat-msg__avatar">
-        {isUser ? <User className="octo-icon-md" /> : <Bot className="octo-icon-md" />}
+        {isUser ? <Icon.User className="octo-icon-md" /> : <Icon.Bot className="octo-icon-md" />}
       </div>
       <div className={cn('octo-chat-msg__body', isUser && 'octo-chat-msg__body octo-chat-msg__body--user')}>
         <div
@@ -68,7 +68,7 @@ function UserBody({ entry }: { entry: Extract<ChatEntry, { kind: 'user' }> }) {
         <div className="octo-chat-msg__attach-names">
           {entry.attachmentNames.map((name, i) => (
             <span key={`${name}-${i}`} className="octo-chat-msg__attach-chip" data-testid="user-attachment-name">
-              <Paperclip className="octo-icon-xs" />
+              <Icon.Paperclip className="octo-icon-xs" />
               <span className="octo-chat-msg__attach-chip-name">{name}</span>
             </span>
           ))}

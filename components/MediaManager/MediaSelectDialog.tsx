@@ -11,7 +11,7 @@
  * a parent re-render.
  */
 
-import { ImageIcon, LayoutGrid, List, Search } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useMediaList } from '../../admin/query/hooks/useMediaList';
@@ -124,7 +124,7 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
           <div className="octo-media-select-dialog__content">
             <div className="octo-media-select-dialog__toolbar">
               <div className="octo-media-select-dialog__search-wrap">
-                <Search className="octo-media-select-dialog__search-icon octo-icon-md" />
+                <Icon.Search className="octo-media-select-dialog__search-icon octo-icon-md" />
                 <input
                   ref={searchRef}
                   value={searchQuery}
@@ -141,7 +141,7 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
                 <div className="octo-media-select-dialog__loading">Loading…</div>
               ) : filteredFiles.length === 0 ? (
                 <div className="octo-media-select-dialog__empty">
-                  <ImageIcon className="octo-icon-2xl" />
+                  <Icon.Image className="octo-icon-2xl" />
                   <p className="octo-u-text-base">
                     {searchQuery ? 'No assets match this search' : 'No files in this folder'}
                   </p>
@@ -201,7 +201,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         onClick={() => onChange('grid')}
         className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn octo-media-view-btn--active')}
       >
-        <LayoutGrid className="octo-icon-sm" />
+        <Icon.LayoutGrid className="octo-icon-sm" />
       </button>
       <button
         type="button"
@@ -211,7 +211,7 @@ function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: 
         onClick={() => onChange('list')}
         className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn octo-media-view-btn--active')}
       >
-        <List className="octo-icon-sm" />
+        <Icon.List className="octo-icon-sm" />
       </button>
     </div>
   );

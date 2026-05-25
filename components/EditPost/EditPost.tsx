@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ChevronRight } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { useEntry } from '../../admin/query/hooks/useEntry';
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
@@ -235,7 +235,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
         <div className="octo-u-row octo-u-gap-2">
           <Button asChild variant="ghost" size="icon" className="octo-btn-back">
             <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-              <ArrowLeft className="octo-icon-md" />
+              <Icon.ArrowLeft className="octo-icon-md" />
             </Link>
           </Button>
           <div className="octo-page-chrome__title-area">
@@ -243,7 +243,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
               <Link href="/cms/content" className="octo-u-text-2">
                 Content
               </Link>
-              <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
+              <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
               <span>{collectionLabel}</span>
             </div>
             <div className="octo-page-chrome__title-row">
@@ -293,7 +293,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
           <div className="octo-u-row octo-u-gap-2">
             <Button asChild variant="ghost" size="icon" className="octo-btn-back">
               <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-                <ArrowLeft className="octo-icon-md" />
+                <Icon.ArrowLeft className="octo-icon-md" />
               </Link>
             </Button>
             <div>
@@ -301,7 +301,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
                 <Link href="/cms/content" className="octo-u-text-2">
                   Content
                 </Link>
-                <ChevronRight className="octo-icon-xs octo-u-opacity-60" />
+                <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
                 <span>{collectionLabel}</span>
               </div>
               <div className="octo-page-chrome__title-row">

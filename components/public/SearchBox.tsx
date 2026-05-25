@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Search, X } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import type { SearchResult } from '../../lib/searchIndex';
 
@@ -159,7 +159,7 @@ export default function SearchBox({ placeholder = 'Search...', className = '' }:
   return (
     <div className={`octo-search-box${className ? ` ${className}` : ''}`}>
       <div className="octo-search-box__input-wrap">
-        <Search className="octo-search-box__icon" size={18} />
+        <Icon.Search className="octo-search-box__icon" size={18} />
         <input
           ref={inputRef}
           type="text"
@@ -177,7 +177,7 @@ export default function SearchBox({ placeholder = 'Search...', className = '' }:
         />
         {query && (
           <button type="button" onClick={handleClear} className="octo-search-box__clear" aria-label="Clear search">
-            <X size={18} />
+            <Icon.X size={18} />
           </button>
         )}
       </div>

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
-import { MoreHorizontal, Plus, Search } from './ui/icons';
+import { Icon } from './ui/icons';
 
 import { newFile } from '../admin/actions';
 import { useConfig } from '../hooks/useConfig';
@@ -77,7 +77,7 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
         </h1>
         {selectedType && (
           <Button variant="default" onClick={addNew} disabled={creating}>
-            <Plus className="octo-icon-md" />
+            <Icon.Plus className="octo-icon-md" />
             Add entry
           </Button>
         )}
@@ -87,7 +87,7 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
         {/* Search bar */}
         <div className="octo-content-types__toolbar">
           <div className="octo-content-search octo-content-types__search-wrap">
-            <Search className="octo-content-search__icon octo-icon-md" />
+            <Icon.Search className="octo-content-search__icon octo-icon-md" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -137,7 +137,7 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" disabled onClick={(e) => e.stopPropagation()}>
-                        <MoreHorizontal className="octo-icon-md octo-u-text-muted" />
+                        <Icon.MoreHorizontal className="octo-icon-md octo-u-text-muted" />
                       </Button>
                     </TableCell>
                   </TableRow>

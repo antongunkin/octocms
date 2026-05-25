@@ -2,7 +2,7 @@ import { cleanup, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { Image, ImageIcon, Search } from './icons';
+import { Icon } from './icons';
 
 afterEach(() => {
   cleanup();
@@ -10,7 +10,7 @@ afterEach(() => {
 
 describe('icons', () => {
   it('applies size, color, strokeWidth, and absoluteStrokeWidth', () => {
-    const { container } = render(<Search size={32} color="tomato" strokeWidth={3} absoluteStrokeWidth />);
+    const { container } = render(<Icon.Search size={32} color="tomato" strokeWidth={3} absoluteStrokeWidth />);
     const svg = container.querySelector('svg');
 
     expect(svg).toBeTruthy();
@@ -21,12 +21,12 @@ describe('icons', () => {
   });
 
   it('keeps aria labels and icon aliases working', () => {
-    const { container } = render(<ImageIcon aria-label="image" />);
+    const { container } = render(<Icon.ImageIcon aria-label="image" />);
     const svg = container.querySelector('svg');
 
     expect(svg).toBeTruthy();
     expect(svg?.getAttribute('aria-label')).toBe('image');
     expect(svg?.getAttribute('aria-hidden')).toBeNull();
-    expect(ImageIcon).toBe(Image);
+    expect(Icon.ImageIcon).toBe(Icon.Image);
   });
 });

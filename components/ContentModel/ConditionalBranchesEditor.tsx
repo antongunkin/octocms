@@ -17,7 +17,7 @@
  */
 
 import React, { useState } from 'react';
-import { GripVertical, Pencil, Plus, Trash2 } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import type { CollectionField, ConditionalBranchConfig } from '../../types';
 import { FIELD_FORMAT_META } from '../../schema/fieldFormats';
@@ -119,7 +119,7 @@ export default function ConditionalBranchesEditor({
                 className="octo-branch-card"
               >
                 <div className="octo-branch-card__header">
-                  <GripVertical className="octo-branch-card__grip octo-icon-sm" />
+                  <Icon.GripVertical className="octo-branch-card__grip octo-icon-sm" />
                   <div className="octo-branch-card__body">
                     <div className="octo-branch-card__grid">
                       <div className="octo-branch-card__field">
@@ -218,7 +218,7 @@ export default function ConditionalBranchesEditor({
                     disabled={disabled}
                     aria-label="Remove branch"
                   >
-                    <Trash2 className="octo-icon-sm" />
+                    <Icon.Trash2 className="octo-icon-sm" />
                   </Button>
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function ConditionalBranchesEditor({
       </div>
 
       <Button type="button" variant="outline" onClick={addBranch} disabled={disabled}>
-        <Plus className="octo-icon-sm" /> Add branch
+        <Icon.Plus className="octo-icon-sm" /> Add branch
       </Button>
 
       {branches.some((b) => !b.key) ||
@@ -304,7 +304,7 @@ function NestedFieldList({
               disabled={disabled}
               aria-label="Edit nested field"
             >
-              <Pencil className="octo-icon-xs" />
+              <Icon.Pencil className="octo-icon-xs" />
             </Button>
             <Button
               type="button"
@@ -315,7 +315,7 @@ function NestedFieldList({
               disabled={disabled}
               aria-label="Remove nested field"
             >
-              <Trash2 className="octo-icon-xs" />
+              <Icon.Trash2 className="octo-icon-xs" />
             </Button>
           </div>
         ))
@@ -327,7 +327,7 @@ function NestedFieldList({
         onClick={() => onEdit(null, null)}
         disabled={disabled}
       >
-        <Plus className="octo-icon-xs" /> Add field
+        <Icon.Plus className="octo-icon-xs" /> Add field
       </Button>
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Paperclip, Send, X } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { Button } from '../ui/button';
 
@@ -102,7 +102,7 @@ export function Composer({
         <div className="octo-chat-composer__attachments">
           {files.map((f, i) => (
             <div key={`${f.name}-${i}`} className="octo-chat-composer__chip" data-testid="chat-attachment-chip">
-              <Paperclip className="octo-icon-xs" />
+              <Icon.Paperclip className="octo-icon-xs" />
               <span className="octo-chat-composer__chip-name">{f.name}</span>
               <span className="octo-chat-composer__chip-size">{formatSize(f.size)}</span>
               <button
@@ -111,7 +111,7 @@ export function Composer({
                 aria-label={`Remove ${f.name}`}
                 className="octo-chat-composer__chip-remove"
               >
-                <X className="octo-icon-xs" />
+                <Icon.X className="octo-icon-xs" />
               </button>
             </div>
           ))}
@@ -146,7 +146,7 @@ export function Composer({
           }
           onClick={() => fileRef.current?.click()}
         >
-          <Paperclip className="octo-icon-md" />
+          <Icon.Paperclip className="octo-icon-md" />
         </Button>
         <textarea
           ref={taRef}
@@ -169,7 +169,7 @@ export function Composer({
           }}
         />
         <Button onClick={send} disabled={disabled || (!value.trim() && files.length === 0)} className="octo-u-gap-1-5">
-          <Send className="octo-icon-md" />
+          <Icon.Send className="octo-icon-md" />
           Send
         </Button>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { GitBranch, GitPullRequest } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { Button } from '../ui/button';
 import { useRecentCMSPullRequests } from '../../admin/query/hooks/useRecentCMSPullRequests';
@@ -54,13 +54,13 @@ function PullRequestRow({ pr, isLast: _isLast }: { pr: RecentCMSPullRequest; isL
   return (
     <div className="octo-pr-row">
       <span className={cn('octo-pr-row__tile', tileVariant)}>
-        <GitPullRequest size={13} />
+        <Icon.GitPullRequest size={13} />
       </span>
       <div className="octo-pr-row__body">
         <div className="octo-pr-row__title">{pr.title}</div>
         <div className="octo-pr-row__meta">
           <span className="octo-pr-row__branch">
-            <GitBranch size={10} />
+            <Icon.GitBranch size={10} />
             {pr.branch} → main
           </span>
           <PRStateBadge state={pr.state} />
@@ -90,7 +90,7 @@ function EmptyState() {
   return (
     <div className="octo-pr-empty">
       <div className="octo-pr-empty__icon">
-        <GitPullRequest className="octo-icon-lg" />
+        <Icon.GitPullRequest className="octo-icon-lg" />
       </div>
       <p className="octo-pr-empty__title">No CMS pull requests yet</p>
       <p className="octo-pr-empty__text">

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Slot } from './Slot';
-import { GitCommit, GitBranch, ChevronDown } from './icons';
+import { Icon } from './icons';
 import { cn } from '../../lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -71,7 +71,7 @@ type PublishButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 export const PublishButton = React.forwardRef<HTMLButtonElement, PublishButtonProps>(
   ({ className, count = 0, label = 'Publish', ...props }, ref) => (
     <button ref={ref} type="button" className={cn('octo-button octo-button--publish', className)} {...props}>
-      <GitCommit size={13} />
+      <Icon.GitCommit size={13} />
       {label}
       {count > 0 && <span className="octo-button__publish-count">{count}</span>}
     </button>
@@ -104,11 +104,11 @@ export const BranchChip = React.forwardRef<HTMLButtonElement, BranchChipProps>(
         )}
         {...props}
       >
-        <GitBranch size={13} style={{ color: isFeature ? 'var(--brand-strong)' : undefined }} />
+        <Icon.GitBranch size={13} style={{ color: isFeature ? 'var(--brand-strong)' : undefined }} />
         <span className="octo-button__branch-name">{name}</span>
         {ahead > 0 && <span className="octo-button__branch-ahead">+{ahead}</span>}
         {dirty > 0 && <span className="octo-button__branch-dirty">· {dirty}</span>}
-        {isFeature && <ChevronDown size={11} style={{ marginLeft: 1, opacity: 0.55 }} />}
+        {isFeature && <Icon.ChevronDown size={11} style={{ marginLeft: 1, opacity: 0.55 }} />}
       </button>
     );
   },

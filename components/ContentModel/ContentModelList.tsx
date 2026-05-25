@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, FileText, Layers, Plus, Search } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import { useSchema } from '../../admin/query/hooks/useSchema';
@@ -74,7 +74,7 @@ export default function ContentModelList() {
               <span className="octo-hdr-right__mono">{rows.length}</span>
             </span>
             <Button className="octo-button octo-button--action" onClick={() => setCreateOpen(true)}>
-              <Plus className="octo-icon-md" />
+              <Icon.Plus className="octo-icon-md" />
               Create content type
             </Button>
           </div>
@@ -90,7 +90,7 @@ export default function ContentModelList() {
             {/* Filter bar */}
             <div className="octo-content-model__filters">
               <div className="octo-search-wrap">
-                <Search className="octo-search-wrap__icon" />
+                <Icon.Search className="octo-search-wrap__icon" />
                 <input
                   ref={searchRef}
                   value={search}
@@ -138,9 +138,9 @@ export default function ContentModelList() {
                               <span className="octo-schema-list__name">
                                 <span className="octo-schema-list__name-icon">
                                   {r.hasMany ? (
-                                    <Layers className="octo-icon-md" />
+                                    <Icon.Layers className="octo-icon-md" />
                                   ) : (
-                                    <FileText className="octo-icon-md" />
+                                    <Icon.FileText className="octo-icon-md" />
                                   )}
                                 </span>
                                 {r.label}
@@ -154,7 +154,7 @@ export default function ContentModelList() {
                             <td className="octo-schema-list__td octo-schema-list__count">{r.entryCount}</td>
                             <td className="octo-schema-list__td octo-schema-list__th octo-schema-list__th--icon">
                               <div className="octo-schema-list__chevron">
-                                <ChevronRight className="octo-icon-md" />
+                                <Icon.ChevronRight className="octo-icon-md" />
                               </div>
                             </td>
                           </tr>

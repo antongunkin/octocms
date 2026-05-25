@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { Variable } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
@@ -36,7 +36,7 @@ const VariableEmbedEditor: React.FC<JsxEditorProps & { allowedVariables?: string
   if (currentName && (variables.length === 0 || variables.includes(currentName))) {
     return (
       <span className="octo-var-embed octo-var-embed--set" contentEditable={false}>
-        <Variable className="octo-var-embed__icon" aria-hidden />
+        <Icon.Variable className="octo-var-embed__icon" aria-hidden />
         {variables.length > 0 ? (
           <select
             value={currentName}
@@ -60,7 +60,7 @@ const VariableEmbedEditor: React.FC<JsxEditorProps & { allowedVariables?: string
   // No variable selected yet — show a compact picker
   return (
     <span className="octo-var-embed octo-var-embed--unset" contentEditable={false}>
-      <Variable className="octo-var-embed__icon" />
+      <Icon.Variable className="octo-var-embed__icon" />
       {variables.length > 0 ? (
         <select
           value={currentName}

@@ -1,6 +1,6 @@
 'use client';
 
-import { CloudUpload } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import React, { useCallback, useState } from 'react';
 
 import { cn } from '../../lib/utils';
@@ -54,7 +54,7 @@ export function MediaUploadBar({ allowedFormats, onFiles, disabled }: MediaUploa
           isDragging && 'octo-media-upload-bar__btn octo-media-upload-bar__btn--dragging',
         )}
       >
-        <CloudUpload className="octo-media-upload-bar__icon h-5 w-5" />
+        <Icon.CloudUpload className="octo-media-upload-bar__icon h-5 w-5" />
         <span>
           <span className="octo-media-upload-bar__label">
             {isDragging ? 'Drop files to upload' : 'Drop images here or click to browse'}

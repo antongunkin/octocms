@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Trash2 } from '../ui/icons';
+import { Icon } from '../ui/icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -212,7 +212,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
         <div className="octo-inline-editor__header">
           <div className="octo-inline-editor__back">
             <Button variant="ghost" onClick={handleClose}>
-              <ArrowLeft className="octo-icon-md octo-u-mr-1" />
+              <Icon.ArrowLeft className="octo-icon-md octo-u-mr-1" />
               Back
             </Button>
           </div>
@@ -230,7 +230,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
                   Restore
                 </Button>
                 <Button variant="destructive" onClick={openDeleteDialog} disabled={isSaving}>
-                  <Trash2 className="octo-icon-md octo-u-mr-1" />
+                  <Icon.Trash2 className="octo-icon-md octo-u-mr-1" />
                   Delete permanently
                 </Button>
               </>

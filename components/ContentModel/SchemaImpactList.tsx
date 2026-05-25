@@ -10,7 +10,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { AlertTriangle, ArrowRight, ShieldCheck, ShieldAlert } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import type { SchemaImpactItem } from '../../admin/actions/schema';
 import { cn } from '../../lib/utils';
@@ -51,7 +51,7 @@ export default function SchemaImpactList({
     <div className={cn('octo-schema-impact', `octo-schema-impact--${tone}`)}>
       {title ? (
         <div className="octo-schema-impact__title">
-          <AlertTriangle className="octo-icon-sm" />
+          <Icon.AlertTriangle className="octo-icon-sm" />
           {title}
         </div>
       ) : null}
@@ -82,7 +82,7 @@ function ImpactRow({ item, asLink }: { item: SchemaImpactItem; asLink: boolean }
         ) : null}
       </span>
       <DataLossBadge dataLoss={item.dataLoss} />
-      {asLink ? <ArrowRight className="octo-icon-sm octo-u-shrink-0 octo-u-opacity-50" /> : null}
+      {asLink ? <Icon.ArrowRight className="octo-icon-sm octo-u-shrink-0 octo-u-opacity-50" /> : null}
     </span>
   );
 
@@ -106,14 +106,14 @@ function DataLossBadge({ dataLoss }: { dataLoss: boolean }) {
   if (dataLoss) {
     return (
       <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge octo-schema-impact__badge--loss')}>
-        <ShieldAlert className="octo-icon-xs" />
+        <Icon.ShieldAlert className="octo-icon-xs" />
         Data loss
       </span>
     );
   }
   return (
     <span className={cn('octo-schema-impact__badge', 'octo-schema-impact__badge octo-schema-impact__badge--ok')}>
-      <ShieldCheck className="octo-icon-xs" />
+      <Icon.ShieldCheck className="octo-icon-xs" />
       Preserved
     </span>
   );

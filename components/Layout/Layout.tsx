@@ -2,7 +2,7 @@
 
 import { signIn, useSession } from 'next-auth/react';
 import React, { Suspense, useEffect } from 'react';
-import { LogIn } from '../ui/icons';
+import { Icon } from '../ui/icons';
 
 import { useConfig } from '../../hooks/useConfig';
 import type { Theme } from '../../admin/theme';
@@ -38,7 +38,7 @@ const Layout = ({ children, initialTheme }: LayoutProps) => {
             <h1 className="octo-layout__sign-in-title">{config.projectName} CMS</h1>
             <p className="octo-layout__sign-in-subtitle">Sign in to manage your content</p>
             <Button onClick={() => signIn('github', { callbackUrl: '/cms' })} size="lg">
-              <LogIn className="octo-icon-md" />
+              <Icon.LogIn className="octo-icon-md" />
               Sign in with GitHub
             </Button>
           </div>
