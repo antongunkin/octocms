@@ -149,8 +149,8 @@ export const rootLayoutConfigInitImport = `${CONFIG_INIT_IMPORT}\n`;
 
 export function buildAdminLayoutTemplate(): string {
   return `${CONFIG_INIT_IMPORT}
-import 'octocms/globals.css';
 import '@mdxeditor/editor/style.css';
+import 'octocms/globals.css';
 
 export { AdminLayout as default, metadata } from 'octocms/admin';
 `;
