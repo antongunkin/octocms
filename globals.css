@@ -5249,14 +5249,12 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    overflow: hidden;
   }
 
   .octo-content-model__body {
     display: flex;
     flex: 1;
     flex-direction: column;
-    overflow: hidden;
     background: var(--bg);
   }
 

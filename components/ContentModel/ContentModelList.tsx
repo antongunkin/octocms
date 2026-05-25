@@ -9,6 +9,7 @@ import { useSchema } from '../../admin/query/hooks/useSchema';
 import { Button } from '../ui/button';
 import CreateContentTypeDialog from './CreateContentTypeDialog';
 import { SchemaTableSkeleton } from './skeletons/SchemaTableSkeleton';
+import { PageBar } from '../Layout/PageBar';
 
 export default function ContentModelList() {
   const router = useRouter();
@@ -57,29 +58,20 @@ export default function ContentModelList() {
 
   return (
     <div className="octo-content-model">
-      {/* Page header */}
-      <div className="octo-page-chrome">
-        <div className="octo-page-chrome__title-area">
-          <div className="octo-page-chrome__breadcrumb">
-            <span className="octo-u-text-2">Model</span>
-          </div>
-          <div className="octo-page-chrome__title-row">
-            <h1 className="octo-page-chrome__title">Content Model</h1>
-          </div>
-        </div>
-        <div className="octo-page-chrome__right">
-          <div className="octo-hdr-right">
-            <span className="octo-hdr-right__label">
-              Content types
-              <span className="octo-hdr-right__mono">{rows.length}</span>
-            </span>
-            <Button className="octo-button octo-button--action" onClick={() => setCreateOpen(true)}>
-              <Icon.Plus className="octo-icon-md" />
-              Create content type
-            </Button>
-          </div>
-        </div>
-      </div>
+      <PageBar
+        title="All content types"
+        breadcrumbs={[
+          {
+            label: 'Model',
+          },
+        ]}
+        actions={
+          <Button className="octo-button octo-button--action" onClick={() => setCreateOpen(true)}>
+            <Icon.Plus className="octo-icon-md" />
+            Add content type
+          </Button>
+        }
+      />
 
       {schema ? <CreateContentTypeDialog open={createOpen} onOpenChange={setCreateOpen} schema={schema} /> : null}
 

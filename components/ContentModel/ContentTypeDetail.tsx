@@ -28,6 +28,7 @@ import DeleteFieldDialog from './DeleteFieldDialog';
 import EditContentTypeDialog from './EditContentTypeDialog';
 import FieldDialog from './FieldDialog';
 import { FieldTableSkeleton } from './skeletons/FieldTableSkeleton';
+import { PageBar } from '../Layout/PageBar';
 
 type Props = {
   type: string;
@@ -173,36 +174,11 @@ export default function ContentTypeDetail({ type }: Props) {
 
   return (
     <div className="octo-content-model">
-      {/* Page header — same chrome as DashboardContent / EditPost */}
-      <div className="octo-page-chrome">
-        <div className="octo-page-chrome__title-area">
-          <div className="octo-content-type-detail__header-row">
-            <Button asChild variant="ghost" size="icon" className="octo-btn-back">
-              <Link href="/cms/model" aria-label="Back to Content Model">
-                <Icon.ArrowLeft className="octo-icon-md" />
-              </Link>
-            </Button>
-            <div className="octo-content-type-detail__title-col">
-              <div className="octo-page-chrome__breadcrumb">
-                <Link href="/cms/model" className="octo-u-text-2">
-                  Model
-                </Link>
-                <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
-                <span className="octo-content-type-detail__type-badge">{type}</span>
-              </div>
-              <div className="octo-page-chrome__title-row">
-                {collection.hasMany ? (
-                  <Icon.Layers className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
-                ) : (
-                  <Icon.FileText className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />
-                )}
-                <h1 className="octo-page-chrome__title">{collection.label}</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="octo-page-chrome__right">
-          <div className="octo-hdr-right">
+      <PageBar
+        title={collection.label}
+        breadcrumbs={[{ label: 'Model', href: '/cms/model' }]}
+        actions={
+          <>
             <Button className="octo-button octo-button--action" onClick={() => setAddFieldOpen(true)}>
               <Icon.Plus className="octo-icon-md" />
               Add field
@@ -233,9 +209,9 @@ export default function ContentTypeDetail({ type }: Props) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <EditContentTypeDialog
         open={editOpen}
