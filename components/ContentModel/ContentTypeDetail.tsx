@@ -28,7 +28,7 @@ import DeleteFieldDialog from './DeleteFieldDialog';
 import EditContentTypeDialog from './EditContentTypeDialog';
 import FieldDialog from './FieldDialog';
 import { FieldTableSkeleton } from './skeletons/FieldTableSkeleton';
-import { PageBar } from '../Layout/PageBar';
+import { Page } from '../Layout/Page';
 
 type Props = {
   type: string;
@@ -173,46 +173,80 @@ export default function ContentTypeDetail({ type }: Props) {
   // ---------------------------------------------------------------------
 
   return (
-    <div className="octo-content-model">
-      <PageBar
-        title={collection.label}
-        breadcrumbs={[{ label: 'Model', href: '/cms/model' }]}
-        actions={
-          <>
-            <Button className="octo-button octo-button--action" onClick={() => setAddFieldOpen(true)}>
-              <Icon.Plus className="octo-icon-md" />
-              Add field
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  aria-label="More actions"
-                  className="octo-button octo-button--icon-sm"
-                >
-                  <Icon.MoreHorizontal className="octo-icon-md" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => setEditOpen(true)}>
-                  <Icon.Pencil className="octo-icon-sm" />
-                  Edit content type
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={() => setDeleteOpen(true)}
-                  className="octo-menu-item octo-menu-item--danger"
-                >
-                  <Icon.Trash2 className="octo-icon-sm" />
-                  Delete content type
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        }
-      />
-
+    <Page
+      title={collection.label}
+      breadcrumbs={[{ label: 'Model', href: '/cms/model' }]}
+      actions={
+        <>
+          <Button className="octo-button octo-button--action" onClick={() => setAddFieldOpen(true)}>
+            <Icon.Plus className="octo-icon-md" />
+            Add field
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="outline"
+                aria-label="More actions"
+                className="octo-button octo-button--icon-sm"
+              >
+                <Icon.MoreHorizontal className="octo-icon-md" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setEditOpen(true)}>
+                <Icon.Pencil className="octo-icon-sm" />
+                Edit content type
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="octo-menu-item octo-menu-item--danger">
+                <Icon.Trash2 className="octo-icon-sm" />
+                Delete content type
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </>
+      }
+      rightBar={
+        <div className="octo-schema-detail__aside">
+          <div className="octo-schema-detail__aside-label">Type details</div>
+          <div className="octo-schema-detail__detail-rows">
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Key</span>
+              <span className="octo-schema-detail__detail-val octo-schema-detail__detail-val--mono" title={type}>
+                {type}
+              </span>
+            </div>
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Cardinality</span>
+              <span className="octo-schema-detail__detail-val">
+                {collection.hasMany ? 'Many entries' : 'Singleton'}
+              </span>
+            </div>
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Entry title</span>
+              <span className="octo-schema-detail__detail-val">
+                {entryTitleKey ? (
+                  <code className="octo-schema-detail__detail-val octo-schema-detail__detail-val--mono">
+                    {entryTitleKey}
+                  </code>
+                ) : (
+                  <span className="octo-u-text-muted">— not set —</span>
+                )}
+              </span>
+            </div>
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Fields</span>
+              <span className="octo-schema-detail__detail-val">{fields.length}</span>
+            </div>
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Entries</span>
+              <span className="octo-schema-detail__detail-val">{entryCount}</span>
+            </div>
+          </div>
+        </div>
+      }
+    >
       <EditContentTypeDialog
         open={editOpen}
         onOpenChange={setEditOpen}
@@ -245,217 +279,171 @@ export default function ContentTypeDetail({ type }: Props) {
         />
       ) : null}
 
-      <div className="octo-schema-detail">
-        {/* Main content column — independently scrollable */}
-        <div className="octo-schema-detail__main">
-          <Tabs defaultValue="fields" className="octo-tabs octo-tabs--flex-col">
-            <TabsList className="octo-u-self-start">
-              <TabsTrigger value="fields">Fields</TabsTrigger>
-              <TabsTrigger value="json">JSON</TabsTrigger>
-            </TabsList>
+      <Tabs defaultValue="fields" className="octo-tabs octo-tabs--flex-col">
+        <TabsList className="octo-u-self-start">
+          <TabsTrigger value="fields">Fields</TabsTrigger>
+          <TabsTrigger value="json">JSON</TabsTrigger>
+        </TabsList>
 
-            <TabsContent value="fields" className="octo-tabs-content octo-tabs-content--mt">
-              <Card className="octo-card octo-card--no-padding">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="octo-table-row octo-table-row--no-hover">
-                      <TableHead className="octo-table-cell octo-table-cell--w8" />
-                      <TableHead className="octo-table-head octo-table-head--muted">Field</TableHead>
-                      <TableHead className="octo-table-head octo-table-head--muted">Key</TableHead>
-                      <TableHead className="octo-table-head octo-table-head--muted">Type</TableHead>
-                      <TableHead className="octo-table-head octo-table-head--muted">Flags</TableHead>
-                      <TableHead className="octo-table-head octo-table-head--muted octo-table-head--right octo-table-head--w20">
-                        Title
-                      </TableHead>
-                      <TableHead className="octo-table-head octo-table-head--w20" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {fields.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={7} className="octo-table-cell octo-table-cell--empty">
-                          No fields configured. Click <strong>Add field</strong> to get started.
+        <TabsContent value="fields" className="octo-tabs-content octo-tabs-content--mt">
+          <Card className="octo-card octo-card--no-padding">
+            <Table>
+              <TableHeader>
+                <TableRow className="octo-table-row octo-table-row--no-hover">
+                  <TableHead className="octo-table-cell octo-table-cell--w8" />
+                  <TableHead className="octo-table-head octo-table-head--muted">Field</TableHead>
+                  <TableHead className="octo-table-head octo-table-head--muted">Key</TableHead>
+                  <TableHead className="octo-table-head octo-table-head--muted">Type</TableHead>
+                  <TableHead className="octo-table-head octo-table-head--muted">Flags</TableHead>
+                  <TableHead className="octo-table-head octo-table-head--muted octo-table-head--right octo-table-head--w20">
+                    Title
+                  </TableHead>
+                  <TableHead className="octo-table-head octo-table-head--w20" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {fields.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="octo-table-cell octo-table-cell--empty">
+                      No fields configured. Click <strong>Add field</strong> to get started.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  fields.map(([key, field]) => {
+                    const titleAllowed =
+                      (field.format === 'string' && field.list !== true) ||
+                      field.format === 'text' ||
+                      field.format === 'slug';
+                    return (
+                      <TableRow
+                        key={key}
+                        className={cn(
+                          'octo-table-row octo-table-row--hover-group',
+                          dragKey === key && 'octo-u-opacity-50',
+                        )}
+                        draggable
+                        onDragStart={() => setDragKey(key)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDragEnd={() => setDragKey(null)}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (!dragKey || dragKey === key) {
+                            setDragKey(null);
+                            return;
+                          }
+                          const order = (orderOverride ?? Object.keys(collection.fields)).filter(
+                            (k) => k in collection.fields,
+                          );
+                          const from = order.indexOf(dragKey);
+                          const to = order.indexOf(key);
+                          if (from < 0 || to < 0) {
+                            setDragKey(null);
+                            return;
+                          }
+                          const nextOrder = [...order];
+                          nextOrder.splice(from, 1);
+                          nextOrder.splice(to, 0, dragKey);
+                          setDragKey(null);
+                          void reorderTo(nextOrder);
+                        }}
+                      >
+                        <TableCell className="octo-table-cell octo-table-cell--drag" aria-label="Drag to reorder">
+                          <Icon.GripVertical className="octo-icon-sm" />
+                        </TableCell>
+                        <TableCell>
+                          <button
+                            type="button"
+                            onClick={() => setEditFieldKey(key)}
+                            className="octo-field-table__label-btn"
+                          >
+                            <span className="octo-field-table__label-name">{field.label}</span>
+                            {field.hint ? <span className="octo-field-table__label-hint">{field.hint}</span> : null}
+                          </button>
+                        </TableCell>
+                        <TableCell className="octo-table-cell octo-table-cell--mono">{key}</TableCell>
+                        <TableCell>
+                          <FormatBadge field={field} />
+                        </TableCell>
+                        <TableCell>
+                          <FieldFlags field={field} />
+                        </TableCell>
+                        <TableCell className="octo-table-cell octo-table-cell--right">
+                          <button
+                            type="button"
+                            title={
+                              titleAllowed
+                                ? field.entryTitle
+                                  ? 'Current entry title'
+                                  : 'Set as entry title'
+                                : 'Entry title must be a non-list string, text, or slug field.'
+                            }
+                            disabled={!titleAllowed || field.entryTitle === true}
+                            onClick={() => void setEntryTitle(key)}
+                            className={cn(
+                              'octo-field-table__star',
+                              field.entryTitle
+                                ? 'octo-field-table__star octo-field-table__star--active'
+                                : titleAllowed
+                                  ? 'octo-field-table__star octo-field-table__star--allowed'
+                                  : 'octo-field-table__star octo-field-table__star--disabled',
+                            )}
+                            aria-pressed={field.entryTitle === true}
+                            aria-label={field.entryTitle ? 'Current entry title' : 'Set as entry title'}
+                          >
+                            <Icon.Star
+                              className={cn(
+                                'octo-icon-sm',
+                                field.entryTitle && 'octo-field-table__star octo-field-table__star--filled',
+                              )}
+                            />
+                          </button>
+                        </TableCell>
+                        <TableCell className="octo-table-cell octo-table-cell--right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="octo-button octo-button--icon-sm octo-btn-row-action"
+                                aria-label={`Actions for ${field.label}`}
+                              >
+                                <Icon.MoreHorizontal className="octo-icon-md" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onSelect={() => setEditFieldKey(key)}>
+                                <Icon.Pencil className="octo-icon-sm" />
+                                Edit field
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onSelect={() => setDeleteFieldKey(key)}
+                                className="octo-menu-item octo-menu-item--danger"
+                              >
+                                <Icon.Trash2 className="octo-icon-sm" />
+                                Delete field
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
-                    ) : (
-                      fields.map(([key, field]) => {
-                        const titleAllowed =
-                          (field.format === 'string' && field.list !== true) ||
-                          field.format === 'text' ||
-                          field.format === 'slug';
-                        return (
-                          <TableRow
-                            key={key}
-                            className={cn(
-                              'octo-table-row octo-table-row--hover-group',
-                              dragKey === key && 'octo-u-opacity-50',
-                            )}
-                            draggable
-                            onDragStart={() => setDragKey(key)}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDragEnd={() => setDragKey(null)}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              if (!dragKey || dragKey === key) {
-                                setDragKey(null);
-                                return;
-                              }
-                              const order = (orderOverride ?? Object.keys(collection.fields)).filter(
-                                (k) => k in collection.fields,
-                              );
-                              const from = order.indexOf(dragKey);
-                              const to = order.indexOf(key);
-                              if (from < 0 || to < 0) {
-                                setDragKey(null);
-                                return;
-                              }
-                              const nextOrder = [...order];
-                              nextOrder.splice(from, 1);
-                              nextOrder.splice(to, 0, dragKey);
-                              setDragKey(null);
-                              void reorderTo(nextOrder);
-                            }}
-                          >
-                            <TableCell className="octo-table-cell octo-table-cell--drag" aria-label="Drag to reorder">
-                              <Icon.GripVertical className="octo-icon-sm" />
-                            </TableCell>
-                            <TableCell>
-                              <button
-                                type="button"
-                                onClick={() => setEditFieldKey(key)}
-                                className="octo-field-table__label-btn"
-                              >
-                                <span className="octo-field-table__label-name">{field.label}</span>
-                                {field.hint ? <span className="octo-field-table__label-hint">{field.hint}</span> : null}
-                              </button>
-                            </TableCell>
-                            <TableCell className="octo-table-cell octo-table-cell--mono">{key}</TableCell>
-                            <TableCell>
-                              <FormatBadge field={field} />
-                            </TableCell>
-                            <TableCell>
-                              <FieldFlags field={field} />
-                            </TableCell>
-                            <TableCell className="octo-table-cell octo-table-cell--right">
-                              <button
-                                type="button"
-                                title={
-                                  titleAllowed
-                                    ? field.entryTitle
-                                      ? 'Current entry title'
-                                      : 'Set as entry title'
-                                    : 'Entry title must be a non-list string, text, or slug field.'
-                                }
-                                disabled={!titleAllowed || field.entryTitle === true}
-                                onClick={() => void setEntryTitle(key)}
-                                className={cn(
-                                  'octo-field-table__star',
-                                  field.entryTitle
-                                    ? 'octo-field-table__star octo-field-table__star--active'
-                                    : titleAllowed
-                                      ? 'octo-field-table__star octo-field-table__star--allowed'
-                                      : 'octo-field-table__star octo-field-table__star--disabled',
-                                )}
-                                aria-pressed={field.entryTitle === true}
-                                aria-label={field.entryTitle ? 'Current entry title' : 'Set as entry title'}
-                              >
-                                <Icon.Star
-                                  className={cn(
-                                    'octo-icon-sm',
-                                    field.entryTitle && 'octo-field-table__star octo-field-table__star--filled',
-                                  )}
-                                />
-                              </button>
-                            </TableCell>
-                            <TableCell className="octo-table-cell octo-table-cell--right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="octo-button octo-button--icon-sm octo-btn-row-action"
-                                    aria-label={`Actions for ${field.label}`}
-                                  >
-                                    <Icon.MoreHorizontal className="octo-icon-md" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onSelect={() => setEditFieldKey(key)}>
-                                    <Icon.Pencil className="octo-icon-sm" />
-                                    Edit field
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem
-                                    onSelect={() => setDeleteFieldKey(key)}
-                                    className="octo-menu-item octo-menu-item--danger"
-                                  >
-                                    <Icon.Trash2 className="octo-icon-sm" />
-                                    Delete field
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    )}
-                  </TableBody>
-                </Table>
-              </Card>
-            </TabsContent>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
 
-            <TabsContent value="json" className="octo-tabs-content octo-tabs-content--mt">
-              <Card className="octo-card octo-card--no-padding octo-u-overflow-hidden">
-                <pre className="octo-field-table__json-pre">
-                  <code>{collectionJson}</code>
-                </pre>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        {/* Sidebar — same chrome as EditPost */}
-        <aside className="octo-schema-detail__aside">
-          <div className="octo-schema-detail__aside-section">
-            <div className="octo-schema-detail__aside-label">Type details</div>
-            <div className="octo-schema-detail__detail-rows">
-              <div className="octo-schema-detail__detail-row">
-                <span className="octo-schema-detail__detail-key">Key</span>
-                <span className="octo-schema-detail__detail-val octo-schema-detail__detail-val--mono" title={type}>
-                  {type}
-                </span>
-              </div>
-              <div className="octo-schema-detail__detail-row">
-                <span className="octo-schema-detail__detail-key">Cardinality</span>
-                <span className="octo-schema-detail__detail-val">
-                  {collection.hasMany ? 'Many entries' : 'Singleton'}
-                </span>
-              </div>
-              <div className="octo-schema-detail__detail-row">
-                <span className="octo-schema-detail__detail-key">Entry title</span>
-                <span className="octo-schema-detail__detail-val">
-                  {entryTitleKey ? (
-                    <code className="octo-schema-detail__detail-val octo-schema-detail__detail-val--mono">
-                      {entryTitleKey}
-                    </code>
-                  ) : (
-                    <span className="octo-u-text-muted">— not set —</span>
-                  )}
-                </span>
-              </div>
-              <div className="octo-schema-detail__detail-row">
-                <span className="octo-schema-detail__detail-key">Fields</span>
-                <span className="octo-schema-detail__detail-val">{fields.length}</span>
-              </div>
-              <div className="octo-schema-detail__detail-row">
-                <span className="octo-schema-detail__detail-key">Entries</span>
-                <span className="octo-schema-detail__detail-val">{entryCount}</span>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
+        <TabsContent value="json" className="octo-tabs-content octo-tabs-content--mt">
+          <Card className="octo-card octo-card--no-padding octo-u-overflow-hidden">
+            <pre className="octo-field-table__json-pre">
+              <code>{collectionJson}</code>
+            </pre>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </Page>
   );
 }
 

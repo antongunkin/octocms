@@ -9,7 +9,7 @@ import { useSchema } from '../../admin/query/hooks/useSchema';
 import { Button } from '../ui/button';
 import CreateContentTypeDialog from './CreateContentTypeDialog';
 import { SchemaTableSkeleton } from './skeletons/SchemaTableSkeleton';
-import { PageBar } from '../Layout/PageBar';
+import { Page } from '../Layout/Page';
 
 export default function ContentModelList() {
   const router = useRouter();
@@ -57,109 +57,99 @@ export default function ContentModelList() {
   }, [rows, search]);
 
   return (
-    <div className="octo-content-model">
-      <PageBar
-        title="All content types"
-        breadcrumbs={[
-          {
-            label: 'Model',
-          },
-        ]}
-        actions={
-          <Button className="octo-button octo-button--action" onClick={() => setCreateOpen(true)}>
-            <Icon.Plus className="octo-icon-md" />
-            Add content type
-          </Button>
-        }
-      />
-
+    <Page
+      title="All content types"
+      breadcrumbs={[
+        {
+          label: 'Model',
+        },
+      ]}
+      actions={
+        <Button className="octo-button octo-button--action" onClick={() => setCreateOpen(true)}>
+          <Icon.Plus className="octo-icon-md" />
+          Add content type
+        </Button>
+      }
+    >
       {schema ? <CreateContentTypeDialog open={createOpen} onOpenChange={setCreateOpen} schema={schema} /> : null}
 
-      {/* Body */}
-      <div className="octo-content-model__body">
-        <div className="octo-content-model__scroll octo-scroll">
-          <div className="octo-content-model__inner">
-            {/* Filter bar */}
-            <div className="octo-content-model__filters">
-              <div className="octo-search-wrap">
-                <Icon.Search className="octo-search-wrap__icon" />
-                <input
-                  ref={searchRef}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Filter content types…"
-                  className="octo-input octo-search-wrap__input"
-                />
-                <kbd className="octo-search-wrap__kbd">/</kbd>
-              </div>
-            </div>
-
-            {isLoading ? (
-              <SchemaTableSkeleton />
-            ) : (
-              /* Table */
-              <div className="octo-schema-list">
-                <div className="octo-schema-list__scroll">
-                  <table className="octo-schema-list__table">
-                    <thead className="octo-schema-list__thead">
-                      <tr className="octo-schema-list__th-row">
-                        <th className="octo-schema-list__th">Name</th>
-                        <th className="octo-schema-list__th">Key</th>
-                        <th className="octo-schema-list__th">Cardinality</th>
-                        <th className="octo-schema-list__th">Fields</th>
-                        <th className="octo-schema-list__th">Entries</th>
-                        <th className="octo-schema-list__th octo-schema-list__th--icon" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="octo-schema-list__empty">
-                            No content types match your search.
-                          </td>
-                        </tr>
-                      ) : (
-                        filtered.map((r) => (
-                          <tr
-                            key={r.key}
-                            onClick={() => router.push(`/cms/model/${r.key}`)}
-                            className="octo-schema-list__item"
-                            onKeyDown={() => router.push(`/cms/model/${r.key}`)}
-                          >
-                            <td className="octo-schema-list__td">
-                              <span className="octo-schema-list__name">
-                                <span className="octo-schema-list__name-icon">
-                                  {r.hasMany ? (
-                                    <Icon.Layers className="octo-icon-md" />
-                                  ) : (
-                                    <Icon.FileText className="octo-icon-md" />
-                                  )}
-                                </span>
-                                {r.label}
-                              </span>
-                            </td>
-                            <td className="octo-schema-list__td octo-schema-list__key">{r.key}</td>
-                            <td className="octo-schema-list__td octo-schema-list__count">
-                              {r.hasMany ? 'Many entries' : 'Singleton'}
-                            </td>
-                            <td className="octo-schema-list__td octo-schema-list__count">{r.fieldCount}</td>
-                            <td className="octo-schema-list__td octo-schema-list__count">{r.entryCount}</td>
-                            <td className="octo-schema-list__td octo-schema-list__th octo-schema-list__th--icon">
-                              <div className="octo-schema-list__chevron">
-                                <Icon.ChevronRight className="octo-icon-md" />
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
+      <div className="octo-content-model__filters">
+        <div className="octo-search-wrap">
+          <Icon.Search className="octo-search-wrap__icon" />
+          <input
+            ref={searchRef}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Filter content types…"
+            className="octo-input octo-search-wrap__input"
+          />
+          <kbd className="octo-search-wrap__kbd">/</kbd>
         </div>
       </div>
-    </div>
+
+      {isLoading ? (
+        <SchemaTableSkeleton />
+      ) : (
+        /* Table */
+        <div className="octo-schema-list">
+          <div className="octo-schema-list__scroll">
+            <table className="octo-schema-list__table">
+              <thead className="octo-schema-list__thead">
+                <tr className="octo-schema-list__th-row">
+                  <th className="octo-schema-list__th">Name</th>
+                  <th className="octo-schema-list__th">Key</th>
+                  <th className="octo-schema-list__th">Cardinality</th>
+                  <th className="octo-schema-list__th">Fields</th>
+                  <th className="octo-schema-list__th">Entries</th>
+                  <th className="octo-schema-list__th octo-schema-list__th--icon" />
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="octo-schema-list__empty">
+                      No content types match your search.
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((r) => (
+                    <tr
+                      key={r.key}
+                      onClick={() => router.push(`/cms/model/${r.key}`)}
+                      className="octo-schema-list__item"
+                      onKeyDown={() => router.push(`/cms/model/${r.key}`)}
+                    >
+                      <td className="octo-schema-list__td">
+                        <span className="octo-schema-list__name">
+                          <span className="octo-schema-list__name-icon">
+                            {r.hasMany ? (
+                              <Icon.Layers className="octo-icon-md" />
+                            ) : (
+                              <Icon.FileText className="octo-icon-md" />
+                            )}
+                          </span>
+                          {r.label}
+                        </span>
+                      </td>
+                      <td className="octo-schema-list__td octo-schema-list__key">{r.key}</td>
+                      <td className="octo-schema-list__td octo-schema-list__count">
+                        {r.hasMany ? 'Many entries' : 'Singleton'}
+                      </td>
+                      <td className="octo-schema-list__td octo-schema-list__count">{r.fieldCount}</td>
+                      <td className="octo-schema-list__td octo-schema-list__count">{r.entryCount}</td>
+                      <td className="octo-schema-list__td octo-schema-list__th octo-schema-list__th--icon">
+                        <div className="octo-schema-list__chevron">
+                          <Icon.ChevronRight className="octo-icon-md" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </Page>
   );
 }

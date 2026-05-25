@@ -5169,30 +5169,11 @@
   }
 
   /* ── octo-content-model ── */
-  .octo-content-model {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-  }
-
-  .octo-content-model__body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    background: var(--bg);
-  }
-
-  .octo-content-model__scroll {
-    flex: 1;
-    overflow: auto;
-    padding: 20px 24px 48px;
-  }
-
   .octo-content-model__filters {
     display: flex;
     min-width: 0;
     align-items: center;
-    gap: 10px;
+    margin-bottom: var(--v-gap);
   }
 
   /* ── octo-schema-list (content type table) ── */
@@ -5301,34 +5282,8 @@
   }
 
   /* ── octo-schema-detail ── */
-  .octo-schema-detail {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  .octo-schema-detail__main {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    overflow-y: auto;
-    background: var(--bg);
-    padding: 20px 24px 48px;
-  }
-
   .octo-schema-detail__aside {
-    display: flex;
-    width: 280px;
-    flex-shrink: 0;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-    border-left: 1px solid var(--border);
-    background: var(--surface-2);
-    padding: 20px 16px;
-  }
-
-  .octo-schema-detail__aside-section {
+    padding: var(--v-gap) var(--h-gap);
   }
 
   .octo-schema-detail__aside-label {
@@ -7151,13 +7106,6 @@
     border-radius: 4px;
     padding: 1px 5px;
     pointer-events: none;
-  }
-
-  /* ------ Content model inner container ------ */
-  .octo-content-model__inner {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
   }
 
   /* ------ Shimmer skeleton table ------ */
