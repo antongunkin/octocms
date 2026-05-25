@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Icon } from '../ui/icons';
 
 import { useEntry } from '../../admin/query/hooks/useEntry';
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
@@ -232,29 +231,73 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
 
   // Header chrome that's safe to render before the entry resolves.
   const headerChrome = (
-    <div className="octo-page-chrome">
-      <div className="octo-page-chrome__title-area">
-        <div className="octo-u-row octo-u-gap-2">
-          <Button asChild variant="ghost" size="icon" className="octo-btn-back">
-            <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-              <Icon.ArrowLeft className="octo-icon-md" />
-            </Link>
+    <PageBar
+      title={entryTitle || collectionLabel}
+      breadcrumbs={[
+        {
+          label: 'Content',
+          href: '/cms/content',
+        },
+        {
+          label: collectionLabel,
+          href: `/cms/content/${type}`,
+        },
+      ]}
+      actions={
+        <>
+          {diffToggleVisible && (
+            <div role="tablist" aria-label="Edit or Diff view" className="octo-edit-post__view-toggle">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={viewMode === 'edit'}
+                onClick={() => setViewMode('edit')}
+                className={cn(
+                  'octo-edit-post__view-btn',
+                  viewMode === 'edit' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
+                )}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={viewMode === 'diff'}
+                onClick={() => setViewMode('diff')}
+                className={cn(
+                  'octo-edit-post__view-btn',
+                  viewMode === 'diff' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
+                )}
+              >
+                Diff
+              </button>
+            </div>
+          )}
+          {currentStatus === 'archived' ? (
+            <>
+              <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
+                Restore
+              </Button>
+              <Button variant="destructive" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
+                Delete permanently
+              </Button>
+            </>
+          ) : (
+            <Button variant="outline" onClick={handleArchive} disabled={isSaving}>
+              Archive
+            </Button>
+          )}
+          <Button
+            type="submit"
+            form="entry-form"
+            variant="default"
+            disabled={isSaving || Object.keys(fieldErrors).length > 0}
+          >
+            {isSaving ? 'Saving...' : 'Save'}
           </Button>
-          <div className="octo-page-chrome__title-area">
-            <div className="octo-page-chrome__breadcrumb">
-              <Link href="/cms/content" className="octo-u-text-2">
-                Content
-              </Link>
-              <Icon.ChevronRight className="octo-icon-xs octo-u-opacity-60" />
-              <span>{collectionLabel}</span>
-            </div>
-            <div className="octo-page-chrome__title-row">
-              <h1 className="octo-page-chrome__title">{entryTitle || collectionLabel}</h1>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 
   if (isLoadingEntry) {
@@ -289,73 +332,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
 
   return (
     <div className="octo-edit-post">
-      <PageBar
-        title={entryTitle || collectionLabel}
-        breadcrumbs={[
-          {
-            label: 'Content',
-            href: '/cms/content',
-          },
-          {
-            label: collectionLabel,
-            href: `/cms/content/${type}`,
-          },
-        ]}
-        actions={
-          <>
-            {diffToggleVisible && (
-              <div role="tablist" aria-label="Edit or Diff view" className="octo-edit-post__view-toggle">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={viewMode === 'edit'}
-                  onClick={() => setViewMode('edit')}
-                  className={cn(
-                    'octo-edit-post__view-btn',
-                    viewMode === 'edit' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
-                  )}
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={viewMode === 'diff'}
-                  onClick={() => setViewMode('diff')}
-                  className={cn(
-                    'octo-edit-post__view-btn',
-                    viewMode === 'diff' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
-                  )}
-                >
-                  Diff
-                </button>
-              </div>
-            )}
-            {currentStatus === 'archived' ? (
-              <>
-                <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
-                  Restore
-                </Button>
-                <Button variant="destructive" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
-                  Delete permanently
-                </Button>
-              </>
-            ) : (
-              <Button variant="outline" onClick={handleArchive} disabled={isSaving}>
-                Archive
-              </Button>
-            )}
-            <Button
-              type="submit"
-              form="entry-form"
-              variant="default"
-              disabled={isSaving || Object.keys(fieldErrors).length > 0}
-            >
-              {isSaving ? 'Saving...' : 'Save'}
-            </Button>
-          </>
-        }
-      />
+      {headerChrome}
 
       <form
         id="entry-form"
