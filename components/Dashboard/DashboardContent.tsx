@@ -50,7 +50,7 @@ export default function DashboardContent({ selectedType }: Props) {
   const isBranched = !selectedType && tabParam === 'branched';
   const isRecent = !selectedType && tabParam === 'recent';
 
-  const entriesQuery = useEntryList(selectedType, { placeholderData: keepPreviousData });
+  const entriesQuery = useEntryList(undefined, { placeholderData: keepPreviousData });
   const branchQuery = useBranch();
   const hasActiveBranchQuery = useHasActiveBranch();
   // Always fetched so the LeftPanel can show the count badge; the hook is
