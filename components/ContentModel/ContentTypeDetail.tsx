@@ -76,7 +76,7 @@ export default function ContentTypeDetail({ type }: Props) {
   if (isLoading || !schema) {
     return (
       <div className="octo-content-model">
-        <div className="octo-page-chrome">
+        <div className="octo-page-top">
           <Button asChild variant="ghost" size="icon" className="octo-btn-back">
             <Link href="/cms/model" aria-label="Back to Content Model">
               <Icon.ArrowLeft className="octo-icon-md" />

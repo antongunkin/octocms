@@ -92,7 +92,6 @@ describe('EditPost', () => {
     getEntryListMock.mockReturnValue(new Promise(() => {}));
     renderWithQuery(<EditPost type="post" id="post-a" />);
     expect(screen.getByLabelText('Loading entry fields')).toBeDefined();
-    expect(screen.getByLabelText('Loading entry sidebar')).toBeDefined();
   });
 
   it('shows the entry-not-found state when the id is missing from the list', async () => {

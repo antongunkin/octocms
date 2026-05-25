@@ -9,22 +9,23 @@ type PageProps = {
   breadcrumbs: { label: string; href?: string }[];
   actions?: React.ReactNode;
   className?: string;
+  rightBar?: React.ReactNode;
   leftBar?: React.ReactNode;
   children: React.ReactNode;
 };
 
-export function Page({ title, breadcrumbs, actions, className, leftBar, children }: PageProps) {
+export function Page({ title, breadcrumbs, actions, className, rightBar, leftBar, children }: PageProps) {
   return (
     <div className={cn('octo-page-shell', className)}>
-      <div className="octo-page-chrome">
-        <div className="octo-page-chrome__title-area">
+      <div className="octo-page-top">
+        <div className="octo-page-top__title-area">
           {breadcrumbs && (
-            <div className="octo-page-chrome__breadcrumb">
+            <div className="octo-page-top__breadcrumb">
               {breadcrumbs.map(({ label, href }, i) => (
                 <React.Fragment key={label}>
                   {i > 0 && <ChevronRightTiny />}
                   {href ? (
-                    <Link href={href} className="octo-page-chrome__breadcrumb">
+                    <Link href={href} className="octo-page-top__breadcrumb">
                       {label}
                     </Link>
                   ) : (
@@ -34,19 +35,24 @@ export function Page({ title, breadcrumbs, actions, className, leftBar, children
               ))}
             </div>
           )}
-          <div className="octo-page-chrome__title-row">
-            <h1 className="octo-page-chrome__title">{title}</h1>
+          <div className="octo-page-top__title-row">
+            <h1 className="octo-page-top__title">{title}</h1>
           </div>
         </div>
-        {actions && <div className="octo-page-chrome__right">{actions}</div>}
+        {actions && <div className="octo-page-top__right">{actions}</div>}
       </div>
       <div className="octo-page-row">
         {leftBar && (
-          <aside className="octo-page-sidebar">
+          <aside className="octo-page-sidebar octo-page-sidebar--left">
             <div className="octo-page-sidebar__bar">{leftBar}</div>
           </aside>
         )}
         <div className="octo-page-content">{children}</div>
+        {rightBar && (
+          <aside className="octo-page-sidebar octo-page-sidebar--right">
+            <div className="octo-page-sidebar__bar">{rightBar}</div>
+          </aside>
+        )}
       </div>
     </div>
   );

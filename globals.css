@@ -26,6 +26,9 @@
     /* Layout */
     --header-height: 56px;
     --footer-height: 40px;
+    --v-gap: 20px;
+    --h-gap: 12px;
+    --h-gap-lg: 24px;
 
     /* Typography — system fonts only */
     --ft-ui:
@@ -2612,7 +2615,7 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    padding: 20px 24px var(--footer-height);
+    padding: var(--v-gap) var(--h-gap-lg) var(--footer-height);
   }
 
   /* ── octo-shimmer-block / octo-shimmer-row ── */
@@ -2628,8 +2631,8 @@
     gap: 16px;
   }
 
-  /* ── octo-page-chrome (shared page header bar pattern) ── */
-  .octo-page-chrome {
+  /* ── octo-page-top (shared page header bar pattern) ── */
+  .octo-page-top {
     position: sticky;
     top: 57px;
     z-index: 40;
@@ -2640,7 +2643,7 @@
     justify-content: space-between;
     gap: 12px;
     background: color-mix(in srgb, var(--bg) 95%, transparent);
-    padding: 12px 24px;
+    padding: 12px var(--h-gap-lg);
     box-shadow:
       -400px 0 0 var(--bg),
       400px 0 0 var(--bg),
@@ -2656,28 +2659,32 @@
     }
   }
 
-  .octo-page-chrome__title-area {
+  .octo-page-top__title-area {
     min-width: 0;
     flex: 1;
   }
 
-  .octo-page-chrome__breadcrumb {
+  .octo-page-top__breadcrumb {
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: 12px;
     color: var(--muted);
-    margin-bottom: 2px;
+    margin-bottom: 4px;
+
+    a {
+      color: var(--muted);
+    }
   }
 
-  .octo-page-chrome__title-row {
+  .octo-page-top__title-row {
     display: flex;
     min-width: 0;
     align-items: center;
     gap: 10px;
   }
 
-  .octo-page-chrome__title {
+  .octo-page-top__title {
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2687,7 +2694,7 @@
     color: var(--text);
   }
 
-  .octo-page-chrome__right {
+  .octo-page-top__right {
     flex: none;
     display: flex;
     align-items: center;
@@ -2696,49 +2703,49 @@
 
   /* ─── Page chrome skeleton ───────────────────────────── */
 
-  .octo-page-chrome__skel-content {
+  .octo-page-top__skel-content {
     display: flex;
     min-height: 0;
     flex: 1;
     overflow: hidden;
   }
 
-  .octo-page-chrome__skel-left {
+  .octo-page-top__skel-left {
     display: flex;
     align-items: center;
     gap: 8px;
   }
 
-  .octo-page-chrome__skel-col {
+  .octo-page-top__skel-col {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
 
-  .octo-page-chrome__skel-right {
+  .octo-page-top__skel-right {
     display: flex;
     gap: 8px;
   }
 
-  .octo-page-chrome__skel-actions {
+  .octo-page-top__skel-actions {
     display: flex;
     gap: 8px;
   }
 
   /* ShimmerBlock helpers for page chrome skeleton */
-  .octo-page-chrome__skel-title {
+  .octo-page-top__skel-title {
     height: 24px;
     width: 160px;
     max-width: 100%;
     border-radius: 4px;
   }
 
-  .octo-page-chrome__skel-subtitle {
+  .octo-page-top__skel-subtitle {
     height: 12px;
     width: 64px;
   }
 
-  .octo-page-chrome__skel-btn {
+  .octo-page-top__skel-btn {
     height: 32px;
     width: 112px;
     flex-shrink: 0;
@@ -2748,9 +2755,16 @@
   /* ── octo-page-sidebar ── */
   .octo-page-sidebar {
     width: 280px;
-    padding: 0 0 0 6px;
     flex-shrink: 0;
     flex-direction: column;
+
+    &[class*='--left'] {
+      padding: 0 0 0 6px;
+    }
+
+    &[class*='--right'] {
+      padding: 0 6px 0 0;
+    }
   }
 
   .octo-page-sidebar__bar {
@@ -4247,23 +4261,9 @@
     flex-direction: column;
   }
 
-  .octo-edit-post__body {
-    display: flex;
-    flex: 1;
-    min-height: 0;
-  }
-
-  .octo-edit-post__form-col {
-    flex: 1;
-    min-width: 0;
-    overflow-y: auto;
-    background: var(--bg);
-  }
-
   .octo-edit-post__form-wrap {
     max-width: 960px;
     margin: 0 auto;
-    padding: 24px 24px 128px;
   }
 
   .octo-edit-post__form-card {
@@ -4276,17 +4276,9 @@
 
   .octo-edit-post__sidebar {
     display: flex;
-    width: 280px;
     flex-shrink: 0;
     flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-    border-left: 1px solid var(--border);
-    background: var(--surface-2);
     padding: 20px 16px;
-  }
-
-  .octo-edit-post__sidebar-section {
   }
 
   .octo-edit-post__sidebar-label {

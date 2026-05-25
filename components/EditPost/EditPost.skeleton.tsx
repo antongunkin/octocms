@@ -8,7 +8,7 @@ import { ShimmerBlock } from '../skeletons/primitives';
 export function EditPostSkeleton() {
   return (
     <div className="octo-edit-post" role="status" aria-label="Loading entry">
-      <div className="octo-page-chrome">
+      <div className="octo-page-top">
         <div className="octo-skel-row-12">
           <ShimmerBlock className="octo-skel-h-7 octo-skel-w-7 octo-skel-rounded-md" />
           <ShimmerBlock className="octo-skel-h-5 octo-skel-w-64" />
@@ -33,15 +33,6 @@ export function EditPostSkeleton() {
             </div>
           </div>
         </div>
-        <aside className="octo-edit-post__sidebar">
-          {Array.from({ length: 3 }, (_, i) => (
-            <div key={i} className="octo-card octo-edit-post__skel-card">
-              <ShimmerBlock className="octo-skel-mb-3 octo-skel-h-4 octo-skel-w-24" />
-              <ShimmerBlock className="octo-skel-h-3 octo-skel-w-full" />
-              <ShimmerBlock className="octo-skel-h-3 octo-skel-w-2-3 octo-edit-post__skel-mt" />
-            </div>
-          ))}
-        </aside>
       </div>
     </div>
   );

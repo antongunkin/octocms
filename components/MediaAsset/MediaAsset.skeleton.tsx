@@ -6,7 +6,7 @@ import { ShimmerBlock } from '../skeletons/primitives';
 export function MediaAssetSkeleton() {
   return (
     <div className="octo-media-asset" role="status" aria-label="Loading asset">
-      <div className="octo-page-chrome">
+      <div className="octo-page-top">
         <div className="octo-skel-row-8">
           <ShimmerBlock className="octo-skel-h-7 octo-skel-w-7 octo-skel-rounded-md" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>

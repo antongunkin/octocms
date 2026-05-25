@@ -101,7 +101,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
   if (isLoading) {
     return (
       <div className="octo-media-asset">
-        <div className="octo-page-chrome">
+        <div className="octo-page-top">
           <div className="octo-u-row octo-u-gap-2">
             <Button variant="ghost" size="icon" className="octo-btn-back" onClick={back} aria-label="Back to media">
               <Icon.ArrowLeft className="octo-icon-md" />

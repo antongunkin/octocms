@@ -6,7 +6,7 @@ import { ShimmerBlock } from '../skeletons/primitives';
 export function MediaManagerSkeleton() {
   return (
     <div className="octo-media-manager" role="status" aria-label="Loading media">
-      <div className="octo-page-chrome">
+      <div className="octo-page-top">
         <ShimmerBlock className="octo-skel-h-5 octo-skel-w-32" />
         <ShimmerBlock className="octo-skel-h-8 octo-skel-w-28 octo-skel-rounded-md" />
       </div>

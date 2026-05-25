@@ -18,30 +18,24 @@ export function PageBar({ title, breadcrumbs, status, actions }: PageBarProps) {
   }
 
   return (
-    <div className="octo-page-chrome">
-      <div className="octo-page-chrome__title-area">
+    <div className="octo-page-top">
+      <div className="octo-page-top__title-area">
         {breadcrumbs && (
-          <div className="octo-page-chrome__breadcrumb">
+          <div className="octo-page-top__breadcrumb">
             {breadcrumbs.map(({ label, href }, i) => (
               <React.Fragment key={label}>
                 {i > 0 && <ChevronRightTiny />}
-                {href ? (
-                  <Link href={href} className="octo-page-chrome__breadcrumb">
-                    {label}
-                  </Link>
-                ) : (
-                  label
-                )}
+                {href ? <Link href={href}>{label}</Link> : label}
               </React.Fragment>
             ))}
           </div>
         )}
-        <div className="octo-page-chrome__title-row">
-          <h1 className="octo-page-chrome__title">{title}</h1>
+        <div className="octo-page-top__title-row">
+          <h1 className="octo-page-top__title">{title}</h1>
           {status && <StatusBadge status={status} />}
         </div>
       </div>
-      {actions && <div className="octo-page-chrome__right">{actions}</div>}
+      {actions && <div className="octo-page-top__right">{actions}</div>}
     </div>
   );
 }

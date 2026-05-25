@@ -13,17 +13,17 @@ import { LeftPanelSkeleton } from './LeftPanelSkeleton';
  */
 export function ContentPageChromeSkeleton() {
   return (
-    <div className="octo-page-chrome octo-page-chrome--skel">
-      <div className="octo-page-chrome">
-        <div className="octo-page-chrome__title-area">
-          <div className="octo-page-chrome__breadcrumb">
+    <div className="octo-page-top octo-page-top--skel">
+      <div className="octo-page-top">
+        <div className="octo-page-top__title-area">
+          <div className="octo-page-top__breadcrumb">
             <ShimmerBlock className="octo-skel-h-3 octo-skel-w-16" />
           </div>
           <div>
             <ShimmerBlock className="octo-skel-h-6 octo-skel-w-40" style={{ maxWidth: '100%', borderRadius: 4 }} />
           </div>
         </div>
-        <div className="octo-page-chrome__right">
+        <div className="octo-page-top__right">
           <ShimmerBlock className="octo-skel-h-8 octo-skel-w-28 octo-skel-rounded-md octo-u-shrink-0" />
         </div>
       </div>

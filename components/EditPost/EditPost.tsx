@@ -35,10 +35,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { toast } from '../../hooks/useToast';
 import CreateBranchDialog from '../CreateBranchDialog';
 
-import { PageBar } from '../Layout/PageBar';
+import { Page } from '../Layout/Page';
 
 import { EntryFormSkeleton } from './skeletons/EntryFormSkeleton';
-import { EntrySidebarSkeleton } from './skeletons/EntrySidebarSkeleton';
+// import { EntrySidebarSkeleton } from './skeletons/EntrySidebarSkeleton';
 
 const HistorySection = dynamic(() => import('../HistorySection/HistorySection'), {
   ssr: false,
@@ -230,113 +230,127 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
   const isNotFound = entryListResolved && !resolvedEntryItem;
 
   // Header chrome that's safe to render before the entry resolves.
-  const headerChrome = (
-    <PageBar
-      title={entryTitle || collectionLabel}
-      breadcrumbs={[
-        {
-          label: 'Content',
-          href: '/cms/content',
-        },
-        {
-          label: collectionLabel,
-          href: `/cms/content/${type}`,
-        },
-      ]}
-      actions={
-        <>
-          {diffToggleVisible && (
-            <div role="tablist" aria-label="Edit or Diff view" className="octo-edit-post__view-toggle">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={viewMode === 'edit'}
-                onClick={() => setViewMode('edit')}
-                className={cn(
-                  'octo-edit-post__view-btn',
-                  viewMode === 'edit' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
-                )}
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={viewMode === 'diff'}
-                onClick={() => setViewMode('diff')}
-                className={cn(
-                  'octo-edit-post__view-btn',
-                  viewMode === 'diff' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
-                )}
-              >
-                Diff
-              </button>
-            </div>
-          )}
-          {currentStatus === 'archived' ? (
-            <>
-              <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
-                Restore
-              </Button>
-              <Button variant="destructive" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
-                Delete permanently
-              </Button>
-            </>
-          ) : (
-            <Button variant="outline" onClick={handleArchive} disabled={isSaving}>
-              Archive
+  const headerProps = {
+    title: entryTitle || collectionLabel,
+    breadcrumbs: [
+      {
+        label: 'Content',
+        href: '/cms/content',
+      },
+      {
+        label: collectionLabel,
+        href: `/cms/content/${type}`,
+      },
+    ],
+    actions: (
+      <>
+        {diffToggleVisible && (
+          <div role="tablist" aria-label="Edit or Diff view" className="octo-edit-post__view-toggle">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={viewMode === 'edit'}
+              onClick={() => setViewMode('edit')}
+              className={cn(
+                'octo-edit-post__view-btn',
+                viewMode === 'edit' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
+              )}
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={viewMode === 'diff'}
+              onClick={() => setViewMode('diff')}
+              className={cn(
+                'octo-edit-post__view-btn',
+                viewMode === 'diff' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
+              )}
+            >
+              Diff
+            </button>
+          </div>
+        )}
+        {currentStatus === 'archived' ? (
+          <>
+            <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
+              Restore
             </Button>
-          )}
-          <Button
-            type="submit"
-            form="entry-form"
-            variant="default"
-            disabled={isSaving || Object.keys(fieldErrors).length > 0}
-          >
-            {isSaving ? 'Saving...' : 'Save'}
+            <Button variant="destructive" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
+              Delete permanently
+            </Button>
+          </>
+        ) : (
+          <Button variant="outline" onClick={handleArchive} disabled={isSaving}>
+            Archive
           </Button>
-        </>
-      }
-    />
-  );
+        )}
+        <Button
+          type="submit"
+          form="entry-form"
+          variant="default"
+          disabled={isSaving || Object.keys(fieldErrors).length > 0}
+        >
+          {isSaving ? 'Saving...' : 'Save'}
+        </Button>
+      </>
+    ),
+  };
 
   if (isLoadingEntry) {
     return (
-      <div className="octo-edit-post">
-        {headerChrome}
-        <div className="octo-edit-post__body">
-          <div className="octo-edit-post__form-col">
-            <div className="octo-edit-post__form-wrap">
-              <EntryFormSkeleton />
-            </div>
-          </div>
-          <EntrySidebarSkeleton />
+      <Page className="octo-edit-post" {...headerProps}>
+        <div className="octo-edit-post__form-wrap">
+          <EntryFormSkeleton />
         </div>
-      </div>
+      </Page>
     );
   }
 
   if (isNotFound || !post?.fields) {
     return (
-      <div className="octo-edit-post">
-        {headerChrome}
+      <Page className="octo-edit-post" {...headerProps}>
         <div className="octo-edit-post__not-found">
           <p className="octo-u-text-base octo-u-font-medium">Entry not found.</p>
           <Button asChild variant="outline">
             <Link href={`/cms/content/${type}`}>Back to {collectionLabel}</Link>
           </Button>
         </div>
-      </div>
+      </Page>
     );
   }
 
   return (
-    <div className="octo-edit-post">
-      {headerChrome}
-
+    <Page
+      className="octo-edit-post"
+      {...headerProps}
+      rightBar={
+        <div className="octo-edit-post__sidebar">
+          <div className="octo-edit-post__sidebar-label">Entry details</div>
+          <div className="octo-u-stack octo-u-gap-3">
+            <div className="octo-edit-post__detail-row">
+              <span className="octo-edit-post__detail-key">ID</span>
+              <span className="octo-edit-post__detail-val octo-edit-post__detail-val--mono" title={post.sys?.id}>
+                {post.sys?.id}
+              </span>
+            </div>
+            <div className="octo-edit-post__detail-row">
+              <span className="octo-edit-post__detail-key">Type</span>
+              <span className="octo-edit-post__detail-val">{collectionLabel}</span>
+            </div>
+            <div className="octo-edit-post__detail-row">
+              <span className="octo-edit-post__detail-key">Status</span>
+              <StatusBadge status={currentStatus} />
+            </div>
+          </div>
+          {selectedFile && <HistorySection entryPath={selectedFile.path} flat />}
+          {selectedFile && <LinkedBySection entryPath={selectedFile.path} />}
+        </div>
+      }
+    >
       <form
         id="entry-form"
-        className="octo-edit-post__body"
         onSubmit={handleSubmit}
         onInput={(e) => {
           const t = e.target;
@@ -352,51 +366,21 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
         }}
       >
         {/* Main content column — independently scrollable */}
-        <div className="octo-edit-post__form-col">
-          <div className="octo-edit-post__form-wrap">
-            {viewMode === 'diff' && selectedFile ? (
-              <DiffView collectionType={type} entryPath={selectedFile.path} />
-            ) : (
-              <section className="octo-edit-post__form-card">
-                <FormFields
-                  key={`${filePath ?? ''}-${entryQuery.dataUpdatedAt}`}
-                  selectedFile={selectedFile}
-                  fields={post.fields}
-                  fieldErrors={fieldErrors}
-                  onClearFieldError={clearFieldError}
-                />
-              </section>
-            )}
-          </div>
+        <div className="octo-edit-post__form-wrap">
+          {viewMode === 'diff' && selectedFile ? (
+            <DiffView collectionType={type} entryPath={selectedFile.path} />
+          ) : (
+            <section className="octo-edit-post__form-card">
+              <FormFields
+                key={`${filePath ?? ''}-${entryQuery.dataUpdatedAt}`}
+                selectedFile={selectedFile}
+                fields={post.fields}
+                fieldErrors={fieldErrors}
+                onClearFieldError={clearFieldError}
+              />
+            </section>
+          )}
         </div>
-
-        {/* Sidebar — fixed width, independently scrollable, surface-2 panel */}
-        <aside className="octo-edit-post__sidebar">
-          {/* Entry details */}
-          <div className="octo-edit-post__sidebar-section">
-            <div className="octo-edit-post__sidebar-label">Entry details</div>
-            <div className="octo-u-stack octo-u-gap-3">
-              <div className="octo-edit-post__detail-row">
-                <span className="octo-edit-post__detail-key">ID</span>
-                <span className="octo-edit-post__detail-val octo-edit-post__detail-val--mono" title={post.sys?.id}>
-                  {post.sys?.id}
-                </span>
-              </div>
-              <div className="octo-edit-post__detail-row">
-                <span className="octo-edit-post__detail-key">Type</span>
-                <span className="octo-edit-post__detail-val">{collectionLabel}</span>
-              </div>
-              <div className="octo-edit-post__detail-row">
-                <span className="octo-edit-post__detail-key">Status</span>
-                <StatusBadge status={currentStatus} />
-              </div>
-            </div>
-          </div>
-
-          {selectedFile && <HistorySection entryPath={selectedFile.path} flat />}
-
-          {selectedFile && <LinkedBySection entryPath={selectedFile.path} />}
-        </aside>
       </form>
 
       {/* Inline entry editor overlays (rendered outside the form to avoid nested forms) */}
@@ -440,7 +424,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
         onOpenChange={setCreateBranchOpen}
         onBranchCreated={handleBranchCreated}
       />
-    </div>
+    </Page>
   );
 };
 
