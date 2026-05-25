@@ -11,7 +11,7 @@
 
 import * as React from 'react';
 import { cn } from '../../lib/utils';
-import { PageBar, type PageBarProps } from './PageBar';
+import { PageBar } from './PageBar';
 
 type PageShellRootProps = {
   className?: string;
@@ -69,5 +69,3 @@ export const PageShell = Object.assign(PageShellRoot, {
   Body: PageShellBody,
   Split: PageShellSplit,
 });
-
-export type { PageBarProps };
