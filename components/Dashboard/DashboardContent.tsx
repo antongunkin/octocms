@@ -99,7 +99,7 @@ export default function DashboardContent({ selectedType }: Props) {
             <span className="octo-u-text-2">Content</span>
           </div>
           <div className="octo-page-chrome__title-row">
-            <h1 className="octo-page-chrome__title">{selectedTypeLabel ?? 'Content'}</h1>
+            <h1 className="octo-page-chrome__title">{selectedTypeLabel ?? 'All content'}</h1>
           </div>
         </div>
         <div className="octo-page-chrome__right">
