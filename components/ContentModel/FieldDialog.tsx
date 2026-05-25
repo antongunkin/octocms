@@ -286,7 +286,6 @@ export default function FieldDialog(props: Props) {
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
                     onClick={() => setStep('format')}
                     className="octo-button octo-button--icon-xs"
                   >
@@ -578,7 +577,6 @@ function ChangeTypeMenu({
       <Button
         type="button"
         variant="ghost"
-        size="sm"
         className="octo-button octo-button--icon-xs"
         onClick={() => setOpenPicker((v) => !v)}
       >

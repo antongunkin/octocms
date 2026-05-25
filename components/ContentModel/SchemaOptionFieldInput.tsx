@@ -354,7 +354,6 @@ function SelectOptionsEditor({
       <Button
         type="button"
         variant="outline"
-        size="sm"
         onClick={add}
         disabled={disabled}
         className="octo-button octo-button--icon-xs"
@@ -414,7 +413,7 @@ function StringListEditor({
           disabled={disabled}
           className="octo-u-flex-1"
         />
-        <Button type="button" variant="outline" size="sm" onClick={commit} disabled={disabled || !draft.trim()}>
+        <Button type="button" variant="outline" onClick={commit} disabled={disabled || !draft.trim()}>
           Add
         </Button>
       </div>

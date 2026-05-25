@@ -173,7 +173,7 @@ function AddEntryButton({ collections }: { collections: string[] }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="default" disabled={creating}>
+        <Button variant="default" disabled={creating}>
           <Plus className="octo-icon-md" />
           Add content
           <ChevronDown className="octo-icon-xs octo-u-opacity-70" />
@@ -448,16 +448,11 @@ function ContentTable({
                   : `Showing ${startIdx}-${endIdx} of ${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'}`}
               </span>
               <div className="octo-content-card__footer-pages">
-                <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
+                <Button variant="outline" onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
                   <ChevronLeft className="octo-icon-sm" />
                   Prev
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={page >= totalPages - 1}
-                >
+                <Button variant="outline" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages - 1}>
                   Next
                   <ChevronRight className="octo-icon-sm" />
                 </Button>

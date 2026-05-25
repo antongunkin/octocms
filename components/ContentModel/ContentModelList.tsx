@@ -73,7 +73,7 @@ export default function ContentModelList() {
               Content types
               <span className="octo-hdr-right__mono">{rows.length}</span>
             </span>
-            <Button size="sm" className="octo-button octo-button--action" onClick={() => setCreateOpen(true)}>
+            <Button className="octo-button octo-button--action" onClick={() => setCreateOpen(true)}>
               <Plus className="octo-icon-md" />
               Create content type
             </Button>

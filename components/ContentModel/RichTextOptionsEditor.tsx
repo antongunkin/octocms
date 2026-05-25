@@ -261,7 +261,7 @@ function VariablesEditor({
           disabled={disabled}
           className="octo-u-flex-1 octo-u-mono octo-select__trigger octo-select__trigger--xs"
         />
-        <Button type="button" variant="outline" size="sm" onClick={commit} disabled={disabled || !draft.trim()}>
+        <Button type="button" variant="outline" onClick={commit} disabled={disabled || !draft.trim()}>
           Add
         </Button>
       </div>
@@ -358,7 +358,6 @@ function ComponentsEditor({
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
                 className="octo-button octo-button--icon-xs octo-button--danger-ghost"
                 onClick={() => removeComponent(name)}
                 disabled={disabled}
@@ -369,7 +368,7 @@ function ComponentsEditor({
           </div>
         ))
       )}
-      <Button type="button" variant="outline" size="sm" onClick={addComponent} disabled={disabled}>
+      <Button type="button" variant="outline" onClick={addComponent} disabled={disabled}>
         <Plus className="octo-icon-sm" /> Add component
       </Button>
     </div>
@@ -395,7 +394,6 @@ function PropsEditor({
       <Button
         type="button"
         variant="outline"
-        size="sm"
         onClick={add}
         disabled={disabled}
         className="octo-button octo-button--icon-xs"
@@ -454,7 +452,6 @@ function PropsEditor({
       <Button
         type="button"
         variant="outline"
-        size="sm"
         onClick={add}
         disabled={disabled}
         className="octo-button octo-button--icon-xs"

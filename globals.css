@@ -29,8 +29,8 @@
 
     /* Typography — system fonts only */
     --ft-ui:
-      -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, helvetica, arial, sans-serif, 'Apple Color Emoji',
-      'Segoe UI Emoji', 'Segoe UI Symbol';
+      system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --ft-mono: ui-monospace, sfmono-regular, 'SF Mono', menlo, consolas, 'Liberation Mono', monospace;
 
     /* surfaces */
@@ -2719,13 +2719,13 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    background: var(--bg);
+    background: color-mix(in srgb, var(--bg) 95%, transparent);
     padding: 12px 24px;
     box-shadow:
       -400px 0 0 var(--bg),
       400px 0 0 var(--bg),
-      0 0 10px var(--bg),
-      0 0 10px var(--bg);
+      0 2px 8px var(--bg);
+    backdrop-filter: blur(4px);
 
     &[class*='--skel'] {
       display: flex;

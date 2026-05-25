@@ -122,7 +122,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
       <div className="octo-media-asset__not-found">
         <ImageIcon className="octo-icon-2xl" />
         <p className="octo-u-text-base">Asset not found.</p>
-        <Button variant="outline" size="sm" onClick={back}>
+        <Button variant="outline" onClick={back}>
           Back to media
         </Button>
       </div>
@@ -155,13 +155,12 @@ export default function MediaAsset({ id }: MediaAssetProps) {
           </div>
         </div>
         <div className="octo-page-chrome__right octo-u-row octo-u-gap-2">
-          <Button variant="outline" size="sm" className="octo-u-gap-1-5" onClick={openInNewTab}>
+          <Button variant="outline" className="octo-u-gap-1-5" onClick={openInNewTab}>
             <ExternalLink className="octo-icon-md" />
             Open in new tab
           </Button>
           <Button
             variant="ghost"
-            size="sm"
             className="octo-button octo-button--danger-ghost"
             onClick={() => setConfirmDelete(true)}
             disabled={isPending}
@@ -196,7 +195,6 @@ export default function MediaAsset({ id }: MediaAssetProps) {
               />
               <Button
                 type="button"
-                size="sm"
                 variant="secondary"
                 className="octo-button octo-button--w-full"
                 onClick={handleSaveTitle}
@@ -224,7 +222,6 @@ export default function MediaAsset({ id }: MediaAssetProps) {
               </Select>
               <Button
                 type="button"
-                size="sm"
                 variant="secondary"
                 className="octo-button octo-button--w-full"
                 onClick={handleSaveFolder}

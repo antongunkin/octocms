@@ -67,7 +67,7 @@ function PullRequestRow({ pr, isLast: _isLast }: { pr: RecentCMSPullRequest; isL
           {pr.updatedAt ? <span>· {compactRelativeTime(pr.updatedAt)}</span> : null}
         </div>
       </div>
-      <Button asChild variant="secondary" size="sm">
+      <Button asChild variant="secondary">
         <a href={pr.prUrl} target="_blank" rel="noopener noreferrer">
           {pr.state === 'open' ? 'Review' : 'View'}
         </a>

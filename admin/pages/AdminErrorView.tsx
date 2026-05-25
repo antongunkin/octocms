@@ -56,10 +56,10 @@ export function AdminErrorView({
         )}
         {isAvailability ? <p className="octo-admin-error__hint">You can try again in a few minutes.</p> : null}
         <div className="octo-admin-error__actions">
-          <Button type="button" size="sm" onClick={() => reset()}>
+          <Button type="button" onClick={() => reset()}>
             Try again
           </Button>
-          <Button type="button" size="sm" variant="outline" asChild>
+          <Button type="button" variant="outline" asChild>
             <a href={backHref}>{backLabel}</a>
           </Button>
         </div>

@@ -85,7 +85,7 @@ function DefaultBoundaryFallback({
       <p className="octo-error-boundary__title">{heading}</p>
       <p className="octo-error-boundary__msg">{error.message || 'An unexpected error occurred.'}</p>
       <div>
-        <Button type="button" variant="outline" size="sm" onClick={reset}>
+        <Button type="button" variant="outline" onClick={reset}>
           Try again
         </Button>
       </div>

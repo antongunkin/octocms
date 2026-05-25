@@ -211,7 +211,7 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
         {/* Top bar */}
         <div className="octo-inline-editor__header">
           <div className="octo-inline-editor__back">
-            <Button variant="ghost" size="sm" onClick={handleClose}>
+            <Button variant="ghost" onClick={handleClose}>
               <ArrowLeft className="octo-icon-md octo-u-mr-1" />
               Back
             </Button>
@@ -226,22 +226,16 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
           <div className="octo-inline-editor__actions">
             {currentStatus === 'archived' ? (
               <>
-                <Button variant="outline" size="sm" onClick={handleRestore} disabled={isSaving}>
+                <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
                   Restore
                 </Button>
-                <Button variant="destructive" size="sm" onClick={openDeleteDialog} disabled={isSaving}>
+                <Button variant="destructive" onClick={openDeleteDialog} disabled={isSaving}>
                   <Trash2 className="octo-icon-md octo-u-mr-1" />
                   Delete permanently
                 </Button>
               </>
             ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                style={{ color: '#6b7280' }}
-                onClick={handleArchive}
-                disabled={isSaving}
-              >
+              <Button variant="outline" style={{ color: '#6b7280' }} onClick={handleArchive} disabled={isSaving}>
                 Archive
               </Button>
             )}

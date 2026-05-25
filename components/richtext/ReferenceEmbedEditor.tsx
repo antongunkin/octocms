@@ -122,7 +122,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
             >
               <Link2 className="octo-icon-sm" />
             </button>
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(true)}>
               Change
             </Button>
             <button
@@ -146,7 +146,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
             </span>
             <span className="octo-ref-embed__loading-id">{currentId}</span>
           </div>
-          <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
+          <Button type="button" variant="outline" onClick={() => setIsOpen(true)}>
             Select entry
           </Button>
         </div>
@@ -157,7 +157,7 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           </div>
           <div>
             <span className="octo-ref-embed__loading-text octo-u-mb-1">No entry selected</span>
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(true)}>
               Select entry
             </Button>
           </div>

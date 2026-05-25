@@ -31,7 +31,7 @@ export function PageBar({ title, breadcrumb, status, right }: PageBarProps) {
         )}
         <div className="octo-page-bar__title-row">
           <h1 className="octo-page-bar__title">{title}</h1>
-          {status && <StatusBadge status={status} size="sm" />}
+          {status && <StatusBadge status={status} />}
         </div>
       </div>
       {right && <div className="octo-page-bar__right">{right}</div>}

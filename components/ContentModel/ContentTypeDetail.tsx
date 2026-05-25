@@ -107,7 +107,7 @@ export default function ContentTypeDetail({ type }: Props) {
         <p className="octo-not-found__desc">
           No collection with key <code className="octo-not-found__code">{type}</code> exists in the schema.
         </p>
-        <Button asChild variant="outline" size="sm">
+        <Button asChild variant="outline">
           <Link href="/cms/model">Back to Content Model</Link>
         </Button>
       </div>
@@ -214,7 +214,7 @@ export default function ContentTypeDetail({ type }: Props) {
         </div>
         <div className="octo-page-chrome__right">
           <div className="octo-hdr-right">
-            <Button size="sm" className="octo-button octo-button--action" onClick={() => setAddFieldOpen(true)}>
+            <Button className="octo-button octo-button--action" onClick={() => setAddFieldOpen(true)}>
               <Plus className="octo-icon-md" />
               Add field
             </Button>

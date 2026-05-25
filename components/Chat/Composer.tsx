@@ -168,12 +168,7 @@ export function Composer({
             el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
           }}
         />
-        <Button
-          onClick={send}
-          disabled={disabled || (!value.trim() && files.length === 0)}
-          size="sm"
-          className="octo-u-gap-1-5"
-        >
+        <Button onClick={send} disabled={disabled || (!value.trim() && files.length === 0)} className="octo-u-gap-1-5">
           <Send className="octo-icon-md" />
           Send
         </Button>

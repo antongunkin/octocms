@@ -120,7 +120,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           <div className="octo-image-embed__info">
             <span className="octo-image-embed__info-label">Image embed</span>
             <span className="octo-image-embed__info-name">{selectedEntry.title || selectedEntry.originalName}</span>
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(true)}>
               Change image
             </Button>
           </div>
@@ -132,7 +132,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
           </div>
           <div>
             <span className="octo-image-embed__no-label">No image selected</span>
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(true)}>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(true)}>
               Select image
             </Button>
           </div>
@@ -169,7 +169,6 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => uploadInputRef.current?.click()}
                   disabled={isPending}
                 >
@@ -195,13 +194,12 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                   />
                 </div>
                 <div className="octo-u-flex octo-u-gap-2">
-                  <Button type="button" size="sm" onClick={confirmStagedUpload} disabled={isPending}>
+                  <Button type="button" onClick={confirmStagedUpload} disabled={isPending}>
                     Upload
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
                     onClick={() => {
                       setStagedFile(null);
                       setUploadTitle('');

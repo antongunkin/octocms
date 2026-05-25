@@ -277,7 +277,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
         {headerChrome}
         <div className="octo-edit-post__not-found">
           <p className="octo-u-text-base octo-u-font-medium">Entry not found.</p>
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline">
             <Link href={`/cms/content/${type}`}>Back to {collectionLabel}</Link>
           </Button>
         </div>
@@ -341,15 +341,15 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
           )}
           {currentStatus === 'archived' ? (
             <>
-              <Button variant="outline" size="sm" onClick={handleRestore} disabled={isSaving}>
+              <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
                 Restore
               </Button>
-              <Button variant="destructive" size="sm" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
+              <Button variant="destructive" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
                 Delete permanently
               </Button>
             </>
           ) : (
-            <Button variant="outline" size="sm" onClick={handleArchive} disabled={isSaving}>
+            <Button variant="outline" onClick={handleArchive} disabled={isSaving}>
               Archive
             </Button>
           )}
@@ -357,7 +357,6 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
             type="submit"
             form="entry-form"
             variant="default"
-            size="sm"
             disabled={isSaving || Object.keys(fieldErrors).length > 0}
           >
             {isSaving ? 'Saving...' : 'Save'}

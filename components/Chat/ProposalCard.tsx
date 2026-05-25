@@ -69,12 +69,11 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
 
       {isPending && !showRejectInput && (
         <div className="octo-proposal-card__actions">
-          <Button size="sm" onClick={() => onAccept(proposal.id)} disabled={isBusy} className="octo-u-gap-1-5">
+          <Button onClick={() => onAccept(proposal.id)} disabled={isBusy} className="octo-u-gap-1-5">
             <Check className="octo-icon-sm" />
             Accept
           </Button>
           <Button
-            size="sm"
             variant="outline"
             onClick={() => setShowRejectInput(true)}
             disabled={isBusy}
@@ -101,15 +100,10 @@ export function ProposalCard({ state, onAccept, onReject }: Props) {
               }
             }}
           />
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() => onReject(proposal.id, rejectReason.trim() || undefined)}
-          >
+          <Button variant="destructive" onClick={() => onReject(proposal.id, rejectReason.trim() || undefined)}>
             Confirm reject
           </Button>
           <Button
-            size="sm"
             variant="ghost"
             onClick={() => {
               setShowRejectInput(false);

@@ -76,7 +76,7 @@ const ContentTypes = ({ entries = [] }: ContentTypesProps) => {
             : 'Entries'}
         </h1>
         {selectedType && (
-          <Button size="sm" variant="default" onClick={addNew} disabled={creating}>
+          <Button variant="default" onClick={addNew} disabled={creating}>
             <Plus className="octo-icon-md" />
             Add entry
           </Button>

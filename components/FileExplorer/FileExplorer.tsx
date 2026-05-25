@@ -57,7 +57,7 @@ const FileExplorer = ({ files = [], folders = [] }: FileExplorerProps) => {
         <div className="octo-file-explorer__main-header">
           <h1 className="octo-file-explorer__main-title">Files</h1>
           {selectedType && (
-            <Button size="sm" style={{ background: '#2563eb', color: '#fff' }} onClick={addNew}>
+            <Button style={{ background: '#2563eb', color: '#fff' }} onClick={addNew}>
               Add New
             </Button>
           )}

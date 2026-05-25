@@ -620,11 +620,11 @@ const FormReferenceField = ({
           {/* Action buttons */}
           {canAdd && (
             <div className="octo-ff-reference__add-row">
-              <Button type="button" variant="outline" size="sm" onClick={() => setIsExistingOpen(true)}>
+              <Button type="button" variant="outline" onClick={() => setIsExistingOpen(true)}>
                 <Plus className="octo-icon-md" />
                 Add existing
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(true)}>
+              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(true)}>
                 <Plus className="octo-icon-md" />
                 Create new
               </Button>

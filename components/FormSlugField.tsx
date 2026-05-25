@@ -108,7 +108,7 @@ const FormSlugField = ({
             />
           </FieldShell>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={onRegenerate}>
+        <Button type="button" variant="outline" onClick={onRegenerate}>
           Regenerate from title
         </Button>
       </div>

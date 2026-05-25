@@ -227,7 +227,7 @@ export default function ConditionalBranchesEditor({
         )}
       </div>
 
-      <Button type="button" variant="outline" size="sm" onClick={addBranch} disabled={disabled}>
+      <Button type="button" variant="outline" onClick={addBranch} disabled={disabled}>
         <Plus className="octo-icon-sm" /> Add branch
       </Button>
 
@@ -323,7 +323,6 @@ function NestedFieldList({
       <Button
         type="button"
         variant="outline"
-        size="sm"
         className="octo-button octo-button--icon-xs"
         onClick={() => onEdit(null, null)}
         disabled={disabled}

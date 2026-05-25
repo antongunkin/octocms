@@ -126,11 +126,11 @@ const FormImageField = ({
           </div>
         )}
         <div className="octo-ff-image__actions">
-          <Button type="button" variant="outline" size="sm" onClick={() => uploadInputRef.current?.click()}>
+          <Button type="button" variant="outline" onClick={() => uploadInputRef.current?.click()}>
             <Upload className="octo-icon-md" />
             Upload new image
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => setShowSelectDialog(true)}>
+          <Button type="button" variant="outline" onClick={() => setShowSelectDialog(true)}>
             <ImagePlus className="octo-icon-md" />
             Select existing image
           </Button>

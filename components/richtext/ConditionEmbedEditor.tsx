@@ -213,7 +213,6 @@ const ConditionEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
                 onClick={() => removeBranch(activeBranch.key)}
                 style={{ height: 24, width: 24, padding: 0, color: 'var(--muted)' }}
                 title="Remove this branch"

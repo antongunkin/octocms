@@ -173,7 +173,6 @@ const MediaManager = () => {
           </span>
           <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
           <Button
-            size="sm"
             className="octo-u-gap-1-5 octo-btn-primary-fg"
             onClick={() => document.getElementById('media-upload-bar-input')?.click()}
             disabled={pendingUpload !== null}
