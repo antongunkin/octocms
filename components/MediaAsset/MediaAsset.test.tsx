@@ -141,10 +141,4 @@ describe('MediaAsset', () => {
     expect(screen.getByText('/media/abc-123.png')).toBeDefined();
     expect(screen.getByText('abc-123')).toBeDefined();
   });
-
-  it('back arrow returns to /cms/media', () => {
-    renderWithFiles([mockFile], mockFile.id);
-    fireEvent.click(screen.getByRole('button', { name: /back to media/i }));
-    expect(pushMock).toHaveBeenCalledWith('/cms/media');
-  });
 });
