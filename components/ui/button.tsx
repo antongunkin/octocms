@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   variant?: 'default' | 'primary' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'brand';
-  size?: 'default' | 'sm' | 'md' | 'lg' | 'icon';
+  size?: 'default' | 'lg' | 'icon';
   icon?: React.ReactNode;
   iconRight?: React.ReactNode;
 }
@@ -66,18 +66,11 @@ Button.displayName = 'Button';
 type PublishButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   count?: number;
   label?: string;
-  size?: 'sm' | 'md';
 };
 
 export const PublishButton = React.forwardRef<HTMLButtonElement, PublishButtonProps>(
-  ({ className, count = 0, label = 'Publish', size = 'md', ...props }, ref) => (
-    <button
-      ref={ref}
-      type="button"
-      className={cn('octo-button octo-button--publish', className)}
-      style={size === 'md' ? { height: '32px' } : undefined}
-      {...props}
-    >
+  ({ className, count = 0, label = 'Publish', ...props }, ref) => (
+    <button ref={ref} type="button" className={cn('octo-button octo-button--publish', className)} {...props}>
       <GitCommit size={13} />
       {label}
       {count > 0 && <span className="octo-button__publish-count">{count}</span>}

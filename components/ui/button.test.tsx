@@ -16,14 +16,7 @@ describe('buttonVariants', () => {
   });
 
   it('includes size modifier (non-default)', () => {
-    expect(buttonVariants({ size: 'sm' })).toContain('octo-button--sm');
-  });
-
-  it('does not include a size modifier for the default size', () => {
-    const cls = buttonVariants({ size: 'default' });
-    expect(cls).not.toContain('octo-button--sm');
-    expect(cls).not.toContain('octo-button--lg');
-    expect(cls).not.toContain('octo-button--md');
+    expect(buttonVariants({ size: 'lg' })).toContain('octo-button--lg');
   });
 
   it('appends extra className', () => {
