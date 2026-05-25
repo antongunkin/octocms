@@ -13,7 +13,7 @@ import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { PageBar } from '../Layout/PageBar';
+import { Page } from '../Layout/Page';
 
 import { MediaMetadataFormSkeleton } from './skeletons/MediaMetadataFormSkeleton';
 import { MediaPreviewSkeleton } from './skeletons/MediaPreviewSkeleton';
@@ -133,115 +133,111 @@ export default function MediaAsset({ id }: MediaAssetProps) {
   const folderLabel = file.folder === '/' ? 'Root' : file.folder;
 
   return (
-    <div className="octo-media-asset">
-      <PageBar
-        title={file.title || file.originalName}
-        breadcrumbs={[
-          {
-            label: 'Media',
-            href: '/cms/media',
-          },
-          {
-            label: folderLabel,
-            href: `/cms/media?folder=${encodeURIComponent(file.folder)}`,
-          },
-        ]}
-        actions={
-          <>
+    <Page
+      className="octo-media-asset"
+      title={file.title || file.originalName}
+      breadcrumbs={[
+        {
+          label: 'Media',
+          href: '/cms/media',
+        },
+        {
+          label: folderLabel,
+          href: `/cms/media?folder=${encodeURIComponent(file.folder)}`,
+        },
+      ]}
+      actions={
+        <Button
+          variant="ghost"
+          className="octo-button octo-button--danger-ghost"
+          onClick={() => setConfirmDelete(true)}
+          disabled={isPending}
+        >
+          <Icon.Trash2 className="octo-icon-md" />
+          Delete
+        </Button>
+      }
+      rightBar={
+        <div className="octo-media-asset__sidebar-inner">
+          <section className="octo-media-asset__sidebar-section">
+            <Label htmlFor="media-asset-title" className="octo-field-label-hint">
+              Title <span className="octo-u-text-danger">*</span>
+            </Label>
+            <input
+              id="media-asset-title"
+              type="text"
+              value={titleDraft}
+              onChange={(e) => setTitleDraft(e.target.value)}
+              disabled={isPending}
+              placeholder="Used as alt text when this image is referenced"
+              className="octo-media-asset__input"
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              className="octo-button octo-button--w-full"
+              onClick={handleSaveTitle}
+              disabled={isPending || titleDraft.trim() === file.title}
+            >
+              Save title
+            </Button>
+          </section>
+
+          <section className="octo-media-asset__sidebar-section">
+            <Label htmlFor="media-asset-folder" className="octo-field-label-hint">
+              Folder
+            </Label>
+            <Select value={folderDraft} onValueChange={setFolderDraft} disabled={isPending}>
+              <SelectTrigger id="media-asset-folder">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {folders.map((f) => (
+                  <SelectItem key={f} value={f}>
+                    {f === '/' ? 'Root' : f}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              variant="secondary"
+              className="octo-button octo-button--w-full"
+              onClick={handleSaveFolder}
+              disabled={isPending || folderDraft === file.folder}
+            >
+              Save folder
+            </Button>
+            <p className="octo-u-text-xs octo-u-text-muted">
+              Folders are virtual labels for sorting &mdash; they aren&rsquo;t physical directories.
+            </p>
+          </section>
+
+          <section className="octo-media-asset__details-section">
+            <h3 className="octo-media-asset__details-heading">Details</h3>
+            <div className="octo-media-asset__details">
+              <DetailRow label="File name" value={file.originalName} mono />
+              <DetailRow label="Format" value={file.extension.toUpperCase()} />
+              {file.width != null && file.height != null && (
+                <DetailRow label="Dimensions" value={`${file.width} × ${file.height}`} />
+              )}
+              <DetailRow label="Path" value={file.publicUrl} mono />
+              <DetailRow label="ID" value={file.id} mono />
+            </div>
+          </section>
+        </div>
+      }
+    >
+      <div className="octo-media-asset__preview">
+        <div>
+          <img src={file.publicUrl} alt={file.title || file.originalName} className="octo-media-asset__preview-img" />
+          <div className="octo-media-asset__preview-buttons">
             <Button variant="outline" className="octo-u-gap-1-5" onClick={openInNewTab}>
               <Icon.ExternalLink className="octo-icon-md" />
               Open in new tab
             </Button>
-            <Button
-              variant="ghost"
-              className="octo-button octo-button--danger-ghost"
-              onClick={() => setConfirmDelete(true)}
-              disabled={isPending}
-            >
-              <Icon.Trash2 className="octo-icon-md" />
-              Delete
-            </Button>
-          </>
-        }
-      />
-
-      <div className="octo-media-asset__body">
-        {/* Preview pane */}
-        <div className="octo-media-asset__preview">
-          <img src={file.publicUrl} alt={file.title || file.originalName} className="octo-media-asset__preview-img" />
-        </div>
-
-        {/* Sidebar form */}
-        <aside className="octo-media-asset__sidebar">
-          <div className="octo-media-asset__sidebar-inner">
-            <section className="octo-media-asset__sidebar-section">
-              <Label htmlFor="media-asset-title" className="octo-field-label-hint">
-                Title <span className="octo-u-text-danger">*</span>
-              </Label>
-              <input
-                id="media-asset-title"
-                type="text"
-                value={titleDraft}
-                onChange={(e) => setTitleDraft(e.target.value)}
-                disabled={isPending}
-                placeholder="Used as alt text when this image is referenced"
-                className="octo-media-asset__input"
-              />
-              <Button
-                type="button"
-                variant="secondary"
-                className="octo-button octo-button--w-full"
-                onClick={handleSaveTitle}
-                disabled={isPending || titleDraft.trim() === file.title}
-              >
-                Save title
-              </Button>
-            </section>
-
-            <section className="octo-media-asset__sidebar-section">
-              <Label htmlFor="media-asset-folder" className="octo-field-label-hint">
-                Folder
-              </Label>
-              <Select value={folderDraft} onValueChange={setFolderDraft} disabled={isPending}>
-                <SelectTrigger id="media-asset-folder">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {folders.map((f) => (
-                    <SelectItem key={f} value={f}>
-                      {f === '/' ? 'Root' : f}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                type="button"
-                variant="secondary"
-                className="octo-button octo-button--w-full"
-                onClick={handleSaveFolder}
-                disabled={isPending || folderDraft === file.folder}
-              >
-                Save folder
-              </Button>
-              <p className="octo-u-text-xs octo-u-text-muted">
-                Folders are virtual labels for sorting &mdash; they aren&rsquo;t physical directories.
-              </p>
-            </section>
-
-            <section className="octo-media-asset__details-section">
-              <h3 className="octo-media-asset__details-heading">Details</h3>
-              <div className="octo-media-asset__details">
-                <DetailRow label="File name" value={file.originalName} mono />
-                <DetailRow label="Format" value={file.extension.toUpperCase()} />
-                {file.width != null && file.height != null && (
-                  <DetailRow label="Dimensions" value={`${file.width} × ${file.height}`} />
-                )}
-                <DetailRow label="Path" value={file.publicUrl} mono />
-                <DetailRow label="ID" value={file.id} mono />
-              </div>
-            </section>
           </div>
-        </aside>
+        </div>
       </div>
 
       <Dialog open={confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(false)}>
@@ -262,7 +258,7 @@ export default function MediaAsset({ id }: MediaAssetProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </Page>
   );
 }
 

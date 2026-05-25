@@ -21,7 +21,7 @@ import { MediaGridSkeleton } from './skeletons/MediaGridSkeleton';
 import { MediaLeftPanelSkeleton } from './skeletons/MediaLeftPanelSkeleton';
 import { MediaListTableSkeleton } from './skeletons/MediaListTableSkeleton';
 
-import { PageBar } from '../Layout/PageBar';
+import { Page } from '../Layout/Page';
 
 type ViewMode = 'grid' | 'list';
 
@@ -149,30 +149,28 @@ const MediaManager = () => {
   }, [pendingFolderDelete, countByFolder, removeCustomFolder, selectedFolder]);
 
   return (
-    <div className="octo-media-manager">
-      <PageBar
-        title={breadcrumbFolderLabel}
-        breadcrumbs={[
-          { label: 'Media', href: selectedFolder !== null ? '/cms/media' : undefined },
-          selectedFolder !== null && { label: selectedFolder === '/' ? 'Root' : selectedFolder },
-        ].filter((b): b is { label: string } => Boolean(b))}
-        actions={
-          <>
-            <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
-            <Button
-              className="octo-u-gap-1-5 octo-btn-primary-fg"
-              onClick={() => document.getElementById('media-upload-bar-input')?.click()}
-              disabled={pendingUpload !== null}
-            >
-              <Icon.Upload className="octo-icon-md" />
-              Upload
-            </Button>
-          </>
-        }
-      />
-
-      <div className="octo-media-manager__body">
-        {isLoadingFiles ? (
+    <Page
+      className="octo-media-manager"
+      title={breadcrumbFolderLabel}
+      breadcrumbs={[
+        { label: 'Media', href: selectedFolder !== null ? '/cms/media' : undefined },
+        selectedFolder !== null && { label: selectedFolder === '/' ? 'Root' : selectedFolder },
+      ].filter((b): b is { label: string } => Boolean(b))}
+      actions={
+        <>
+          <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
+          <Button
+            className="octo-u-gap-1-5 octo-btn-primary-fg"
+            onClick={() => document.getElementById('media-upload-bar-input')?.click()}
+            disabled={pendingUpload !== null}
+          >
+            <Icon.Upload className="octo-icon-md" />
+            Upload
+          </Button>
+        </>
+      }
+      leftBar={
+        isLoadingFiles ? (
           <MediaLeftPanelSkeleton />
         ) : (
           <MediaLeftPanel
@@ -186,8 +184,10 @@ const MediaManager = () => {
             onAddFolder={() => setShowCreateFolder(true)}
             onDeleteFolder={(f) => setPendingFolderDelete(f)}
           />
-        )}
-
+        )
+      }
+    >
+      <div className="octo-media-manager__body">
         <div className="octo-media-manager__content">
           <MediaUploadBar
             allowedFormats={config.mediaAllowedFormats}
@@ -210,51 +210,49 @@ const MediaManager = () => {
             </div>
           </div>
 
-          <div className="octo-media-manager__scroll">
-            {isLoadingFiles ? (
-              viewMode === 'grid' ? (
-                <MediaGridSkeleton />
-              ) : (
-                <MediaListTableSkeleton />
-              )
-            ) : filteredFiles.length === 0 ? (
-              <div className="octo-media-manager__empty">
-                <Icon.Image className="octo-icon-2xl" />
-                <p className="octo-u-text-base">
-                  {searchQuery ? 'No assets match this search' : 'No files in this folder yet'}
-                </p>
-              </div>
-            ) : viewMode === 'grid' ? (
-              <div className="octo-media-grid">
-                {filteredFiles.map((file) => (
-                  <button
-                    key={file.id}
-                    type="button"
-                    onClick={() => router.push(`/cms/media/${file.id}`)}
-                    className="octo-media-grid__card"
-                  >
-                    <div className="octo-media-grid__img-wrap">
-                      <img
-                        src={file.publicUrl}
-                        alt={file.title || file.originalName}
-                        className="octo-media-grid__img"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="octo-media-grid__info">
-                      <p className="octo-media-grid__name">{file.title || file.originalName}</p>
-                      <p className="octo-media-grid__meta">
-                        {file.extension.toUpperCase()}
-                        {file.width != null && file.height != null ? ` · ${file.width}×${file.height}` : ''}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
+          {isLoadingFiles ? (
+            viewMode === 'grid' ? (
+              <MediaGridSkeleton />
             ) : (
-              <MediaListTable files={filteredFiles} />
-            )}
-          </div>
+              <MediaListTableSkeleton />
+            )
+          ) : filteredFiles.length === 0 ? (
+            <div className="octo-media-manager__empty">
+              <Icon.Image className="octo-icon-2xl" />
+              <p className="octo-u-text-base">
+                {searchQuery ? 'No assets match this search' : 'No files in this folder yet'}
+              </p>
+            </div>
+          ) : viewMode === 'grid' ? (
+            <div className="octo-media-grid">
+              {filteredFiles.map((file) => (
+                <button
+                  key={file.id}
+                  type="button"
+                  onClick={() => router.push(`/cms/media/${file.id}`)}
+                  className="octo-media-grid__card"
+                >
+                  <div className="octo-media-grid__img-wrap">
+                    <img
+                      src={file.publicUrl}
+                      alt={file.title || file.originalName}
+                      className="octo-media-grid__img"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="octo-media-grid__info">
+                    <p className="octo-media-grid__name">{file.title || file.originalName}</p>
+                    <p className="octo-media-grid__meta">
+                      {file.extension.toUpperCase()}
+                      {file.width != null && file.height != null ? ` · ${file.width}×${file.height}` : ''}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <MediaListTable files={filteredFiles} />
+          )}
         </div>
       </div>
 
@@ -291,7 +289,7 @@ const MediaManager = () => {
         onComplete={handleUploadComplete}
         onCancel={() => setPendingUpload(null)}
       />
-    </div>
+    </Page>
   );
 };
 
