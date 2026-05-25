@@ -284,7 +284,7 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
         <DropdownMenuTrigger asChild>
           <button type="button" className="octo-top-header__user-btn" aria-label="Account">
             <Avatar className="octo-top-header__avatar">
-              <AvatarImage src={data?.user?.image ?? ''} alt={data?.user?.name ?? ''} />
+              {data?.user?.image && <AvatarImage src={data.user.image} alt={userInitials} />}
               <AvatarFallback className="octo-top-header__avatar-fallback">{userInitials}</AvatarFallback>
             </Avatar>
           </button>

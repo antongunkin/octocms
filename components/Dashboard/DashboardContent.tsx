@@ -108,7 +108,7 @@ export default function DashboardContent({ selectedType }: Props) {
       </div>
 
       {/* Body: left nav + right content */}
-      <div className="octo-u-flex octo-u-flex-1 octo-u-overflow-hidden">
+      <div className="octo-page-row">
         {isLoadingEntries ? (
           <LeftPanelSkeleton />
         ) : (
@@ -218,52 +218,53 @@ function LeftPanel({
 
   return (
     <aside className="octo-left-panel">
-      <div className="octo-left-panel__section">
-        <nav className="octo-left-panel__nav">
-          <LeftNavItem
-            href="/cms"
-            icon={<LayoutList className="octo-icon-md" />}
-            label="All content"
-            count={entries.length}
-            active={!isBranched && !isRecent && !selectedType}
-          />
-          <LeftNavItem
-            href="/cms?tab=branched"
-            icon={<GitBranch className="octo-icon-md" />}
-            label="Branched content"
-            count={branchedCount}
-            active={isBranched}
-          />
-          <LeftNavItem
-            href="/cms?tab=recent"
-            icon={<GitPullRequest className="octo-icon-md" />}
-            label="Recent PRs"
-            count={recentPRsCount}
-            active={isRecent}
-          />
-        </nav>
-      </div>
-
-      {collections.length > 0 && (
-        <div className="octo-left-panel__section octo-u-pt-1">
-          <span className="octo-left-panel__section-label">Collections</span>
+      <div className="octo-left-panel__bar">
+        <div className="octo-left-panel__section">
           <nav className="octo-left-panel__nav">
-            {collections.map((c) => {
-              const label = config.collections[c as keyof typeof config.collections]?.label ?? c;
-              return (
-                <LeftNavItem
-                  key={c}
-                  href={`/cms/content/${c}`}
-                  icon={<FileText className="octo-icon-md" />}
-                  label={label}
-                  count={countByType[c] ?? 0}
-                  active={selectedType === c}
-                />
-              );
-            })}
+            <LeftNavItem
+              href="/cms"
+              icon={<LayoutList className="octo-icon-md" />}
+              label="All content"
+              count={entries.length}
+              active={!isBranched && !isRecent && !selectedType}
+            />
+            <LeftNavItem
+              href="/cms?tab=branched"
+              icon={<GitBranch className="octo-icon-md" />}
+              label="Branched content"
+              count={branchedCount}
+              active={isBranched}
+            />
+            <LeftNavItem
+              href="/cms?tab=recent"
+              icon={<GitPullRequest className="octo-icon-md" />}
+              label="Recent PRs"
+              count={recentPRsCount}
+              active={isRecent}
+            />
           </nav>
         </div>
-      )}
+        {collections.length > 0 && (
+          <div className="octo-left-panel__section">
+            <span className="octo-left-panel__section-label">Collections</span>
+            <nav className="octo-left-panel__nav">
+              {collections.map((c) => {
+                const label = config.collections[c as keyof typeof config.collections]?.label ?? c;
+                return (
+                  <LeftNavItem
+                    key={c}
+                    href={`/cms/content/${c}`}
+                    icon={<FileText className="octo-icon-md" />}
+                    label={label}
+                    count={countByType[c] ?? 0}
+                    active={selectedType === c}
+                  />
+                );
+              })}
+            </nav>
+          </div>
+        )}
+      </div>
     </aside>
   );
 }
@@ -352,7 +353,7 @@ function ContentTable({
 
   return (
     <div className="octo-content-area">
-      <div className="octo-content-table-wrap octo-scroll">
+      <div className="octo-content-table-wrap">
         <div className="octo-content-table-inner">
           <div className="octo-content-filters">
             <div className="octo-content-search">
