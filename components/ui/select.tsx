@@ -10,6 +10,16 @@ import { usePopoverContent } from '../../hooks/usePopoverContent';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
+function getNodeText(node: React.ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(getNodeText).join('');
+  if (React.isValidElement(node)) {
+    const element = node as React.ReactElement<{ children?: React.ReactNode }>;
+    return getNodeText(element.props.children);
+  }
+  return '';
+}
+
 // Scan the React element tree for SelectItem nodes and collect value→label pairs.
 // Runs synchronously during render so SelectValue can display labels even when
 // SelectContent has never been open (items haven't mounted yet).
@@ -18,12 +28,7 @@ function collectOptionLabels(children: React.ReactNode, labels: Map<string, stri
     if (!React.isValidElement(child)) return;
     const props = child.props as Record<string, unknown>;
     if ((child.type as { displayName?: string }).displayName === 'SelectItem' && typeof props.value === 'string') {
-      const text =
-        typeof props.children === 'string'
-          ? props.children
-          : props.children != null
-            ? String(props.children)
-            : props.value;
+      const text = getNodeText(props.children as React.ReactNode).trim() || props.value;
       labels.set(props.value as string, text as string);
     }
     if (props.children) collectOptionLabels(props.children as React.ReactNode, labels);
@@ -250,7 +255,7 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
     // Register label text for SelectValue display
     React.useEffect(() => {
       const labels = optionLabels.current;
-      const text = labelRef.current?.textContent ?? String(children);
+      const text = labelRef.current?.textContent ?? getNodeText(children);
       labels.set(value, text);
       return () => {
         labels.delete(value);

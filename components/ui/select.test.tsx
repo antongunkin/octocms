@@ -96,6 +96,31 @@ describe('Select — value display', () => {
     expect(screen.getByText('Pick one')).toBeDefined();
   });
 
+  it('shows placeholder (not [object Object]) when options use JSX labels and no value is selected', () => {
+    render(
+      <Select>
+        <SelectTrigger>
+          <SelectValue placeholder="Pick one" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="apple">
+            <span>
+              <strong>Apple</strong>
+            </span>
+          </SelectItem>
+          <SelectItem value="banana">
+            <span>
+              <em>Banana</em>
+            </span>
+          </SelectItem>
+        </SelectContent>
+      </Select>,
+    );
+
+    expect(screen.getByRole('combobox').textContent).toContain('Pick one');
+    expect(screen.getByRole('combobox').textContent).not.toContain('[object Object]');
+  });
+
   it('shows selected label for defaultValue', () => {
     render(<BasicSelect defaultValue="banana" />);
     expect(screen.getByRole('combobox').textContent).toContain('Banana');
@@ -106,6 +131,31 @@ describe('Select — value display', () => {
     expect(screen.getByRole('combobox').textContent).toContain('Apple');
     rerender(<BasicSelect value="cherry" onValueChange={vi.fn()} />);
     expect(screen.getByRole('combobox').textContent).toContain('Cherry');
+  });
+
+  it('shows selected JSX item text instead of [object Object]', () => {
+    render(
+      <Select defaultValue="apple">
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="apple">
+            <span>
+              <strong>Apple</strong>
+            </span>
+          </SelectItem>
+          <SelectItem value="banana">
+            <span>
+              <em>Banana</em>
+            </span>
+          </SelectItem>
+        </SelectContent>
+      </Select>,
+    );
+
+    expect(screen.getByRole('combobox').textContent).toContain('Apple');
+    expect(screen.getByRole('combobox').textContent).not.toContain('[object Object]');
   });
 });
 
