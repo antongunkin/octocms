@@ -8,7 +8,7 @@ import { ShimmerBlock } from '../../skeletons/primitives';
  */
 export function MediaLeftPanelSkeleton() {
   return (
-    <aside role="status" aria-label="Loading folders" className="octo-media-left-panel">
+    <div role="status" aria-label="Loading folders">
       <div className="octo-media-left-panel__skel-inner">
         <ShimmerBlock className="octo-skel-mb-3 octo-skel-h-7 octo-skel-w-full octo-skel-rounded-lg" />
         <ShimmerBlock className="octo-skel-mb-2 octo-skel-ml-2 octo-skel-h-3 octo-skel-w-16" />
@@ -18,6 +18,6 @@ export function MediaLeftPanelSkeleton() {
           ))}
         </div>
       </div>
-    </aside>
+    </div>
   );
 }

@@ -9,7 +9,7 @@ import { ShimmerBlock } from '../../skeletons/primitives';
  */
 export function EntrySidebarSkeleton() {
   return (
-    <aside role="status" aria-label="Loading entry sidebar">
+    <div className="octo-edit-post__sidebar" role="status" aria-label="Loading entry sidebar">
       <div>
         <ShimmerBlock className="octo-skel-h-3 octo-skel-w-24 octo-edit-post__skel-mb" />
         <div className="octo-skel-col-10">
@@ -20,6 +20,6 @@ export function EntrySidebarSkeleton() {
       </div>
       <CardSkeleton lines={3} />
       <CardSkeleton lines={2} />
-    </aside>
+    </div>
   );
 }

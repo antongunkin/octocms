@@ -46,7 +46,7 @@ import CreateBranchDialog from '../Layout/CreateBranchDialog';
 import { Page } from '../Layout/Page';
 
 import { EntryFormSkeleton } from './skeletons/EntryFormSkeleton';
-// import { EntrySidebarSkeleton } from './skeletons/EntrySidebarSkeleton';
+import { EntrySidebarSkeleton } from './skeletons/EntrySidebarSkeleton';
 
 const HistorySection = dynamic(() => import('../HistorySection/HistorySection'), {
   ssr: false,
@@ -290,7 +290,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
 
   if (isLoadingEntry) {
     return (
-      <Page className="octo-edit-post" {...headerProps}>
+      <Page className="octo-edit-post" {...headerProps} rightBar={<EntrySidebarSkeleton />}>
         <EntryFormSkeleton />
       </Page>
     );

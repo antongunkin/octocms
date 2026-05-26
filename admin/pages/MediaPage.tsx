@@ -2,12 +2,12 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 
-import { MediaManagerSkeleton } from '../../components/MediaManager/MediaManager.skeleton';
+import { MediaManagerPageSkeleton } from '../../components/MediaManager/skeletons/MediaManagerPageSkeleton';
 import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
 import { authOptions } from '../auth';
 
 const MediaManager = dynamic(() => import('../../components/MediaManager/MediaManager'), {
-  loading: () => <MediaManagerSkeleton />,
+  loading: () => <MediaManagerPageSkeleton />,
 });
 
 /**

@@ -1,4 +1,4 @@
-import { DashboardContentSkeleton } from '../components/Dashboard/DashboardContent.skeleton';
+import { NeutralPageSkeleton } from '../components/Layout/skeletons/NeutralPageSkeleton';
 
 import { ChatPage } from './pages/ChatPage';
 import { CollectionPage } from './pages/CollectionPage';
@@ -73,5 +73,5 @@ export async function AdminApp({ params }: AdminAppProps) {
     return <EntryPage params={Promise.resolve({ type, id })} key={`${type}/${id}`} />;
   }
 
-  return <DashboardContentSkeleton />;
+  return <NeutralPageSkeleton />;
 }

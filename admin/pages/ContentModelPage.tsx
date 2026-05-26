@@ -2,11 +2,11 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 
-import { ContentModelListSkeleton } from '../../components/ContentModel/ContentModelList.skeleton';
+import { ContentModelListPageSkeleton } from '../../components/ContentModel/skeletons/ContentModelListPageSkeleton';
 import { authOptions } from '../auth';
 
 const ContentModelList = dynamic(() => import('../../components/ContentModel/ContentModelList'), {
-  loading: () => <ContentModelListSkeleton />,
+  loading: () => <ContentModelListPageSkeleton />,
 });
 
 /**

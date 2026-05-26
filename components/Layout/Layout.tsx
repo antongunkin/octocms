@@ -7,7 +7,7 @@ import { Button, Icon } from '../ui';
 import { useConfig } from '../../hooks/useConfig';
 import type { Theme } from '../../admin/theme';
 import { cn } from '../../lib/utils';
-import { MainSlotSkeleton } from '../skeletons';
+import { RouteMainSlotSkeleton } from '../Layout/skeletons/RouteMainSlotSkeleton';
 import { TopHeader } from './TopHeader';
 import { CommandK, useCommandK } from '../CommandK/CommandK';
 
@@ -47,9 +47,9 @@ const Layout = ({ children, initialTheme }: LayoutProps) => {
           <TopHeader onCommandK={() => setCmdkOpen(true)} initialTheme={initialTheme} />
           <main className="octo-layout__main">
             {/* Catch-all `AdminApp` can suspend on `await params`. Keep `TopHeader`
-                mounted; show `MainSlotSkeleton` in the main slot instead of an
+                mounted; show route-matched page skeleton in the main slot instead of an
                 empty flash, then route-specific TanStack Query skeletons take over. */}
-            <Suspense fallback={<MainSlotSkeleton />}>{children}</Suspense>
+            <Suspense fallback={<RouteMainSlotSkeleton />}>{children}</Suspense>
           </main>
           <CommandK open={cmdkOpen} onOpenChange={setCmdkOpen} />
         </>

@@ -3,13 +3,13 @@ import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 import React from 'react';
 
-import { EditPostSkeleton } from '../../components/EditPost/EditPost.skeleton';
+import { EditPostPageSkeleton } from '../../components/EditPost/skeletons/EditPostPageSkeleton';
 import { FileContextProvider } from '../../hooks/useFileState';
 import { getConfig } from '../../lib/configStore';
 import { authOptions } from '../auth';
 
 const EditPost = dynamic(() => import('../../components/EditPost/EditPost'), {
-  loading: () => <EditPostSkeleton />,
+  loading: () => <EditPostPageSkeleton />,
 });
 
 /**

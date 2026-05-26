@@ -111,19 +111,14 @@ export default function MediaAsset({ id }: MediaAssetProps) {
   // skeletons so chip widths stay stable while the list resolves.
   if (isLoading) {
     return (
-      <div className="octo-media-asset">
-        <div className="octo-page-top">
-          <div className="octo-u-row octo-u-gap-2">
-            <Button variant="ghost" size="icon" className="octo-btn-back" onClick={back} aria-label="Back to media">
-              <Icon.ArrowLeft className="octo-icon-md" />
-            </Button>
-          </div>
-        </div>
-        <div className="octo-media-asset__body">
-          <MediaPreviewSkeleton />
-          <MediaMetadataFormSkeleton />
-        </div>
-      </div>
+      <Page
+        className="octo-media-asset"
+        title="…"
+        breadcrumbs={[{ label: 'Media', href: '/cms/media' }]}
+        rightBar={<MediaMetadataFormSkeleton />}
+      >
+        <MediaPreviewSkeleton />
+      </Page>
     );
   }
 

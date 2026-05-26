@@ -91,21 +91,12 @@ export default function ContentTypeDetail({ type }: Props) {
     [collection, type],
   );
 
-  // Loading state — render the field-table skeleton while schema resolves.
+  // Loading state — same `Page` shell as the loaded editor; block skeleton only.
   if (isLoading || !schema) {
     return (
-      <div className="octo-content-model">
-        <div className="octo-page-top">
-          <Button asChild variant="ghost" size="icon" className="octo-btn-back">
-            <Link href="/cms/model" aria-label="Back to Content Model">
-              <Icon.ArrowLeft className="octo-icon-md" />
-            </Link>
-          </Button>
-        </div>
-        <div className="octo-schema-detail__main">
-          <FieldTableSkeleton />
-        </div>
-      </div>
+      <Page title={type} breadcrumbs={[{ label: 'Model', href: '/cms/model' }]}>
+        <FieldTableSkeleton />
+      </Page>
     );
   }
 

@@ -3,12 +3,12 @@ import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 import React from 'react';
 
-import { DashboardCollectionSkeleton } from '../../components/Dashboard/DashboardContent.collection.skeleton';
+import { DashboardCollectionPageSkeleton } from '../../components/Dashboard/skeletons/DashboardCollectionPageSkeleton';
 import { getConfig } from '../../lib/configStore';
 import { authOptions } from '../auth';
 
 const DashboardContent = dynamic(() => import('../../components/Dashboard/DashboardContent'), {
-  loading: () => <DashboardCollectionSkeleton />,
+  loading: () => <DashboardCollectionPageSkeleton />,
 });
 
 export async function CollectionPage({ params }: { params: Promise<{ type: string }> }) {
