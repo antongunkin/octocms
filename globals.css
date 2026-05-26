@@ -260,13 +260,6 @@
      3. Field shell helpers
      ============================================================ */
 
-  /* .focus-ring — legacy alias; new code should use .octo-focus-ring instead */
-  .focus-ring:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
-    border-radius: inherit;
-  }
-
   .field-shell {
     transition:
       border-color 120ms,
@@ -320,13 +313,6 @@
      4. BEM foundation utilities
      ============================================================ */
 
-  /* Focus ring */
-  .octo-focus-ring:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
-    border-radius: inherit;
-  }
-
   /* Screen-reader only */
   .octo-sr-only {
     position: absolute;
@@ -358,9 +344,6 @@
   }
 
   /* Shadow utility */
-  .octo-shadow-1 {
-    box-shadow: var(--shadow-1);
-  }
 
   /* Skeleton shimmer keyframe — replaces Tailwind animate-pulse */
   @keyframes octo-shimmer {
@@ -375,10 +358,6 @@
     100% {
       opacity: 1;
     }
-  }
-
-  .octo-shimmer {
-    animation: octo-shimmer 2s ease-in-out infinite;
   }
 
   @keyframes octo-spin {
@@ -661,15 +640,6 @@
 
   /* variants */
 
-  .octo-button__publish-count {
-    border-radius: 4px;
-    padding: 0 6px;
-    font-family: var(--ft-mono);
-    font-size: 12px;
-    font-weight: 700;
-    background: rgb(0 61 41 / 18%);
-  }
-
   /* branch chip */
 
   .octo-button__branch-name {
@@ -767,54 +737,7 @@
 
   /* Banner variant */
 
-  .octo-card__banner-icon {
-    display: inline-flex;
-    flex-shrink: 0;
-  }
-
-  .octo-card__banner-body {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .octo-card__banner-title {
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .octo-card__banner-text {
-    margin-top: 2px;
-    font-size: 12px;
-    line-height: 1.5;
-    opacity: 0.85;
-  }
-
   /* Empty variant */
-
-  .octo-card__empty-icon {
-    display: inline-grid;
-    height: 48px;
-    width: 48px;
-    place-items: center;
-    border-radius: 12px;
-    background: var(--surface-2);
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
-
-  .octo-card__empty-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .octo-card__empty-text {
-    margin: 6px auto 16px;
-    max-width: 380px;
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--muted);
-  }
 
   /* ── octo-chip ── */
   .octo-chip {
@@ -2456,30 +2379,6 @@
 
   /* ─── Page chrome skeleton ───────────────────────────── */
 
-  .octo-page-top__skel-content {
-    display: flex;
-    min-height: 0;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  .octo-page-top__skel-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .octo-page-top__skel-col {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .octo-page-top__skel-right {
-    display: flex;
-    gap: 8px;
-  }
-
   .octo-page-top__skel-actions {
     display: flex;
     gap: 8px;
@@ -2491,18 +2390,6 @@
     width: 160px;
     max-width: 100%;
     border-radius: 4px;
-  }
-
-  .octo-page-top__skel-subtitle {
-    height: 12px;
-    width: 64px;
-  }
-
-  .octo-page-top__skel-btn {
-    height: 32px;
-    width: 112px;
-    flex-shrink: 0;
-    border-radius: 6px;
   }
 
   /* ── octo-page-sidebar ── */
@@ -2564,23 +2451,10 @@
     }
   }
 
-  .octo-page-sidebar__skel-col {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
   /* ── octo-content-area ── */
   .octo-page-row {
     display: flex;
     flex: 1;
-  }
-
-  .octo-content-area {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    padding: 20px 24px var(--footer-height);
   }
 
   .octo-content-table-wrap {
@@ -2876,9 +2750,6 @@
   }
 
   /* ── octo-pr-list (RecentPullRequests) ── */
-  .octo-pr-list__wrap {
-    flex: 1;
-  }
 
   .octo-pr-list__heading {
     font-size: 14px;
@@ -3088,41 +2959,6 @@
   }
 
   /* ─── Dashboard skeleton specifics ───────────────────── */
-  .octo-dashboard-skel__wrap {
-    display: flex;
-    flex: 1;
-  }
-
-  .octo-dashboard-skel__panel {
-    width: 240px;
-  }
-
-  .octo-dashboard-skel__content {
-    padding: 24px;
-    gap: 16px;
-  }
-
-  .octo-dashboard-skel__card {
-    padding: 16px;
-  }
-
-  .octo-dashboard-skel__heading-skel {
-    height: 24px;
-    width: 128px;
-  }
-
-  .octo-dashboard-skel__empty {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-
-  .octo-dashboard-skel__empty-line {
-    height: 16px;
-    width: 192px;
-  }
 
   /* ── octo-error-boundary ── */
   .octo-error-boundary {
@@ -3165,11 +3001,6 @@
     font-weight: 400;
   }
 
-  .octo-create-branch__textarea {
-    resize: vertical;
-    min-height: 4.5rem;
-  }
-
   /* ── octo-user-account-dialog (account modal in TopHeader) ── */
   .octo-user-account-dialog__profile {
     display: flex;
@@ -3196,13 +3027,6 @@
   }
 
   /* ── octo-form-field (generic wrapper used by all field types) ── */
-  .octo-form-field {
-    margin-bottom: 20px;
-
-    &[class*='--lg'] {
-      margin-bottom: 24px;
-    }
-  }
 
   /* ── octo-field-label (label row with type badge + right slot) ── */
   .octo-field-label {
@@ -3212,69 +3036,14 @@
     margin-bottom: 8px;
   }
 
-  .octo-field-label__text {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1;
-    margin-right: 5px;
-  }
-
-  .octo-field-label__required {
-    margin-left: 2px;
-    color: var(--danger);
-  }
-
-  .octo-field-label__type {
-    font-family: var(--ft-mono);
-    font-size: 11px;
-    color: color-mix(in oklab, var(--muted) 80%, transparent);
-    line-height: 1;
-  }
-
-  .octo-field-label__right {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  /* ── octo-field-hint-error (hint + error below field) ── */
-  .octo-field-hint-error {
-    margin-top: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
   .octo-field-hint-error__hint {
     font-size: 12px;
     color: var(--muted);
   }
 
-  .octo-field-hint-error__error {
-    font-size: 13px;
-    color: var(--danger);
-  }
-
   /* ── octo-ff-markdown ── */
   .octo-ff-markdown {
     margin-bottom: 24px;
-  }
-
-  .octo-ff-markdown__label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .octo-ff-markdown__required {
-    color: var(--danger);
-    margin-left: 4px;
   }
 
   /* ── octo-ff-boolean (segmented toggle) ── */
@@ -3342,24 +3111,6 @@
   .octo-ff-select__multi-checkbox {
     border-radius: 4px;
     border: 1px solid var(--border);
-  }
-
-  /* ── octo-ff-image (image upload field) ── */
-  .octo-ff-image {
-    margin-bottom: 24px;
-  }
-
-  .octo-ff-image__label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .octo-ff-image__required {
-    color: var(--danger);
-    margin-left: 4px;
   }
 
   .octo-ff-image__body {
@@ -3513,19 +3264,6 @@
     margin-bottom: 24px;
   }
 
-  .octo-ff-conditional__label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .octo-ff-conditional__required {
-    color: var(--danger);
-    margin-left: 4px;
-  }
-
   .octo-ff-conditional__tabs {
     margin-top: 4px;
   }
@@ -3604,42 +3342,10 @@
     margin-bottom: 24px;
   }
 
-  .octo-ff-richtext__label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .octo-ff-richtext__required {
-    color: var(--danger);
-    margin-left: 4px;
-  }
-
   .octo-ff-richtext__editor-wrap {
     position: relative;
   }
 
-  /* ── octo-ff-list (string list field) ── */
-  .octo-ff-list {
-    margin-bottom: 24px;
-  }
-
-  .octo-ff-list__label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .octo-ff-list__required {
-    color: var(--danger);
-    margin-left: 4px;
-  }
-
-  /* octo-ff-list also re-uses .octo-ff-list__label for the required span */
   .octo-ff-list__add-input {
     width: 100%;
     font-size: 14px;
@@ -3738,19 +3444,6 @@
   /* ── octo-ff-reference (reference field with drag-and-drop) ── */
   .octo-ff-reference {
     margin-bottom: 24px;
-  }
-
-  .octo-ff-reference__label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .octo-ff-reference__required {
-    color: var(--danger);
-    margin-left: 4px;
   }
 
   .octo-ff-reference__badge {
@@ -4095,41 +3788,7 @@
     gap: 20px;
   }
 
-  .octo-edit-post__field-skel {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .octo-edit-post__sidebar-skel {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
   /* ShimmerBlock size helpers for edit-post skeleton */
-  .octo-edit-post__skel-label {
-    height: 14px;
-    width: 96px;
-  }
-
-  .octo-edit-post__skel-field-sm {
-    height: 36px;
-    width: 100%;
-  }
-
-  .octo-edit-post__skel-field-lg {
-    height: 160px;
-    width: 100%;
-  }
-
-  .octo-edit-post__skel-card {
-    padding: 16px;
-  }
-
-  .octo-edit-post__skel-mt {
-    margin-top: 8px;
-  }
 
   .octo-edit-post__skel-mb {
     margin-bottom: 10px;
@@ -4310,10 +3969,6 @@
     padding: 12px 24px;
   }
 
-  .octo-media-manager__skel-content {
-    background: var(--bg);
-  }
-
   .octo-media-grid__item-skel {
     display: flex;
     flex-direction: column;
@@ -4375,10 +4030,6 @@
     margin-left: 8px;
     font-size: 12px;
     color: var(--muted);
-  }
-
-  .octo-media-upload-bar__input {
-    display: none;
   }
 
   /* ── octo-media-left-panel (MediaLeftPanel) ── */
@@ -4478,12 +4129,6 @@
 
   .octo-media-left-panel__skel-inner {
     padding: 12px 12px 16px;
-  }
-
-  .octo-media-left-panel__skel-col {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
   }
 
   /* ── octo-media-select-dialog ── */
@@ -4749,24 +4394,6 @@
   }
 
   /* ─── MediaAsset skeleton ────────────────────────────── */
-  .octo-media-asset__skel-section {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    border-top: 1px solid var(--border);
-    padding-top: 20px;
-  }
-
-  .octo-media-asset__skel-row {
-    display: flex;
-    gap: 8px;
-  }
-
-  .octo-media-asset__form-skel {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
 
   /* ── octo-upload-dialog (MediaUploadDialog rows) ── */
   .octo-upload-dialog__rows {
@@ -5285,17 +4912,6 @@
       background: #022c22;
       color: #6ee7b7;
     }
-  }
-
-  .octo-schema-impact__overflow {
-    padding-left: 8px;
-  }
-
-  .octo-schema-option-field__help {
-    padding: 4px 6px;
-    font-size: 11px;
-    font-style: italic;
-    color: var(--muted);
   }
 
   /* ── octo-cardinality-option (cardinality picker card) ── */
@@ -6015,88 +5631,14 @@
   }
 
   /* ─── Content Types list ─────────────────────────── */
-  .octo-content-types__body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 24px;
-  }
-
-  .octo-content-types__toolbar {
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .octo-content-types__search-wrap {
-    max-width: 384px;
-    flex: 1;
-  }
-
-  .octo-content-types__table-wrap {
-    flex: 1;
-    overflow: auto;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
-  }
-
-  .octo-content-types__empty {
-    height: 128px;
-    text-align: center;
-    font-size: 14px;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
   /* ─── Content Type Detail additions ─────────────── */
-  .octo-content-type-detail__header-row {
-    display: flex;
-    min-width: 0;
-    flex: 1;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .octo-content-type-detail__title-col {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .octo-content-type-detail__type-badge {
-    font-family: var(--ft-mono);
-    font-size: 11px;
-    color: var(--muted);
-  }
 
   /* ContentTypeDetail skeleton */
-  .octo-content-type-detail__skel-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
 
   /* ShimmerBlock size helpers */
-  .octo-content-type-detail__skel-name {
-    height: 20px;
-    width: 180px;
-  }
-
-  .octo-content-type-detail__skel-type {
-    height: 12px;
-    width: 80px;
-  }
 
   /* Search input with leading icon offset */
-  .octo-search-input {
-    &[class*='--icon-padded'] {
-      padding-left: 36px;
-    }
-  }
 
   /* ── octo-chat ── */
   .octo-chat {
@@ -6105,53 +5647,6 @@
     min-width: 0;
     flex: 1;
     flex-direction: column;
-  }
-
-  .octo-chat__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    padding: 8px 16px;
-  }
-
-  .octo-chat__header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-  }
-
-  .octo-chat__header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .octo-chat__header-meta {
-    color: var(--muted);
-  }
-
-  .octo-chat__usage {
-    border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 50%, transparent);
-    padding: 2px 10px;
-    font-family: var(--ft-mono);
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .octo-chat__body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0 16px;
-  }
-
-  .octo-chat__messages {
-    margin: 0 auto;
-    max-width: 768px;
-    padding: 16px 0;
   }
 
   .octo-chat__empty {
@@ -6166,66 +5661,6 @@
     justify-content: center;
     margin-bottom: 12px;
     opacity: 0.5;
-  }
-
-  .octo-chat__notice {
-    margin: 12px 0;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
-    padding: 8px 12px;
-    font-size: 12px;
-
-    &[class*='--stopped'] {
-      color: var(--muted);
-    }
-
-    &[class*='--error'] {
-      border-color: color-mix(in oklab, var(--danger) 40%, transparent);
-      background: color-mix(in oklab, var(--danger) 10%, transparent);
-      color: var(--danger);
-    }
-
-    &[class*='--budget'] {
-      border-color: #78350f;
-      background: #fefce8;
-      color: #78350f;
-    }
-  }
-
-  .octo-chat__accept-all {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 12px 0;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-
-  .octo-chat__attachments-notice {
-    margin: 12px 0;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-
-  .octo-chat__attachments-title {
-    font-weight: 500;
-    margin-bottom: 4px;
-  }
-
-  .octo-chat__attachments-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
   }
 
   /* ── octo-chat-msg ── */
@@ -6286,12 +5721,6 @@
     overflow-wrap: anywhere;
   }
 
-  .octo-chat-msg__content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
   .octo-chat-msg__thinking {
     color: var(--muted);
   }
@@ -6304,39 +5733,6 @@
     background: currentcolor;
     vertical-align: baseline;
     animation: octo-shimmer 1s ease-in-out infinite;
-  }
-
-  .octo-chat-msg__attachments {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .octo-chat-msg__attachment-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    border-radius: 9999px;
-    background: rgb(37 99 235 / 40%);
-    padding: 2px 8px;
-    font-size: 12px;
-    max-width: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .octo-chat-msg__system {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin: 12px 0;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 30%, transparent);
-    padding: 8px 12px;
-    font-size: 12px;
-    color: var(--muted);
   }
 
   /* ── octo-chat-composer ── */
@@ -6467,16 +5863,6 @@
     padding: 8px 12px;
   }
 
-  .octo-proposal-card__icon {
-    flex-shrink: 0;
-    color: var(--muted);
-  }
-
-  .octo-proposal-card__title {
-    font-size: 12px;
-    font-weight: 600;
-  }
-
   .octo-proposal-card__summary {
     flex: 1;
     min-width: 0;
@@ -6502,14 +5888,6 @@
     gap: 12px;
   }
 
-  .octo-proposal-card__error-body {
-    border-top: 1px solid color-mix(in oklab, var(--danger) 40%, transparent);
-    background: color-mix(in oklab, var(--danger) 10%, transparent);
-    padding: 8px 12px;
-    font-size: 12px;
-    color: var(--danger);
-  }
-
   .octo-proposal-card__error-title {
     font-weight: 600;
   }
@@ -6521,14 +5899,6 @@
   }
 
   .octo-proposal-card__actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
-    padding: 8px 12px;
-  }
-
-  .octo-proposal-card__reject-row {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -6561,45 +5931,9 @@
     color: var(--muted);
   }
 
-  .octo-proposal-card__status-badge {
-    font-size: 11px;
-
-    &[class*='--muted'] {
-      color: var(--muted);
-    }
-
-    &[class*='--accepted'] {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      color: #6ee7b7;
-    }
-
-    &[class*='--error'] {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      color: var(--danger);
-    }
-  }
-
   .octo-proposal-card__entry-path {
     font-family: var(--ft-mono);
     font-size: 11px;
-    color: var(--muted);
-  }
-
-  .octo-proposal-card__field-row {
-  }
-
-  .octo-proposal-card__field-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
     color: var(--muted);
   }
 
@@ -6625,31 +5959,6 @@
     letter-spacing: normal;
   }
 
-  .octo-proposal-card__diff-inline {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    font-size: 12px;
-  }
-
-  .octo-proposal-card__diff-del {
-    border-radius: 4px;
-    border: 1px solid color-mix(in oklab, #7f1d1d 40%, transparent);
-    background: color-mix(in oklab, #7f1d1d 40%, transparent);
-    padding: 4px 8px;
-    font-family: var(--ft-mono);
-    color: #fca5a5;
-  }
-
-  .octo-proposal-card__diff-add {
-    border-radius: 4px;
-    border: 1px solid color-mix(in oklab, #064e3b 40%, transparent);
-    background: color-mix(in oklab, #064e3b 40%, transparent);
-    padding: 4px 8px;
-    font-family: var(--ft-mono);
-    color: #6ee7b7;
-  }
-
   .octo-proposal-card__create-meta {
     font-size: 11px;
     color: var(--muted);
@@ -6669,25 +5978,9 @@
     border-top: 0;
   }
 
-  .octo-proposal-card__create-td {
-    padding: 6px 0;
-    vertical-align: top;
-  }
-
   .octo-proposal-card__create-key {
     width: 33%;
     padding-right: 8px;
-  }
-
-  .octo-proposal-card__create-key-name {
-    font-weight: 600;
-  }
-
-  .octo-proposal-card__create-key-format {
-    margin-left: 8px;
-    font-family: var(--ft-mono);
-    font-size: 10px;
-    color: color-mix(in oklab, var(--muted) 70%, transparent);
   }
 
   .octo-proposal-card__create-val pre {
@@ -6695,11 +5988,6 @@
     overflow-wrap: anywhere;
     font-family: var(--ft-mono);
     font-size: 11px;
-  }
-
-  .octo-proposal-card__unset {
-    font-style: italic;
-    color: color-mix(in oklab, var(--muted) 70%, transparent);
   }
 
   /* ── octo-tool-call-card ── */
@@ -6713,18 +6001,6 @@
     &[class*='--error'] {
       border-color: color-mix(in oklab, var(--danger) 40%, transparent);
     }
-  }
-
-  .octo-tool-call-card__trigger {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    text-align: left;
-    background: transparent;
-    border: 0;
-    cursor: pointer;
   }
 
   .octo-tool-call-card__chevron {
@@ -6788,24 +6064,6 @@
      ============================================================ */
 
   /* ------ Page header right slot ------ */
-  .octo-hdr-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .octo-hdr-right__label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-2);
-  }
-
-  .octo-hdr-right__mono {
-    margin-left: 6px;
-    font-family: var(--ft-mono);
-    font-size: 12px;
-    color: var(--muted);
-  }
 
   /* ------ Search wrap ------ */
   .octo-search-wrap {
@@ -8223,9 +7481,6 @@
     color: var(--muted);
   }
 
-  .octo-linked-by__empty {
-  }
-
   /* ------ InlineEntryEditor ------ */
   .octo-inline-editor {
     position: fixed;
@@ -8424,10 +7679,6 @@
     margin-top: 8px;
     font-size: 13.5px;
     color: var(--danger);
-  }
-
-  .octo-inline-editor__archive-btn {
-    color: #6b7280;
   }
 
   /* ------ CommandK ------ */
@@ -8765,42 +8016,6 @@
       background: #78350f;
       color: #fef3c7;
     }
-  }
-
-  .octo-var-embed__prop {
-    color: #fbbf24;
-  }
-
-  .octo-embed-editor__icon-component {
-    width: 16px;
-    height: 16px;
-    color: #fcd34d;
-  }
-
-  .octo-embed-editor__icon-condition {
-    width: 16px;
-    height: 16px;
-    color: #5eead4;
-  }
-
-  .octo-embed-editor__field-input {
-    display: block;
-    max-width: 240px;
-  }
-
-  .octo-embed-editor__branch-key-input {
-    width: 128px;
-  }
-
-  .octo-embed-editor__delete-btn {
-    height: 24px;
-    width: 24px;
-    padding: 0;
-    color: var(--muted);
-  }
-
-  .octo-embed-editor__checkbox-input {
-    width: auto;
   }
 
   /* Image embed editor */
@@ -9316,26 +8531,6 @@
     object-fit: cover;
   }
 
-  .octo-richtext-content__reference-card {
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 12px;
-    margin: 8px 0;
-    background: color-mix(in oklab, var(--surface-2) 30%, transparent);
-  }
-
-  .octo-richtext-content__reference-type {
-    font-size: 12px;
-    color: var(--muted);
-    display: block;
-    margin-bottom: 2px;
-  }
-
-  .octo-richtext-content__reference-title {
-    font-size: 13.5px;
-    font-weight: 500;
-  }
-
   .octo-search-box {
     position: relative;
     width: 100%;
@@ -9414,13 +8609,6 @@
     font-size: 13.5px;
     color: #6b7280;
     text-align: center;
-  }
-
-  .octo-search-box__highlight {
-    background: #fef08a;
-    color: inherit;
-    border-radius: 2px;
-    padding: 0 2px;
   }
 
   .octo-search-box__list {
@@ -9597,16 +8785,6 @@
     align-items: center;
   }
 
-  .octo-u-row-start {
-    display: flex;
-    align-items: flex-start;
-  }
-
-  .octo-u-row-baseline {
-    display: flex;
-    align-items: baseline;
-  }
-
   .octo-u-stack {
     display: flex;
     flex-direction: column;
@@ -9614,10 +8792,6 @@
 
   .octo-u-flex {
     display: flex;
-  }
-
-  .octo-u-grid {
-    display: grid;
   }
 
   .octo-u-hidden {
@@ -9628,29 +8802,8 @@
     flex: 1;
   }
 
-  .octo-u-grow {
-    flex-grow: 1;
-  }
-
   .octo-u-shrink-0 {
     flex-shrink: 0;
-  }
-
-  .octo-u-wrap {
-    flex-wrap: wrap;
-  }
-
-  .octo-u-center {
-    align-items: center;
-    justify-content: center;
-  }
-
-  .octo-u-between {
-    justify-content: space-between;
-  }
-
-  .octo-u-end {
-    justify-content: flex-end;
   }
 
   .octo-u-gap-1 {
@@ -9673,10 +8826,6 @@
     gap: 16px;
   }
 
-  .octo-u-gap-6 {
-    gap: 24px;
-  }
-
   .octo-u-text-xs {
     font-size: 11px;
   }
@@ -9685,32 +8834,16 @@
     font-size: 12px;
   }
 
-  .octo-u-text-md {
-    font-size: 13px;
-  }
-
   .octo-u-text-base {
     font-size: 14px;
-  }
-
-  .octo-u-text-lg {
-    font-size: 16px;
   }
 
   .octo-u-text-muted {
     color: var(--muted);
   }
 
-  .octo-u-text-2 {
-    color: var(--text-2);
-  }
-
   .octo-u-text-danger {
     color: var(--danger);
-  }
-
-  .octo-u-text-fg {
-    color: var(--text);
   }
 
   .octo-u-font-medium {
@@ -9719,12 +8852,6 @@
 
   .octo-u-font-semibold {
     font-weight: 600;
-  }
-
-  .octo-u-truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .octo-u-whitespace-pre-wrap {
@@ -9753,176 +8880,32 @@
     opacity: 0.6;
   }
 
-  .octo-u-cursor-pointer {
-    cursor: pointer;
-  }
-
   .octo-u-relative {
     position: relative;
-  }
-
-  .octo-u-absolute {
-    position: absolute;
   }
 
   .octo-u-mt-1 {
     margin-top: 4px;
   }
 
-  .octo-u-mt-2 {
-    margin-top: 8px;
-  }
-
-  .octo-u-mt-3 {
-    margin-top: 12px;
-  }
-
-  .octo-u-mt-4 {
-    margin-top: 16px;
-  }
-
   .octo-u-mb-1 {
     margin-bottom: 4px;
-  }
-
-  .octo-u-mb-2 {
-    margin-bottom: 8px;
-  }
-
-  .octo-u-mb-3 {
-    margin-bottom: 12px;
-  }
-
-  .octo-u-p-2 {
-    padding: 8px;
-  }
-
-  .octo-u-p-3 {
-    padding: 12px;
-  }
-
-  .octo-u-p-4 {
-    padding: 16px;
-  }
-
-  .octo-u-p-6 {
-    padding: 24px;
-  }
-
-  .octo-u-w-full {
-    width: 100%;
-  }
-
-  .octo-u-h-full {
-    height: 100%;
-  }
-
-  .octo-u-min-h-0 {
-    min-height: 0;
   }
 
   .octo-u-overflow-hidden {
     overflow: hidden;
   }
 
-  .octo-u-overflow-auto {
-    overflow: auto;
-  }
-
-  .octo-u-rounded {
-    border-radius: 4px;
-  }
-
-  .octo-u-rounded-md {
-    border-radius: 6px;
-  }
-
-  .octo-u-rounded-lg {
-    border-radius: 8px;
-  }
-
-  .octo-u-rounded-xl {
-    border-radius: 12px;
-  }
-
-  .octo-u-rounded-full {
-    border-radius: 9999px;
-  }
-
-  .octo-u-border {
-    border: 1px solid var(--border);
-  }
-
-  .octo-u-border-strong {
-    border: 1px solid var(--border-strong);
-  }
-
-  .octo-u-bg-bg {
-    background: var(--bg);
-  }
-
-  .octo-u-bg-surface-1 {
-    background: var(--surface-1);
-  }
-
-  .octo-u-bg-surface-2 {
-    background: var(--surface-2);
-  }
-
-  .octo-u-bg-surface-3 {
-    background: var(--surface-3);
-  }
-
   .octo-u-mono {
     font-family: var(--ft-mono);
-  }
-
-  .octo-u-uppercase {
-    text-transform: uppercase;
-  }
-
-  .octo-u-tracking-wide {
-    letter-spacing: 0.025em;
-  }
-
-  .octo-u-leading-6 {
-    line-height: 1.5rem;
-  }
-
-  .octo-u-sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
   }
 
   .octo-u-mt-0-5 {
     margin-top: 2px;
   }
 
-  .octo-u-pt-5 {
-    padding-top: 20px;
-  }
-
-  .octo-u-pr-2 {
-    padding-right: 8px;
-  }
-
-  .octo-u-overflow-y-auto {
-    overflow-y: auto;
-  }
-
   .octo-u-min-w-0 {
     min-width: 0;
-  }
-
-  .octo-u-text-center {
-    text-align: center;
   }
 
   .octo-u-word-break-all {
@@ -9933,36 +8916,12 @@
     font-style: italic;
   }
 
-  .octo-u-border-right {
-    border-right: 1px solid var(--border);
-  }
-
-  .octo-u-border-top {
-    border-top: 1px solid var(--border);
-  }
-
   .octo-u-text-brand {
     color: var(--brand);
   }
 
-  .octo-u-text-white {
-    color: #fff;
-  }
-
   .octo-u-self-start {
     align-self: flex-start;
-  }
-
-  .octo-u-text-xl {
-    font-size: 20px;
-  }
-
-  .octo-u-col-span-full {
-    grid-column: 1 / -1;
-  }
-
-  .octo-u-object-cover {
-    object-fit: cover;
   }
 
   .octo-u-mr-1 {
@@ -10095,10 +9054,6 @@
     height: 24px;
   }
 
-  .octo-icon-shrink {
-    flex-shrink: 0;
-  }
-
   /* ----- Skeleton block size utilities (deterministic shimmer chips for skeletons) ----- */
   .octo-skel-h-3 {
     height: 12px;
@@ -10106,14 +9061,6 @@
 
   .octo-skel-h-4 {
     height: 16px;
-  }
-
-  .octo-skel-h-5 {
-    height: 20px;
-  }
-
-  .octo-skel-h-6 {
-    height: 24px;
   }
 
   .octo-skel-h-7 {
@@ -10130,10 +9077,6 @@
 
   .octo-skel-h-40 {
     height: 160px;
-  }
-
-  .octo-skel-h-12 {
-    height: 48px;
   }
 
   .octo-skel-h-16 {
@@ -10156,14 +9099,6 @@
     width: 28px;
   }
 
-  .octo-skel-w-9 {
-    width: 36px;
-  }
-
-  .octo-skel-w-12 {
-    width: 48px;
-  }
-
   .octo-skel-w-16 {
     width: 64px;
   }
@@ -10176,32 +9111,8 @@
     width: 96px;
   }
 
-  .octo-skel-w-28 {
-    width: 112px;
-  }
-
   .octo-skel-w-32 {
     width: 128px;
-  }
-
-  .octo-skel-w-36 {
-    width: 144px;
-  }
-
-  .octo-skel-w-40 {
-    width: 160px;
-  }
-
-  .octo-skel-w-44 {
-    width: 176px;
-  }
-
-  .octo-skel-w-48 {
-    width: 192px;
-  }
-
-  .octo-skel-w-64 {
-    width: 256px;
   }
 
   .octo-skel-w-72 {
@@ -10240,10 +9151,6 @@
     border-radius: 12px;
   }
 
-  .octo-skel-rounded-full {
-    border-radius: 9999px;
-  }
-
   .octo-skel-aspect-square {
     aspect-ratio: 1 / 1;
   }
@@ -10276,80 +9183,15 @@
   }
 
   /* ----- Compact layout helpers for content model dialogs and dashboard skeletons ----- */
-  .octo-stack-2 {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .octo-stack-3 {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .octo-stack-4 {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .octo-row-2 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .octo-row-3 {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .octo-row-wrap-2 {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-  }
 
   /* ─── Skeleton layout helpers ────────────────────────── */
 
   /* These are layout containers *around* ShimmerBlocks — not the shimmer blocks themselves */
-  .octo-skel-row-12 {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .octo-skel-row-8 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .octo-skel-col-20 {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .octo-skel-col-12 {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
 
   .octo-skel-col-10 {
     display: flex;
     flex-direction: column;
     gap: 10px;
-  }
-
-  .octo-skel-col-8 {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
   }
 
   .octo-skel-col-6 {
@@ -10358,40 +9200,15 @@
     gap: 6px;
   }
 
-  .octo-skel-col-4 {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .octo-skel-row-gap-8 {
-    display: flex;
-    gap: 8px;
-  }
-
   .octo-skel-row-gap-16 {
     display: flex;
     align-items: center;
     gap: 16px;
   }
 
-  .octo-skel-between {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
   /* ----- Button finishing-pass extras ----- */
 
   /* Back-button shape: ghost icon btn with -8px left margin, 28×28, muted color */
-  .octo-btn-back {
-    margin-left: -8px;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    flex-shrink: 0;
-    color: var(--muted);
-  }
 
   .octo-button {
     /* Action button: dark bg / light text (for "Add field", "Create", primary CTAs) */
@@ -10449,13 +9266,6 @@
   }
 
   /* Breadcrumb button reset */
-  .octo-btn-breadcrumb {
-    color: var(--text-2);
-    background: none;
-    border: 0;
-    cursor: pointer;
-    padding: 0;
-  }
 
   /* ----- Table BEM finishing extras ----- */
   .octo-table-row {
@@ -10786,15 +9596,6 @@
   }
 
   /* Responsive two-column card grid */
-  .octo-design-cards {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-
-    @media (width >= 1024px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
 
   /* Row layout helpers */
   .octo-design-row {
@@ -10842,14 +9643,8 @@
   }
 
   /* Spacer between banner group and toast/empty grid */
-  .octo-design-spacer {
-    height: 18px;
-  }
 
   /* Full-width utility for child elements inside flex/grid containers */
-  .octo-fill {
-    width: 100%;
-  }
 }
 
 @layer utilities {
