@@ -470,6 +470,7 @@
     font-weight: normal;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
+    scrollbar-gutter: stable;
   }
 
   body {
@@ -479,6 +480,10 @@
     background: var(--background);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizelegibility;
+  }
+
+  body:has(dialog[open]) {
+    overflow: hidden;
   }
 }
 
@@ -2176,10 +2181,6 @@
   .octo-layout__main {
     /* position: relative;
     z-index: 0; */
-  }
-
-  body:has(dialog[open]) {
-    overflow: hidden;
   }
 
   /* ── octo-top-header ── */
