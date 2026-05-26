@@ -5103,7 +5103,6 @@
     transition: background-color 120ms;
 
     &[class*='--active'] {
-      background: color-mix(in oklab, #78350f 60%, transparent);
       color: #fcd34d;
     }
 
