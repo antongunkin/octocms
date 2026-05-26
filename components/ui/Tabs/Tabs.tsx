@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { useControllableState } from '../../../hooks/useControllableState';
 import { cn } from '../../../lib/utils';
+import { Switcher, SwitcherItem } from '../Switcher/Switcher';
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
@@ -63,89 +64,33 @@ Tabs.displayName = 'Tabs';
 
 // ── TabsList ──────────────────────────────────────────────────────────────────
 
-type TabsListProps = React.HTMLAttributes<HTMLDivElement> & {
-  variant?: 'default' | 'pill';
-};
+type TabsListProps = React.HTMLAttributes<HTMLDivElement>;
 
-const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
-  ({ className, variant = 'default', onKeyDown, ...props }, ref) => {
-    const { setActiveValue } = React.useContext(TabsContext);
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const list = e.currentTarget;
-      const triggers = Array.from(list.querySelectorAll<HTMLButtonElement>('[role="tab"]:not([disabled])'));
-      if (triggers.length === 0) return;
-
-      const currentIdx = triggers.findIndex((el) => el === document.activeElement);
-      let nextIdx = currentIdx;
-
-      if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        nextIdx = (currentIdx + 1) % triggers.length;
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        nextIdx = (currentIdx - 1 + triggers.length) % triggers.length;
-      } else if (e.key === 'Home') {
-        e.preventDefault();
-        nextIdx = 0;
-      } else if (e.key === 'End') {
-        e.preventDefault();
-        nextIdx = triggers.length - 1;
-      } else {
-        onKeyDown?.(e);
-        return;
-      }
-
-      const next = triggers[nextIdx];
-      if (next) {
-        next.focus();
-        const value = next.getAttribute('data-value');
-        if (value) setActiveValue(value);
-      }
-      onKeyDown?.(e);
-    };
-
-    return (
-      <div
-        ref={ref}
-        role="tablist"
-        className={cn('octo-tabs__list', variant === 'pill' && 'octo-tabs__list octo-tabs__list--pill', className)}
-        onKeyDown={handleKeyDown}
-        {...props}
-      />
-    );
-  },
-);
+const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(({ className, ...props }, ref) => {
+  return <Switcher ref={ref} className={className} {...props} />;
+});
 TabsList.displayName = 'TabsList';
 
 // ── TabsTrigger ───────────────────────────────────────────────────────────────
 
 type TabsTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   value: string;
-  variant?: 'default' | 'pill';
 };
 
 const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
-  ({ className, value, variant = 'default', disabled, onClick, ...props }, ref) => {
+  ({ className, value, disabled, onClick, ...props }, ref) => {
     const { activeValue, setActiveValue, triggerId, panelId } = React.useContext(TabsContext);
     const isActive = activeValue === value;
 
     return (
-      <button
+      <SwitcherItem
         ref={ref}
-        role="tab"
-        id={triggerId(value)}
-        aria-selected={isActive}
-        aria-controls={panelId(value)}
-        data-state={isActive ? 'active' : 'inactive'}
-        data-value={value}
+        active={isActive}
         disabled={disabled}
-        {...(disabled ? { 'data-disabled': '' } : {})}
-        className={cn(
-          'octo-tabs__trigger',
-          variant === 'pill' && 'octo-tabs__trigger octo-tabs__trigger--pill',
-          className,
-        )}
+        id={triggerId(value)}
+        aria-controls={panelId(value)}
+        data-value={value}
+        className={className}
         onClick={(e) => {
           setActiveValue(value);
           onClick?.(e);

@@ -225,25 +225,13 @@ describe('Tabs disabled trigger', () => {
 // ── Variant classes ────────────────────────────────────────────────────────────
 
 describe('Tabs variants', () => {
-  it('TabsList has octo-tabs__list class', () => {
+  it('TabsList uses the shared switcher class', () => {
     render(<BasicTabs />);
-    expect(screen.getByRole('tablist').className).toContain('octo-tabs__list');
+    expect(screen.getByRole('tablist').className).toContain('octo-switcher');
   });
 
-  it('TabsList pill variant has octo-tabs__list--pill class', () => {
-    render(
-      <Tabs defaultValue="a">
-        <TabsList variant="pill">
-          <TabsTrigger value="a">A</TabsTrigger>
-        </TabsList>
-        <TabsContent value="a">A</TabsContent>
-      </Tabs>,
-    );
-    expect(screen.getByRole('tablist').className).toContain('octo-tabs__list--pill');
-  });
-
-  it('TabsTrigger has octo-tabs__trigger class', () => {
+  it('TabsTrigger uses the shared switcher item class', () => {
     render(<BasicTabs />);
-    expect(screen.getAllByRole('tab')[0].className).toContain('octo-tabs__trigger');
+    expect(screen.getAllByRole('tab')[0].className).toContain('octo-switcher__item');
   });
 });

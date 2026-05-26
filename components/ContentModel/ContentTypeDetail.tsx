@@ -297,8 +297,12 @@ export default function ContentTypeDetail({ type }: Props) {
 
       <Tabs defaultValue="fields" className="octo-tabs octo-tabs--flex-col">
         <TabsList className="octo-u-self-start">
-          <TabsTrigger value="fields">Fields</TabsTrigger>
-          <TabsTrigger value="json">JSON</TabsTrigger>
+          <TabsTrigger key="fields" value="fields">
+            Fields
+          </TabsTrigger>
+          <TabsTrigger key="json" value="json">
+            JSON
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="fields" className="octo-tabs-content octo-tabs-content--mt">

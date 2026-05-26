@@ -3,6 +3,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorBoundary } from './ErrorBoundary';
+import { Switcher, SwitcherItem } from './ui/Switcher/Switcher';
 
 afterEach(() => {
   cleanup();
@@ -21,6 +22,10 @@ function ResetKeysErrorBoundaryWrapper({ shouldThrow, resetKey }: { shouldThrow:
   );
 }
 
+function keyWarnings(consoleError: ReturnType<typeof vi.spyOn>) {
+  return consoleError.mock.calls.filter((call) => String(call[0]).includes('unique "key" prop'));
+}
+
 describe('ErrorBoundary', () => {
   it('renders children on the happy path', () => {
     render(
@@ -29,6 +34,36 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     );
     expect(screen.getByText('healthy')).toBeTruthy();
+  });
+
+  it('does not warn when multiple children are passed', () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(
+      <ErrorBoundary label="test">
+        <span>one</span>
+        <span>two</span>
+      </ErrorBoundary>,
+    );
+    expect(screen.getByText('one')).toBeTruthy();
+    expect(screen.getByText('two')).toBeTruthy();
+    expect(keyWarnings(consoleError)).toHaveLength(0);
+    consoleError.mockRestore();
+  });
+
+  it('does not warn when wrapping a switcher', () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(
+      <ErrorBoundary label="test">
+        <Switcher aria-label="Example">
+          <SwitcherItem key="one" active>
+            One
+          </SwitcherItem>
+          <SwitcherItem key="two">Two</SwitcherItem>
+        </Switcher>
+      </ErrorBoundary>,
+    );
+    expect(keyWarnings(consoleError)).toHaveLength(0);
+    consoleError.mockRestore();
   });
 
   it('renders default fallback when child throws', () => {

@@ -21,6 +21,7 @@ import type { MediaFile } from '../../types';
 
 import { MediaLeftPanel } from './MediaLeftPanel';
 import { MediaListTable } from './MediaListTable';
+import { MediaViewModeSwitcher } from './MediaViewModeSwitcher';
 
 type ViewMode = 'grid' | 'list';
 
@@ -132,7 +133,7 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
                   className="octo-media-select-dialog__search-input"
                 />
               </div>
-              <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
+              <MediaViewModeSwitcher value={viewMode} onChange={setViewMode} />
             </div>
 
             <div className="octo-media-select-dialog__scroll">
@@ -186,32 +187,5 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: ViewMode) => void }) {
-  return (
-    <div className="octo-media-view-switcher" role="tablist" aria-label="View mode">
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'grid'}
-        aria-label="Grid view"
-        onClick={() => onChange('grid')}
-        className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn octo-media-view-btn--active')}
-      >
-        <Icon.LayoutGrid className="octo-icon-sm" />
-      </button>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'list'}
-        aria-label="List view"
-        onClick={() => onChange('list')}
-        className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn octo-media-view-btn--active')}
-      >
-        <Icon.List className="octo-icon-sm" />
-      </button>
-    </div>
   );
 }

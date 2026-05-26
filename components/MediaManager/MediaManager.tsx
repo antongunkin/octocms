@@ -8,14 +8,13 @@ import { useMediaList } from '../../admin/query/hooks/useMediaList';
 import { useConfig } from '../../hooks/useConfig';
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { toast } from '../../hooks/useToast';
-import { cn } from '../../lib/utils';
-
 import { CreateFolderDialog } from './CreateFolderDialog';
 import { DeleteFolderDialog } from './DeleteFolderDialog';
 import { MediaLeftPanel } from './MediaLeftPanel';
 import { MediaListTable } from './MediaListTable';
 import { MediaUploadBar } from './MediaUploadBar';
 import { MediaUploadDialog } from './MediaUploadDialog';
+import { MediaViewModeSwitcher } from './MediaViewModeSwitcher';
 import { MediaGridSkeleton } from './skeletons/MediaGridSkeleton';
 import { MediaLeftPanelSkeleton } from './skeletons/MediaLeftPanelSkeleton';
 import { MediaListTableSkeleton } from './skeletons/MediaListTableSkeleton';
@@ -157,7 +156,7 @@ const MediaManager = () => {
       ].filter((b): b is { label: string } => Boolean(b))}
       actions={
         <>
-          <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
+          <MediaViewModeSwitcher value={viewMode} onChange={setViewMode} />
           <Button
             className="octo-u-gap-1-5 octo-btn-primary-fg"
             onClick={() => document.getElementById('media-upload-bar-input')?.click()}
@@ -291,32 +290,5 @@ const MediaManager = () => {
     </Page>
   );
 };
-
-function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: ViewMode) => void }) {
-  return (
-    <div className="octo-media-view-switcher" role="tablist" aria-label="View mode">
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'grid'}
-        aria-label="Grid view"
-        onClick={() => onChange('grid')}
-        className={cn('octo-media-view-btn', value === 'grid' && 'octo-media-view-btn octo-media-view-btn--active')}
-      >
-        <Icon.LayoutGrid className="octo-icon-sm" />
-      </button>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'list'}
-        aria-label="List view"
-        onClick={() => onChange('list')}
-        className={cn('octo-media-view-btn', value === 'list' && 'octo-media-view-btn octo-media-view-btn--active')}
-      >
-        <Icon.List className="octo-icon-sm" />
-      </button>
-    </div>
-  );
-}
 
 export default MediaManager;

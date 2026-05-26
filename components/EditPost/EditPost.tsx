@@ -29,8 +29,17 @@ import FormFields from '../FormFields';
 import InlineEntryEditor from '../InlineEntryEditor/InlineEntryEditor';
 import LinkedBySection from '../LinkedBySection/LinkedBySection';
 import { DiffView } from '../DiffView';
-import { cn } from '../../lib/utils';
-import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Switcher,
+  SwitcherItem,
+} from '../ui';
 import { toast } from '../../hooks/useToast';
 import CreateBranchDialog from '../CreateBranchDialog';
 
@@ -244,32 +253,14 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
     actions: (
       <>
         {diffToggleVisible && (
-          <div role="tablist" aria-label="Edit or Diff view" className="octo-edit-post__view-toggle">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={viewMode === 'edit'}
-              onClick={() => setViewMode('edit')}
-              className={cn(
-                'octo-edit-post__view-btn',
-                viewMode === 'edit' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
-              )}
-            >
+          <Switcher aria-label="Edit or Diff view">
+            <SwitcherItem key="edit" active={viewMode === 'edit'} onClick={() => setViewMode('edit')}>
               Edit
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={viewMode === 'diff'}
-              onClick={() => setViewMode('diff')}
-              className={cn(
-                'octo-edit-post__view-btn',
-                viewMode === 'diff' && 'octo-edit-post__view-btn octo-edit-post__view-btn--active',
-              )}
-            >
+            </SwitcherItem>
+            <SwitcherItem key="diff" active={viewMode === 'diff'} onClick={() => setViewMode('diff')}>
               Diff
-            </button>
-          </div>
+            </SwitcherItem>
+          </Switcher>
         )}
         {currentStatus === 'archived' ? (
           <>

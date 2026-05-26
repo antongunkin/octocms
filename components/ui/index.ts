@@ -49,6 +49,8 @@ export {
   SelectValue,
 } from './Select/Select';
 
+export { Switcher, SwitcherItem } from './Switcher/Switcher';
+
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs/Tabs';
 
 export {

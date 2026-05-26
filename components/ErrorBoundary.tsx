@@ -55,7 +55,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
   render() {
     const { error } = this.state;
-    if (!error) return this.props.children;
+    if (!error) {
+      const { children } = this.props;
+      if (children == null) return null;
+      if (React.Children.count(children) <= 1) return children;
+      return <>{React.Children.toArray(children)}</>;
+    }
 
     const { fallback, label, className } = this.props;
     if (typeof fallback === 'function') {
