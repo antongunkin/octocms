@@ -3424,6 +3424,7 @@
     font-weight: 500;
     color: var(--text);
     line-height: 1;
+    margin-right: 5px;
   }
 
   .octo-field-label__required {
