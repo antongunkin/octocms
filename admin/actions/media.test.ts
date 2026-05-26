@@ -129,6 +129,7 @@ describe('getMediaEntries', () => {
         width: 100,
         height: 80,
         hasBlurPlaceholder: true,
+        blurDataURL: 'data:image/jpeg;base64,xx',
       },
     ]);
   });

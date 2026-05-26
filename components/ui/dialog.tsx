@@ -100,43 +100,65 @@ const DialogContent = React.forwardRef<HTMLDialogElement, DialogContentProps>(
     const dialogRef = React.useRef<HTMLDialogElement>(null);
     const composedRef = useComposedRefs(ref, dialogRef);
 
-    // Upgrade to modal on mount. The <dialog> element below carries the `open` attribute
-    // in JSX so it is immediately accessible to testing queries (fireEvent.click doesn't
-    // flush effects, so we can't rely on showModal() alone to set `open`). The browser
-    // requires that `open` is absent before calling showModal(), so we strip it first.
-    // useLayoutEffect fires before the first paint so users never see the non-modal state.
+    // Promote to native modal mode whenever the dialog opens so the browser
+    // controls backdrop rendering/interactions via ::backdrop + top-layer semantics.
     React.useLayoutEffect(() => {
+      if (!open) return;
+
       const d = dialogRef.current;
-      if (!d || typeof d.showModal !== 'function') return;
-      d.removeAttribute('open');
-      d.showModal();
-    }, []);
+      if (!d) return;
+
+      if (typeof d.showModal === 'function') {
+        try {
+          if (d.open) d.close();
+          d.showModal();
+        } catch {
+          // Best effort only.
+        }
+        // Some test environments expose showModal without toggling the open flag.
+        if (!d.open) d.setAttribute('open', '');
+      } else {
+        // Fallback for environments without showModal.
+        d.setAttribute('open', '');
+      }
+
+      return () => {
+        try {
+          if (d.open && typeof d.close === 'function') d.close();
+        } catch {
+          // Ignore cleanup failures.
+        }
+      };
+    }, [open]);
 
     // Prevent the native cancel event so the browser's ESC→cancel→close chain
     // doesn't run; we handle ESC ourselves via the document keydown listener below.
     React.useEffect(() => {
+      if (!open) return;
+
       const dialog = dialogRef.current;
       if (!dialog) return;
       const preventCancel = (e: Event) => e.preventDefault();
       dialog.addEventListener('cancel', preventCancel);
       return () => dialog.removeEventListener('cancel', preventCancel);
-    }, []);
+    }, [open]);
 
     // ESC keydown on document — works in real browsers and jsdom tests
     React.useEffect(() => {
+      if (!open) return;
+
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') setOpen(false);
       };
       document.addEventListener('keydown', handleKeyDown);
       return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [setOpen]);
+    }, [open, setOpen]);
 
     if (!open) return null;
 
     return (
       <dialog
         ref={composedRef}
-        open
         className={cn('octo-dialog__content', className)}
         data-state="open"
         aria-modal="true"
