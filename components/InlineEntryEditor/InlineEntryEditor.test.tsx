@@ -91,14 +91,14 @@ vi.mock('../../lib/validateEntryFields', () => ({
   validateEntryFields: () => ({ ok: true, fieldErrors: {} }),
 }));
 
-vi.mock('../FormFields', () => ({
+vi.mock('../ui/FormField/FormFields', () => ({
   default: ({ fields }: { fields: Record<string, string> }) => (
     <input name="name" defaultValue={fields?.name ?? ''} data-testid="name-input" />
   ),
 }));
 
 vi.mock('../LinkedBySection/LinkedBySection', () => ({ default: () => null }));
-vi.mock('../CreateBranchDialog', () => ({ default: () => null }));
+vi.mock('../Layout/CreateBranchDialog', () => ({ default: () => null }));
 
 // Render Dialog inline so getAllByRole finds the confirm button.
 vi.mock('../ui', async (importOriginal) => {

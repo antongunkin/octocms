@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 
 import { MediaAssetSkeleton } from '../../components/MediaAsset/MediaAsset.skeleton';
-import { ErrorBoundary } from '../../components/ErrorBoundary';
+import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
 import { authOptions } from '../auth';
 
 const MediaAsset = dynamic(() => import('../../components/MediaAsset/MediaAsset'), {

@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 
 import { MediaManagerSkeleton } from '../../components/MediaManager/MediaManager.skeleton';
-import { ErrorBoundary } from '../../components/ErrorBoundary';
+import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
 import { authOptions } from '../auth';
 
 const MediaManager = dynamic(() => import('../../components/MediaManager/MediaManager'), {

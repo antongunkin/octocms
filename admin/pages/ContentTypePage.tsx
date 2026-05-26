@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { getServerSession } from 'next-auth';
 
 import { ContentTypeDetailSkeleton } from '../../components/ContentModel/ContentTypeDetail.skeleton';
-import { ErrorBoundary } from '../../components/ErrorBoundary';
+import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
 import { authOptions } from '../auth';
 
 const ContentTypeDetail = dynamic(() => import('../../components/ContentModel/ContentTypeDetail'), {

@@ -17,15 +17,13 @@ import {
   useSaveFile,
 } from '../../admin/query/hooks/useEntryMutations';
 import type { EntryStatus, SelectedFile } from '../../types';
-import { StatusBadge } from '../StatusBadge';
+import type { Config } from '../../admin/types';
 import { useFileState } from '../../hooks/useFileState';
 import { EntryStackProvider, useEntryStack } from '../../hooks/useEntryStack';
 import { validateEntryFields } from '../../lib/validateEntryFields';
 import { rebuildConditionalFields } from '../../lib/conditionalField';
-import type { Config } from '../../admin/types';
 import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 import { useConfig } from '../../hooks/useConfig';
-import FormFields from '../FormFields';
 import InlineEntryEditor from '../InlineEntryEditor/InlineEntryEditor';
 import LinkedBySection from '../LinkedBySection/LinkedBySection';
 import { DiffView } from '../DiffView';
@@ -37,11 +35,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  FormFields,
+  StatusBadge,
   Switcher,
   SwitcherItem,
 } from '../ui';
 import { toast } from '../../hooks/useToast';
-import CreateBranchDialog from '../CreateBranchDialog';
+import CreateBranchDialog from '../Layout/CreateBranchDialog';
 
 import { Page } from '../Layout/Page';
 

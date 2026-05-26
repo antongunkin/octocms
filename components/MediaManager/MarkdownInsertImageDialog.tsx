@@ -35,8 +35,7 @@ import React, { useState } from 'react';
 import { queryKeys } from '../../admin/query/keys';
 import { suggestedTitleFromFileName } from '../../lib/suggestedMediaTitle';
 import type { MediaFile } from '../../types';
-import FormImageField from '../FormImageField';
-import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Label } from '../ui';
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, FormImageField, Label } from '../ui';
 
 export const MarkdownInsertImageDialog: React.FC = () => {
   const queryClient = useQueryClient();

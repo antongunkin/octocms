@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Button, Icon } from '../ui';
 
-import { ErrorBoundary } from '../ErrorBoundary';
+import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary';
 
 import { Composer } from './Composer';
 import { Message } from './Message';

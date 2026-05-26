@@ -32,7 +32,7 @@ import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
 import { useConfig } from '../../hooks/useConfig';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
-import CreateBranchDialog from '../CreateBranchDialog';
+import CreateBranchDialog from './CreateBranchDialog';
 import { ThemeToggle, type Theme } from '../../admin/theme';
 
 import { AgentNavSkeleton } from './skeletons/AgentNavSkeleton';

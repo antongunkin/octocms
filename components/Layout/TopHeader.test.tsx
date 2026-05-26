@@ -45,7 +45,7 @@ vi.mock('../../admin/theme', () => ({
   ThemeToggle: () => null,
 }));
 
-vi.mock('../CreateBranchDialog', () => ({
+vi.mock('./CreateBranchDialog', () => ({
   default: () => null,
 }));
 

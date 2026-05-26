@@ -1,6 +1,17 @@
 'use client';
 
-import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Icon } from '../ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  FormFields,
+  Icon,
+  StatusBadge,
+} from '../ui';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -23,11 +34,9 @@ import { toast } from '../../hooks/useToast';
 import { toReferenceKey } from '../../lib/referenceKeys';
 import { validateEntryFields } from '../../lib/validateEntryFields';
 import type { EntryStatus } from '../../types';
-import { StatusBadge } from '../StatusBadge';
 
-import FormFields from '../FormFields';
 import LinkedBySection from '../LinkedBySection/LinkedBySection';
-import CreateBranchDialog from '../CreateBranchDialog';
+import CreateBranchDialog from '../Layout/CreateBranchDialog';
 
 type InlineEntryEditorProps = {
   entryPath: string;
