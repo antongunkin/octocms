@@ -20,12 +20,12 @@ export type ChatSetupInfo = {
   steps: ChatSetupStep[];
 };
 
-export function isChatAgentReady(agentConfig: AgentConfig | undefined): boolean {
+export function isChatAgentReady(agentConfig: AgentConfig | null | undefined): boolean {
   if (!agentConfig) return false;
   return getAgentStatus(agentConfig).enabled;
 }
 
-export function buildChatSetupInfo(agentConfig: AgentConfig | undefined): ChatSetupInfo {
+export function buildChatSetupInfo(agentConfig: AgentConfig | null | undefined): ChatSetupInfo {
   if (!agentConfig) {
     return {
       reason: 'no-config',

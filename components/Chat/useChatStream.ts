@@ -274,6 +274,8 @@ function buildAppendedHistory(state: State, assistantId: string): NormalizedMess
 
 export type UseChatStreamReturn = {
   entries: ChatEntry[];
+  /** Wire history sent to the chat API on the next request. */
+  history: NormalizedMessage[];
   meta: ChatMeta | null;
   usage: UsageSummary;
   status: State['status'];
@@ -574,6 +576,7 @@ export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamRet
 
   return {
     entries: state.entries,
+    history: state.history,
     meta: state.meta,
     usage: state.usage,
     status: state.status,

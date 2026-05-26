@@ -70,7 +70,7 @@ export function toPersistedState(state: StreamStateForPersist): PersistedChatSta
     return { ...e, streaming: false };
   });
 
-  const status: PersistedChatStatus = state.status === 'streaming' ? 'idle' : (state.status as PersistedChatStatus);
+  const status = state.status as PersistedChatStatus;
 
   return {
     entries,

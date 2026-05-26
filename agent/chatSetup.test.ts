@@ -5,7 +5,11 @@ import type { AgentConfig } from './types';
 import { recordTurn, resetUsage } from './usage';
 
 const anthropicConfig: AgentConfig = {
-  provider: { type: 'anthropic', model: 'claude-haiku-4-5-20251001' },
+  provider: {
+    type: 'anthropic',
+    model: 'claude-haiku-4-5-20251001',
+    pricing: { inputPerM: 1, outputPerM: 5, cachedInputPerM: 0.1 },
+  },
   maxInputTokens: 100_000,
   maxOutputTokens: 10_000,
   maxProposalsPerTurn: 20,
@@ -57,7 +61,7 @@ describe('buildChatSetupInfo', () => {
   it('describes a missing local endpoint without echoing URLs', () => {
     const cfg: AgentConfig = {
       ...localConfig,
-      provider: { type: 'local', model: 'x' },
+      provider: { type: 'local', model: 'x', baseURL: '' },
     };
     const setup = buildChatSetupInfo(cfg);
     expect(setup.reason).toBe('no-key');
