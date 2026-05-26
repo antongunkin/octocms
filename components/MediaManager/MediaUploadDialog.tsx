@@ -13,9 +13,16 @@ import React, { useEffect, useState, useTransition } from 'react';
 import { useUploadMedia } from '../../admin/query/hooks/useMediaMutations';
 import { toast } from '../../hooks/useToast';
 import { suggestedTitleFromFileName } from '../../lib/suggestedMediaTitle';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Label } from '../ui/label';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Label,
+} from '../ui';
 
 type UploadRow = { file: File; title: string; generateBlur: boolean };
 

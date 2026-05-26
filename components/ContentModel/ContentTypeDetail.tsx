@@ -3,23 +3,31 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { keepPreviousData } from '@tanstack/react-query';
 import Link from 'next/link';
-import { Icon } from '../ui/icons';
-
-import { useEntryList } from '../../admin/query/hooks/useEntryList';
-import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
-import { useSchema } from '../../admin/query/hooks/useSchema';
-import { toast } from '../../hooks/useToast';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
 import {
+  Button,
+  Card,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+  Icon,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '../ui';
+
+import { useEntryList } from '../../admin/query/hooks/useEntryList';
+import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
+import { useSchema } from '../../admin/query/hooks/useSchema';
+import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
 import { FIELD_FORMAT_META } from '../../schema/fieldFormats';
 import type { Collection, CollectionField, Config } from '../../types';

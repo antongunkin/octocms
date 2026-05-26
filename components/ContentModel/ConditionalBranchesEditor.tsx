@@ -17,13 +17,10 @@
  */
 
 import React, { useState } from 'react';
-import { Icon } from '../ui/icons';
+import { Button, Icon, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui';
 
 import type { CollectionField, ConditionalBranchConfig } from '../../types';
 import { FIELD_FORMAT_META } from '../../schema/fieldFormats';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { cn } from '../../lib/utils';
 import { describeInvalidFieldKey, slugifyFieldKey } from './fieldKey';
 

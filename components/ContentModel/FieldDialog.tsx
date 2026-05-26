@@ -18,16 +18,23 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Icon } from '../ui/icons';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Icon,
+  Input,
+} from '../ui';
 
 import { previewSchemaChange } from '../../admin/actions';
 import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import type { PreviewSchemaResult } from '../../admin/actions/schema';
 import { FIELD_FORMAT_META, FIELD_FORMATS } from '../../schema/fieldFormats';
 import { toast } from '../../hooks/useToast';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Input } from '../ui/input';
 import { cn } from '../../lib/utils';
 import type { CollectionField, Collection, Config, FieldFormat } from '../../types';
 import ConditionalBranchesEditor from './ConditionalBranchesEditor';

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Icon } from '../ui/icons';
+import { Icon } from '../ui';
 
 import { cn } from '../../lib/utils';
 

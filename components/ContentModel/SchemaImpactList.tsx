@@ -10,7 +10,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Icon } from '../ui/icons';
+import { Icon } from '../ui';
 
 import type { SchemaImpactItem } from '../../admin/actions/schema';
 import { cn } from '../../lib/utils';

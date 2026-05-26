@@ -32,7 +32,7 @@ import {
 } from '@mdxeditor/editor';
 import type { JsxComponentDescriptor } from '@mdxeditor/editor';
 import { usePublisher } from '@mdxeditor/gurx';
-import { Icon } from './ui/icons';
+import { Icon } from './ui';
 
 import { cn } from '../lib/utils';
 import type { RichTextComponentDef, RichTextFieldConfig } from '../admin/types';

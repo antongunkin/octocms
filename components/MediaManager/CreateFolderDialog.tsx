@@ -2,9 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Label } from '../ui/label';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Label,
+} from '../ui';
 
 export type CreateFolderDialogProps = {
   open: boolean;

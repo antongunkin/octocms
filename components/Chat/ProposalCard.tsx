@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Icon } from '../ui/icons';
+import { Button, Icon } from '../ui';
 
 import { useEntry } from '../../admin/query/hooks/useEntry';
 import { useConfig } from '../../hooks/useConfig';
 import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
 import { DiffHunk } from '../DiffView/DiffHunk';
 
 import type { Proposal, ProposalUiState } from './types';

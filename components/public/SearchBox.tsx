@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Icon } from '../ui/icons';
+import { Icon } from '../ui';
 
 import type { SearchResult } from '../../lib/searchIndex';
 

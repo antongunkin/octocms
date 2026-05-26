@@ -2,11 +2,10 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Icon } from '../ui/icons';
+import { Button, Icon } from '../ui';
 
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import { useSchema } from '../../admin/query/hooks/useSchema';
-import { Button } from '../ui/button';
 import CreateContentTypeDialog from './CreateContentTypeDialog';
 import { SchemaTableSkeleton } from './skeletons/SchemaTableSkeleton';
 import { Page } from '../Layout/Page';

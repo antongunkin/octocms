@@ -6,7 +6,7 @@
 import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { Icon } from '../ui/icons';
+import { Dialog, DialogContent, Icon, Kbd } from '../ui';
 
 import { getEntryList } from '../../admin/actions/entries';
 import { getFile } from '../../admin/actions/files';
@@ -14,7 +14,6 @@ import { listCMSBranches, searchEntries, type CMSBranch, type SearchResult } fro
 import { queryKeys } from '../../admin/query/keys';
 import { useConfig } from '../../hooks/useConfig';
 import { entryAdminHref } from '../../lib/searchIndex';
-import { Dialog, DialogContent, Kbd } from '../ui';
 import { RowItem, Section } from './parts';
 
 type CommandKProps = {

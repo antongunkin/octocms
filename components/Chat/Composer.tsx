@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Icon } from '../ui/icons';
-
-import { Button } from '../ui/button';
+import { Button, Icon } from '../ui';
 
 /** Allowed file types for chat attachments — kept in sync with `classifyAttachment`. */
 const ACCEPTED_TYPES =

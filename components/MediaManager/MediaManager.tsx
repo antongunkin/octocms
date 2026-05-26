@@ -1,6 +1,6 @@
 'use client';
 
-import { Icon } from '../ui/icons';
+import { Button, Icon } from '../ui';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -9,7 +9,6 @@ import { useConfig } from '../../hooks/useConfig';
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
 
 import { CreateFolderDialog } from './CreateFolderDialog';
 import { DeleteFolderDialog } from './DeleteFolderDialog';

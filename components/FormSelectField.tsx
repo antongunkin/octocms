@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import type { SelectOption } from '../admin/types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui';
 
 import { FieldHintAndError } from './FieldHintAndError';
 import { FieldLabel } from './FieldLabel';

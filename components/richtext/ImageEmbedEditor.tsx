@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Icon } from '../ui/icons';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Icon, Label } from '../ui';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
@@ -13,9 +13,6 @@ import { useConfig } from '../../hooks/useConfig';
 import { toast } from '../../hooks/useToast';
 import type { MediaFile } from '../../types';
 import { suggestedTitleFromFileName } from '../../lib/suggestedMediaTitle';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui';
-import { Label } from '../ui/label';
 
 const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
   const config = useConfig();

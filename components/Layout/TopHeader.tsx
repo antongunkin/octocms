@@ -9,7 +9,19 @@ import { useIsFetching, useIsMutating, useQueryClient } from '@tanstack/react-qu
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
-import { Icon } from '../ui/icons';
+import {
+  Icon,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  BranchChip,
+  Kbd,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui';
 
 import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 import { useAgentStatus } from '../../admin/query/hooks/useAgentStatus';
@@ -20,15 +32,6 @@ import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
 import { useConfig } from '../../hooks/useConfig';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { BranchChip, Kbd } from '../ui';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
 import CreateBranchDialog from '../CreateBranchDialog';
 import { ThemeToggle, type Theme } from '../../admin/theme';
 

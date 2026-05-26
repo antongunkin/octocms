@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Icon } from '../ui/icons';
+import { Button, Icon } from '../ui';
 
-import { Button } from '../ui/button';
 import { ErrorBoundary } from '../ErrorBoundary';
 
 import { Composer } from './Composer';

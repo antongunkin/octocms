@@ -2,11 +2,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Icon } from '../ui/icons';
+import { Card, CardContent, CardHeader, CardTitle, Icon } from '../ui';
 
 import { useEntryCommits } from '../../admin/query/hooks/useEntryCommits';
 import { queryKeys } from '../../admin/query/keys';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useEntryStack } from '../../hooks/useEntryStack';
 import { relativeTime } from '../../lib/relativeTime';
 

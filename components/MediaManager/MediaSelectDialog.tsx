@@ -11,14 +11,13 @@
  * a parent re-render.
  */
 
-import { Icon } from '../ui/icons';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Icon } from '../ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useMediaList } from '../../admin/query/hooks/useMediaList';
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { cn } from '../../lib/utils';
 import type { MediaFile } from '../../types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 
 import { MediaLeftPanel } from './MediaLeftPanel';
 import { MediaListTable } from './MediaListTable';

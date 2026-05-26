@@ -18,11 +18,8 @@ import { openEditImageDialog$, parseImageDimension } from '@mdxeditor/editor';
 import { usePublisher } from '@mdxeditor/gurx';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNodeByKey } from 'lexical';
-import { Icon } from '../ui/icons';
+import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Icon } from '../ui';
 import React, { useState } from 'react';
-
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 
 type Props = {
   nodeKey: string;

@@ -1,9 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { Icon } from '../ui/icons';
+import { Button, Icon } from '../ui';
 
-import { Button } from '../ui/button';
 import { useRecentCMSPullRequests } from '../../admin/query/hooks/useRecentCMSPullRequests';
 import { cn } from '../../lib/utils';
 import type { RecentCMSPullRequest } from '../../admin/actions/git';

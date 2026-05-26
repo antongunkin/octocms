@@ -1,6 +1,6 @@
 'use client';
 
-import { Icon } from '../ui/icons';
+import { Icon } from '../ui';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 

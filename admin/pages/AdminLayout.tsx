@@ -5,7 +5,7 @@ import React, { Suspense } from 'react';
 
 import { AdminBootstrapSkeleton } from '../../components/skeletons';
 import Provider from '../provider';
-import { Toaster } from '../../components/ui/toaster';
+import { Toaster } from '../../components/ui';
 import Layout from '../../components/Layout/Layout';
 import { getThemeCookie } from '../theme/cookie';
 import { getConfig } from '../../lib/configStore';

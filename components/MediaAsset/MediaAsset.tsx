@@ -1,6 +1,21 @@
 'use client';
 
-import { Icon } from '../ui/icons';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Icon,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -9,10 +24,6 @@ import { useDeleteMedia, useMoveMedia, useUpdateMediaMetadata } from '../../admi
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Page } from '../Layout/Page';
 
 import { MediaMetadataFormSkeleton } from './skeletons/MediaMetadataFormSkeleton';

@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Icon } from '../../components/ui/icons';
-
-import { DropdownMenuItem, DropdownMenuSeparator } from '../../components/ui';
+import { DropdownMenuItem, DropdownMenuSeparator, Icon } from '../../components/ui';
 import type { Theme } from './types';
 
 export function ThemeToggle({ initialTheme }: { initialTheme: Theme }) {

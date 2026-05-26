@@ -4009,7 +4009,6 @@
   .octo-ff-reference__item-body {
     flex: 1;
     min-width: 0;
-    text-align: left;
     cursor: pointer;
     background: transparent;
     border: 0;
@@ -8567,6 +8566,7 @@
       var(--shadow-1);
     border-radius: 12px;
   }
+
   /* 
   .octo-inline-editor__sidebar {
     position: relative;

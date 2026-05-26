@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import React, { useMemo } from 'react';
 
-import { Button } from '../ui/button';
+import { Button } from '../ui';
 import { useFileState } from '../../hooks/useFileState';
 import type { SelectedFile } from '../../types';
 

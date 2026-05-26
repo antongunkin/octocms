@@ -12,12 +12,9 @@
  */
 
 import React from 'react';
-import { Icon } from '../ui/icons';
+import { Button, Icon, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui';
 
 import type { RichTextComponentDef, RichTextComponentProp, RichTextFieldConfig } from '../../types';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { cn } from '../../lib/utils';
 
 interface Props {

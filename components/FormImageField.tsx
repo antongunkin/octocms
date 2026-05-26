@@ -1,6 +1,6 @@
 'use client';
 
-import { Icon } from './ui/icons';
+import { Button, Icon } from './ui';
 import React, { useCallback, useRef, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
@@ -15,7 +15,6 @@ import type { MediaFile } from '../types';
 import { FieldHintAndError } from './FieldHintAndError';
 import { MediaSelectDialog } from './MediaManager/MediaSelectDialog';
 import { MediaUploadDialog } from './MediaManager/MediaUploadDialog';
-import { Button } from './ui/button';
 
 type FormImageFieldProps = {
   label: string;

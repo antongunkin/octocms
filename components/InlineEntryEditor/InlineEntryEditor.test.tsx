@@ -194,7 +194,7 @@ describe('InlineEntryEditor', () => {
     });
     await waitFor(() => expect(saveFileMock).toHaveBeenCalled());
 
-    fireEvent.click(screen.getByRole('button', { name: /back/i }));
+    fireEvent.click(screen.getByRole('button', { name: /close editor/i }));
 
     expect(bumpRefreshMock).toHaveBeenCalledTimes(1);
     expect(onCloseMock).toHaveBeenCalledTimes(1);
@@ -207,7 +207,7 @@ describe('InlineEntryEditor', () => {
     renderWithQuery(<InlineEntryEditor {...baseProps} />, { client });
     await waitFor(() => expect(screen.getByTestId('name-input')).toBeTruthy());
 
-    fireEvent.click(screen.getByRole('button', { name: /back/i }));
+    fireEvent.click(screen.getByRole('button', { name: /close editor/i }));
 
     expect(bumpRefreshMock).not.toHaveBeenCalled();
     expect(onCloseMock).toHaveBeenCalledTimes(1);

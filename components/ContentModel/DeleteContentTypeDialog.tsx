@@ -7,8 +7,7 @@ import { previewSchemaChange } from '../../admin/actions';
 import type { PreviewSchemaResult } from '../../admin/actions/schema';
 import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import { toast } from '../../hooks/useToast';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui';
 import type { Config } from '../../types';
 import SchemaImpactList from './SchemaImpactList';
 

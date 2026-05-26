@@ -1,11 +1,9 @@
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { Icon } from '../ui/icons';
+import { Button, Icon } from '../ui';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
-
-import { Button } from '../ui/button';
 
 /**
  * WYSIWYG editor component for `<CmsCondition>` JSX embeds inside richtext fields.

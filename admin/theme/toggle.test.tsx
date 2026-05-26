@@ -3,6 +3,10 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../components/ui', () => ({
+  Icon: {
+    Sun: (props: React.SVGProps<SVGSVGElement>) => <svg data-testid="icon-sun" {...props} />,
+    Moon: (props: React.SVGProps<SVGSVGElement>) => <svg data-testid="icon-moon" {...props} />,
+  },
   DropdownMenuItem: ({
     children,
     onSelect,

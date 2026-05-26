@@ -1,6 +1,6 @@
 'use client';
 
-import { Icon } from './ui/icons';
+import { Icon } from './ui';
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { cn } from '../lib/utils';

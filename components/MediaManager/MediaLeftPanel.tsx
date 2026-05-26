@@ -1,6 +1,6 @@
 'use client';
 
-import { Icon } from '../ui/icons';
+import { Icon } from '../ui';
 import React from 'react';
 
 import { LeftNavItem } from '../Layout/LeftNavItem';

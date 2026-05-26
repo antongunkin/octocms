@@ -7,7 +7,7 @@ import { sanitizeSlugFieldInputValue, slugifyForUrl } from '../lib/slugField';
 import { FieldHintAndError } from './FieldHintAndError';
 import { FieldLabel } from './FieldLabel';
 import { FieldShell, FIELD_INPUT_CLASS } from './FieldShell';
-import { Button } from './ui/button';
+import { Button } from './ui';
 
 type FormSlugFieldProps = {
   label: string;

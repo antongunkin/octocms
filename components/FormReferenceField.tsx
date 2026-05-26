@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { Icon } from './ui/icons';
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Icon } from './ui';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { getEntryList } from '../admin/actions/entries';
@@ -16,8 +16,6 @@ import { toContentPath, toReferenceKey } from '../lib/referenceKeys';
 import { cn } from '../lib/utils';
 import type { EntryListItem, ReferenceItem } from '../types';
 import { FieldHintAndError } from './FieldHintAndError';
-import { Button } from './ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui';
 
 type FormReferenceFieldProps = {
   label: string;

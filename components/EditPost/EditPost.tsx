@@ -30,8 +30,7 @@ import InlineEntryEditor from '../InlineEntryEditor/InlineEntryEditor';
 import LinkedBySection from '../LinkedBySection/LinkedBySection';
 import { DiffView } from '../DiffView';
 import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui';
+import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui';
 import { toast } from '../../hooks/useToast';
 import CreateBranchDialog from '../CreateBranchDialog';
 

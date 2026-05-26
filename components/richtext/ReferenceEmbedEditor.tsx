@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Icon } from '../ui/icons';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Icon } from '../ui';
 import type { JsxEditorProps } from '@mdxeditor/editor';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
@@ -10,8 +10,6 @@ import { useConfig } from '../../hooks/useConfig';
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import type { EntryListItem } from '../../types';
 import { toReferenceKey } from '../../lib/referenceKeys';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui';
 
 /**
  * WYSIWYG editor component for `<CmsRef>` JSX embeds inside richtext fields.

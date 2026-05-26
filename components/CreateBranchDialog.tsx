@@ -4,8 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 import { createBranch } from '../admin/actions';
 import { toast } from '../hooks/useToast';
-import { Button } from './ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui';
+import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui';
 
 type Props = {
   open: boolean;

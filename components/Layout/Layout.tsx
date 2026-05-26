@@ -2,12 +2,11 @@
 
 import { signIn, useSession } from 'next-auth/react';
 import React, { Suspense, useEffect } from 'react';
-import { Icon } from '../ui/icons';
+import { Button, Icon } from '../ui';
 
 import { useConfig } from '../../hooks/useConfig';
 import type { Theme } from '../../admin/theme';
 import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
 import { MainSlotSkeleton } from '../skeletons';
 import { TopHeader } from './TopHeader';
 import { CommandK, useCommandK } from '../CommandK/CommandK';
