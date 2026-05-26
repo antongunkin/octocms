@@ -3,26 +3,45 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Button, Icon } from '../ui';
 
+import type { ChatSetupInfo } from '../../agent/chatSetup';
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary';
+import { Page } from '../Layout/Page';
 
+import { ChatAgentSetup } from './ChatAgentSetup';
+import { ChatSidebar } from './ChatSidebar';
 import { Composer } from './Composer';
 import { Message } from './Message';
-import { useChatStream } from './useChatStream';
+import { useChatHistory } from './useChatHistory';
 
-type Props = {
-  /** Initial provider info — used until the SSE `meta` event arrives. */
-  initialMeta: { provider: 'anthropic' | 'openai' | 'local'; model: string };
-  /** Attachment caps from `agentConfig` — drive Composer UI validation. */
-  attachmentLimits: { maxAttachmentBytes: number; maxAttachmentsPerTurn: number };
-};
+type Props =
+  | {
+      mode: 'setup';
+      setup: ChatSetupInfo;
+    }
+  | {
+      mode: 'ready';
+      /** Initial provider info — used until the SSE `meta` event arrives. */
+      initialMeta: { provider: 'anthropic' | 'openai' | 'local'; model: string };
+      /** Attachment caps from `agentConfig` — drive Composer UI validation. */
+      attachmentLimits: { maxAttachmentBytes: number; maxAttachmentsPerTurn: number };
+    };
 
-const PROVIDER_LABEL: Record<'anthropic' | 'openai' | 'local', string> = {
-  anthropic: 'Anthropic',
-  openai: 'OpenAI',
-  local: 'Local',
-};
+export default function ChatPage(props: Props) {
+  if (props.mode === 'setup') {
+    return <ChatAgentSetup setup={props.setup} />;
+  }
+  return <ChatPageReady {...props} />;
+}
 
-export default function ChatPage({ initialMeta, attachmentLimits }: Props) {
+type ReadyProps = Extract<Props, { mode: 'ready' }>;
+
+function ChatPageReady({ initialMeta, attachmentLimits }: ReadyProps) {
+  const PROVIDER_LABEL: Record<'anthropic' | 'openai' | 'local', string> = {
+    anthropic: 'Anthropic',
+    openai: 'OpenAI',
+    local: 'Local',
+  };
+
   const {
     entries,
     meta,
@@ -33,12 +52,16 @@ export default function ChatPage({ initialMeta, attachmentLimits }: Props) {
     proposals,
     attachmentDiagnostics,
     send,
-    reset,
     stop,
     acceptProposal,
     rejectProposal,
     acceptAllPending,
-  } = useChatStream();
+    sessions,
+    activeId,
+    newConversation,
+    selectSession,
+    deleteSession,
+  } = useChatHistory();
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -66,17 +89,12 @@ export default function ChatPage({ initialMeta, attachmentLimits }: Props) {
   }, [proposals, latestAssistantId]);
 
   return (
-    <div className="octo-chat">
-      {/* Top bar */}
-      <div className="octo-chat__topbar">
-        <div className="octo-chat__topbar-left">
-          <Icon.Bot className="octo-icon-md" />
-          <span className="octo-chat__topbar-title">Chat</span>
-          <span className="octo-chat__topbar-meta">
-            · {PROVIDER_LABEL[provider]} · <span className="octo-chat__topbar-model">{model}</span>
-          </span>
-        </div>
-        <div className="octo-chat__topbar-right">
+    <Page
+      className="octo-chat-page"
+      title="Chat"
+      breadcrumbs={[{ label: `${PROVIDER_LABEL[provider]} · ${model}` }]}
+      actions={
+        <>
           <UsageBadge
             totalCostUSD={usage.totalCostUSD}
             inputTokens={usage.inputTokens}
@@ -95,100 +113,102 @@ export default function ChatPage({ initialMeta, attachmentLimits }: Props) {
               Stop
             </Button>
           ) : (
-            <Button variant="outline" onClick={reset} disabled={entries.length === 0} className="octo-u-gap-1-5">
-              <Icon.RefreshCw className="octo-icon-sm" />
+            <Button variant="primary" onClick={newConversation}>
+              <Icon.Plus className="octo-icon-sm" />
               New conversation
             </Button>
           )}
-        </div>
-      </div>
-
-      {/* Transcript */}
-      <div ref={scrollerRef} className="octo-chat__scroller">
-        <div className="octo-chat__transcript">
-          {entries.length === 0 && (
-            <div className="octo-chat__empty">
-              <Icon.Bot className="octo-chat__empty-icon octo-icon-xl" />
-              <div className="octo-chat__empty-title">Ask your CMS anything.</div>
-              <div className="octo-chat__empty-hint">
-                Try: <em>"show me posts about caching"</em> or <em>"fix the typo 'recieve' in any post"</em>.
+        </>
+      }
+      leftBar={
+        <ChatSidebar sessions={sessions} activeId={activeId} onSelect={selectSession} onDelete={deleteSession} />
+      }
+    >
+      <div className="octo-chat">
+        <div ref={scrollerRef} className="octo-chat__scroller">
+          <div className="octo-chat__transcript">
+            {entries.length === 0 && (
+              <div className="octo-chat__empty">
+                <Icon.Bot className="octo-chat__empty-icon octo-icon-xl" />
+                <div className="octo-chat__empty-title">Ask your CMS anything.</div>
+                <div className="octo-chat__empty-hint">
+                  Try: <em>"show me posts about caching"</em> or <em>"fix the typo 'recieve' in any post"</em>.
+                </div>
               </div>
-            </div>
-          )}
-          {entries.map((e) => (
-            <ErrorBoundary key={e.id} label="message" resetKeys={[e.id]}>
-              <Message
-                entry={e}
-                proposals={proposals}
-                onAcceptProposal={acceptProposal}
-                onRejectProposal={rejectProposal}
-              />
-            </ErrorBoundary>
-          ))}
+            )}
+            {entries.map((e) => (
+              <ErrorBoundary key={e.id} label="message" resetKeys={[e.id]}>
+                <Message
+                  entry={e}
+                  proposals={proposals}
+                  onAcceptProposal={acceptProposal}
+                  onRejectProposal={rejectProposal}
+                />
+              </ErrorBoundary>
+            ))}
 
-          {pendingForLatest.length >= 2 && status !== 'streaming' && (
-            <div className="octo-chat__accept-all-bar">
-              <span>
-                <strong>{pendingForLatest.length}</strong> proposals pending in this turn.
-              </span>
-              <Button
-                onClick={() => latestAssistantId && acceptAllPending(latestAssistantId)}
-                className="octo-u-gap-1-5"
-              >
-                <Icon.CheckCheck className="octo-icon-sm" />
-                Accept all pending
-              </Button>
-            </div>
-          )}
+            {pendingForLatest.length >= 2 && status !== 'streaming' && (
+              <div className="octo-chat__accept-all-bar">
+                <span>
+                  <strong>{pendingForLatest.length}</strong> proposals pending in this turn.
+                </span>
+                <Button
+                  onClick={() => latestAssistantId && acceptAllPending(latestAssistantId)}
+                  className="octo-u-gap-1-5"
+                >
+                  <Icon.CheckCheck className="octo-icon-sm" />
+                  Accept all pending
+                </Button>
+              </div>
+            )}
 
-          {attachmentDiagnostics.length > 0 && (
-            <div className="octo-chat__attachment-diag">
-              <div className="octo-chat__attachment-diag-title">Attachments</div>
-              <ul className="octo-chat__attachment-diag-list">
-                {attachmentDiagnostics.map((d, i) => (
-                  <li key={i}>
-                    {d.status === 'ok' ? (
-                      <span>
-                        ✓ <span className="octo-u-mono">{d.filename}</span> ({d.kind})
-                      </span>
-                    ) : (
-                      <span className="octo-chat__attachment-diag-error">
-                        ✗ <span className="octo-u-mono">{d.filename}</span> — {d.reason}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+            {attachmentDiagnostics.length > 0 && (
+              <div className="octo-chat__attachment-diag">
+                <div className="octo-chat__attachment-diag-title">Attachments</div>
+                <ul className="octo-chat__attachment-diag-list">
+                  {attachmentDiagnostics.map((d, i) => (
+                    <li key={i}>
+                      {d.status === 'ok' ? (
+                        <span>
+                          ✓ <span className="octo-u-mono">{d.filename}</span> ({d.kind})
+                        </span>
+                      ) : (
+                        <span className="octo-chat__attachment-diag-error">
+                          ✗ <span className="octo-u-mono">{d.filename}</span> — {d.reason}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-          {status === 'stopped' && (
-            <div className="octo-chat__status-bar" role="status">
-              Stopped — the assistant was interrupted. Send another message to continue.
-            </div>
-          )}
+            {status === 'stopped' && (
+              <div className="octo-chat__status-bar" role="status">
+                Stopped — the assistant was interrupted. Send another message to continue.
+              </div>
+            )}
 
-          {status === 'error' && error && <div className="octo-chat__error-bar">{error}</div>}
-          {status === 'budget_exceeded' && (
-            <div className="octo-chat__budget-bar">
-              Budget reached ({budgetReason ?? 'unknown'}). Click <strong>New conversation</strong> to start over, or
-              raise the caps in <code>cms/octocms.config.ts</code>.
-            </div>
-          )}
+            {status === 'error' && error && <div className="octo-chat__error-bar">{error}</div>}
+            {status === 'budget_exceeded' && (
+              <div className="octo-chat__budget-bar">
+                Budget reached ({budgetReason ?? 'unknown'}). Click <strong>New conversation</strong> to start over, or
+                raise the caps in <code>cms/octocms.config.ts</code>.
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Composer — disabled while streaming or after budget hit, but enabled
-          after a Stop click so the user can immediately follow up. */}
-      <ErrorBoundary label="composer">
-        <Composer
-          disabled={status === 'streaming' || status === 'budget_exceeded'}
-          maxAttachmentBytes={attachmentLimits.maxAttachmentBytes}
-          maxAttachmentsPerTurn={attachmentLimits.maxAttachmentsPerTurn}
-          onSubmit={send}
-        />
-      </ErrorBoundary>
-    </div>
+        <ErrorBoundary label="composer">
+          <Composer
+            disabled={status === 'streaming' || status === 'budget_exceeded'}
+            maxAttachmentBytes={attachmentLimits.maxAttachmentBytes}
+            maxAttachmentsPerTurn={attachmentLimits.maxAttachmentsPerTurn}
+            onSubmit={send}
+          />
+        </ErrorBoundary>
+      </div>
+    </Page>
   );
 }
 

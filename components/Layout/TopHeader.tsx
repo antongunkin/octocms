@@ -12,7 +12,6 @@ import { useSession } from 'next-auth/react';
 import { Icon, Avatar, AvatarFallback, AvatarImage, BranchChip, Kbd } from '../ui';
 
 import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
-import { useAgentStatus } from '../../admin/query/hooks/useAgentStatus';
 import { useBranch } from '../../admin/query/hooks/useBranch';
 import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
 import { useConfig } from '../../hooks/useConfig';
@@ -23,7 +22,6 @@ import CreateBranchDialog from './CreateBranchDialog';
 import { UserAccountDialog } from './UserAccountDialog';
 import type { Theme } from '../../admin/theme';
 
-import { AgentNavSkeleton } from './skeletons/AgentNavSkeleton';
 import { BranchChipSkeleton } from './skeletons/BranchChipSkeleton';
 
 // `content` is the admin index — both `/cms` (canonical) and `/cms/content`
@@ -49,7 +47,6 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
   const router = useRouter();
   const qc = useQueryClient();
 
-  const agentStatusQuery = useAgentStatus();
   const branchQuery = useBranch();
   const hasActiveBranchQuery = useHasActiveBranch();
 
@@ -57,8 +54,6 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
   const [createBranchOpen, setCreateBranchOpen] = React.useState(false);
   const [userOpen, setUserOpen] = React.useState(false);
 
-  const agentEnabled = agentStatusQuery.data?.enabled ?? false;
-  const agentStatusLoading = agentStatusQuery.isPending;
   const activeBranch = branchQuery.data ?? '';
   const branchChipLoading = branchQuery.isPending || hasActiveBranchQuery.isPending;
 
@@ -128,10 +123,6 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       {/* Nav */}
       <nav className="octo-top-header__nav">
         {NAV.map((n) => {
-          if (n.id === 'chat') {
-            if (agentStatusLoading) return <AgentNavSkeleton key={n.id} />;
-            if (!agentEnabled) return null;
-          }
           const isActive = active === n.id;
           return (
             <Link

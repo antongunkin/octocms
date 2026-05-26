@@ -1,9 +1,8 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { notFound } from 'next/navigation';
 
 import { getAgentConfig } from '../../agent/configStore';
-import { isAgentEnabled } from '../../agent/featureFlag';
+import { buildChatSetupInfo, isChatAgentReady } from '../../agent/chatSetup';
 
 const ChatPageClient = dynamic(() => import('../../components/Chat/ChatPage'), {
   loading: () => null,
@@ -12,21 +11,22 @@ const ChatPageClient = dynamic(() => import('../../components/Chat/ChatPage'), {
 /**
  * Server component wrapper for the chat page.
  *
- * Returns 404 (instead of rendering) when the chat agent isn't configured for
- * this deploy. The same gate is applied on the API route, so neither the UI
- * nor its data layer leak the feature's existence.
+ * Always renders `/cms/chat`. When the agent is not ready, the client shows an
+ * in-page setup guide (see `docs/chat-agent.md`). Chat API routes stay 404 until
+ * `isAgentEnabled` passes — credentials are never sent to the browser.
  */
 export function ChatPage() {
   const agentConfig = getAgentConfig();
-  if (!agentConfig || !isAgentEnabled(agentConfig)) {
-    notFound();
+  if (!isChatAgentReady(agentConfig)) {
+    return <ChatPageClient mode="setup" setup={buildChatSetupInfo(agentConfig)} />;
   }
   return (
     <ChatPageClient
-      initialMeta={{ provider: agentConfig.provider.type, model: agentConfig.provider.model }}
+      mode="ready"
+      initialMeta={{ provider: agentConfig!.provider.type, model: agentConfig!.provider.model }}
       attachmentLimits={{
-        maxAttachmentBytes: agentConfig.maxAttachmentBytes,
-        maxAttachmentsPerTurn: agentConfig.maxAttachmentsPerTurn,
+        maxAttachmentBytes: agentConfig!.maxAttachmentBytes,
+        maxAttachmentsPerTurn: agentConfig!.maxAttachmentsPerTurn,
       }}
     />
   );

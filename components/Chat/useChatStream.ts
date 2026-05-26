@@ -11,6 +11,8 @@ import type { ChatEvent } from '../../agent/chat';
 import type { NormalizedMessage } from '../../agent/providers/types';
 import type { Proposal } from '../../agent/proposals';
 
+import type { PersistedChatState } from './chatStorage';
+import { toPersistedState } from './chatStorage';
 import type { ChatEntry, ChatMeta, ChatToolCall, ProposalStatus, ProposalUiState, UsageSummary } from './types';
 
 type State = {
@@ -46,7 +48,8 @@ type Action =
   | { type: 'finish'; assistantId: string; appendedHistory: NormalizedMessage[] }
   | { type: 'errored'; message: string }
   | { type: 'stopped'; assistantId: string }
-  | { type: 'proposal_status'; proposalId: string; status: ProposalStatus };
+  | { type: 'proposal_status'; proposalId: string; status: ProposalStatus }
+  | { type: 'hydrate'; snapshot: PersistedChatState };
 
 const ZERO_USAGE: UsageSummary = { inputTokens: 0, outputTokens: 0, cachedInputTokens: 0, totalCostUSD: 0 };
 
@@ -66,6 +69,19 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'reset':
       return { ...initial, meta: state.meta };
+    case 'hydrate':
+      return {
+        ...initial,
+        entries: action.snapshot.entries,
+        history: action.snapshot.history,
+        meta: action.snapshot.meta,
+        usage: action.snapshot.usage,
+        status: action.snapshot.status,
+        error: action.snapshot.error,
+        budgetReason: action.snapshot.budgetReason,
+        proposals: action.snapshot.proposals,
+        attachmentDiagnostics: [],
+      };
     case 'submit': {
       const userEntry: ChatEntry = {
         id: action.entryId,
@@ -277,6 +293,8 @@ export type UseChatStreamReturn = {
   acceptProposal(proposalId: string): Promise<void>;
   rejectProposal(proposalId: string, reason?: string): Promise<void>;
   acceptAllPending(assistantEntryId: string): Promise<void>;
+  hydrate(snapshot: PersistedChatState): void;
+  getSnapshot(): PersistedChatState | null;
 };
 
 export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamReturn {
@@ -291,13 +309,28 @@ export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamRet
    */
   const inFlightRef = useRef<{ controller: AbortController; assistantId: string } | null>(null);
 
-  const reset = useCallback(() => {
-    // Cancel any in-flight stream so a "New conversation" click really starts fresh.
+  const abortInFlight = useCallback(() => {
     if (inFlightRef.current) {
       inFlightRef.current.controller.abort();
       inFlightRef.current = null;
     }
+  }, []);
+
+  const reset = useCallback(() => {
+    abortInFlight();
     dispatch({ type: 'reset' });
+  }, [abortInFlight]);
+
+  const hydrate = useCallback(
+    (snapshot: PersistedChatState) => {
+      abortInFlight();
+      dispatch({ type: 'hydrate', snapshot });
+    },
+    [abortInFlight],
+  );
+
+  const getSnapshot = useCallback((): PersistedChatState | null => {
+    return toPersistedState(stateRef.current);
   }, []);
 
   // Abort any pending stream when the hook unmounts (page navigation, etc.)
@@ -554,8 +587,12 @@ export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamRet
     acceptProposal,
     rejectProposal,
     acceptAllPending,
+    hydrate,
+    getSnapshot,
   };
 }
+
+export type { PersistedChatState };
 
 /**
  * Build a multipart FormData body. The chat history is JSON-serialised into

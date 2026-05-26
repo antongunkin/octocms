@@ -207,3 +207,45 @@ describe('useChatStream — proposal accept', () => {
     expect(client.getQueryState(queryKeys.entries.list('post'))?.isInvalidated).toBe(true);
   });
 });
+
+describe('useChatStream — hydrate & getSnapshot', () => {
+  const { Wrapper } = withQuery();
+
+  it('getSnapshot returns null when transcript is empty', () => {
+    const { result } = renderHook(() => useChatStream(), { wrapper: Wrapper });
+    expect(result.current.getSnapshot()).toBeNull();
+  });
+
+  it('hydrate restores entries and history', () => {
+    const { result } = renderHook(() => useChatStream(), { wrapper: Wrapper });
+    act(() => {
+      result.current.hydrate({
+        entries: [
+          { id: 'u1', kind: 'user', text: 'saved question' },
+          {
+            id: 'a1',
+            kind: 'assistant',
+            text: 'saved answer',
+            toolCalls: [],
+            proposalIds: [],
+            streaming: false,
+          },
+        ],
+        history: [
+          { role: 'user', content: 'saved question' },
+          { role: 'assistant', content: [{ type: 'text', text: 'saved answer' }] },
+        ],
+        meta: { provider: 'anthropic', model: 'claude' },
+        usage: { inputTokens: 1, outputTokens: 2, cachedInputTokens: 0, totalCostUSD: 0 },
+        status: 'idle',
+        error: null,
+        budgetReason: null,
+        proposals: {},
+      });
+    });
+    expect(result.current.entries).toHaveLength(2);
+    expect(result.current.entries[0]).toMatchObject({ kind: 'user', text: 'saved question' });
+    expect(result.current.getSnapshot()?.history).toHaveLength(2);
+    expect(result.current.getSnapshot()?.entries).toHaveLength(2);
+  });
+});

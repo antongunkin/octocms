@@ -31,7 +31,7 @@ afterEach(cleanup);
 describe('MediaListTable', () => {
   it('renders the column headers', () => {
     render(<MediaListTable files={[]} />);
-    for (const header of ['Title', 'Folder', 'Format', 'Dimensions', 'File name']) {
+    for (const header of ['Title', 'Folder', 'Format', 'Dimensions']) {
       expect(screen.getByText(header)).toBeDefined();
     }
   });

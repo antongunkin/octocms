@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
+import { cn } from '../../lib/utils';
 import { Button, Icon } from '../ui';
 
 /** Allowed file types for chat attachments — kept in sync with `classifyAttachment`. */
@@ -87,7 +88,7 @@ export function Composer({
 
   return (
     <div
-      className={`octo-chat-composer${dragOver ? ' octo-chat-composer octo-chat-composer--dragover' : ''}`}
+      className={cn('octo-chat-composer', dragOver && 'octo-chat-composer--dragover')}
       onDragOver={(e) => {
         e.preventDefault();
         if (!disabled) setDragOver(true);

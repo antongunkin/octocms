@@ -22,7 +22,7 @@ type AdminAppProps = {
  *   /cms/content             → ContentPage (alias for /cms — kept for legacy links)
  *   /cms/content/<type>      → CollectionPage
  *   /cms/content/<type>/<id> → EntryPage
- *   /cms/chat                → ChatPage (gated on `isAgentEnabled(agentConfig)`)
+ *   /cms/chat                → ChatPage (setup guide when agent not enabled)
  *   /cms/media               → MediaPage (library — grid + folders)
  *   /cms/media/<id>          → MediaAssetPage (full-page asset editor)
  *   /cms/model               → ContentModelPage
