@@ -114,12 +114,15 @@ export default defineConfig([
     sourcemap: true,
     clean: true,
   },
-  // CJS build — used when next.config.ts is loaded by jiti (require() context)
+  // CJS build — used when next.config.ts is loaded by jiti (require() context).
+  // bundle: false — same as ESM: transpile only. Bundling pulled in Lexical/MDXEditor
+  // subgraph (top-level await) and inflated the CJS graph beyond what jiti needs.
   {
     entry: cjsEntry,
     format: ['cjs'],
     dts: false,
     external,
+    bundle: false,
     outExtension: cjsOutExtension,
     sourcemap: true,
   },
