@@ -22,15 +22,13 @@ export function EditPostSkeleton() {
       </div>
       <div className="octo-edit-post__body">
         <div className="octo-edit-post__form-col">
-          <div className="octo-edit-post__form-wrap">
-            <div className="octo-edit-post__form-skel">
-              {Array.from({ length: 6 }, (_, i) => (
-                <div key={i} className="octo-skel-col-8">
-                  <ShimmerBlock className="octo-edit-post__skel-label" />
-                  <ShimmerBlock style={{ height: i === 4 ? 160 : 36, width: '100%' }} />
-                </div>
-              ))}
-            </div>
+          <div className="octo-edit-post__form-skel">
+            {Array.from({ length: 6 }, (_, i) => (
+              <div key={i} className="octo-skel-col-8">
+                <ShimmerBlock className="octo-edit-post__skel-label" />
+                <ShimmerBlock style={{ height: i === 4 ? 160 : 36, width: '100%' }} />
+              </div>
+            ))}
           </div>
         </div>
       </div>

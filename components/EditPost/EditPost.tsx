@@ -301,9 +301,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
   if (isLoadingEntry) {
     return (
       <Page className="octo-edit-post" {...headerProps}>
-        <div className="octo-edit-post__form-wrap">
-          <EntryFormSkeleton />
-        </div>
+        <EntryFormSkeleton />
       </Page>
     );
   }
@@ -366,21 +364,19 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
         }}
       >
         {/* Main content column — independently scrollable */}
-        <div className="octo-edit-post__form-wrap">
-          {viewMode === 'diff' && selectedFile ? (
-            <DiffView collectionType={type} entryPath={selectedFile.path} />
-          ) : (
-            <section className="octo-edit-post__form-card">
-              <FormFields
-                key={`${filePath ?? ''}-${entryQuery.dataUpdatedAt}`}
-                selectedFile={selectedFile}
-                fields={post.fields}
-                fieldErrors={fieldErrors}
-                onClearFieldError={clearFieldError}
-              />
-            </section>
-          )}
-        </div>
+        {viewMode === 'diff' && selectedFile ? (
+          <DiffView collectionType={type} entryPath={selectedFile.path} />
+        ) : (
+          <section className="octo-edit-post__form-card">
+            <FormFields
+              key={`${filePath ?? ''}-${entryQuery.dataUpdatedAt}`}
+              selectedFile={selectedFile}
+              fields={post.fields}
+              fieldErrors={fieldErrors}
+              onClearFieldError={clearFieldError}
+            />
+          </section>
+        )}
       </form>
 
       {/* Inline entry editor overlays (rendered outside the form to avoid nested forms) */}

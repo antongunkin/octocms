@@ -24,13 +24,7 @@ export function Page({ title, breadcrumbs, actions, className, rightBar, leftBar
               {breadcrumbs.map(({ label, href }, i) => (
                 <React.Fragment key={label}>
                   {i > 0 && <ChevronRightTiny />}
-                  {href ? (
-                    <Link href={href} className="octo-page-top__breadcrumb">
-                      {label}
-                    </Link>
-                  ) : (
-                    label
-                  )}
+                  {href ? <Link href={href}>{label}</Link> : label}
                 </React.Fragment>
               ))}
             </div>

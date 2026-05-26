@@ -24,7 +24,8 @@
      ============================================================ */
   :root {
     /* Layout */
-    --header-height: 56px;
+    --header-height: 57px;
+    --page-top-height: 63px;
     --footer-height: 40px;
     --v-gap: 20px;
     --h-gap: 12px;
@@ -482,7 +483,8 @@
     text-rendering: optimizelegibility;
   }
 
-  body:has(dialog[open]) {
+  body:has(dialog[open]),
+  body:has(.octo-inline-editor) {
     overflow: hidden;
   }
 }
@@ -2187,9 +2189,9 @@
   .octo-top-header {
     position: sticky;
     top: 0;
-    z-index: 41;
+    z-index: 42;
     display: flex;
-    height: 57px;
+    height: var(--header-height);
     flex: none;
     align-items: center;
     gap: 10px;
@@ -2605,10 +2607,10 @@
   /* ── octo-page-top (shared page header bar pattern) ── */
   .octo-page-top {
     position: sticky;
-    top: 57px;
+    top: var(--header-height);
     z-index: 40;
     display: flex;
-    height: 63px;
+    height: var(--page-top-height);
     flex: none;
     align-items: center;
     justify-content: space-between;
@@ -2741,7 +2743,7 @@
   .octo-page-sidebar__bar {
     position: sticky;
     top: 120px;
-    z-index: 42;
+    z-index: 41;
     height: calc(100vh - 120px - 6px);
 
     /* max-height: calc(100vh - 120px - 40px); */
@@ -4008,6 +4010,10 @@
     min-width: 0;
     text-align: left;
     cursor: pointer;
+    background: transparent;
+    border: 0;
+    text-align: left;
+    color: inherit;
   }
 
   .octo-ff-reference__item-title {
@@ -4016,11 +4022,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .octo-ff-reference__item-body:hover .octo-ff-reference__item-title {
-    color: var(--brand);
-    transition: color 120ms;
   }
 
   .octo-ff-reference__item-type {
@@ -4230,11 +4231,6 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-  }
-
-  .octo-edit-post__form-wrap {
-    max-width: 960px;
-    margin: 0 auto;
   }
 
   .octo-edit-post__form-card {
@@ -8445,29 +8441,66 @@
 
   /* ------ InlineEntryEditor ------ */
   .octo-inline-editor {
-    position: absolute;
+    position: fixed;
     inset: 0;
+    top: var(--header-height);
+  }
+
+  .octo-inline-editor__container {
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
   }
 
   .octo-inline-editor__backdrop {
     position: absolute;
     inset: 0;
     z-index: 0;
-    background: rgb(0 0 0 / 30%);
+
+    &::before {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      background: var(--bg);
+      opacity: 0.8;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      left: 100%;
+      width: 100px;
+      box-shadow: var(--shadow-2);
+    }
+  }
+
+  .octo-inline-editor__backdrop-top {
+    position: relative;
+    z-index: 1;
+    height: var(--page-top-height);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: var(--h-gap-lg);
+  }
+
+  .octo-inline-editor__backdrop-button {
+    width: 36px;
+    padding: 0;
   }
 
   .octo-inline-editor__panel {
-    position: absolute;
-    z-index: 10;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    position: relative;
+    z-index: 2;
     display: flex;
-    min-width: 0;
     flex-direction: column;
     background: var(--bg);
-    box-shadow: var(--shadow-3, 0 8px 32px rgb(0 0 0 / 40%));
     animation: octo-slide-in-right 0.2s ease;
+    flex: 1 1 auto;
   }
 
   @keyframes octo-slide-in-right {
@@ -8482,49 +8515,8 @@
     }
   }
 
-  .octo-inline-editor__header {
-    flex-shrink: 0;
-    display: flex;
-    height: var(--header-height);
-    align-items: center;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .octo-inline-editor__back {
-    flex-shrink: 0;
-    padding: 10px 20px;
-  }
-
-  .octo-inline-editor__title-wrap {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .octo-inline-editor__collection {
-    margin-bottom: 2px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13.5px;
-    color: var(--muted);
-  }
-
-  .octo-inline-editor__entry-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .octo-inline-editor__actions {
-    flex-shrink: 0;
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .octo-inline-editor__top {
+    box-shadow: 0 2px 8px var(--bg);
   }
 
   .octo-inline-editor__loading {
@@ -8545,7 +8537,8 @@
   .octo-inline-editor__fields {
     flex: 1;
     overflow-y: auto;
-    padding: 40px 20px;
+    padding: var(--v-gap) var(--h-gap-lg) var(--footer-height);
+    height: calc(100vh - 120px);
   }
 
   .octo-inline-editor__fields-inner {
@@ -8553,6 +8546,27 @@
     max-width: 1000px;
   }
 
+  .octo-inline-editor__sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    flex-direction: column;
+    padding: 0 6px 0 0;
+  }
+
+  .octo-inline-editor__sidebar-inner {
+    position: sticky;
+    top: 0;
+    z-index: 42;
+    height: calc(100vh - 120px - 6px);
+    overflow-y: auto;
+    padding: var(--v-gap) var(--h-gap-lg);
+    background: var(--surface-2);
+    box-shadow:
+      inset 0 0 0 1px var(--border),
+      var(--shadow-1);
+    border-radius: 12px;
+  }
+  /* 
   .octo-inline-editor__sidebar {
     position: relative;
     width: 360px;
@@ -8568,7 +8582,7 @@
     top: 0;
     width: 100%;
     padding: 40px 20px;
-  }
+  } */
 
   .octo-inline-editor__meta-grid {
     margin-bottom: 16px;
@@ -10346,12 +10360,6 @@
   .octo-theme-toggle__icon {
     width: 14px;
     height: 14px;
-  }
-
-  /* ----- Inline entry editor submit button ----- */
-  .octo-inline-editor__submit {
-    width: 100%;
-    margin-bottom: 24px;
   }
 
   /* ----- Primary-emphasis button override (replaces Tailwind bg-foreground text-background hover:bg-foreground/90) ----- */
