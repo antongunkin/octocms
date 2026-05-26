@@ -1176,6 +1176,7 @@
     padding: 24px;
     box-shadow: var(--shadow-2);
     border-radius: 12px;
+    color: var(--text);
   }
 
   .octo-dialog__content[data-state='open'] {
@@ -2111,75 +2112,104 @@
     outline-offset: 2px;
   }
 
-  .octo-top-header__branch-row {
+  .octo-branch-selector-dialog {
+    max-width: 420px;
+  }
+
+  .octo-branch-selector-dialog__create {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .octo-branch-selector-dialog__list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .octo-branch-selector-dialog__row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    border-radius: 8px;
-    padding: 4px 12px;
-    font-size: 14px;
+    gap: 4px;
   }
 
-  .octo-top-header__branch-dot {
-    width: 12px;
-    flex-shrink: 0;
-    font-size: 12px;
-    text-align: center;
-    color: var(--brand-strong);
-  }
-
-  .octo-top-header__branch-name {
+  .octo-branch-selector-dialog__branch {
     flex: 1;
-    cursor: pointer;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .octo-branch-selector-dialog__dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background: transparent;
+  }
+
+  .octo-branch-selector-dialog__dot--active {
+    background: var(--ok);
+  }
+
+  .octo-branch-selector-dialog__name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    border: none;
-    background: transparent;
-    padding: 2px 0;
-    text-align: left;
     font-family: var(--ft-mono);
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--text);
   }
 
-  .octo-top-header__branch-name:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
-
-  .octo-top-header__branch-live {
+  .octo-branch-selector-dialog__live {
     flex-shrink: 0;
-    padding: 0 4px;
+    padding: 0 8px 0 4px;
     font-size: 12px;
     font-weight: 600;
     color: var(--ok);
   }
 
-  .octo-top-header__branch-publish {
+  .octo-branch-selector-dialog__publish {
     flex-shrink: 0;
-    cursor: pointer;
-    border-radius: 4px;
-    border: none;
-    background: transparent;
-    padding: 2px 4px;
+    height: 32px;
+    padding: 0 8px;
     font-size: 12px;
+    font-weight: 500;
     color: var(--muted);
-    transition: color 80ms;
 
     &:hover {
       color: var(--ok);
     }
   }
 
-  .octo-top-header__branch-loading {
+  .octo-branch-selector-dialog__pr {
+    flex-shrink: 0;
+    height: 32px;
+    width: 32px;
+    color: var(--muted);
+
+    &:hover {
+      color: var(--text);
+    }
+  }
+
+  .octo-branch-selector-dialog__loading {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
     font-size: 14px;
     color: var(--muted);
+  }
+
+  .octo-branch-selector-dialog__spinner {
+    width: 12px;
+    height: 12px;
+    animation: octo-spin 1s linear infinite;
+  }
+
+  .octo-branch-selector-dialog__footer {
+    margin-top: 4px;
   }
 
   .octo-top-header__logo-spinner {
@@ -2193,18 +2223,6 @@
     opacity: 0.75;
   }
 
-  .octo-top-header__branch-spinner {
-    width: 12px;
-    height: 12px;
-    animation: octo-spin 1s linear infinite;
-  }
-
-  .octo-top-header__branch-pr-link {
-    flex-shrink: 0;
-    color: var(--muted);
-    text-decoration: none;
-  }
-
   .octo-top-header__avatar {
     height: 26px;
     width: 26px;
@@ -2215,21 +2233,6 @@
     font-size: 11.5px;
     font-weight: 600;
     color: #fff;
-  }
-
-  .octo-top-header__dropdown-branch {
-    min-width: 300px;
-  }
-
-  .octo-top-header__dropdown-user {
-    min-width: 180px;
-  }
-
-  .octo-top-header__user-name {
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
   }
 
   /* skeleton placeholders */
@@ -3171,6 +3174,31 @@
   .octo-create-branch__textarea {
     resize: vertical;
     min-height: 4.5rem;
+  }
+
+  /* ── octo-user-account-dialog (account modal in TopHeader) ── */
+  .octo-user-account-dialog__profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--v-gap);
+  }
+
+  .octo-user-account-dialog__avatar {
+    height: 64px;
+    width: 64px;
+  }
+
+  .octo-user-account-dialog__name {
+    margin: 0;
+    text-align: center;
+  }
+
+  .octo-user-account-dialog__theme {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
   }
 
   /* ── octo-form-field (generic wrapper used by all field types) ── */
@@ -9946,17 +9974,6 @@
     text-transform: uppercase;
     letter-spacing: 0.025em;
     color: var(--muted);
-  }
-
-  /* ----- Theme toggle ----- */
-  .octo-theme-toggle__item {
-    cursor: pointer;
-    gap: 8px;
-  }
-
-  .octo-theme-toggle__icon {
-    width: 14px;
-    height: 14px;
   }
 
   /* ----- Primary-emphasis button override (replaces Tailwind bg-foreground text-background hover:bg-foreground/90) ----- */

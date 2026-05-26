@@ -8,32 +8,20 @@ import * as React from 'react';
 import { useIsFetching, useIsMutating, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { signOut, useSession } from 'next-auth/react';
-import {
-  Icon,
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  BranchChip,
-  Kbd,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui';
+import { useSession } from 'next-auth/react';
+import { Icon, Avatar, AvatarFallback, AvatarImage, BranchChip, Kbd } from '../ui';
 
 import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 import { useAgentStatus } from '../../admin/query/hooks/useAgentStatus';
 import { useBranch } from '../../admin/query/hooks/useBranch';
-import { useBranchList } from '../../admin/query/hooks/useBranchList';
-import { useClearBranch, usePublishBranch, useSetActiveBranch } from '../../admin/query/hooks/useBranchMutations';
 import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
 import { useConfig } from '../../hooks/useConfig';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
+import { BranchSelectorDialog } from './BranchSelectorDialog';
 import CreateBranchDialog from './CreateBranchDialog';
-import { ThemeToggle, type Theme } from '../../admin/theme';
+import { UserAccountDialog } from './UserAccountDialog';
+import type { Theme } from '../../admin/theme';
 
 import { AgentNavSkeleton } from './skeletons/AgentNavSkeleton';
 import { BranchChipSkeleton } from './skeletons/BranchChipSkeleton';
@@ -67,38 +55,17 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
 
   const [branchOpen, setBranchOpen] = React.useState(false);
   const [createBranchOpen, setCreateBranchOpen] = React.useState(false);
-  const branchListQuery = useBranchList({ enabled: branchOpen });
-
-  const setActiveBranchMutation = useSetActiveBranch();
-  const clearBranchMutation = useClearBranch();
-  const publishBranchMutation = usePublishBranch();
+  const [userOpen, setUserOpen] = React.useState(false);
 
   const agentEnabled = agentStatusQuery.data?.enabled ?? false;
   const agentStatusLoading = agentStatusQuery.isPending;
   const activeBranch = branchQuery.data ?? '';
   const branchChipLoading = branchQuery.isPending || hasActiveBranchQuery.isPending;
-  const cmsBranches = branchListQuery.data ?? [];
-  const branchListLoading = branchListQuery.isPending && branchListQuery.fetchStatus !== 'idle';
 
   const active: string =
     NAV.slice()
       .reverse()
       .find((n) => n.matchPrefix && pathname.startsWith(n.matchPrefix))?.id ?? 'content';
-
-  const handleSwitchBranch = async (branch: string, isBaseRow: boolean) => {
-    if (isBaseRow) {
-      await clearBranchMutation.mutateAsync();
-      toast({ title: `Viewing ${branch} (read-only)`, variant: 'success' });
-      return;
-    }
-    await setActiveBranchMutation.mutateAsync(branch);
-    toast({ title: `Switched to ${branch}`, variant: 'success' });
-  };
-
-  const handleClearBranch = async () => {
-    await clearBranchMutation.mutateAsync();
-    toast({ title: 'Back to main branch', variant: 'success' });
-  };
 
   const handleBranchCreated = async (branchName: string, prUrl: string, prWarning?: string) => {
     // Cookie is set on the createBranch response; invalidate git queries and
@@ -115,16 +82,6 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
       toast({ title: 'Branch created', variant: 'success' });
     }
     if (prUrl) window.open(prUrl, '_blank');
-  };
-
-  const handlePublish = async (branchName: string) => {
-    setBranchOpen(false);
-    try {
-      await publishBranchMutation.mutateAsync(branchName);
-      toast({ title: `Published: ${branchName}`, variant: 'success' });
-    } catch (e) {
-      toast({ title: e instanceof Error ? e.message : 'Publish failed', variant: 'destructive' });
-    }
   };
 
   const userInitials = data?.user?.name
@@ -208,97 +165,46 @@ export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps)
 
       <span className="octo-top-header__sep" />
 
-      {/* Branch chip — always visible; menu opens in dev and prod (create branch before any edit) */}
+      {/* Branch chip — always visible; dialog opens in dev and prod (create branch before any edit) */}
       {branchChipLoading ? (
         <BranchChipSkeleton />
       ) : (
-        <DropdownMenu open={branchOpen} onOpenChange={setBranchOpen}>
-          <DropdownMenuTrigger asChild>
-            <BranchChip name={branchLabel} ahead={ahead} menuTrigger aria-label={`Branch menu, ${branchLabel}`} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="octo-top-header__dropdown-branch" sideOffset={5} align="end">
-            <DropdownMenuItem
-              onSelect={() => {
-                setBranchOpen(false);
-                setCreateBranchOpen(true);
-              }}
-            >
-              <Icon.Plus className="octo-icon-md" />
-              Create new branch
-            </DropdownMenuItem>
-
-            {(branchListLoading || cmsBranches.length > 0) && <DropdownMenuSeparator />}
-
-            {branchListLoading && (
-              <div className="octo-top-header__branch-loading">
-                <Icon.RefreshCw className="octo-top-header__branch-spinner" />
-                Loading…
-              </div>
-            )}
-
-            {!branchListLoading &&
-              cmsBranches.map((b) => (
-                <div key={b.branch} className="octo-top-header__branch-row">
-                  <span className="octo-top-header__branch-dot">{b.branch === activeBranch ? '●' : ''}</span>
-                  <button
-                    type="button"
-                    className="octo-top-header__branch-name"
-                    onClick={() => handleSwitchBranch(b.branch, b.prNumber === 0 && !b.prUrl)}
-                  >
-                    {b.branch}
-                  </button>
-                  {b.isPublished && <span className="octo-top-header__branch-live">Live</span>}
-                  {!b.isPublished && (
-                    <button
-                      type="button"
-                      className="octo-top-header__branch-publish"
-                      onClick={() => handlePublish(b.branch)}
-                      title={`Publish ${b.branch}`}
-                    >
-                      Publish
-                    </button>
-                  )}
-                  {b.prUrl && (
-                    <a
-                      href={b.prUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="octo-top-header__branch-pr-link"
-                      onClick={(e) => e.stopPropagation()}
-                      title="Open PR on GitHub"
-                    >
-                      <Icon.ExternalLink className="octo-icon-xs" />
-                    </a>
-                  )}
-                </div>
-              ))}
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={handleClearBranch}>
-              <Icon.X className="octo-icon-md" />
-              Back to main
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <BranchChip
+          name={branchLabel}
+          ahead={ahead}
+          menuTrigger
+          aria-label={`Branch menu, ${branchLabel}`}
+          onClick={() => setBranchOpen(true)}
+        />
       )}
 
-      {/* User avatar dropdown — design.html omits the chevron */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button type="button" className="octo-top-header__user-btn" aria-label="Account">
-            <Avatar className="octo-top-header__avatar">
-              {data?.user?.image && <AvatarImage src={data.user.image} alt={userInitials} />}
-              <AvatarFallback className="octo-top-header__avatar-fallback">{userInitials}</AvatarFallback>
-            </Avatar>
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="octo-top-header__dropdown-user" sideOffset={8} align="end">
-          {data?.user?.name && <div className="octo-top-header__user-name">{data.user.name}</div>}
-          <ThemeToggle initialTheme={initialTheme} />
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => signOut()}>Sign out</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <button
+        type="button"
+        className="octo-top-header__user-btn"
+        aria-label="Account"
+        onClick={() => setUserOpen(true)}
+      >
+        <Avatar className="octo-top-header__avatar">
+          {data?.user?.image && <AvatarImage src={data.user.image} alt={userInitials} />}
+          <AvatarFallback className="octo-top-header__avatar-fallback">{userInitials}</AvatarFallback>
+        </Avatar>
+      </button>
+
+      <BranchSelectorDialog
+        open={branchOpen}
+        onOpenChange={setBranchOpen}
+        activeBranch={activeBranch}
+        onRequestCreateBranch={() => setCreateBranchOpen(true)}
+      />
+
+      <UserAccountDialog
+        open={userOpen}
+        onOpenChange={setUserOpen}
+        userName={data?.user?.name}
+        userImage={data?.user?.image}
+        userInitials={userInitials}
+        initialTheme={initialTheme}
+      />
 
       <CreateBranchDialog
         open={createBranchOpen}

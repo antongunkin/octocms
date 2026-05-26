@@ -41,12 +41,24 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
 
-vi.mock('../../admin/theme', () => ({
-  ThemeToggle: () => null,
-}));
-
 vi.mock('./CreateBranchDialog', () => ({
   default: () => null,
+}));
+
+vi.mock('./BranchSelectorDialog', () => ({
+  BranchSelectorDialog: ({ open, onRequestCreateBranch }: { open: boolean; onRequestCreateBranch: () => void }) =>
+    open ? (
+      <div data-testid="branch-selector-dialog">
+        <button type="button" onClick={onRequestCreateBranch}>
+          Create new branch
+        </button>
+      </div>
+    ) : null,
+}));
+
+vi.mock('./UserAccountDialog', () => ({
+  UserAccountDialog: ({ open, userName }: { open: boolean; userName?: string | null }) =>
+    open ? <div data-testid="user-account-dialog">{userName}</div> : null,
 }));
 
 beforeEach(() => {
@@ -99,19 +111,7 @@ describe('TopHeader', () => {
     await waitFor(() => expect(screen.queryByText('Chat')).not.toBeNull());
   });
 
-  it('does not call listCMSBranches until the branch dropdown opens', async () => {
-    getBranchMock.mockResolvedValue('main');
-    hasActiveBranchMock.mockResolvedValue(false);
-    getAgentClientStatusMock.mockResolvedValue({ enabled: false });
-    listCMSBranchesMock.mockResolvedValue([]);
-
-    renderWithQuery(<TopHeader />);
-    await waitFor(() => expect(screen.queryByText('main')).not.toBeNull());
-
-    expect(listCMSBranchesMock).not.toHaveBeenCalled();
-  });
-
-  it('opens the branch menu from main and lists Create new branch', async () => {
+  it('opens the branch dialog from main and lists Create new branch', async () => {
     getBranchMock.mockResolvedValue('main');
     hasActiveBranchMock.mockResolvedValue(false);
     getAgentClientStatusMock.mockResolvedValue({ enabled: false });
@@ -122,10 +122,23 @@ describe('TopHeader', () => {
 
     const trigger = screen.getByRole('button', { name: 'Branch menu, main' });
     expect((trigger as HTMLButtonElement).disabled).toBe(false);
-    trigger.focus();
-    fireEvent.keyDown(trigger, { key: 'Enter', code: 'Enter' });
+    fireEvent.click(trigger);
 
-    expect(await screen.findByText('Create new branch')).toBeDefined();
-    await waitFor(() => expect(listCMSBranchesMock).toHaveBeenCalled());
+    expect(await screen.findByTestId('branch-selector-dialog')).toBeDefined();
+    expect(screen.getByText('Create new branch')).toBeDefined();
+  });
+
+  it('opens the account dialog when the avatar button is clicked', async () => {
+    getBranchMock.mockResolvedValue('main');
+    hasActiveBranchMock.mockResolvedValue(false);
+    getAgentClientStatusMock.mockResolvedValue({ enabled: false });
+
+    renderWithQuery(<TopHeader />);
+    await waitFor(() => expect(screen.queryByText('main')).not.toBeNull());
+
+    fireEvent.click(screen.getByRole('button', { name: 'Account' }));
+
+    expect(await screen.findByTestId('user-account-dialog')).toBeDefined();
+    expect(screen.getByText('Tester')).toBeDefined();
   });
 });
