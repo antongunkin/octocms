@@ -35,6 +35,7 @@ import DeleteContentTypeDialog from './DeleteContentTypeDialog';
 import DeleteFieldDialog from './DeleteFieldDialog';
 import EditContentTypeDialog from './EditContentTypeDialog';
 import FieldDialog from './FieldDialog';
+import { reorderFields } from './fieldOptions';
 import { FieldTableSkeleton } from './skeletons/FieldTableSkeleton';
 import { Page } from '../Layout/Page';
 
@@ -65,7 +66,17 @@ export default function ContentTypeDetail({ type }: Props) {
   // Optimistic local order so the row hops while we wait for the save → refresh
   // round-trip. Reset whenever the underlying schema (props) changes.
   const [orderOverride, setOrderOverride] = useState<string[] | null>(null);
-  useEffect(() => setOrderOverride(null), [collection]);
+  // Clear the optimistic order once the schema cache catches up (same keys in
+  // the same sequence). A blind reset on every `collection` change would wipe
+  // the override right after drop — reorder-only saves are deep-equal to TanStack
+  // Query so the cache often keeps the old key order until a full refetch.
+  useEffect(() => {
+    if (orderOverride === null || !collection) return;
+    const serverOrder = Object.keys(collection.fields);
+    const matches =
+      serverOrder.length === orderOverride.length && serverOrder.every((key, index) => key === orderOverride[index]);
+    if (matches) setOrderOverride(null);
+  }, [collection, orderOverride]);
 
   const fields = useMemo(() => {
     if (!collection) return [];
@@ -143,10 +154,7 @@ export default function ContentTypeDetail({ type }: Props) {
   };
 
   const reorderTo = async (nextOrder: string[]) => {
-    const nextFields: Record<string, CollectionField> = {};
-    for (const k of nextOrder) {
-      if (k in collection.fields) nextFields[k] = collection.fields[k]!;
-    }
+    const nextFields = reorderFields(collection.fields, nextOrder);
     await saveCollectionFields(
       nextFields,
       `CMS: reorder fields on ${type}`,
@@ -352,6 +360,7 @@ export default function ContentTypeDetail({ type }: Props) {
                           nextOrder.splice(from, 1);
                           nextOrder.splice(to, 0, dragKey);
                           setDragKey(null);
+                          setOrderOverride(nextOrder);
                           void reorderTo(nextOrder);
                         }}
                       >

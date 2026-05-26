@@ -1,10 +1,11 @@
-import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { queryKeys } from '../admin/query/keys';
 import { renderWithQuery } from '../admin/query/test/renderWithQuery';
 import FormReferenceField from './FormReferenceField';
+import { fireDragReorder } from './test/dndTestUtils';
 
 const { mockPushEntry, getRefreshTick, setRefreshTick } = vi.hoisted(() => {
   let tick = 0;
@@ -387,5 +388,77 @@ describe('FormReferenceField', () => {
       expect(screen.queryByText('Alice')).toBeNull();
       expect(screen.getByText('Bob')).toBeDefined();
     });
+  });
+});
+
+function referenceItemTitles(): string[] {
+  return Array.from(document.querySelectorAll('.octo-ff-reference__item-title')).map((el) => el.textContent ?? '');
+}
+
+function referenceItemByTitle(title: string): HTMLElement {
+  const item = Array.from(document.querySelectorAll('.octo-ff-reference__item')).find((candidate) =>
+    candidate.querySelector('.octo-ff-reference__item-title')?.textContent?.includes(title),
+  );
+  if (!item) throw new Error(`No reference item titled "${title}"`);
+  return item as HTMLElement;
+}
+
+describe('FormReferenceField drag-and-drop reorder', () => {
+  it('reorders selected items on drop', async () => {
+    renderWithQuery(
+      <FormReferenceField
+        label="Posts"
+        name="posts"
+        value={JSON.stringify(['post-p1.json', 'post-p2.json'])}
+        reference={{ collections: ['post'], cardinality: 'many' }}
+      />,
+    );
+
+    await waitFor(() => expect(referenceItemTitles()).toEqual(['First Post', 'Second Post']));
+
+    await fireDragReorder(referenceItemByTitle('First Post'), referenceItemByTitle('Second Post'));
+
+    expect(referenceItemTitles()).toEqual(['Second Post', 'First Post']);
+  });
+
+  it('updates the hidden input to match the new item order', async () => {
+    renderWithQuery(
+      <FormReferenceField
+        label="Posts"
+        name="posts"
+        value={JSON.stringify(['post-p1.json', 'post-p2.json'])}
+        reference={{ collections: ['post'], cardinality: 'many' }}
+      />,
+    );
+
+    await waitFor(() => expect(referenceItemTitles()).toEqual(['First Post', 'Second Post']));
+
+    await fireDragReorder(referenceItemByTitle('First Post'), referenceItemByTitle('Second Post'));
+
+    const hiddenInput = document.querySelector('input[type="hidden"][name="posts"]') as HTMLInputElement;
+    expect(JSON.parse(hiddenInput.value)).toEqual(['post-p2.json', 'post-p1.json']);
+  });
+
+  it('does not reorder when dropped onto the same item', async () => {
+    renderWithQuery(
+      <FormReferenceField
+        label="Posts"
+        name="posts"
+        value={JSON.stringify(['post-p1.json', 'post-p2.json'])}
+        reference={{ collections: ['post'], cardinality: 'many' }}
+      />,
+    );
+
+    await waitFor(() => expect(referenceItemTitles()).toEqual(['First Post', 'Second Post']));
+
+    const item = referenceItemByTitle('First Post');
+    await act(async () => {
+      fireEvent.dragStart(item);
+    });
+    await act(async () => {
+      fireEvent.drop(item);
+    });
+
+    expect(referenceItemTitles()).toEqual(['First Post', 'Second Post']);
   });
 });
