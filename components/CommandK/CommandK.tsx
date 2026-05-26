@@ -14,7 +14,7 @@ import { listCMSBranches, searchEntries, type CMSBranch, type SearchResult } fro
 import { queryKeys } from '../../admin/query/keys';
 import { useConfig } from '../../hooks/useConfig';
 import { entryAdminHref } from '../../lib/searchIndex';
-import { Kbd } from '../ui';
+import { Dialog, DialogContent, Kbd } from '../ui';
 import { RowItem, Section } from './parts';
 
 type CommandKProps = {
@@ -177,21 +177,14 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
     }
   };
 
-  if (!open) return null;
-
   let runningIndex = -1;
 
   return (
-    <div
-      className="octo-cmdk"
-      role="dialog"
-      aria-modal="true"
-      onClick={() => onOpenChange(false)}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') onOpenChange(false);
-      }}
-    >
-      <div className="octo-cmdk__panel" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className="octo-cmdk__dialog octo-dialog-content octo-dialog-content--3xl octo-dialog-content--no-padding octo-dialog-content--overflow-hidden"
+        aria-label="Command palette"
+      >
         <div className="octo-cmdk__input-row">
           <Icon.Search size={18} className="octo-cmdk__input-icon" />
           <input
@@ -292,7 +285,7 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
             <Kbd>↵</Kbd> open in new tab
           </span>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
