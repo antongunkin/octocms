@@ -2,9 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Label } from '../ui/label';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Label,
+} from '../ui';
 
 export type CreateFolderDialogProps = {
   open: boolean;
@@ -53,8 +60,8 @@ export function CreateFolderDialog({ open, onOpenChange, existing, onCreate }: C
               Folders are virtual labels for sorting your assets. They aren&rsquo;t physical directories.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-1.5 py-4">
-            <Label htmlFor="new-folder-name" className="text-xs text-muted-foreground">
+          <div className="octo-folder-dialog__body">
+            <Label htmlFor="new-folder-name" className="octo-field-label-hint">
               Folder name
             </Label>
             <input
@@ -66,10 +73,10 @@ export function CreateFolderDialog({ open, onOpenChange, existing, onCreate }: C
                 setError(null);
               }}
               placeholder="e.g. blog-posts"
-              className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="octo-folder-dialog__input"
             />
-            {error && <p className="text-xs text-destructive">{error}</p>}
-            <p className="text-[11px] text-muted-foreground">
+            {error && <p className="octo-folder-dialog__error">{error}</p>}
+            <p className="octo-folder-dialog__hint">
               Allowed: letters, digits, dashes, underscores. Other characters become &ldquo;-&rdquo;.
             </p>
           </div>

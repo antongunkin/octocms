@@ -1,4 +1,4 @@
-import { DashboardContentSkeleton } from '../components/Dashboard/DashboardContent.skeleton';
+import { NeutralPageSkeleton } from '../components/Layout/skeletons/NeutralPageSkeleton';
 
 import { ChatPage } from './pages/ChatPage';
 import { CollectionPage } from './pages/CollectionPage';
@@ -22,7 +22,7 @@ type AdminAppProps = {
  *   /cms/content             → ContentPage (alias for /cms — kept for legacy links)
  *   /cms/content/<type>      → CollectionPage
  *   /cms/content/<type>/<id> → EntryPage
- *   /cms/chat                → ChatPage (gated on `isAgentEnabled(agentConfig)`)
+ *   /cms/chat                → ChatPage (setup guide when agent not enabled)
  *   /cms/media               → MediaPage (library — grid + folders)
  *   /cms/media/<id>          → MediaAssetPage (full-page asset editor)
  *   /cms/model               → ContentModelPage
@@ -73,5 +73,5 @@ export async function AdminApp({ params }: AdminAppProps) {
     return <EntryPage params={Promise.resolve({ type, id })} key={`${type}/${id}`} />;
   }
 
-  return <DashboardContentSkeleton />;
+  return <NeutralPageSkeleton />;
 }

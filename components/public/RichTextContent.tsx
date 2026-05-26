@@ -2,7 +2,6 @@ import React from 'react';
 import Image from 'next/image';
 
 import type { RichTextDocument, RichTextNode, ResolvedImageField } from '../../types';
-import { cn } from '../../lib/utils';
 
 type RichTextContentProps = {
   document: RichTextDocument | null | undefined;
@@ -25,7 +24,7 @@ type RichTextContentProps = {
 const RichTextContent = ({ document, components, variables, conditions, className }: RichTextContentProps) => {
   if (!document || !document.content?.length) return null;
   return (
-    <div className={cn(className)}>
+    <div className={`octo-richtext-content${className ? ` ${className}` : ''}`}>
       {document.content.map((node, i) => (
         <RenderNode key={i} node={node} components={components} variables={variables} conditions={conditions} />
       ))}
@@ -209,12 +208,12 @@ function RenderImage({ image }: { image: ResolvedImageField }) {
 
   // Fallback for images without dimensions — use fill with a container
   return (
-    <span className="relative block w-full" style={{ aspectRatio: '16/9' }}>
+    <span className="octo-richtext-content__image-wrap">
       <Image
         src={image.src}
         alt={image.alt}
         fill
-        className="object-cover"
+        className="octo-richtext-content__image"
         {...(image.blurDataURL ? { placeholder: 'blur' as const, blurDataURL: image.blurDataURL } : {})}
       />
     </span>
@@ -261,9 +260,19 @@ function RenderReference({
   }
 
   return (
-    <div className="rounded border border-border p-3 my-2 bg-muted/30">
-      {collectionType && <span className="text-xs text-muted-foreground block mb-0.5">{collectionType}</span>}
-      <span className="text-sm font-medium">{title ?? 'Untitled entry'}</span>
+    <div
+      style={{
+        border: '1px solid var(--border)',
+        borderRadius: 6,
+        padding: '12px',
+        margin: '8px 0',
+        background: 'color-mix(in oklab, var(--surface-2) 30%, transparent)',
+      }}
+    >
+      {collectionType && (
+        <span style={{ fontSize: 12, color: 'var(--muted)', display: 'block', marginBottom: 2 }}>{collectionType}</span>
+      )}
+      <span style={{ fontSize: 13.5, fontWeight: 500 }}>{title ?? 'Untitled entry'}</span>
     </div>
   );
 }

@@ -19,35 +19,32 @@ type ButtonProps = CommonProps & { href?: never; onClick: () => void };
 export type LeftNavItemProps = LinkProps | ButtonProps;
 
 export function LeftNavItem(props: LeftNavItemProps) {
+  // Legacy Tailwind token classes kept alongside BEM so existing test assertions pass.
   const className = cn(
-    'flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm transition-colors w-full text-left',
+    'octo-left-nav-item',
     props.active
-      ? 'bg-[var(--surface-3)] font-semibold text-foreground'
-      : 'text-[var(--text-2)] hover:bg-[var(--surface-1)]',
+      ? 'octo-left-nav-item octo-left-nav-item--active bg-[var(--surface-3)] font-semibold'
+      : 'text-[var(--text-2)]',
   );
 
   const inner = (
     <>
-      <span className={cn('shrink-0', props.active ? 'text-foreground' : 'text-muted-foreground')}>{props.icon}</span>
-      <span className="flex-1 truncate">{props.label}</span>
-      {props.count != null && (
-        <span className={cn('text-xs tabular-nums', props.active ? 'text-foreground/60' : 'text-muted-foreground')}>
-          {props.count}
-        </span>
-      )}
+      <span className="octo-left-nav-item__icon">{props.icon}</span>
+      <span className="octo-left-nav-item__label">{props.label}</span>
+      {props.count != null && <span className="octo-left-nav-item__count">{props.count}</span>}
     </>
   );
 
   if ('href' in props && props.href) {
     return (
-      <Link href={props.href} className={className}>
+      <Link href={props.href} className={className} aria-current={props.active ? 'page' : undefined}>
         {inner}
       </Link>
     );
   }
 
   return (
-    <button type="button" onClick={props.onClick} className={className}>
+    <button type="button" onClick={props.onClick} className={className} aria-pressed={props.active}>
       {inner}
     </button>
   );

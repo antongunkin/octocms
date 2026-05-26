@@ -1,6 +1,6 @@
-import slugify from 'slugify';
-
 import type { CollectionField } from '../admin/types';
+
+import { slugify } from './slugify';
 
 /** Stored slugs and URL segments must match this pattern (after normalization). */
 export const SLUG_MAX_LENGTH = 200;
@@ -35,11 +35,11 @@ export function sanitizeSlugFieldInputValue(raw: string): string {
  */
 export function slugifyForUrl(input: string): string {
   const trimmed = String(input).trim();
-  const preprocessed = trimmed.replace(/_+/g, ' ').replace(/\s+/g, ' ').trim();
+  const preprocessed = trimmed.replace(/&/g, ' and ').replace(/_+/g, ' ').replace(/\s+/g, ' ').trim();
   if (!preprocessed) {
     return '';
   }
-  const raw = slugify(preprocessed, { lower: true, strict: true, trim: true });
+  const raw = slugify(preprocessed);
   let collapsed = raw.replace(/-+/g, '-').replace(/^-|-$/g, '');
   if (collapsed.length > SLUG_MAX_LENGTH) {
     collapsed = collapsed.slice(0, SLUG_MAX_LENGTH).replace(/-+$/g, '');

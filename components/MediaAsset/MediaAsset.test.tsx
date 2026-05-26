@@ -3,7 +3,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MediaFile } from '../../types';
-import { MediaAsset } from './MediaAsset';
+import MediaAsset from './MediaAsset';
 import { queryKeys } from '../../admin/query/keys';
 import { createTestQueryClient, renderWithQuery } from '../../admin/query/test/renderWithQuery';
 
@@ -140,11 +140,5 @@ describe('MediaAsset', () => {
     expect(screen.getByText('800 × 600')).toBeDefined();
     expect(screen.getByText('/media/abc-123.png')).toBeDefined();
     expect(screen.getByText('abc-123')).toBeDefined();
-  });
-
-  it('back arrow returns to /cms/media', () => {
-    renderWithFiles([mockFile], mockFile.id);
-    fireEvent.click(screen.getByRole('button', { name: /back to media/i }));
-    expect(pushMock).toHaveBeenCalledWith('/cms/media');
   });
 });

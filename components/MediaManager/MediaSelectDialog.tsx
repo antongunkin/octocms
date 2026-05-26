@@ -11,17 +11,17 @@
  * a parent re-render.
  */
 
-import { ImageIcon, LayoutGrid, List, Search } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Icon } from '../ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useMediaList } from '../../admin/query/hooks/useMediaList';
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { cn } from '../../lib/utils';
 import type { MediaFile } from '../../types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 
 import { MediaLeftPanel } from './MediaLeftPanel';
 import { MediaListTable } from './MediaListTable';
+import { MediaViewModeSwitcher } from './MediaViewModeSwitcher';
 
 type ViewMode = 'grid' | 'list';
 
@@ -99,12 +99,12 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[80vh] max-w-5xl flex-col overflow-hidden p-0">
-        <DialogHeader className="border-b border-border px-6 py-4">
+      <DialogContent className="octo-dialog-content octo-dialog-content--5xl octo-dialog-content--vh-80 octo-dialog-content--flex-col octo-dialog-content--overflow-hidden octo-dialog-content--no-padding">
+        <DialogHeader className="octo-dialog-header octo-dialog-header--bordered">
           <DialogTitle>Select an image</DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-1 overflow-hidden">
+        <div className="octo-media-select-dialog__body">
           <MediaLeftPanel
             folders={folders}
             selectedFolder={selectedFolder}
@@ -121,31 +121,33 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
             }}
           />
 
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <div className="flex items-center justify-between gap-3 px-6 pb-3 pt-3">
-              <div className="relative min-w-[220px] max-w-[420px] flex-[0_1_420px]">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="octo-media-select-dialog__content">
+            <div className="octo-media-select-dialog__toolbar">
+              <div className="octo-media-select-dialog__search-wrap">
+                <Icon.Search className="octo-media-select-dialog__search-icon octo-icon-md" />
                 <input
                   ref={searchRef}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter assets…"
-                  className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+                  className="octo-media-select-dialog__search-input"
                 />
               </div>
-              <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
+              <MediaViewModeSwitcher value={viewMode} onChange={setViewMode} />
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 pb-6">
+            <div className="octo-media-select-dialog__scroll">
               {isPending && files.length === 0 ? (
-                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Loading…</div>
+                <div className="octo-media-select-dialog__loading">Loading…</div>
               ) : filteredFiles.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
-                  <ImageIcon className="h-12 w-12" />
-                  <p className="text-sm">{searchQuery ? 'No assets match this search' : 'No files in this folder'}</p>
+                <div className="octo-media-select-dialog__empty">
+                  <Icon.Image className="octo-icon-2xl" />
+                  <p className="octo-u-text-base">
+                    {searchQuery ? 'No assets match this search' : 'No files in this folder'}
+                  </p>
                 </div>
               ) : viewMode === 'grid' ? (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
+                <div className="octo-media-grid octo-media-grid--auto">
                   {filteredFiles.map((file) => {
                     const isSelected = selectedId === file.id;
                     return (
@@ -154,23 +156,21 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
                         type="button"
                         onClick={() => handlePick(file)}
                         className={cn(
-                          'group relative cursor-pointer overflow-hidden rounded-xl border bg-background text-left transition-all hover:border-foreground/40 hover:shadow-sm',
-                          isSelected ? 'border-primary ring-2 ring-primary/30' : 'border-border',
+                          'octo-media-grid__card',
+                          isSelected && 'octo-media-grid__card octo-media-grid__card--selected',
                         )}
                       >
-                        <div className="aspect-square bg-[var(--surface-2)]">
+                        <div className="octo-media-grid__img-wrap">
                           <img
                             src={file.publicUrl}
                             alt={file.title || file.originalName}
-                            className="h-full w-full object-cover"
+                            className="octo-media-grid__img"
                             loading="lazy"
                           />
                         </div>
-                        <div className="border-t border-border bg-background px-3 py-2">
-                          <p className="truncate text-sm font-medium text-foreground">
-                            {file.title || file.originalName}
-                          </p>
-                          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                        <div className="octo-media-grid__info">
+                          <p className="octo-media-grid__name">{file.title || file.originalName}</p>
+                          <p className="octo-media-grid__meta">
                             {file.extension.toUpperCase()}
                             {file.width != null && file.height != null ? ` · ${file.width}×${file.height}` : ''}
                           </p>
@@ -187,42 +187,5 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: ViewMode) => void }) {
-  return (
-    <div
-      className="inline-flex items-center rounded-full border border-border bg-background p-0.5"
-      role="tablist"
-      aria-label="View mode"
-    >
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'grid'}
-        aria-label="Grid view"
-        onClick={() => onChange('grid')}
-        className={cn(
-          'flex h-7 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors',
-          value === 'grid' ? 'bg-[var(--surface-3)] text-foreground' : 'hover:text-foreground',
-        )}
-      >
-        <LayoutGrid className="h-3.5 w-3.5" />
-      </button>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'list'}
-        aria-label="List view"
-        onClick={() => onChange('list')}
-        className={cn(
-          'flex h-7 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors',
-          value === 'list' ? 'bg-[var(--surface-3)] text-foreground' : 'hover:text-foreground',
-        )}
-      >
-        <List className="h-3.5 w-3.5" />
-      </button>
-    </div>
   );
 }

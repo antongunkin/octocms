@@ -9,19 +9,15 @@ import { ShimmerBlock, ShimmerRow } from '../../skeletons/primitives';
 export function MediaListTableSkeleton({ rows = 8 }: { rows?: number }) {
   const widths = ['40%', '16%', '12%', '14%', '16%'];
   return (
-    <div
-      role="status"
-      aria-label="Loading media list"
-      className="overflow-hidden rounded-xl border border-border bg-[var(--surface-1)]"
-    >
-      <div className="border-b border-border bg-[var(--surface-2)] px-4 py-2.5">
+    <div role="status" aria-label="Loading media list" className="octo-content-card">
+      <div className="octo-content-card__th-row" style={{ padding: '10px 16px' }}>
         <ShimmerRow widths={widths} />
       </div>
-      <div className="flex flex-col gap-3 px-4 py-3">
+      <div className="octo-content-table__skel-body">
         {Array.from({ length: rows }, (_, i) => (
-          <div key={i} className="flex items-center gap-4">
-            <ShimmerBlock className="h-7 w-7 shrink-0 rounded-md" />
-            <ShimmerRow className="flex-1" widths={widths} />
+          <div key={i} className="octo-skel-row-gap-16">
+            <ShimmerBlock className="octo-skel-h-7 octo-skel-w-7 octo-u-shrink-0 octo-skel-rounded-md" />
+            <ShimmerRow className="octo-u-flex-1" widths={widths} />
           </div>
         ))}
       </div>

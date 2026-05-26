@@ -53,7 +53,7 @@ describe('DiffView', () => {
 
     const { container } = renderWithQuery(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
     // Skeleton: three pulsing placeholder divs.
-    expect(container.querySelector('.bg-muted\\/40')).toBeTruthy();
+    expect(container.querySelector('.octo-diff-view__skeleton-line')).toBeTruthy();
   });
 
   it('shows the empty state when there are no unmerged changes', async () => {
@@ -120,9 +120,9 @@ describe('DiffView', () => {
     const { container } = renderWithQuery(<DiffView collectionType="post" entryPath="cms/content/post/post-p1.json" />);
 
     await waitFor(() => expect(screen.getAllByText('No changes').length).toBeGreaterThanOrEqual(2));
-    // The changed title field renders red and emerald hunk rows.
-    expect(container.querySelector('[class*="bg-red"]')).toBeTruthy();
-    expect(container.querySelector('[class*="bg-emerald"]')).toBeTruthy();
+    // The changed title field renders del and add hunk rows.
+    expect(container.querySelector('.octo-diff-hunk__line--del')).toBeTruthy();
+    expect(container.querySelector('.octo-diff-hunk__line--add')).toBeTruthy();
   });
 
   it('renders a side-by-side image diff with resolved URLs', async () => {

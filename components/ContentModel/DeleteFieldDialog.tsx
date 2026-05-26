@@ -22,9 +22,16 @@ import { previewSchemaChange } from '../../admin/actions';
 import type { PreviewSchemaResult } from '../../admin/actions/schema';
 import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
 import { toast } from '../../hooks/useToast';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Input } from '../ui/input';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Input,
+} from '../ui';
 import type { Collection, CollectionField, Config } from '../../types';
 import SchemaImpactList from './SchemaImpactList';
 
@@ -110,44 +117,46 @@ export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="octo-dialog-content octo-dialog-content--2xl">
         <DialogHeader>
           <DialogTitle>Delete field</DialogTitle>
           <DialogDescription>
-            Permanently remove <strong>{field.label}</strong> (<code className="font-mono text-xs">{fieldKey}</code>)
-            from <strong>{collection.label}</strong>.
+            Permanently remove <strong>{field.label}</strong> (
+            <code className="octo-u-mono octo-u-text-xs">{fieldKey}</code>) from <strong>{collection.label}</strong>.
             {hasCompanionFiles ? (
               <>
                 {' '}
-                The companion <code className="font-mono text-xs">{field.format === 'markdown' ? '.md' : '.mdx'}</code>{' '}
-                file for every entry will be deleted in the same commit.
+                The companion{' '}
+                <code className="octo-u-mono octo-u-text-xs">{field.format === 'markdown' ? '.md' : '.mdx'}</code> file
+                for every entry will be deleted in the same commit.
               </>
             ) : null}
           </DialogDescription>
         </DialogHeader>
 
         {previewing ? (
-          <p className="text-sm text-muted-foreground">Checking impact…</p>
+          <p className="octo-dialog-field__hint">Checking impact…</p>
         ) : preview && !preview.valid ? (
-          <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-            <p className="font-medium">The change is invalid:</p>
-            <ul className="mt-1 list-disc space-y-1 pl-4 text-xs">
+          <div className="octo-error-box">
+            <p className="octo-error-box__title">The change is invalid:</p>
+            <ul className="octo-error-box__list octo-error-box__list--sm">
               {preview.errors.map((e, i) => (
                 <li key={i}>{e}</li>
               ))}
             </ul>
-            <p className="mt-2 text-xs">
+            <p className="octo-error-box__note">
               Cancel and adjust the schema first (e.g. set a different field as the entry title or add a slugSource).
             </p>
           </div>
         ) : preview ? (
-          <div className="space-y-3">
+          <div className="octo-dialog-fields">
             {ownEntries.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Schema-only change — no entries store this field.</p>
+              <p className="octo-dialog-field__hint">Schema-only change — no entries store this field.</p>
             ) : (
               <>
-                <p className="text-xs text-muted-foreground">
-                  Any value stored in <code className="font-mono">{fieldKey}</code> on these entries will be discarded.
+                <p className="octo-dialog-field__hint">
+                  Any value stored in <code className="octo-u-mono">{fieldKey}</code> on these entries will be
+                  discarded.
                 </p>
                 <SchemaImpactList
                   tone="amber"
@@ -157,16 +166,16 @@ export default function DeleteFieldDialog({ open, onOpenChange, schema, type, fi
               </>
             )}
 
-            <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm">
-              <label htmlFor="field-confirm" className="mb-1.5 block font-medium text-destructive">
-                Type <code className="font-mono">{fieldKey}</code> to confirm
+            <div className="octo-confirm-box">
+              <label htmlFor="field-confirm" className="octo-confirm-box__label">
+                Type <code className="octo-u-mono">{fieldKey}</code> to confirm
               </label>
               <Input
                 id="field-confirm"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 disabled={busy}
-                className="font-mono text-sm"
+                className="octo-u-mono"
                 autoComplete="off"
               />
             </div>

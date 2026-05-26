@@ -62,20 +62,19 @@ describe('MediaLeftPanel', () => {
   it('the delete X is rendered as a sibling of LeftNavItem (not nested in its button)', () => {
     render(<MediaLeftPanel {...baseProps} />);
     const deleteBtn = screen.getByRole('button', { name: /delete folder campaigns/i });
-    // Walk up — there must be NO <button> ancestor before the row's `.group` wrapper.
+    // Walk up — there must be NO <button> ancestor before the row's folder-row wrapper.
     let node: HTMLElement | null = deleteBtn.parentElement;
-    while (node && !node.classList.contains('group')) {
+    while (node && !node.classList.contains('octo-media-left-panel__folder-row')) {
       expect(node.tagName.toLowerCase()).not.toBe('button');
       node = node.parentElement;
     }
     expect(node).not.toBeNull();
   });
 
-  it('the delete X starts hidden via group-hover:flex (no overlap with the count)', () => {
+  it('the delete X uses BEM class octo-media-left-panel__folder-del', () => {
     render(<MediaLeftPanel {...baseProps} />);
     const deleteBtn = screen.getByRole('button', { name: /delete folder campaigns/i });
-    expect(deleteBtn.className).toMatch(/\bhidden\b/);
-    expect(deleteBtn.className).toMatch(/group-hover:flex/);
+    expect(deleteBtn.className).toMatch(/octo-media-left-panel__folder-del/);
   });
 
   it('clicking the delete X calls onDeleteFolder and stops propagation to the row', () => {

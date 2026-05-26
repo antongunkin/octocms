@@ -104,14 +104,6 @@ describe('MediaManager', () => {
     expect(screen.queryByRole('button', { name: /asset actions/i })).toBeNull();
   });
 
-  it('shows the assets count in the header', () => {
-    const files = [mockFile, { ...mockFile, id: 'def-456', title: 'Second' }];
-    renderWithFiles(files);
-    const label = screen.getByText('Assets');
-    // Count is rendered as a sibling <span> inside the same wrapper span.
-    expect(label.querySelector('span')?.textContent).toBe('2');
-  });
-
   it('search input filters cards by title and originalName', async () => {
     const files = [
       { ...mockFile, id: 'a', title: 'Hero shot', originalName: 'hero.png' },

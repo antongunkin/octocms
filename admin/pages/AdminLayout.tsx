@@ -1,11 +1,11 @@
-import '../../globals.css';
 import '@mdxeditor/editor/style.css';
+import '../../globals.css';
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 
 import { AdminBootstrapSkeleton } from '../../components/skeletons';
 import Provider from '../provider';
-import { Toaster } from '../../components/ui/toaster';
+import { Toaster } from '../../components/ui';
 import Layout from '../../components/Layout/Layout';
 import { getThemeCookie } from '../theme/cookie';
 import { getConfig } from '../../lib/configStore';

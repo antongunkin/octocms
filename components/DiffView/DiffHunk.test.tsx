@@ -15,17 +15,17 @@ describe('DiffHunk', () => {
     expect(container.textContent).not.toMatch(/[+−]/);
   });
 
-  it('renders added lines with a + gutter and emerald background classes', () => {
+  it('renders added lines with a + gutter and add BEM modifier', () => {
     const { container } = render(<DiffHunk before={'a\nb\n'} after={'a\nb\nc\n'} />);
-    const added = container.querySelector('[class*="bg-emerald"]');
+    const added = container.querySelector('.octo-diff-hunk__line--add');
     expect(added).toBeTruthy();
     expect(added!.textContent).toContain('+');
     expect(added!.textContent).toContain('c');
   });
 
-  it('renders removed lines with a − gutter and red background classes', () => {
+  it('renders removed lines with a − gutter and del BEM modifier', () => {
     const { container } = render(<DiffHunk before={'a\nb\nc\n'} after={'a\nb\n'} />);
-    const removed = container.querySelector('[class*="bg-red"]');
+    const removed = container.querySelector('.octo-diff-hunk__line--del');
     expect(removed).toBeTruthy();
     expect(removed!.textContent).toContain('−');
     expect(removed!.textContent).toContain('c');
@@ -33,20 +33,20 @@ describe('DiffHunk', () => {
 
   it('shows both a − and a + line when a line is changed', () => {
     const { container } = render(<DiffHunk before={'hello world'} after={'hello there'} />);
-    expect(container.querySelector('[class*="bg-red"]')).toBeTruthy();
-    expect(container.querySelector('[class*="bg-emerald"]')).toBeTruthy();
+    expect(container.querySelector('.octo-diff-hunk__line--del')).toBeTruthy();
+    expect(container.querySelector('.octo-diff-hunk__line--add')).toBeTruthy();
   });
 
   it('omits line-number gutters by default', () => {
     const { container } = render(<DiffHunk before={'a'} after={'b'} />);
-    // Line-number spans have the distinctive `w-9` width; gutter sign span is `w-6`.
-    expect(container.querySelector('span.w-9')).toBeNull();
-    expect(container.querySelector('span.w-6')).toBeTruthy();
+    // Line-number spans use octo-diff-hunk__line-num; sign span uses octo-diff-hunk__line-sign.
+    expect(container.querySelector('.octo-diff-hunk__line-num')).toBeNull();
+    expect(container.querySelector('.octo-diff-hunk__line-sign')).toBeTruthy();
   });
 
   it('renders line-number gutters when showLineNumbers is true', () => {
     const { container } = render(<DiffHunk before={'a\nb'} after={'a\nc'} showLineNumbers />);
-    const gutters = container.querySelectorAll('span.w-9');
+    const gutters = container.querySelectorAll('.octo-diff-hunk__line-num');
     // Two gutters (before/after) on each rendered row.
     expect(gutters.length).toBeGreaterThanOrEqual(4);
   });

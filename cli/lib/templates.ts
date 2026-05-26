@@ -149,8 +149,8 @@ export const rootLayoutConfigInitImport = `${CONFIG_INIT_IMPORT}\n`;
 
 export function buildAdminLayoutTemplate(): string {
   return `${CONFIG_INIT_IMPORT}
-import 'octocms/globals.css';
 import '@mdxeditor/editor/style.css';
+import 'octocms/globals.css';
 
 export { AdminLayout as default, metadata } from 'octocms/admin';
 `;
@@ -465,12 +465,9 @@ Built with [OctoCMS](https://octocms.com) — a file-based CMS on Next.js.
 
 \`\`\`bash
 npm install octocms next-auth @tanstack/react-query @mdxeditor/editor \\
-  @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \\
-  @radix-ui/react-label @radix-ui/react-select @radix-ui/react-slot \\
-  @radix-ui/react-tabs @radix-ui/react-toast \\
-  class-variance-authority clsx glob lucide-react minisearch octokit \\
+  minisearch octokit \\
   react-markdown rehype-sanitize remark-gfm remark-mdx \\
-  sharp slugify sonner tailwind-merge zod
+  sharp zod
 \`\`\`
 
 > The exact list (with the right \`octocms\` version pin) is also printed by \`npx octocms init\` — copy it from there.

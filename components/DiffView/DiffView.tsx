@@ -6,7 +6,6 @@ import { useEntryDiff } from '../../admin/query/hooks/useEntryDiff';
 import { useConfig } from '../../hooks/useConfig';
 import { stringifyFieldValue, type FieldDiff } from '../../lib/entryDiff';
 import type { CollectionField } from '../../types';
-import { cn } from '../../lib/utils';
 
 import { DiffHunk } from './DiffHunk';
 
@@ -33,37 +32,37 @@ export function DiffView({ collectionType, entryPath }: DiffViewProps) {
 
   if (diffQuery.isPending && !diff) {
     return (
-      <div className="space-y-3">
-        <div className="h-6 w-64 rounded bg-muted/40" />
-        <div className="h-24 rounded bg-muted/30" />
-        <div className="h-24 rounded bg-muted/30" />
+      <div className="octo-diff-view">
+        <div className="octo-diff-view__skeleton-line octo-diff-view__skeleton-line--heading" />
+        <div className="octo-diff-view__skeleton-line octo-diff-view__skeleton-line--content" />
+        <div className="octo-diff-view__skeleton-line octo-diff-view__skeleton-line--content" />
       </div>
     );
   }
 
   if (diffQuery.isError || !diff) {
-    return <p className="text-sm text-muted-foreground">Could not load diff.</p>;
+    return <p className="octo-diff-view__error">Could not load diff.</p>;
   }
 
   if (!diff.changed) {
     return (
-      <div className="rounded-md border border-border bg-card p-8 text-center">
-        <p className="text-sm font-medium text-foreground">No unmerged changes for this entry</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Active branch <code className="font-mono">{diff.activeBranch || '—'}</code> matches{' '}
-          <code className="font-mono">{diff.baseBranch}</code> for this file.
+      <div className="octo-diff-view__empty">
+        <p className="octo-diff-view__empty-title">No unmerged changes for this entry</p>
+        <p className="octo-diff-view__empty-sub">
+          Active branch <code className="octo-u-mono">{diff.activeBranch || '—'}</code> matches{' '}
+          <code className="octo-u-mono">{diff.baseBranch}</code> for this file.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+    <div className="octo-diff-view">
+      <div className="octo-diff-view__branch-row">
         <span>Comparing</span>
-        <code className="font-mono rounded bg-muted px-1.5 py-0.5 text-foreground">{diff.activeBranch}</code>
+        <code className="octo-diff-view__branch-code">{diff.activeBranch}</code>
         <span>→</span>
-        <code className="font-mono rounded bg-muted px-1.5 py-0.5 text-foreground">{diff.baseBranch}</code>
+        <code className="octo-diff-view__branch-code">{diff.baseBranch}</code>
       </div>
       {fieldList.map(([name, fieldDef]) => (
         <FieldDiffRow
@@ -101,20 +100,20 @@ function FieldDiffRow({ name, fieldDef, fieldDiff, companion, imageUrls }: Field
   const isUnchanged = usesCompanion ? before === after : !fieldDiff || fieldDiff.kind === 'unchanged';
 
   return (
-    <section className="rounded-md border border-border bg-card overflow-hidden">
-      <header className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-2">
-        <label className="text-[13.5px] font-semibold text-foreground">{fieldDef.label}</label>
-        <code className="font-mono text-[11px] text-muted-foreground">{format}</code>
+    <section className="octo-diff-hunk">
+      <header className="octo-diff-hunk__header">
+        <label className="octo-diff-hunk__header-label">{fieldDef.label}</label>
+        <code className="octo-diff-hunk__header-format">{format}</code>
         {!isUnchanged && (
-          <span title="Unpublished change" className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-label="Changed" />
+          <span className="octo-diff-hunk__header-dot" title="Unpublished change" aria-label="Changed" />
         )}
-        <div className="flex-1" />
-        <span className="text-[11px] text-muted-foreground">{name}</span>
+        <div className="octo-diff-hunk__header-spacer" />
+        <span className="octo-diff-hunk__header-key">{name}</span>
       </header>
 
-      <div className="p-3">
+      <div className="octo-diff-hunk__body">
         {isUnchanged ? (
-          <p className="text-xs text-muted-foreground">No changes</p>
+          <p className="octo-diff-hunk__unchanged">No changes</p>
         ) : format === 'image' ? (
           <ImageDiff fieldDiff={fieldDiff} imageUrls={imageUrls} />
         ) : (
@@ -145,7 +144,7 @@ function ImageDiff({ fieldDiff, imageUrls }: { fieldDiff: FieldDiff | undefined;
   const afterUrl = afterUuid ? (imageUrls[afterUuid] ?? '') : '';
 
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+    <div className="octo-diff-hunk__image-grid">
       <ImageSide label="Was" uuid={beforeUuid} url={beforeUrl} tone="del" />
       <ImageSide label="Now" uuid={afterUuid} url={afterUrl} tone="add" />
     </div>
@@ -154,34 +153,16 @@ function ImageDiff({ fieldDiff, imageUrls }: { fieldDiff: FieldDiff | undefined;
 
 function ImageSide({ label, uuid, url, tone }: { label: string; uuid: string; url: string; tone: 'add' | 'del' }) {
   return (
-    <div
-      className={cn(
-        'rounded-md border p-2',
-        tone === 'add'
-          ? 'border-emerald-900 bg-emerald-950/30 light:border-emerald-200 light:bg-emerald-50'
-          : 'border-red-900 bg-red-950/30 light:border-red-200 light:bg-red-50',
-      )}
-    >
-      <div className="mb-2 flex items-center gap-2">
-        <span
-          className={cn(
-            'inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-semibold',
-            tone === 'add'
-              ? 'bg-emerald-900/50 text-emerald-200 light:bg-emerald-100 light:text-emerald-900'
-              : 'bg-red-900/50 text-red-200 light:bg-red-100 light:text-red-900',
-          )}
-        >
-          {label}
-        </span>
-        <code className="font-mono text-[11px] text-muted-foreground truncate">{uuid || '—'}</code>
+    <div className={`octo-diff-hunk__image-side octo-diff-hunk__image-side--${tone}`}>
+      <div className="octo-diff-hunk__image-label-row">
+        <span className={`octo-diff-hunk__image-badge octo-diff-hunk__image-badge--${tone}`}>{label}</span>
+        <code className="octo-diff-hunk__image-uuid">{uuid || '—'}</code>
       </div>
       {url ? (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={url} alt={label} className="w-full h-auto rounded border border-border bg-background" />
+        <img src={url} alt={label} className="octo-diff-hunk__image-preview" />
       ) : (
-        <div className="flex h-32 items-center justify-center rounded border border-dashed border-border bg-background text-xs text-muted-foreground">
-          {uuid ? 'No preview' : 'None'}
-        </div>
+        <div className="octo-diff-hunk__image-empty">{uuid ? 'No preview' : 'None'}</div>
       )}
     </div>
   );

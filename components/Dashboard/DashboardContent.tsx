@@ -4,26 +4,24 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { keepPreviousData } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  GitBranch,
-  GitPullRequest,
-  Image as ImageIcon,
-  LayoutList,
-  Plus,
-  Search,
-} from 'lucide-react';
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Icon,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui';
 
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
 import { useBranch } from '../../admin/query/hooks/useBranch';
 import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
 import { useNewFile } from '../../admin/query/hooks/useNewFile';
 import { useConfig } from '../../hooks/useConfig';
-import { Button } from '../ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { LeftNavItem } from '../Layout/LeftNavItem';
 import { toast } from '../../hooks/useToast';
 import { entryEditUrl } from '../../lib/entryEditUrl';
@@ -35,6 +33,8 @@ import { ContentTableSkeleton } from './skeletons/ContentTableSkeleton';
 import { LeftPanelSkeleton } from './skeletons/LeftPanelSkeleton';
 import { RecentPullRequestsView } from './RecentPullRequests';
 import { useRecentCMSPullRequests } from '../../admin/query/hooks/useRecentCMSPullRequests';
+
+import { Page } from '../Layout/Page';
 
 const PAGE_SIZE = 20;
 const ALL_STATUSES: EntryStatus[] = ['draft', 'changed', 'published', 'merged', 'archived'];
@@ -50,7 +50,7 @@ export default function DashboardContent({ selectedType }: Props) {
   const isBranched = !selectedType && tabParam === 'branched';
   const isRecent = !selectedType && tabParam === 'recent';
 
-  const entriesQuery = useEntryList(selectedType, { placeholderData: keepPreviousData });
+  const entriesQuery = useEntryList(undefined, { placeholderData: keepPreviousData });
   const branchQuery = useBranch();
   const hasActiveBranchQuery = useHasActiveBranch();
   // Always fetched so the LeftPanel can show the count badge; the hook is
@@ -91,27 +91,12 @@ export default function DashboardContent({ selectedType }: Props) {
   }, [entries]);
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Page header */}
-      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-        <div className="min-w-0 flex-1">
-          <div className="mb-px flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
-            <span style={{ color: 'var(--text-2)' }}>Content</span>
-          </div>
-          <div>
-            <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-              {selectedTypeLabel ?? 'Content'}
-            </h1>
-          </div>
-        </div>
-        <div className="flex-none">
-          <AddEntryButton collections={addCollections} />
-        </div>
-      </div>
-
-      {/* Body: left nav + right content */}
-      <div className="flex flex-1 overflow-hidden">
-        {isLoadingEntries ? (
+    <Page
+      title={selectedTypeLabel ?? 'All content'}
+      breadcrumbs={[{ label: 'Content' }]}
+      actions={<AddEntryButton collections={addCollections} />}
+      leftBar={
+        isLoadingEntries ? (
           <LeftPanelSkeleton />
         ) : (
           <LeftPanel
@@ -124,29 +109,29 @@ export default function DashboardContent({ selectedType }: Props) {
             isRecent={isRecent}
             selectedType={selectedType}
           />
-        )}
-
-        {isLoadingEntries ? (
-          <ContentTableSkeleton />
-        ) : isRecent ? (
-          <RecentPullRequestsView />
-        ) : isBranched ? (
-          <BranchedView
-            entries={branchedEntries}
-            collections={collections}
-            hasBranch={hasBranch}
-            activeBranch={activeBranch}
-          />
-        ) : (
-          <ContentTable
-            entries={visibleEntries}
-            collections={collections}
-            activeBranch={activeBranch}
-            lockedType={selectedType}
-          />
-        )}
-      </div>
-    </div>
+        )
+      }
+    >
+      {isLoadingEntries ? (
+        <ContentTableSkeleton />
+      ) : isRecent ? (
+        <RecentPullRequestsView />
+      ) : isBranched ? (
+        <BranchedView
+          entries={branchedEntries}
+          collections={collections}
+          hasBranch={hasBranch}
+          activeBranch={activeBranch}
+        />
+      ) : (
+        <ContentTable
+          entries={visibleEntries}
+          collections={collections}
+          activeBranch={activeBranch}
+          lockedType={selectedType}
+        />
+      )}
+    </Page>
   );
 }
 
@@ -175,16 +160,16 @@ function AddEntryButton({ collections }: { collections: string[] }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="sm" className="gap-1.5 bg-foreground text-background hover:bg-foreground/90" disabled={creating}>
-          <Plus className="h-4 w-4" />
+        <Button variant="default" disabled={creating}>
+          <Icon.Plus className="octo-icon-md" />
           Add content
-          <ChevronDown className="h-3 w-3 opacity-70" />
+          <Icon.ChevronDown className="octo-icon-xs octo-u-opacity-70" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {collections.map((c) => (
           <DropdownMenuItem key={c} onSelect={() => handleCreate(c)}>
-            <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+            <Icon.FileText className="octo-icon-md octo-u-text-muted" />
             {config.collections[c as keyof typeof config.collections]?.label ?? c}
           </DropdownMenuItem>
         ))}
@@ -219,44 +204,43 @@ function LeftPanel({
   const config = useConfig();
 
   return (
-    <aside className="flex w-[248px] shrink-0 flex-col overflow-y-auto border-r border-border bg-[var(--surface-2)]">
-      <nav className="space-y-0.5 px-3 py-4">
-        <LeftNavItem
-          href="/cms"
-          icon={<LayoutList className="h-4 w-4" />}
-          label="All content"
-          count={entries.length}
-          active={!isBranched && !isRecent && !selectedType}
-        />
-        <LeftNavItem
-          href="/cms?tab=branched"
-          icon={<GitBranch className="h-4 w-4" />}
-          label="Branched content"
-          count={branchedCount}
-          active={isBranched}
-        />
-        <LeftNavItem
-          href="/cms?tab=recent"
-          icon={<GitPullRequest className="h-4 w-4" />}
-          label="Recent PRs"
-          count={recentPRsCount}
-          active={isRecent}
-        />
-      </nav>
-
+    <>
+      <div className="octo-page-sidebar__section">
+        <nav className="octo-page-sidebar__nav">
+          <LeftNavItem
+            href="/cms"
+            icon={<Icon.LayoutList className="octo-icon-md" />}
+            label="All content"
+            count={entries.length}
+            active={!isBranched && !isRecent && !selectedType}
+          />
+          <LeftNavItem
+            href="/cms?tab=branched"
+            icon={<Icon.GitBranch className="octo-icon-md" />}
+            label="Branched content"
+            count={branchedCount}
+            active={isBranched}
+          />
+          <LeftNavItem
+            href="/cms?tab=recent"
+            icon={<Icon.GitPullRequest className="octo-icon-md" />}
+            label="Recent PRs"
+            count={recentPRsCount}
+            active={isRecent}
+          />
+        </nav>
+      </div>
       {collections.length > 0 && (
-        <div className="px-3 pb-4 pt-1">
-          <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
-            Collections
-          </p>
-          <nav className="space-y-0.5">
+        <div className="octo-page-sidebar__section">
+          <span className="octo-page-sidebar__section-label">Collections</span>
+          <nav className="octo-page-sidebar__nav">
             {collections.map((c) => {
               const label = config.collections[c as keyof typeof config.collections]?.label ?? c;
               return (
                 <LeftNavItem
                   key={c}
                   href={`/cms/content/${c}`}
-                  icon={<FileText className="h-4 w-4" />}
+                  icon={<Icon.FileText className="octo-icon-md" />}
                   label={label}
                   count={countByType[c] ?? 0}
                   active={selectedType === c}
@@ -266,7 +250,7 @@ function LeftPanel({
           </nav>
         </div>
       )}
-    </aside>
+    </>
   );
 }
 
@@ -353,133 +337,109 @@ function ContentTable({
   const baseBranch = config.git.baseBranch;
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-[var(--bg)]">
-      <div className="scroll flex-1 overflow-auto px-6 pb-12 pt-5">
-        <div className="flex flex-col gap-4">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <div className="relative min-w-[220px] flex-[0_1_420px]">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                ref={searchRef}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Filter entries…"
-                className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
-              />
-              <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-border bg-[var(--surface-2)] px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                /
-              </kbd>
-            </div>
-            {!lockedType && (
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="h-9 w-[130px] shrink-0 rounded-full border-border text-sm font-normal">
-                  <SelectValue placeholder="Any type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="any">Any type</SelectItem>
-                  {collections.map((collection) => (
-                    <SelectItem key={collection} value={collection}>
-                      {config.collections[collection as keyof typeof config.collections]?.label ?? collection}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-9 w-[130px] shrink-0 rounded-full border-border text-sm font-normal">
-                <SelectValue placeholder="Any status" />
+    <div className="octo-content-table-wrap">
+      <div className="octo-content-table-inner">
+        <div className="octo-content-filters">
+          <div className="octo-content-search">
+            <Icon.Search className="octo-content-search__icon octo-icon-md" />
+            <input
+              ref={searchRef}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Filter entries…"
+              className="octo-content-search__input"
+            />
+            <kbd className="octo-content-search__kbd">/</kbd>
+          </div>
+          {!lockedType && (
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
+                <SelectValue placeholder="Any type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="any">Any status</SelectItem>
-                {ALL_STATUSES.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s.charAt(0).toUpperCase() + s.slice(1)}
+                <SelectItem value="any">Any type</SelectItem>
+                {collections.map((collection) => (
+                  <SelectItem key={collection} value={collection}>
+                    {config.collections[collection as keyof typeof config.collections]?.label ?? collection}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <div className="ml-auto shrink-0">
-              <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as 'newest' | 'oldest')}>
-                <SelectTrigger className="h-9 w-[138px] rounded-full border-border text-sm font-normal">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Newest first</SelectItem>
-                  <SelectItem value="oldest">Oldest first</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          )}
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
+              <SelectValue placeholder="Any status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any status</SelectItem>
+              {ALL_STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="octo-content-sort">
+            <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as 'newest' | 'oldest')}>
+              <SelectTrigger className="octo-select__trigger octo-select__trigger--pill">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest first</SelectItem>
+                <SelectItem value="oldest">Oldest first</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="octo-content-card">
+          <div className="octo-content-card__scroll">
+            <table className="octo-content-card__table">
+              <thead>
+                <tr className="octo-content-card__th-row">
+                  <th className="octo-content-card__th">Title</th>
+                  <th className="octo-content-card__th">Type</th>
+                  <th className="octo-content-card__th">Branch</th>
+                  <th className="octo-content-card__th">Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pageItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="octo-content-row__empty">
+                      No entries found.
+                    </td>
+                  </tr>
+                ) : (
+                  pageItems.map((entry) => (
+                    <EntryRow
+                      key={entry.path}
+                      entry={entry}
+                      activeBranch={activeBranch}
+                      baseBranch={baseBranch}
+                      onClick={() => router.push(entryEditUrl(entry))}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-border bg-[var(--surface-1)] shadow-[var(--shadow-1)]">
-            <div className="overflow-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border bg-[var(--surface-2)]">
-                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                      Title
-                    </th>
-                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                      Type
-                    </th>
-                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                      Branch
-                    </th>
-                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                      Updated
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pageItems.length === 0 ? (
-                    <tr>
-                      <td colSpan={4} className="h-32 text-center text-sm text-muted-foreground">
-                        No entries found.
-                      </td>
-                    </tr>
-                  ) : (
-                    pageItems.map((entry) => (
-                      <EntryRow
-                        key={entry.path}
-                        entry={entry}
-                        activeBranch={activeBranch}
-                        baseBranch={baseBranch}
-                        onClick={() => router.push(entryEditUrl(entry))}
-                      />
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-border px-4 py-3">
-              <span className="text-sm text-muted-foreground">
-                {filtered.length === 0
-                  ? 'No entries'
-                  : `Showing ${startIdx}-${endIdx} of ${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'}`}
-              </span>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 gap-1 rounded-full px-3"
-                  onClick={() => setPage((p) => p - 1)}
-                  disabled={page === 0}
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                  Prev
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 gap-1 rounded-full px-3"
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={page >= totalPages - 1}
-                >
-                  Next
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </Button>
-              </div>
+          <div className="octo-content-card__footer">
+            <span className="octo-content-card__footer-count">
+              {filtered.length === 0
+                ? 'No entries'
+                : `Showing ${startIdx}-${endIdx} of ${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'}`}
+            </span>
+            <div className="octo-content-card__footer-pages">
+              <Button variant="outline" onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
+                <Icon.ChevronLeft className="octo-icon-sm" />
+                Prev
+              </Button>
+              <Button variant="outline" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages - 1}>
+                Next
+                <Icon.ChevronRight className="octo-icon-sm" />
+              </Button>
             </div>
           </div>
         </div>
@@ -505,13 +465,13 @@ function BranchedView({
 }) {
   if (!hasBranch) {
     return (
-      <div className="flex flex-1 items-center justify-center p-6">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-            <GitBranch className="h-5 w-5 text-muted-foreground" />
+      <div className="octo-branched-empty">
+        <div className="octo-branched-empty__inner">
+          <div className="octo-branched-empty__icon">
+            <Icon.GitBranch className="octo-icon-lg" />
           </div>
-          <p className="text-sm font-medium text-foreground">No active branch</p>
-          <p className="max-w-xs text-sm text-muted-foreground">
+          <p className="octo-branched-empty__title">No active branch</p>
+          <p className="octo-branched-empty__text">
             Create a branch to start tracking content changes separately from the main branch.
           </p>
         </div>
@@ -521,13 +481,13 @@ function BranchedView({
 
   if (entries.length === 0) {
     return (
-      <div className="flex flex-1 items-center justify-center p-6">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-            <GitBranch className="h-5 w-5 text-muted-foreground" />
+      <div className="octo-branched-empty">
+        <div className="octo-branched-empty__inner">
+          <div className="octo-branched-empty__icon">
+            <Icon.GitBranch className="octo-icon-lg" />
           </div>
-          <p className="text-sm font-medium text-foreground">No changes on this branch yet</p>
-          <p className="text-sm text-muted-foreground">Edits you make will appear here.</p>
+          <p className="octo-branched-empty__title">No changes on this branch yet</p>
+          <p className="octo-branched-empty__text">Edits you make will appear here.</p>
         </div>
       </div>
     );
@@ -561,10 +521,7 @@ function EntryRow({
   return (
     <tr
       tabIndex={0}
-      className={cn(
-        'cursor-pointer border-b border-border transition-colors hover:bg-[var(--surface-2)]',
-        entry.status === 'archived' && 'opacity-60',
-      )}
+      className={cn('octo-content-row', entry.status === 'archived' && 'octo-content-row octo-content-row--archived')}
       onClick={onClick}
       onKeyDown={(e) => {
         if (!entryRowActivateKey(e)) return;
@@ -572,32 +529,32 @@ function EntryRow({
         onClick();
       }}
     >
-      <td className="px-4 py-3 text-sm font-medium text-foreground">
-        <span className="inline-flex items-center gap-2.5">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-[var(--surface-2)] text-muted-foreground">
+      <td className="octo-content-row__td">
+        <span className="octo-content-row__thumb-wrap">
+          <span className="octo-content-row__thumb">
             {entry.thumbnailUrl ? (
-              <img src={entry.thumbnailUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+              <img src={entry.thumbnailUrl} alt="" loading="lazy" />
             ) : (
-              <ImageIcon className="h-3.5 w-3.5 opacity-60" />
+              <Icon.Image className="octo-icon-sm octo-u-opacity-60" />
             )}
           </span>
-          <span className="truncate">{entry.title}</span>
+          <span className="octo-content-row__title">{entry.title}</span>
         </span>
       </td>
-      <td className="px-4 py-3 text-sm text-muted-foreground">
+      <td className="octo-content-row__td octo-content-row__meta">
         {config.collections[entry.type as keyof typeof config.collections]?.label ?? entry.type}
       </td>
-      <td className="px-4 py-3">
+      <td className="octo-content-row__td">
         <span
-          className="inline-flex items-center gap-1.5 text-sm"
+          className="octo-content-row__branch"
           style={{ color: `var(--st-${entry.status})` }}
           title={entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
         >
-          <GitBranch className="h-3.5 w-3.5 shrink-0" />
-          <span className="font-mono text-xs">{branchLabel}</span>
+          <Icon.GitBranch className="octo-icon-sm octo-u-shrink-0" />
+          <span className="octo-content-row__branch-label">{branchLabel}</span>
         </span>
       </td>
-      <td className="px-4 py-3 text-sm text-muted-foreground" title={formatUpdatedAtFull(entry.updatedAt)}>
+      <td className="octo-content-row__td octo-content-row__meta" title={formatUpdatedAtFull(entry.updatedAt)}>
         {formatUpdatedAt(entry.updatedAt)}
       </td>
     </tr>

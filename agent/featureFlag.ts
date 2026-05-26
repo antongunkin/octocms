@@ -7,9 +7,9 @@
  *   2. cumulative spend on this deploy is under `config.totalBudgetUSD`
  *      (cap is bypassed when `totalBudgetUSD <= 0`).
  *
- * When either check fails, the `/cms/chat` route returns 404 and the Header
- * nav link is hidden. Do not call from client components — the result must be
- * passed down as a boolean prop to avoid leaking the key.
+ * When either check fails, `/cms/chat` renders an in-page setup guide and chat
+ * API routes return 404. Do not call from client components to gate UI — the
+ * server page passes setup props instead of leaking the key.
  *
  * Note: this does NOT check whether the SDK packages are installed. They are
  * optional peer deps; their absence surfaces at chat-route invocation time

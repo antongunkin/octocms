@@ -8,12 +8,8 @@ import { FormFieldSkeleton } from '../../skeletons/blocks';
  */
 export function EntryFormSkeleton({ fields = 6 }: { fields?: number }) {
   return (
-    <section
-      role="status"
-      aria-label="Loading entry fields"
-      className="rounded-2xl border border-border bg-bg px-7 py-7 shadow-1"
-    >
-      <div className="flex flex-col gap-5">
+    <section role="status" aria-label="Loading entry fields" className="octo-edit-post__form-card">
+      <div className="octo-edit-post__form-skel">
         {Array.from({ length: fields }, (_, i) => (
           <FormFieldSkeleton key={i} />
         ))}

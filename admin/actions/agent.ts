@@ -20,9 +20,9 @@ export type AgentClientStatus =
 /**
  * Server-side check exposed to the admin client (Header nav link).
  *
- * Never returns the API key. Returns `{ enabled: false }` when the chat is
- * disabled, so the client can hide the nav link without learning *why* —
- * mirroring the route-handler 404.
+ * Never returns the API key. Returns `{ enabled: false }` when the chat API is
+ * disabled (missing config, key, or budget). The `/cms/chat` page still renders
+ * a setup guide; this action is for optional client UI that needs a boolean gate.
  */
 export async function getAgentClientStatus(): Promise<AgentClientStatus> {
   const cfg = getAgentConfig();

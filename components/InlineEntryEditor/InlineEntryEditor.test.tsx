@@ -91,16 +91,16 @@ vi.mock('../../lib/validateEntryFields', () => ({
   validateEntryFields: () => ({ ok: true, fieldErrors: {} }),
 }));
 
-vi.mock('../FormFields', () => ({
+vi.mock('../ui/FormField/FormFields', () => ({
   default: ({ fields }: { fields: Record<string, string> }) => (
     <input name="name" defaultValue={fields?.name ?? ''} data-testid="name-input" />
   ),
 }));
 
 vi.mock('../LinkedBySection/LinkedBySection', () => ({ default: () => null }));
-vi.mock('../CreateBranchDialog', () => ({ default: () => null }));
+vi.mock('../Layout/CreateBranchDialog', () => ({ default: () => null }));
 
-// Render Dialog inline (bypass Radix portal) so getAllByRole finds the confirm button.
+// Render Dialog inline so getAllByRole finds the confirm button.
 vi.mock('../ui', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../ui')>();
   return {
@@ -194,7 +194,7 @@ describe('InlineEntryEditor', () => {
     });
     await waitFor(() => expect(saveFileMock).toHaveBeenCalled());
 
-    fireEvent.click(screen.getByRole('button', { name: /back/i }));
+    fireEvent.click(screen.getByRole('button', { name: /close editor/i }));
 
     expect(bumpRefreshMock).toHaveBeenCalledTimes(1);
     expect(onCloseMock).toHaveBeenCalledTimes(1);
@@ -207,7 +207,7 @@ describe('InlineEntryEditor', () => {
     renderWithQuery(<InlineEntryEditor {...baseProps} />, { client });
     await waitFor(() => expect(screen.getByTestId('name-input')).toBeTruthy());
 
-    fireEvent.click(screen.getByRole('button', { name: /back/i }));
+    fireEvent.click(screen.getByRole('button', { name: /close editor/i }));
 
     expect(bumpRefreshMock).not.toHaveBeenCalled();
     expect(onCloseMock).toHaveBeenCalledTimes(1);

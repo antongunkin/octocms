@@ -13,9 +13,16 @@ import React, { useEffect, useState, useTransition } from 'react';
 import { useUploadMedia } from '../../admin/query/hooks/useMediaMutations';
 import { toast } from '../../hooks/useToast';
 import { suggestedTitleFromFileName } from '../../lib/suggestedMediaTitle';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Label } from '../ui/label';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Label,
+} from '../ui';
 
 type UploadRow = { file: File; title: string; generateBlur: boolean };
 
@@ -78,18 +85,18 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
 
   return (
     <Dialog open={files !== null} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="flex max-h-[85vh] max-w-lg flex-col">
+      <DialogContent className="octo-dialog-content octo-dialog-content--lg octo-dialog-content--vh-85 octo-dialog-content--flex-col">
         <DialogHeader>
           <DialogTitle>Set title for each image</DialogTitle>
           <DialogDescription>
             Titles are required and used as default alt text when this image is referenced in content.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 overflow-y-auto py-2 pr-1">
+        <div className="octo-upload-dialog__rows">
           {rows.map((row, i) => (
-            <div key={`${row.file.name}-${i}`} className="space-y-1.5">
-              <p className="break-all text-xs text-muted-foreground">{row.file.name}</p>
-              <Label className="text-xs font-medium text-foreground" htmlFor={`upload-title-${i}`}>
+            <div key={`${row.file.name}-${i}`} className="octo-upload-dialog__row">
+              <p className="octo-upload-dialog__filename">{row.file.name}</p>
+              <Label className="octo-field-label" htmlFor={`upload-title-${i}`}>
                 Title
               </Label>
               <input
@@ -100,10 +107,10 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
                   const v = e.target.value;
                   setRows((prev) => prev.map((r, j) => (j === i ? { ...r, title: v } : r)));
                 }}
-                className="w-full rounded border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+                className="octo-upload-dialog__input"
                 disabled={isPending}
               />
-              <label className="flex cursor-pointer items-center gap-2 pt-1 text-xs text-muted-foreground">
+              <label className="octo-upload-dialog__blur-label">
                 <input
                   type="checkbox"
                   checked={row.generateBlur}
@@ -111,7 +118,7 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
                     const checked = e.target.checked;
                     setRows((prev) => prev.map((r, j) => (j === i ? { ...r, generateBlur: checked } : r)));
                   }}
-                  className="h-3.5 w-3.5 rounded border-border"
+                  className="octo-upload-check"
                   disabled={isPending}
                 />
                 Generate blur placeholder
@@ -119,7 +126,7 @@ export function MediaUploadDialog({ files, defaultFolder, onComplete, onCancel }
             </div>
           ))}
         </div>
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter>
           <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
             Cancel
           </Button>

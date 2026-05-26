@@ -4,33 +4,30 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { keepPreviousData } from '@tanstack/react-query';
 import Link from 'next/link';
 import {
-  ArrowLeft,
-  ChevronRight,
-  FileText,
-  GripVertical,
-  Layers,
-  MoreHorizontal,
-  Pencil,
-  Plus,
-  Star,
-  Trash2,
-} from 'lucide-react';
-
-import { useEntryList } from '../../admin/query/hooks/useEntryList';
-import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
-import { useSchema } from '../../admin/query/hooks/useSchema';
-import { toast } from '../../hooks/useToast';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
-import {
+  Button,
+  Card,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+  Icon,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '../ui';
+
+import { useEntryList } from '../../admin/query/hooks/useEntryList';
+import { useSaveSchema } from '../../admin/query/hooks/useSaveSchema';
+import { useSchema } from '../../admin/query/hooks/useSchema';
+import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
 import { FIELD_FORMAT_META } from '../../schema/fieldFormats';
 import type { Collection, CollectionField, Config } from '../../types';
@@ -38,7 +35,9 @@ import DeleteContentTypeDialog from './DeleteContentTypeDialog';
 import DeleteFieldDialog from './DeleteFieldDialog';
 import EditContentTypeDialog from './EditContentTypeDialog';
 import FieldDialog from './FieldDialog';
+import { reorderFields } from './fieldOptions';
 import { FieldTableSkeleton } from './skeletons/FieldTableSkeleton';
+import { Page } from '../Layout/Page';
 
 type Props = {
   type: string;
@@ -67,7 +66,17 @@ export default function ContentTypeDetail({ type }: Props) {
   // Optimistic local order so the row hops while we wait for the save → refresh
   // round-trip. Reset whenever the underlying schema (props) changes.
   const [orderOverride, setOrderOverride] = useState<string[] | null>(null);
-  useEffect(() => setOrderOverride(null), [collection]);
+  // Clear the optimistic order once the schema cache catches up (same keys in
+  // the same sequence). A blind reset on every `collection` change would wipe
+  // the override right after drop — reorder-only saves are deep-equal to TanStack
+  // Query so the cache often keeps the old key order until a full refetch.
+  useEffect(() => {
+    if (orderOverride === null || !collection) return;
+    const serverOrder = Object.keys(collection.fields);
+    const matches =
+      serverOrder.length === orderOverride.length && serverOrder.every((key, index) => key === orderOverride[index]);
+    if (matches) setOrderOverride(null);
+  }, [collection, orderOverride]);
 
   const fields = useMemo(() => {
     if (!collection) return [];
@@ -82,33 +91,23 @@ export default function ContentTypeDetail({ type }: Props) {
     [collection, type],
   );
 
-  // Loading state — render the field-table skeleton while schema resolves.
+  // Loading state — same `Page` shell as the loaded editor; block skeleton only.
   if (isLoading || !schema) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden bg-[var(--bg)]">
-        <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
-            <Link href="/cms/model" aria-label="Back to Content Model">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-        <div className="flex-1 px-6 pt-5">
-          <FieldTableSkeleton />
-        </div>
-      </div>
+      <Page title={type} breadcrumbs={[{ label: 'Model', href: '/cms/model' }]}>
+        <FieldTableSkeleton />
+      </Page>
     );
   }
 
   if (!collection) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 bg-[var(--bg)] p-6 text-center">
-        <p className="text-sm font-medium text-foreground">Content type not found</p>
-        <p className="max-w-sm text-sm text-muted-foreground">
-          No collection with key <code className="rounded bg-muted px-1 py-0.5 font-mono">{type}</code> exists in the
-          schema.
+      <div className="octo-not-found">
+        <p className="octo-not-found__title">Content type not found</p>
+        <p className="octo-not-found__desc">
+          No collection with key <code className="octo-not-found__code">{type}</code> exists in the schema.
         </p>
-        <Button asChild variant="outline" size="sm">
+        <Button asChild variant="outline">
           <Link href="/cms/model">Back to Content Model</Link>
         </Button>
       </div>
@@ -146,10 +145,7 @@ export default function ContentTypeDetail({ type }: Props) {
   };
 
   const reorderTo = async (nextOrder: string[]) => {
-    const nextFields: Record<string, CollectionField> = {};
-    for (const k of nextOrder) {
-      if (k in collection.fields) nextFields[k] = collection.fields[k]!;
-    }
+    const nextFields = reorderFields(collection.fields, nextOrder);
     await saveCollectionFields(
       nextFields,
       `CMS: reorder fields on ${type}`,
@@ -184,72 +180,80 @@ export default function ContentTypeDetail({ type }: Props) {
   // ---------------------------------------------------------------------
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Page header — same chrome as DashboardContent / EditPost */}
-      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
-            <Link href="/cms/model" aria-label="Back to Content Model">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div className="min-w-0 flex-1">
-            <div className="mb-px flex items-center gap-1.5 text-[12px]" style={{ color: 'var(--text-2)' }}>
-              <Link
-                href="/cms/model"
-                className="transition-colors hover:text-foreground"
-                style={{ color: 'var(--text-2)' }}
-              >
-                Model
-              </Link>
-              <ChevronRight className="h-3 w-3 opacity-60" />
-              <span className="font-mono text-[11px] text-[var(--muted)]">{type}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {collection.hasMany ? (
-                <Layers className="h-4 w-4 shrink-0 text-muted-foreground" />
-              ) : (
-                <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
-              )}
-              <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-                {collection.label}
-              </h1>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-none items-center gap-2">
-          <Button
-            size="sm"
-            className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
-            onClick={() => setAddFieldOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
+    <Page
+      title={collection.label}
+      breadcrumbs={[{ label: 'Model', href: '/cms/model' }]}
+      actions={
+        <>
+          <Button className="octo-button octo-button--action" onClick={() => setAddFieldOpen(true)}>
+            <Icon.Plus className="octo-icon-md" />
             Add field
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="outline" aria-label="More actions" className="h-9 w-9">
-                <MoreHorizontal className="h-4 w-4" />
+              <Button
+                size="icon"
+                variant="outline"
+                aria-label="More actions"
+                className="octo-button octo-button--icon-sm"
+              >
+                <Icon.MoreHorizontal className="octo-icon-md" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => setEditOpen(true)}>
-                <Pencil className="mr-2 h-3.5 w-3.5" />
+                <Icon.Pencil className="octo-icon-sm" />
                 Edit content type
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onSelect={() => setDeleteOpen(true)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="mr-2 h-3.5 w-3.5" />
+              <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="octo-menu-item octo-menu-item--danger">
+                <Icon.Trash2 className="octo-icon-sm" />
                 Delete content type
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </>
+      }
+      rightBar={
+        <div className="octo-schema-detail__aside">
+          <div className="octo-schema-detail__aside-label">Type details</div>
+          <div className="octo-schema-detail__detail-rows">
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Key</span>
+              <span className="octo-schema-detail__detail-val octo-schema-detail__detail-val--mono" title={type}>
+                {type}
+              </span>
+            </div>
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Cardinality</span>
+              <span className="octo-schema-detail__detail-val">
+                {collection.hasMany ? 'Many entries' : 'Singleton'}
+              </span>
+            </div>
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Entry title</span>
+              <span className="octo-schema-detail__detail-val">
+                {entryTitleKey ? (
+                  <code className="octo-schema-detail__detail-val octo-schema-detail__detail-val--mono">
+                    {entryTitleKey}
+                  </code>
+                ) : (
+                  <span className="octo-u-text-muted">— not set —</span>
+                )}
+              </span>
+            </div>
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Fields</span>
+              <span className="octo-schema-detail__detail-val">{fields.length}</span>
+            </div>
+            <div className="octo-schema-detail__detail-row">
+              <span className="octo-schema-detail__detail-key">Entries</span>
+              <span className="octo-schema-detail__detail-val">{entryCount}</span>
+            </div>
+          </div>
         </div>
-      </div>
-
+      }
+    >
       <EditContentTypeDialog
         open={editOpen}
         onOpenChange={setEditOpen}
@@ -282,209 +286,176 @@ export default function ContentTypeDetail({ type }: Props) {
         />
       ) : null}
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Main content column — independently scrollable */}
-        <div className="flex flex-1 flex-col overflow-y-auto bg-[var(--bg)] px-6 pb-12 pt-5">
-          <Tabs defaultValue="fields" className="flex flex-1 flex-col">
-            <TabsList className="self-start">
-              <TabsTrigger value="fields">Fields</TabsTrigger>
-              <TabsTrigger value="json">JSON</TabsTrigger>
-            </TabsList>
+      <Tabs defaultValue="fields" className="octo-tabs octo-tabs--flex-col">
+        <TabsList className="octo-u-self-start">
+          <TabsTrigger key="fields" value="fields">
+            Fields
+          </TabsTrigger>
+          <TabsTrigger key="json" value="json">
+            JSON
+          </TabsTrigger>
+        </TabsList>
 
-            <TabsContent value="fields" className="mt-4 flex-1">
-              <Card className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="hover:bg-transparent">
-                      <TableHead className="w-8" />
-                      <TableHead className="font-medium text-muted-foreground">Field</TableHead>
-                      <TableHead className="font-medium text-muted-foreground">Key</TableHead>
-                      <TableHead className="font-medium text-muted-foreground">Type</TableHead>
-                      <TableHead className="font-medium text-muted-foreground">Flags</TableHead>
-                      <TableHead className="w-20 text-right font-medium text-muted-foreground">Title</TableHead>
-                      <TableHead className="w-20" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {fields.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={7} className="h-32 text-center text-sm text-muted-foreground">
-                          No fields configured. Click <strong>Add field</strong> to get started.
+        <TabsContent value="fields" className="octo-tabs-content octo-tabs-content--mt">
+          <Card className="octo-card octo-card--no-padding">
+            <Table>
+              <TableHeader>
+                <TableRow className="octo-table-row octo-table-row--no-hover">
+                  <TableHead className="octo-table-cell octo-table-cell--w8" />
+                  <TableHead className="octo-table-head octo-table-head--muted">Field</TableHead>
+                  <TableHead className="octo-table-head octo-table-head--muted">Key</TableHead>
+                  <TableHead className="octo-table-head octo-table-head--muted">Type</TableHead>
+                  <TableHead className="octo-table-head octo-table-head--muted">Flags</TableHead>
+                  <TableHead className="octo-table-head octo-table-head--muted octo-table-head--right octo-table-head--w20">
+                    Title
+                  </TableHead>
+                  <TableHead className="octo-table-head octo-table-head--w20" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {fields.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="octo-table-cell octo-table-cell--empty">
+                      No fields configured. Click <strong>Add field</strong> to get started.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  fields.map(([key, field]) => {
+                    const titleAllowed =
+                      (field.format === 'string' && field.list !== true) ||
+                      field.format === 'text' ||
+                      field.format === 'slug';
+                    return (
+                      <TableRow
+                        key={key}
+                        className={cn(
+                          'octo-table-row octo-table-row--hover-group',
+                          dragKey === key && 'octo-u-opacity-50',
+                        )}
+                        draggable
+                        onDragStart={() => setDragKey(key)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDragEnd={() => setDragKey(null)}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (!dragKey || dragKey === key) {
+                            setDragKey(null);
+                            return;
+                          }
+                          const order = (orderOverride ?? Object.keys(collection.fields)).filter(
+                            (k) => k in collection.fields,
+                          );
+                          const from = order.indexOf(dragKey);
+                          const to = order.indexOf(key);
+                          if (from < 0 || to < 0) {
+                            setDragKey(null);
+                            return;
+                          }
+                          const nextOrder = [...order];
+                          nextOrder.splice(from, 1);
+                          nextOrder.splice(to, 0, dragKey);
+                          setDragKey(null);
+                          setOrderOverride(nextOrder);
+                          void reorderTo(nextOrder);
+                        }}
+                      >
+                        <TableCell className="octo-table-cell octo-table-cell--drag" aria-label="Drag to reorder">
+                          <Icon.GripVertical className="octo-icon-sm" />
+                        </TableCell>
+                        <TableCell>
+                          <button
+                            type="button"
+                            onClick={() => setEditFieldKey(key)}
+                            className="octo-field-table__label-btn"
+                          >
+                            <span className="octo-field-table__label-name">{field.label}</span>
+                            {field.hint ? <span className="octo-field-table__label-hint">{field.hint}</span> : null}
+                          </button>
+                        </TableCell>
+                        <TableCell className="octo-table-cell octo-table-cell--mono">{key}</TableCell>
+                        <TableCell>
+                          <FormatBadge field={field} />
+                        </TableCell>
+                        <TableCell>
+                          <FieldFlags field={field} />
+                        </TableCell>
+                        <TableCell className="octo-table-cell octo-table-cell--right">
+                          <button
+                            type="button"
+                            title={
+                              titleAllowed
+                                ? field.entryTitle
+                                  ? 'Current entry title'
+                                  : 'Set as entry title'
+                                : 'Entry title must be a non-list string, text, or slug field.'
+                            }
+                            disabled={!titleAllowed || field.entryTitle === true}
+                            onClick={() => void setEntryTitle(key)}
+                            className={cn(
+                              'octo-field-table__star',
+                              field.entryTitle
+                                ? 'octo-field-table__star octo-field-table__star--active'
+                                : titleAllowed
+                                  ? 'octo-field-table__star octo-field-table__star--allowed'
+                                  : 'octo-field-table__star octo-field-table__star--disabled',
+                            )}
+                            aria-pressed={field.entryTitle === true}
+                            aria-label={field.entryTitle ? 'Current entry title' : 'Set as entry title'}
+                          >
+                            <Icon.Star
+                              className={cn(
+                                'octo-icon-sm',
+                                field.entryTitle && 'octo-field-table__star octo-field-table__star--filled',
+                              )}
+                            />
+                          </button>
+                        </TableCell>
+                        <TableCell className="octo-table-cell octo-table-cell--right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="octo-button octo-button--icon-sm octo-btn-row-action"
+                                aria-label={`Actions for ${field.label}`}
+                              >
+                                <Icon.MoreHorizontal className="octo-icon-md" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onSelect={() => setEditFieldKey(key)}>
+                                <Icon.Pencil className="octo-icon-sm" />
+                                Edit field
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onSelect={() => setDeleteFieldKey(key)}
+                                className="octo-menu-item octo-menu-item--danger"
+                              >
+                                <Icon.Trash2 className="octo-icon-sm" />
+                                Delete field
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
-                    ) : (
-                      fields.map(([key, field]) => {
-                        const titleAllowed =
-                          (field.format === 'string' && field.list !== true) ||
-                          field.format === 'text' ||
-                          field.format === 'slug';
-                        return (
-                          <TableRow
-                            key={key}
-                            className={cn('group hover:bg-muted/30', dragKey === key && 'opacity-40')}
-                            draggable
-                            onDragStart={() => setDragKey(key)}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDragEnd={() => setDragKey(null)}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              if (!dragKey || dragKey === key) {
-                                setDragKey(null);
-                                return;
-                              }
-                              const order = (orderOverride ?? Object.keys(collection.fields)).filter(
-                                (k) => k in collection.fields,
-                              );
-                              const from = order.indexOf(dragKey);
-                              const to = order.indexOf(key);
-                              if (from < 0 || to < 0) {
-                                setDragKey(null);
-                                return;
-                              }
-                              const nextOrder = [...order];
-                              nextOrder.splice(from, 1);
-                              nextOrder.splice(to, 0, dragKey);
-                              setDragKey(null);
-                              void reorderTo(nextOrder);
-                            }}
-                          >
-                            <TableCell className="cursor-grab text-muted-foreground" aria-label="Drag to reorder">
-                              <GripVertical className="h-3.5 w-3.5" />
-                            </TableCell>
-                            <TableCell>
-                              <button
-                                type="button"
-                                onClick={() => setEditFieldKey(key)}
-                                className="flex flex-col items-start text-left hover:underline"
-                              >
-                                <span className="font-medium">{field.label}</span>
-                                {field.hint ? (
-                                  <span className="mt-0.5 text-xs text-muted-foreground">{field.hint}</span>
-                                ) : null}
-                              </button>
-                            </TableCell>
-                            <TableCell className="font-mono text-xs text-muted-foreground">{key}</TableCell>
-                            <TableCell>
-                              <FormatBadge field={field} />
-                            </TableCell>
-                            <TableCell>
-                              <FieldFlags field={field} />
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <button
-                                type="button"
-                                title={
-                                  titleAllowed
-                                    ? field.entryTitle
-                                      ? 'Current entry title'
-                                      : 'Set as entry title'
-                                    : 'Entry title must be a non-list string, text, or slug field.'
-                                }
-                                disabled={!titleAllowed || field.entryTitle === true}
-                                onClick={() => void setEntryTitle(key)}
-                                className={cn(
-                                  'inline-flex h-7 w-7 items-center justify-center rounded-full transition',
-                                  field.entryTitle
-                                    ? 'bg-amber-950 text-amber-400 light:bg-amber-50 light:text-amber-500'
-                                    : titleAllowed
-                                      ? 'text-muted-foreground hover:bg-muted hover:text-amber-500'
-                                      : 'cursor-not-allowed text-muted-foreground/30',
-                                )}
-                                aria-pressed={field.entryTitle === true}
-                                aria-label={field.entryTitle ? 'Current entry title' : 'Set as entry title'}
-                              >
-                                <Star
-                                  className={cn('h-3.5 w-3.5', field.entryTitle && 'fill-amber-400 text-amber-500')}
-                                />
-                              </button>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-7 w-7 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100"
-                                    aria-label={`Actions for ${field.label}`}
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onSelect={() => setEditFieldKey(key)}>
-                                    <Pencil className="mr-2 h-3.5 w-3.5" />
-                                    Edit field
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem
-                                    onSelect={() => setDeleteFieldKey(key)}
-                                    className="text-destructive focus:text-destructive"
-                                  >
-                                    <Trash2 className="mr-2 h-3.5 w-3.5" />
-                                    Delete field
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    )}
-                  </TableBody>
-                </Table>
-              </Card>
-            </TabsContent>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
 
-            <TabsContent value="json" className="mt-4 flex-1">
-              <Card className="overflow-hidden p-0">
-                <pre className="m-0 max-h-[70vh] overflow-auto bg-[var(--surface-2)] p-4 font-mono text-xs leading-5 text-foreground">
-                  <code>{collectionJson}</code>
-                </pre>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        {/* Sidebar — same chrome as EditPost */}
-        <aside className="flex w-[280px] shrink-0 flex-col gap-5 overflow-y-auto border-l border-border bg-[var(--surface-2)] px-4 py-5">
-          <div>
-            <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-              Type details
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Key</span>
-                <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-foreground" title={type}>
-                  {type}
-                </span>
-              </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Cardinality</span>
-                <span className="flex-1 text-foreground">{collection.hasMany ? 'Many entries' : 'Singleton'}</span>
-              </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Entry title</span>
-                <span className="min-w-0 flex-1 truncate text-foreground">
-                  {entryTitleKey ? (
-                    <code className="font-mono text-[11px]">{entryTitleKey}</code>
-                  ) : (
-                    <span className="text-muted-foreground">— not set —</span>
-                  )}
-                </span>
-              </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Fields</span>
-                <span className="flex-1 text-foreground">{fields.length}</span>
-              </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-20 shrink-0 text-muted-foreground">Entries</span>
-                <span className="flex-1 text-foreground">{entryCount}</span>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
+        <TabsContent value="json" className="octo-tabs-content octo-tabs-content--mt">
+          <Card className="octo-card octo-card--no-padding octo-u-overflow-hidden">
+            <pre className="octo-field-table__json-pre">
+              <code>{collectionJson}</code>
+            </pre>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </Page>
   );
 }
 
@@ -495,10 +466,7 @@ export default function ContentTypeDetail({ type }: Props) {
 function FormatBadge({ field }: { field: CollectionField }) {
   const meta = FIELD_FORMAT_META[field.format];
   return (
-    <span
-      className="inline-flex items-center rounded-md border border-border bg-muted/40 px-2 py-0.5 font-mono text-xs text-foreground"
-      title={meta?.description ?? field.format}
-    >
+    <span className="octo-field-table__format-badge" title={meta?.description ?? field.format}>
       {field.format}
     </span>
   );
@@ -552,17 +520,21 @@ function FieldFlags({ field }: { field: CollectionField }) {
   }
 
   if (flags.length === 0) {
-    return <span className="text-xs text-muted-foreground">—</span>;
+    return (
+      <span className="octo-field-table__flags">
+        <span className="octo-u-text-xs octo-u-text-muted">—</span>
+      </span>
+    );
   }
 
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="octo-field-table__flags">
       {flags.map((flag, i) => (
         <span
           key={i}
           className={cn(
-            'inline-flex items-center rounded-md border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground',
-            flag === 'required' && 'border-blue-200 bg-blue-50 text-blue-700',
+            'octo-field-table__flag',
+            flag === 'required' && 'octo-field-table__flag octo-field-table__flag--required',
           )}
         >
           {flag}

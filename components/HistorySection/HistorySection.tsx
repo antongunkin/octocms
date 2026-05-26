@@ -2,11 +2,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ExternalLink } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, Icon } from '../ui';
 
 import { useEntryCommits } from '../../admin/query/hooks/useEntryCommits';
 import { queryKeys } from '../../admin/query/keys';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useEntryStack } from '../../hooks/useEntryStack';
 import { relativeTime } from '../../lib/relativeTime';
 
@@ -71,29 +70,24 @@ const HistorySection = ({ entryPath, flat }: HistorySectionProps) => {
   const body = (
     <>
       {showSkeleton && (
-        <div className="space-y-2" data-testid="history-skeleton">
-          <div className="h-8 rounded bg-muted/40" />
-          <div className="h-8 rounded bg-muted/40" />
-          <div className="h-8 rounded bg-muted/40" />
+        <div className="octo-history__skeleton" data-testid="history-skeleton">
+          <div className="octo-history__skeleton-row" />
+          <div className="octo-history__skeleton-row" />
+          <div className="octo-history__skeleton-row" />
         </div>
       )}
-      {showEmpty && <p className="text-sm text-muted-foreground">No commits yet.</p>}
+      {showEmpty && <p className="octo-history__empty">No commits yet.</p>}
       {showList && (
-        <ul className="space-y-2">
+        <ul className="octo-history__list">
           {commits.map((c) => (
             <li key={c.sha}>
-              <a
-                href={c.url}
-                target="_blank"
-                rel="noreferrer"
-                className="block rounded-md px-2 py-1.5 hover:bg-muted/50 transition-colors"
-              >
-                <div className="text-sm font-medium text-foreground truncate" title={c.message}>
+              <a href={c.url} target="_blank" rel="noreferrer" className="octo-history__item">
+                <div className="octo-history__msg" title={c.message}>
                   {c.message}
                 </div>
-                <div className="text-xs text-muted-foreground truncate">
+                <div className="octo-history__meta">
                   {c.author.name} · {relativeTime(c.committedAt)} ·{' '}
-                  <code className="font-mono text-[11px]">{c.shortSha}</code>
+                  <code className="octo-history__sha">{c.shortSha}</code>
                 </div>
               </a>
             </li>
@@ -101,14 +95,9 @@ const HistorySection = ({ entryPath, flat }: HistorySectionProps) => {
         </ul>
       )}
       {showSeeAll && (
-        <a
-          href={seeAllUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-3 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-        >
+        <a href={seeAllUrl} target="_blank" rel="noreferrer" className="octo-history__see-all">
           See all commits
-          <ExternalLink className="h-3 w-3" />
+          <Icon.ExternalLink className="octo-icon-xs" />
         </a>
       )}
     </>
@@ -116,10 +105,8 @@ const HistorySection = ({ entryPath, flat }: HistorySectionProps) => {
 
   if (flat) {
     return (
-      <div ref={rootRef}>
-        <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          History
-        </div>
+      <div ref={rootRef} className="octo-history">
+        <div className="octo-history__title">History</div>
         {body}
       </div>
     );

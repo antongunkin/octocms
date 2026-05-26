@@ -16,9 +16,13 @@ import { ShimmerBlock } from './primitives';
  */
 export function FormFieldSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('flex flex-col gap-1.5', className)} role="status" aria-label="Loading field">
-      <ShimmerBlock className="h-3 w-24" />
-      <ShimmerBlock className="h-9 w-full" />
+    <div
+      className={cn('octo-field', 'octo-field octo-field--skel', className)}
+      role="status"
+      aria-label="Loading field"
+    >
+      <ShimmerBlock className="octo-skel-h-3 octo-skel-w-24" />
+      <ShimmerBlock className="octo-skel-h-9 octo-skel-w-full" />
     </div>
   );
 }
@@ -32,12 +36,12 @@ export function CardSkeleton({ lines = 3, className }: { lines?: number; classNa
     <div
       role="status"
       aria-label="Loading card"
-      className={cn('flex flex-col gap-3 rounded-xl border border-border bg-[var(--surface-1)] p-4', className)}
+      className={cn('octo-card', 'octo-card octo-card--skel-layout', className)}
     >
-      <ShimmerBlock className="h-4 w-1/3" />
-      <div className="flex flex-col gap-2">
+      <ShimmerBlock className="octo-skel-h-4" style={{ width: '33%' }} />
+      <div className="octo-card__skel-lines">
         {Array.from({ length: lines }, (_, i) => (
-          <ShimmerBlock key={i} className="h-3 w-full" />
+          <ShimmerBlock key={i} className="octo-skel-h-3 octo-skel-w-full" />
         ))}
       </div>
     </div>

@@ -1,24 +1,22 @@
 import { cleanup, render } from '@testing-library/react';
 import React from 'react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ContentModelListSkeleton } from '../ContentModel/ContentModelList.skeleton';
-import { ContentTypeDetailSkeleton } from '../ContentModel/ContentTypeDetail.skeleton';
-import { DashboardCollectionSkeleton } from '../Dashboard/DashboardContent.collection.skeleton';
-import { DashboardListSkeleton } from '../Dashboard/DashboardContent.list.skeleton';
-import { DashboardContentSkeleton } from '../Dashboard/DashboardContent.skeleton';
-import { EditPostSkeleton } from '../EditPost/EditPost.skeleton';
-import { MediaAssetSkeleton } from '../MediaAsset/MediaAsset.skeleton';
-import { MediaManagerSkeleton } from '../MediaManager/MediaManager.skeleton';
+import { ContentModelListPageSkeleton } from '../ContentModel/skeletons/ContentModelListPageSkeleton';
+import { ContentTypeDetailPageSkeleton } from '../ContentModel/skeletons/ContentTypeDetailPageSkeleton';
+import { DashboardCollectionPageSkeleton } from '../Dashboard/skeletons/DashboardCollectionPageSkeleton';
+import { DashboardPageSkeleton } from '../Dashboard/skeletons/DashboardPageSkeleton';
+import { EditPostPageSkeleton } from '../EditPost/skeletons/EditPostPageSkeleton';
+import { MediaAssetPageSkeleton } from '../MediaAsset/skeletons/MediaAssetPageSkeleton';
+import { MediaManagerPageSkeleton } from '../MediaManager/skeletons/MediaManagerPageSkeleton';
+import { RouteMainSlotSkeleton } from '../Layout/skeletons/RouteMainSlotSkeleton';
+import { resolveAdminRouteSkeleton } from '../Layout/skeletons/routeSkeletons';
 
-import {
-  AdminBootstrapSkeleton,
-  CardSkeleton,
-  FormFieldSkeleton,
-  MainSlotSkeleton,
-  ShimmerBlock,
-  ShimmerRow,
-} from './index';
+import { AdminBootstrapSkeleton, CardSkeleton, FormFieldSkeleton, ShimmerBlock, ShimmerRow } from './index';
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/cms',
+}));
 
 afterEach(() => {
   cleanup();
@@ -38,9 +36,9 @@ describe('skeleton primitives', () => {
   });
 });
 
-describe('main slot fallbacks', () => {
-  it('MainSlotSkeleton exposes role=status', () => {
-    const { container } = render(<MainSlotSkeleton />);
+describe('layout fallbacks', () => {
+  it('RouteMainSlotSkeleton exposes role=status via nested page skeleton', () => {
+    const { container } = render(<RouteMainSlotSkeleton />);
     expect(container.querySelector('[role="status"]')).not.toBeNull();
     expect(container.querySelector('.animate-pulse')).not.toBeNull();
   });
@@ -49,6 +47,29 @@ describe('main slot fallbacks', () => {
     const { container } = render(<AdminBootstrapSkeleton />);
     expect(container.querySelector('[role="status"]')).not.toBeNull();
     expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(4);
+  });
+});
+
+describe('route skeleton resolver', () => {
+  it('maps content routes to dashboard skeletons', () => {
+    const { container: cms } = render(<>{resolveAdminRouteSkeleton('/cms')}</>);
+    expect(cms.querySelector('[aria-label="Loading content"]')).not.toBeNull();
+
+    const { container: collection } = render(<>{resolveAdminRouteSkeleton('/cms/content/post')}</>);
+    expect(collection.querySelector('[aria-label="Loading content"]')).not.toBeNull();
+  });
+
+  it('maps media routes to media skeletons', () => {
+    const { container: list } = render(<>{resolveAdminRouteSkeleton('/cms/media')}</>);
+    expect(list.querySelector('[aria-label="Loading media"]')).not.toBeNull();
+
+    const { container: asset } = render(<>{resolveAdminRouteSkeleton('/cms/media/abc-123')}</>);
+    expect(asset.querySelector('[aria-label="Loading asset"]')).not.toBeNull();
+  });
+
+  it('maps entry editor routes to edit skeleton', () => {
+    const { container } = render(<>{resolveAdminRouteSkeleton('/cms/content/post/my-id')}</>);
+    expect(container.querySelector('[aria-label="Loading entry"]')).not.toBeNull();
   });
 });
 
@@ -68,21 +89,19 @@ describe('shared block skeletons', () => {
 
   it('CardSkeleton honours `lines` prop', () => {
     const { container } = render(<CardSkeleton lines={5} />);
-    // Header shimmer + 5 body lines = 6 shimmer blocks.
     expect(container.querySelectorAll('.animate-pulse').length).toBe(6);
   });
 });
 
-describe('co-located component skeletons', () => {
+describe('page skeleton compositions', () => {
   const cases: { name: string; render: () => React.ReactNode }[] = [
-    { name: 'DashboardContentSkeleton', render: () => <DashboardContentSkeleton /> },
-    { name: 'DashboardListSkeleton', render: () => <DashboardListSkeleton /> },
-    { name: 'DashboardCollectionSkeleton', render: () => <DashboardCollectionSkeleton /> },
-    { name: 'EditPostSkeleton', render: () => <EditPostSkeleton /> },
-    { name: 'MediaManagerSkeleton', render: () => <MediaManagerSkeleton /> },
-    { name: 'MediaAssetSkeleton', render: () => <MediaAssetSkeleton /> },
-    { name: 'ContentModelListSkeleton', render: () => <ContentModelListSkeleton /> },
-    { name: 'ContentTypeDetailSkeleton', render: () => <ContentTypeDetailSkeleton /> },
+    { name: 'DashboardPageSkeleton', render: () => <DashboardPageSkeleton /> },
+    { name: 'DashboardCollectionPageSkeleton', render: () => <DashboardCollectionPageSkeleton /> },
+    { name: 'EditPostPageSkeleton', render: () => <EditPostPageSkeleton /> },
+    { name: 'MediaManagerPageSkeleton', render: () => <MediaManagerPageSkeleton /> },
+    { name: 'MediaAssetPageSkeleton', render: () => <MediaAssetPageSkeleton /> },
+    { name: 'ContentModelListPageSkeleton', render: () => <ContentModelListPageSkeleton /> },
+    { name: 'ContentTypeDetailPageSkeleton', render: () => <ContentTypeDetailPageSkeleton /> },
   ];
 
   for (const c of cases) {

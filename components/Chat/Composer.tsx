@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Paperclip, Send, X } from 'lucide-react';
-
-import { Button } from '../ui/button';
+import { cn } from '../../lib/utils';
+import { Button, Icon } from '../ui';
 
 /** Allowed file types for chat attachments — kept in sync with `classifyAttachment`. */
 const ACCEPTED_TYPES =
@@ -89,7 +88,7 @@ export function Composer({
 
   return (
     <div
-      className={`border-t border-border bg-background ${dragOver ? 'ring-2 ring-ring' : ''}`}
+      className={cn('octo-chat-composer', dragOver && 'octo-chat-composer--dragover')}
       onDragOver={(e) => {
         e.preventDefault();
         if (!disabled) setDragOver(true);
@@ -99,41 +98,37 @@ export function Composer({
       data-testid="chat-composer"
     >
       {(files.length > 0 || error) && (
-        <div className="px-4 pt-3 flex flex-wrap gap-2 items-center">
+        <div className="octo-chat-composer__attachments">
           {files.map((f, i) => (
-            <div
-              key={`${f.name}-${i}`}
-              className="inline-flex items-center gap-2 rounded-full border border-input bg-muted px-3 py-1 text-xs"
-              data-testid="chat-attachment-chip"
-            >
-              <Paperclip className="h-3 w-3" />
-              <span className="max-w-[180px] truncate">{f.name}</span>
-              <span className="text-muted-foreground">{formatSize(f.size)}</span>
+            <div key={`${f.name}-${i}`} className="octo-chat-composer__chip" data-testid="chat-attachment-chip">
+              <Icon.Paperclip className="octo-icon-xs" />
+              <span className="octo-chat-composer__chip-name">{f.name}</span>
+              <span className="octo-chat-composer__chip-size">{formatSize(f.size)}</span>
               <button
                 type="button"
                 onClick={() => removeFile(i)}
                 aria-label={`Remove ${f.name}`}
-                className="text-muted-foreground hover:text-foreground"
+                className="octo-chat-composer__chip-remove"
               >
-                <X className="h-3 w-3" />
+                <Icon.X className="octo-icon-xs" />
               </button>
             </div>
           ))}
           {error && (
-            <span className="text-xs text-destructive" role="alert">
+            <span className="octo-chat-composer__attach-error" role="alert">
               {error}
             </span>
           )}
         </div>
       )}
 
-      <div className="flex items-end gap-2 px-4 py-3">
+      <div className="octo-chat-composer__row">
         <input
           ref={fileRef}
           type="file"
           multiple
           accept={ACCEPTED_TYPES}
-          className="hidden"
+          className="octo-chat-composer__file-input"
           onChange={(e) => e.target.files && addFiles(e.target.files)}
           data-testid="chat-file-input"
         />
@@ -150,7 +145,7 @@ export function Composer({
           }
           onClick={() => fileRef.current?.click()}
         >
-          <Paperclip className="h-4 w-4" />
+          <Icon.Paperclip className="octo-icon-md" />
         </Button>
         <textarea
           ref={taRef}
@@ -165,20 +160,15 @@ export function Composer({
               : "Ask about your content — e.g. 'show me posts about caching'"
           }
           aria-label="Chat message"
-          className="flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 max-h-40"
+          className="octo-chat-composer__textarea"
           onInput={(e) => {
             const el = e.currentTarget;
             el.style.height = 'auto';
             el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
           }}
         />
-        <Button
-          onClick={send}
-          disabled={disabled || (!value.trim() && files.length === 0)}
-          size="sm"
-          className="gap-1.5"
-        >
-          <Send className="h-4 w-4" />
+        <Button onClick={send} disabled={disabled || (!value.trim() && files.length === 0)} className="octo-u-gap-1-5">
+          <Icon.Send className="octo-icon-md" />
           Send
         </Button>
       </div>

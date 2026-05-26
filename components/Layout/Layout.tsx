@@ -2,13 +2,12 @@
 
 import { signIn, useSession } from 'next-auth/react';
 import React, { Suspense, useEffect } from 'react';
-import { LogIn } from 'lucide-react';
+import { Button, Icon } from '../ui';
 
 import { useConfig } from '../../hooks/useConfig';
 import type { Theme } from '../../admin/theme';
 import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
-import { MainSlotSkeleton } from '../skeletons';
+import { RouteMainSlotSkeleton } from '../Layout/skeletons/RouteMainSlotSkeleton';
 import { TopHeader } from './TopHeader';
 import { CommandK, useCommandK } from '../CommandK/CommandK';
 
@@ -30,20 +29,15 @@ const Layout = ({ children, initialTheme }: LayoutProps) => {
   }, [initialTheme]);
 
   return (
-    <div
-      id="cms-layout"
-      className={cn('relative z-0 h-screen flex flex-col bg-background', initialTheme === 'light' && 'light')}
-    >
+    <div id="cms-layout" className={cn('octo-layout', initialTheme === 'light' && 'light')}>
       {session === null ? (
-        <div className="min-h-screen flex items-center justify-center bg-muted/30">
-          <div className="text-center">
-            <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600">
-              <span className="text-xl font-bold text-white">O</span>
-            </div>
-            <h1 className="text-2xl font-semibold text-foreground mb-2">{config.projectName} CMS</h1>
-            <p className="text-sm text-muted-foreground mb-8">Sign in to manage your content</p>
+        <div className="octo-layout__sign-in">
+          <div className="octo-layout__sign-in-inner">
+            <div className="octo-layout__sign-in-icon">O</div>
+            <h1 className="octo-layout__sign-in-title">{config.projectName} CMS</h1>
+            <p className="octo-layout__sign-in-subtitle">Sign in to manage your content</p>
             <Button onClick={() => signIn('github', { callbackUrl: '/cms' })} size="lg">
-              <LogIn className="w-4 h-4" />
+              <Icon.LogIn className="octo-icon-md" />
               Sign in with GitHub
             </Button>
           </div>
@@ -51,11 +45,11 @@ const Layout = ({ children, initialTheme }: LayoutProps) => {
       ) : (
         <>
           <TopHeader onCommandK={() => setCmdkOpen(true)} initialTheme={initialTheme} />
-          <main className="relative z-0 flex flex-1 min-h-0">
+          <main className="octo-layout__main">
             {/* Catch-all `AdminApp` can suspend on `await params`. Keep `TopHeader`
-                mounted; show `MainSlotSkeleton` in the main slot instead of an
+                mounted; show route-matched page skeleton in the main slot instead of an
                 empty flash, then route-specific TanStack Query skeletons take over. */}
-            <Suspense fallback={<MainSlotSkeleton />}>{children}</Suspense>
+            <Suspense fallback={<RouteMainSlotSkeleton />}>{children}</Suspense>
           </main>
           <CommandK open={cmdkOpen} onOpenChange={setCmdkOpen} />
         </>

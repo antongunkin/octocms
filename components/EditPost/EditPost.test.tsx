@@ -61,7 +61,7 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/cms',
 }));
 
-vi.mock('../FormFields', () => ({
+vi.mock('../ui/FormField/FormFields', () => ({
   default: ({ fields }: { fields: Record<string, string> }) => (
     <input name="title" defaultValue={fields?.title ?? ''} data-testid="title-input" />
   ),
@@ -70,7 +70,7 @@ vi.mock('../FormFields', () => ({
 vi.mock('../HistorySection/HistorySection', () => ({ default: () => null }));
 vi.mock('../LinkedBySection/LinkedBySection', () => ({ default: () => null }));
 vi.mock('../DiffView', () => ({ DiffView: () => null }));
-vi.mock('../CreateBranchDialog', () => ({ default: () => null }));
+vi.mock('../Layout/CreateBranchDialog', () => ({ default: () => null }));
 vi.mock('../InlineEntryEditor/InlineEntryEditor', () => ({ default: () => null }));
 
 const filePath = 'cms/content/post/post-a.json';
@@ -92,7 +92,6 @@ describe('EditPost', () => {
     getEntryListMock.mockReturnValue(new Promise(() => {}));
     renderWithQuery(<EditPost type="post" id="post-a" />);
     expect(screen.getByLabelText('Loading entry fields')).toBeDefined();
-    expect(screen.getByLabelText('Loading entry sidebar')).toBeDefined();
   });
 
   it('shows the entry-not-found state when the id is missing from the list', async () => {

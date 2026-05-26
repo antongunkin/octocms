@@ -1,6 +1,21 @@
 'use client';
 
-import { ArrowLeft, ChevronRight, ExternalLink, ImageIcon, Trash2 } from 'lucide-react';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Icon,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -9,10 +24,7 @@ import { useDeleteMedia, useMoveMedia, useUpdateMediaMetadata } from '../../admi
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Page } from '../Layout/Page';
 
 import { MediaMetadataFormSkeleton } from './skeletons/MediaMetadataFormSkeleton';
 import { MediaPreviewSkeleton } from './skeletons/MediaPreviewSkeleton';
@@ -21,7 +33,7 @@ export type MediaAssetProps = {
   id: string;
 };
 
-export function MediaAsset({ id }: MediaAssetProps) {
+export default function MediaAsset({ id }: MediaAssetProps) {
   const router = useRouter();
   const { asset: file, allFiles, isLoading } = useMediaAsset(id);
   const updateMetadataMutation = useUpdateMediaMetadata();
@@ -99,25 +111,14 @@ export function MediaAsset({ id }: MediaAssetProps) {
   // skeletons so chip widths stay stable while the list resolves.
   if (isLoading) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="-ml-2 h-7 w-7 text-muted-foreground"
-              onClick={back}
-              aria-label="Back to media"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        <div className="flex flex-1 overflow-hidden">
-          <MediaPreviewSkeleton />
-          <MediaMetadataFormSkeleton />
-        </div>
-      </div>
+      <Page
+        className="octo-media-asset"
+        title="…"
+        breadcrumbs={[{ label: 'Media', href: '/cms/media' }]}
+        rightBar={<MediaMetadataFormSkeleton />}
+      >
+        <MediaPreviewSkeleton />
+      </Page>
     );
   }
 
@@ -125,10 +126,10 @@ export function MediaAsset({ id }: MediaAssetProps) {
   // so navigation between assets stays inside the cached SPA.
   if (!file) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-muted-foreground">
-        <ImageIcon className="h-12 w-12" />
-        <p className="text-sm">Asset not found.</p>
-        <Button variant="outline" size="sm" onClick={back}>
+      <div className="octo-media-asset__not-found">
+        <Icon.Image className="octo-icon-2xl" />
+        <p className="octo-u-text-base">Asset not found.</p>
+        <Button variant="outline" onClick={back}>
           Back to media
         </Button>
       </div>
@@ -138,142 +139,123 @@ export function MediaAsset({ id }: MediaAssetProps) {
   const folderLabel = file.folder === '/' ? 'Root' : file.folder;
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Page header — same chrome as content list */}
-      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="-ml-2 h-7 w-7 text-muted-foreground"
-            onClick={back}
-            aria-label="Back to media"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="min-w-0 flex-1">
-            <div className="mb-px flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
-              <button
-                type="button"
-                onClick={back}
-                className="text-[var(--text-2)] hover:text-foreground"
-                style={{ color: 'var(--text-2)' }}
-              >
-                Media
-              </button>
-              <ChevronRight className="h-3 w-3 opacity-60" />
-              <span style={{ color: 'var(--text-2)' }}>{folderLabel}</span>
-            </div>
-            <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-              {file.title || file.originalName}
-            </h1>
-          </div>
-        </div>
-        <div className="flex flex-none items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={openInNewTab}>
-            <ExternalLink className="h-4 w-4" />
-            Open in new tab
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
-            onClick={() => setConfirmDelete(true)}
-            disabled={isPending}
-          >
-            <Trash2 className="h-4 w-4" />
-            Delete
-          </Button>
-        </div>
-      </div>
+    <Page
+      className="octo-media-asset"
+      title={file.title || file.originalName}
+      breadcrumbs={[
+        {
+          label: 'Media',
+          href: '/cms/media',
+        },
+        {
+          label: folderLabel,
+          href: `/cms/media?folder=${encodeURIComponent(file.folder)}`,
+        },
+      ]}
+      actions={
+        <Button
+          variant="ghost"
+          className="octo-button octo-button--danger-ghost"
+          onClick={() => setConfirmDelete(true)}
+          disabled={isPending}
+        >
+          <Icon.Trash2 className="octo-icon-md" />
+          Delete
+        </Button>
+      }
+      rightBar={
+        <div className="octo-media-asset__sidebar-inner">
+          <section className="octo-media-asset__sidebar-section">
+            <Label htmlFor="media-asset-title" className="octo-field-label-hint">
+              Title <span className="octo-u-text-danger">*</span>
+            </Label>
+            <input
+              id="media-asset-title"
+              type="text"
+              value={titleDraft}
+              onChange={(e) => setTitleDraft(e.target.value)}
+              disabled={isPending}
+              placeholder="Used as alt text when this image is referenced"
+              className="octo-media-asset__input"
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              className="octo-button octo-button--w-full"
+              onClick={handleSaveTitle}
+              disabled={isPending || titleDraft.trim() === file.title}
+            >
+              Save title
+            </Button>
+          </section>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Preview pane */}
-        <div className="flex flex-1 items-center justify-center overflow-auto bg-[var(--surface-2)] p-8">
-          <img
-            src={file.publicUrl}
-            alt={file.title || file.originalName}
-            className="max-h-full max-w-full rounded-lg border border-border bg-background object-contain shadow-sm"
-          />
-        </div>
+          <section className="octo-media-asset__sidebar-section">
+            <Label htmlFor="media-asset-folder" className="octo-field-label-hint">
+              Folder
+            </Label>
+            <Select value={folderDraft} onValueChange={setFolderDraft} disabled={isPending}>
+              <SelectTrigger id="media-asset-folder">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {folders.map((f) => (
+                  <SelectItem key={f} value={f}>
+                    {f === '/' ? 'Root' : f}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              variant="secondary"
+              className="octo-button octo-button--w-full"
+              onClick={handleSaveFolder}
+              disabled={isPending || folderDraft === file.folder}
+            >
+              Save folder
+            </Button>
+            <p className="octo-u-text-xs octo-u-text-muted">
+              Folders are virtual labels for sorting &mdash; they aren&rsquo;t physical directories.
+            </p>
+          </section>
 
-        {/* Sidebar form */}
-        <aside className="flex w-[360px] shrink-0 flex-col overflow-y-auto border-l border-border bg-background">
-          <div className="space-y-6 px-5 py-5">
-            <section className="space-y-1.5">
-              <Label htmlFor="media-asset-title" className="text-xs text-muted-foreground">
-                Title <span className="text-destructive">*</span>
-              </Label>
-              <input
-                id="media-asset-title"
-                type="text"
-                value={titleDraft}
-                onChange={(e) => setTitleDraft(e.target.value)}
-                disabled={isPending}
-                placeholder="Used as alt text when this image is referenced"
-                className={cn(
-                  'w-full rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm text-foreground',
-                  'focus:outline-none focus:ring-2 focus:ring-primary/30',
-                )}
-              />
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                className="w-full"
-                onClick={handleSaveTitle}
-                disabled={isPending || titleDraft.trim() === file.title}
-              >
-                Save title
-              </Button>
-            </section>
-
-            <section className="space-y-1.5">
-              <Label htmlFor="media-asset-folder" className="text-xs text-muted-foreground">
-                Folder
-              </Label>
-              <Select value={folderDraft} onValueChange={setFolderDraft} disabled={isPending}>
-                <SelectTrigger
-                  id="media-asset-folder"
-                  className="h-9 w-full rounded-lg border-border text-sm font-normal"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {folders.map((f) => (
-                    <SelectItem key={f} value={f}>
-                      {f === '/' ? 'Root' : f}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                className="w-full"
-                onClick={handleSaveFolder}
-                disabled={isPending || folderDraft === file.folder}
-              >
-                Save folder
-              </Button>
-              <p className="text-[11px] text-muted-foreground">
-                Folders are virtual labels for sorting &mdash; they aren&rsquo;t physical directories.
-              </p>
-            </section>
-
-            <section className="space-y-2.5 border-t border-border pt-5 text-sm">
-              <h3 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Details</h3>
+          <section className="octo-media-asset__details-section">
+            <h3 className="octo-media-asset__details-heading">Details</h3>
+            <div className="octo-media-asset__details">
               <DetailRow label="File name" value={file.originalName} mono />
               <DetailRow label="Format" value={file.extension.toUpperCase()} />
               {file.width != null && file.height != null && (
                 <DetailRow label="Dimensions" value={`${file.width} × ${file.height}`} />
               )}
+              {file.blurDataURL && (
+                <DetailRow label="Blur data URL" value={file.blurDataURL.slice(0, 13) + '...'} mono />
+              )}
               <DetailRow label="Path" value={file.publicUrl} mono />
               <DetailRow label="ID" value={file.id} mono />
-            </section>
+            </div>
+          </section>
+        </div>
+      }
+    >
+      <div className="octo-media-asset__preview">
+        {file.hasBlurPlaceholder && file.blurDataURL && (
+          <div className="octo-media-asset__preview-blur">
+            <img
+              src={file.blurDataURL}
+              alt={file.title || file.originalName}
+              className="octo-media-asset__preview-blur-src"
+            />
           </div>
-        </aside>
+        )}
+        <div className="octo-media-asset__preview-inner">
+          <img src={file.publicUrl} alt={file.title || file.originalName} className="octo-media-asset__preview-img" />
+          <div className="octo-media-asset__preview-buttons">
+            <Button variant="link" className="octo-u-gap-1-5" onClick={openInNewTab}>
+              <Icon.ExternalLink className="octo-icon-md" />
+              Open in new tab
+            </Button>
+          </div>
+        </div>
       </div>
 
       <Dialog open={confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(false)}>
@@ -294,15 +276,22 @@ export function MediaAsset({ id }: MediaAssetProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </Page>
   );
 }
 
 function DetailRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="flex items-start gap-2">
-      <span className="w-24 flex-none text-xs text-muted-foreground">{label}</span>
-      <span className={cn('break-all text-xs text-foreground', mono && 'font-mono')}>{value}</span>
+    <div className="octo-media-asset__detail">
+      <span className="octo-media-asset__detail-label">{label}</span>
+      <span
+        className={cn(
+          'octo-media-asset__detail-value',
+          mono && 'octo-media-asset__detail-value octo-media-asset__detail-value--mono',
+        )}
+      >
+        {value}
+      </span>
     </div>
   );
 }

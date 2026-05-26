@@ -1,6 +1,17 @@
 'use client';
 
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  FormFields,
+  Icon,
+  StatusBadge,
+} from '../ui';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -23,13 +34,9 @@ import { toast } from '../../hooks/useToast';
 import { toReferenceKey } from '../../lib/referenceKeys';
 import { validateEntryFields } from '../../lib/validateEntryFields';
 import type { EntryStatus } from '../../types';
-import { StatusBadge } from '../StatusBadge';
 
-import FormFields from '../FormFields';
 import LinkedBySection from '../LinkedBySection/LinkedBySection';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui';
-import CreateBranchDialog from '../CreateBranchDialog';
+import CreateBranchDialog from '../Layout/CreateBranchDialog';
 
 type InlineEntryEditorProps = {
   entryPath: string;
@@ -205,153 +212,150 @@ const InlineEntryEditor = ({ entryPath, entryType, entryId, depth, onClose }: In
   const leftInsetPx = depth * 100;
 
   return (
-    <div className="absolute inset-0" style={{ zIndex: 10 + depth }}>
-      <div className="absolute inset-0 z-0 bg-black/30" aria-hidden />
-      <div
-        className="absolute z-10 top-0 right-0 bottom-0 flex min-w-0 flex-col bg-background shadow-lg animate-in slide-in-from-right-4 duration-200"
-        style={{ left: leftInsetPx }}
-      >
-        {/* Top bar */}
-        <div className="flex-none flex h-[var(--header-height)] items-center bg-background border-b border-border">
-          <div className="flex-none px-5 py-2.5">
-            <Button variant="ghost" size="sm" onClick={handleClose}>
-              <ArrowLeft className="mr-1 h-4 w-4" />
-              Back
+    <div className="octo-inline-editor" style={{ zIndex: 45 + depth }}>
+      <div className="octo-inline-editor__container" style={{ paddingLeft: leftInsetPx }}>
+        <div className="octo-inline-editor__backdrop" style={{ width: leftInsetPx }}>
+          <div className="octo-inline-editor__backdrop-top">
+            <Button
+              variant="secondary"
+              onClick={handleClose}
+              className="octo-inline-editor__backdrop-button"
+              aria-label="Close editor"
+            >
+              <Icon.ArrowLeft className="octo-icon-md" />
             </Button>
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="mb-0.5 flex items-center gap-2 text-sm text-muted-foreground">
-              {collectionLabel}
-              {entry && <StatusBadge status={currentStatus} />}
-            </div>
-            <div className="truncate text-base font-semibold text-foreground">{entry?.fields?.title || entryId}</div>
-          </div>
-          <div className="flex-none px-5 py-2.5 flex items-center gap-2">
-            {currentStatus === 'archived' ? (
-              <>
-                <Button variant="outline" size="sm" onClick={handleRestore} disabled={isSaving}>
-                  Restore
+        </div>
+        <div className="octo-inline-editor__panel">
+          {/* Content */}
+          {isLoading ? (
+            <div className="octo-inline-editor__loading">Loading entry...</div>
+          ) : !entry ? (
+            <div className="octo-inline-editor__loading">Entry not found</div>
+          ) : (
+            <form
+              onSubmit={handleSubmit}
+              onInput={(e) => {
+                const t = e.target;
+                if ((t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) && t.name) {
+                  clearFieldError(t.name);
+                }
+              }}
+              onChange={(e) => {
+                const t = e.target;
+                if ((t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) && t.name) {
+                  clearFieldError(t.name);
+                }
+              }}
+            >
+              <div className="octo-page-top octo-inline-editor__top">
+                <div className="octo-page-top__title-area">
+                  <div className="octo-page-top__breadcrumb">{collectionLabel}</div>
+                  <div className="octo-page-top__title-row">
+                    <h1 className="octo-page-top__title">{entry?.fields?.title || entryId}</h1>
+                  </div>
+                </div>
+                <div className="octo-page-top__right">
+                  {currentStatus === 'archived' ? (
+                    <>
+                      <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
+                        Restore
+                      </Button>
+                      <Button variant="destructive" onClick={openDeleteDialog} disabled={isSaving}>
+                        <Icon.Trash2 className="octo-icon-md octo-u-mr-1" />
+                        Delete permanently
+                      </Button>
+                    </>
+                  ) : (
+                    <Button variant="outline" onClick={handleArchive} disabled={isSaving}>
+                      Archive
+                    </Button>
+                  )}
+                  <Button type="submit" disabled={isSaving || Object.keys(fieldErrors).length > 0}>
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </Button>
+                </div>
+              </div>
+              <div className="octo-inline-editor__body">
+                <div className="octo-inline-editor__fields">
+                  <div className="octo-inline-editor__fields-inner">
+                    <FormFields
+                      key={`${entryPath}-${entryQuery.dataUpdatedAt}`}
+                      selectedFile={selectedFile}
+                      fields={entry.fields}
+                      fieldErrors={fieldErrors}
+                      onClearFieldError={clearFieldError}
+                    />
+                  </div>
+                </div>
+                <div className="octo-inline-editor__sidebar">
+                  <div className="octo-inline-editor__sidebar-inner">
+                    <div className="octo-inline-editor__meta-grid">
+                      <span className="octo-inline-editor__meta-key">ID:</span>
+                      <span className="octo-inline-editor__meta-val">{entryId}</span>
+                      <span className="octo-inline-editor__meta-key">Type:</span>
+                      <span className="octo-inline-editor__meta-val">{collectionLabel}</span>
+                      <span className="octo-inline-editor__meta-key">Status:</span>
+                      <span>
+                        <StatusBadge status={currentStatus} />
+                      </span>
+                    </div>
+                    <LinkedBySection entryPath={entryPath} />
+                  </div>
+                </div>
+              </div>
+            </form>
+          )}
+
+          {/* Delete confirmation dialog with backlink warnings */}
+          <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Permanent Deletion</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to permanently delete this entry? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              {isLoadingBacklinks ? (
+                <div className="octo-inline-editor__loading octo-u-py-2">Checking references...</div>
+              ) : (
+                deleteBacklinks.length > 0 && (
+                  <div className="octo-inline-editor__delete-warning">
+                    <p className="octo-inline-editor__delete-warning-title">
+                      This entry is referenced by {deleteBacklinks.length}{' '}
+                      {deleteBacklinks.length === 1 ? 'entry' : 'entries'}:
+                    </p>
+                    <ul className="octo-inline-editor__delete-warning-list">
+                      {deleteBacklinks.map((link) => (
+                        <li key={link.path} className="octo-inline-editor__delete-warning-item">
+                          {link.title}{' '}
+                          <span className="octo-u-text-sm">
+                            ({config.collections[link.type as keyof Config['collections']]?.label || link.type})
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="octo-inline-editor__delete-warning-foot">Removing it will break those references.</p>
+                  </div>
+                )
+              )}
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+                  Cancel
                 </Button>
-                <Button variant="destructive" size="sm" onClick={openDeleteDialog} disabled={isSaving}>
-                  <Trash2 className="mr-1 h-4 w-4" />
+                <Button variant="destructive" onClick={handleDelete} disabled={isLoadingBacklinks}>
                   Delete permanently
                 </Button>
-              </>
-            ) : (
-              <Button variant="outline" size="sm" className="text-gray-500" onClick={handleArchive} disabled={isSaving}>
-                Archive
-              </Button>
-            )}
-          </div>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <CreateBranchDialog
+            open={createBranchOpen}
+            onOpenChange={setCreateBranchOpen}
+            onBranchCreated={handleBranchCreated}
+          />
         </div>
-
-        {/* Content */}
-        {isLoading ? (
-          <div className="flex flex-1 items-center justify-center text-muted-foreground">Loading entry...</div>
-        ) : !entry ? (
-          <div className="flex flex-1 items-center justify-center text-muted-foreground">Entry not found</div>
-        ) : (
-          <form
-            className="flex min-h-0 flex-1 overflow-auto"
-            onSubmit={handleSubmit}
-            onInput={(e) => {
-              const t = e.target;
-              if ((t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) && t.name) {
-                clearFieldError(t.name);
-              }
-            }}
-            onChange={(e) => {
-              const t = e.target;
-              if ((t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) && t.name) {
-                clearFieldError(t.name);
-              }
-            }}
-          >
-            <div className="flex-1 overflow-y-auto p-10 px-5">
-              <div className="mx-auto max-w-[1000px]">
-                <FormFields
-                  key={`${entryPath}-${entryQuery.dataUpdatedAt}`}
-                  selectedFile={selectedFile}
-                  fields={entry.fields}
-                  fieldErrors={fieldErrors}
-                  onClearFieldError={clearFieldError}
-                />
-              </div>
-            </div>
-            <div className="relative w-[360px] flex-none overflow-y-auto border-l border-border bg-background">
-              <div className="sticky left-0 top-0 w-full p-10 px-5">
-                <div className="mb-4 grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm">
-                  <span className="font-medium text-muted-foreground">ID:</span>
-                  <span className="text-foreground">{entryId}</span>
-                  <span className="font-medium text-muted-foreground">Type:</span>
-                  <span className="text-foreground">{collectionLabel}</span>
-                  <span className="font-medium text-muted-foreground">Status:</span>
-                  <span>
-                    <StatusBadge status={currentStatus} />
-                  </span>
-                </div>
-                <Button
-                  type="submit"
-                  className="mb-6 w-full"
-                  disabled={isSaving || Object.keys(fieldErrors).length > 0}
-                >
-                  {isSaving ? 'Saving...' : 'Save'}
-                </Button>
-
-                <LinkedBySection entryPath={entryPath} />
-              </div>
-            </div>
-          </form>
-        )}
-
-        {/* Delete confirmation dialog with backlink warnings */}
-        <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirm Permanent Deletion</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to permanently delete this entry? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            {isLoadingBacklinks ? (
-              <div className="py-2 text-sm text-muted-foreground">Checking references...</div>
-            ) : (
-              deleteBacklinks.length > 0 && (
-                <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3">
-                  <p className="mb-1 text-sm font-medium text-destructive">
-                    This entry is referenced by {deleteBacklinks.length}{' '}
-                    {deleteBacklinks.length === 1 ? 'entry' : 'entries'}:
-                  </p>
-                  <ul className="space-y-0.5 text-sm text-muted-foreground">
-                    {deleteBacklinks.map((link) => (
-                      <li key={link.path} className="truncate">
-                        {link.title}{' '}
-                        <span className="text-xs">
-                          ({config.collections[link.type as keyof Config['collections']]?.label || link.type})
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-2 text-sm text-destructive">Removing it will break those references.</p>
-                </div>
-              )
-            )}
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={handleDelete} disabled={isLoadingBacklinks}>
-                Delete permanently
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <CreateBranchDialog
-          open={createBranchOpen}
-          onOpenChange={setCreateBranchOpen}
-          onBranchCreated={handleBranchCreated}
-        />
       </div>
     </div>
   );

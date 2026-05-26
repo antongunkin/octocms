@@ -10,22 +10,19 @@ import { ShimmerBlock } from '../../skeletons/primitives';
  */
 export function TopHeaderSkeleton() {
   return (
-    <header
-      className="flex h-14 shrink-0 items-center gap-[10px] border-b border-[var(--border)] bg-[var(--surface-1)] px-6 text-[var(--text)]"
-      aria-hidden
-    >
-      <ShimmerBlock className="h-8 w-[120px] shrink-0 rounded-full border border-[var(--border)] bg-transparent" />
-      <span className="mx-1 h-[22px] w-px shrink-0 bg-[var(--border)]" />
-      <nav className="flex shrink-0 items-center gap-0.5">
+    <header className="octo-top-header" aria-hidden>
+      <ShimmerBlock className="octo-top-header__logo-skel" />
+      <span className="octo-top-header__sep" />
+      <nav className="octo-top-header__nav">
         {Array.from({ length: 4 }, (_, i) => (
-          <ShimmerBlock key={i} className="h-8 w-[76px] shrink-0 rounded-full" />
+          <ShimmerBlock key={i} className="octo-top-header__nav-link-skel" />
         ))}
       </nav>
-      <div className="min-w-0 flex-1" />
-      <ShimmerBlock className="h-8 w-[150px] shrink-0 rounded-full border border-[var(--border)] bg-[var(--surface-2)]" />
-      <span className="mx-1 h-[22px] w-px shrink-0 bg-[var(--border)]" />
-      <ShimmerBlock className="h-8 w-[88px] shrink-0 rounded-full border border-[var(--border)] bg-[var(--surface-1)]" />
-      <ShimmerBlock className="h-[26px] w-[26px] shrink-0 rounded-full" />
+      <div className="octo-top-header__spacer" />
+      <ShimmerBlock className="octo-top-header__branch-skel" />
+      <span className="octo-top-header__sep" />
+      <ShimmerBlock className="octo-top-header__user-skel" />
+      <ShimmerBlock className="octo-top-header__avatar-skel" />
     </header>
   );
 }

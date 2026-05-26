@@ -35,11 +35,11 @@ describe('MediaUploadBar', () => {
     render(<MediaUploadBar allowedFormats={['png']} onFiles={() => {}} />);
     const dropzone = screen.getByRole('button');
 
-    expect(dropzone.className).toMatch(/border-border/);
+    expect(dropzone.className).toMatch(/octo-media-upload-bar__btn/);
     fireEvent.dragOver(dropzone);
-    expect(dropzone.className).toMatch(/border-primary/);
+    expect(dropzone.className).toMatch(/octo-media-upload-bar__btn--dragging/);
     fireEvent.dragLeave(dropzone);
-    expect(dropzone.className).toMatch(/border-border/);
+    expect(dropzone.className).not.toMatch(/octo-media-upload-bar__btn--dragging/);
   });
 
   it('forwards dropped files to onFiles', () => {

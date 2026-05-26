@@ -1,7 +1,7 @@
-export { Avatar, AvatarFallback, AvatarImage } from './avatar';
+export { Avatar, AvatarFallback, AvatarImage } from './Avatar/Avatar';
 
-export { Button, buttonVariants } from './button';
-export type { ButtonProps } from './button';
+export { Button, buttonVariants } from './Button/Button';
+export type { ButtonProps } from './Button/Button';
 
 export {
   Dialog,
@@ -14,7 +14,7 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from './dialog';
+} from './Dialog/Dialog';
 
 export {
   DropdownMenu,
@@ -32,9 +32,9 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from './dropdown-menu';
+} from './DropdownMenu/DropdownMenu';
 
-export { Label } from './label';
+export { Label } from './Label/Label';
 
 export {
   Select,
@@ -47,9 +47,11 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from './select';
+} from './Select/Select';
 
-export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
+export { Switcher, SwitcherItem } from './Switcher/Switcher';
+
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs/Tabs';
 
 export {
   Toast,
@@ -59,35 +61,56 @@ export {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-  toastVariants,
-} from './toast';
-export type { ToastProps } from './toast';
+} from './Toast/Toast';
+export type { ToastProps } from './Toast/Toast';
 
-export { Toaster } from './toaster';
+export { Toaster } from './Toaster/Toaster';
 
-// Sonner-based toaster — use this in v0-generated components
-export { Toaster as SonnerToaster } from './sonner';
+export { Input } from './Input/Input';
+export type { InputProps } from './Input/Input';
+export { Textarea } from './Textarea/Textarea';
+export type { TextareaProps } from './Textarea/Textarea';
 
-export { Input } from './input';
-export type { InputProps } from './input';
-export { Textarea } from './textarea';
-export type { TextareaProps } from './textarea';
+export { Card, CardHeader, CardTitle, CardContent } from './Card/Card';
 
-export { Card, CardHeader, CardTitle, CardContent } from './card';
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from './Table/Table';
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './table';
+export { Icon } from './Icon/Icon';
 
-// ─── Redesign v2 primitives ────────────────────────────────────────────
-export { Kbd } from './kbd';
-export { Chip } from './chip';
-export { StatusBadge, STATUSES } from './status-badge';
-export { AvatarStack } from './avatar-stack';
-export { BranchChip } from './branch-chip';
-export { PublishButton } from './publish-button';
-export { Field } from './field';
-export { Banner } from './banner';
-export { Empty } from './empty';
-export { ToastCard } from './toast-card';
-export type { ToastCardTone } from './toast-card';
-export { TabsPill } from './tabs-pill';
-export type { TabsPillItem } from './tabs-pill';
+export { Slot } from './Slot/Slot';
+export type { SlotProps } from './Slot/Slot';
+export { Portal } from './Portal/Portal';
+
+export { Kbd } from './Kbd/Kbd';
+export { Chip } from './Chip/Chip';
+export { StatusBadge, STATUSES } from './StatusBadge/StatusBadge';
+export { BranchChip } from './BranchChip/BranchChip';
+export { Field } from './FormField/Field';
+export { FieldShell, FIELD_INPUT_CLASS, FIELD_TEXTAREA_CLASS } from './FormField/FieldShell';
+
+export { default as FormFields } from './FormField/FormFields';
+export { default as FormBooleanField } from './FormField/FormBooleanField';
+export { default as FormColorField } from './FormField/FormColorField';
+export { default as FormConditionalField } from './FormField/FormConditionalField';
+export { default as FormDatetimeField } from './FormField/FormDatetimeField';
+export { default as FormImageField } from './FormField/FormImageField';
+export { default as FormJsonField } from './FormField/FormJsonField';
+export { default as FormMarkdownField } from './FormField/FormMarkdownField';
+export { default as FormNumberField } from './FormField/FormNumberField';
+export { default as FormReferenceField } from './FormField/FormReferenceField';
+export { default as FormRichTextField } from './FormField/FormRichTextField';
+export { default as FormSelectField } from './FormField/FormSelectField';
+export { default as FormSlugField } from './FormField/FormSlugField';
+export { default as FormStringField } from './FormField/FormStringField';
+export { default as FormStringListField } from './FormField/FormStringListField';
+export { default as FormTextField } from './FormField/FormTextField';
+export { default as FormUrlField } from './FormField/FormUrlField';

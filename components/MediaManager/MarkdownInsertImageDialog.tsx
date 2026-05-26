@@ -35,10 +35,7 @@ import React, { useState } from 'react';
 import { queryKeys } from '../../admin/query/keys';
 import { suggestedTitleFromFileName } from '../../lib/suggestedMediaTitle';
 import type { MediaFile } from '../../types';
-import FormImageField from '../FormImageField';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Label } from '../ui/label';
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, FormImageField, Label } from '../ui';
 
 export const MarkdownInsertImageDialog: React.FC = () => {
   const queryClient = useQueryClient();
@@ -103,7 +100,7 @@ function InsertNewImage({
     <Dialog
       open
       onOpenChange={(open) => {
-        // Radix only fires this on user-initiated close (X / Esc / overlay).
+        // Fires this on user-initiated close (X / Esc / overlay).
         if (!open) onCancel();
       }}
     >
@@ -150,24 +147,24 @@ function EditMarkdownImage({ initialAlt, initialSrc }: { initialAlt: string; ini
         <DialogHeader>
           <DialogTitle>Edit image</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-2">
+        <div className="octo-u-stack octo-u-gap-4 octo-u-py-2">
           {initialSrc ? (
-            <div className="overflow-hidden rounded-lg border border-border bg-muted">
+            <div className="octo-markdown-dialog__preview">
               {/* eslint-disable-next-line jsx-a11y/alt-text */}
-              <img src={initialSrc} alt={altText} className="max-h-48 w-full object-contain" />
+              <img src={initialSrc} alt={altText} className="octo-markdown-dialog__preview-img" />
             </div>
           ) : null}
-          <div className="space-y-1.5">
+          <div className="octo-markdown-dialog__alt-field">
             <Label htmlFor="markdown-edit-image-alt">Alt text</Label>
             <input
               id="markdown-edit-image-alt"
               type="text"
               value={altText}
               onChange={(e) => setAltText(e.target.value)}
-              className="block w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+              className="octo-markdown-dialog__alt-input"
               placeholder="Describe this image"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="octo-markdown-dialog__alt-hint">
               Used by screen readers and shown if the image fails to load. To replace the image, delete it and insert a
               new one.
             </p>

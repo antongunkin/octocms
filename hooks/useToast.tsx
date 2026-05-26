@@ -2,22 +2,20 @@
 
 import * as React from 'react';
 
-import type { ToastProps } from '../components/ui/toast';
-import { toastVariants } from '../components/ui/toast';
-import type { VariantProps } from 'class-variance-authority';
-
 type ToastActionElement = React.ReactElement;
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000;
 
-type ToasterToast = ToastProps &
-  VariantProps<typeof toastVariants> & {
-    id: string;
-    title?: React.ReactNode;
-    description?: React.ReactNode;
-    action?: ToastActionElement;
-  };
+type ToasterToast = {
+  id: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ToastActionElement;
+  variant?: 'default' | 'destructive' | 'success';
+  open?: boolean;
+  dismiss?: () => void;
+};
 
 const actionTypes = {
   ADD_TOAST: 'ADD_TOAST',
@@ -155,9 +153,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
-      },
+      dismiss,
     },
   });
 

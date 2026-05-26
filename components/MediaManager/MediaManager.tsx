@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageIcon, ChevronRight, LayoutGrid, List, Search, Upload } from 'lucide-react';
+import { Button, Icon } from '../ui';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -8,18 +8,18 @@ import { useMediaList } from '../../admin/query/hooks/useMediaList';
 import { useConfig } from '../../hooks/useConfig';
 import { useMediaCustomFolders } from '../../hooks/useMediaCustomFolders';
 import { toast } from '../../hooks/useToast';
-import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
-
 import { CreateFolderDialog } from './CreateFolderDialog';
 import { DeleteFolderDialog } from './DeleteFolderDialog';
 import { MediaLeftPanel } from './MediaLeftPanel';
 import { MediaListTable } from './MediaListTable';
 import { MediaUploadBar } from './MediaUploadBar';
 import { MediaUploadDialog } from './MediaUploadDialog';
+import { MediaViewModeSwitcher } from './MediaViewModeSwitcher';
 import { MediaGridSkeleton } from './skeletons/MediaGridSkeleton';
 import { MediaLeftPanelSkeleton } from './skeletons/MediaLeftPanelSkeleton';
 import { MediaListTableSkeleton } from './skeletons/MediaListTableSkeleton';
+
+import { Page } from '../Layout/Page';
 
 type ViewMode = 'grid' | 'list';
 
@@ -147,43 +147,28 @@ const MediaManager = () => {
   }, [pendingFolderDelete, countByFolder, removeCustomFolder, selectedFolder]);
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Page header — mirrors DashboardContent */}
-      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-        <div className="min-w-0 flex-1">
-          <div className="mb-px flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
-            <span style={{ color: 'var(--text-2)' }}>Media</span>
-            {selectedFolder !== null && (
-              <>
-                <ChevronRight className="h-3 w-3 opacity-60" />
-                <span style={{ color: 'var(--text-2)' }}>{selectedFolder === '/' ? 'Root' : selectedFolder}</span>
-              </>
-            )}
-          </div>
-          <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-            {breadcrumbFolderLabel}
-          </h1>
-        </div>
-        <div className="flex flex-none items-center gap-2">
-          <span className="text-[13px] font-medium text-[var(--text-2)]">
-            Assets
-            <span className="ml-1.5 font-mono text-[12px] font-normal text-[var(--muted)]">{filteredFiles.length}</span>
-          </span>
-          <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
+    <Page
+      className="octo-media-manager"
+      title={breadcrumbFolderLabel}
+      breadcrumbs={[
+        { label: 'Media', href: selectedFolder !== null ? '/cms/media' : undefined },
+        selectedFolder !== null && { label: selectedFolder === '/' ? 'Root' : selectedFolder },
+      ].filter((b): b is { label: string } => Boolean(b))}
+      actions={
+        <>
+          <MediaViewModeSwitcher value={viewMode} onChange={setViewMode} />
           <Button
-            size="sm"
-            className="gap-1.5 bg-foreground text-background hover:bg-foreground/90"
+            className="octo-u-gap-1-5 octo-btn-primary-fg"
             onClick={() => document.getElementById('media-upload-bar-input')?.click()}
             disabled={pendingUpload !== null}
           >
-            <Upload className="h-4 w-4" />
+            <Icon.Upload className="octo-icon-md" />
             Upload
           </Button>
-        </div>
-      </div>
-
-      <div className="flex flex-1 overflow-hidden">
-        {isLoadingFiles ? (
+        </>
+      }
+      leftBar={
+        isLoadingFiles ? (
           <MediaLeftPanelSkeleton />
         ) : (
           <MediaLeftPanel
@@ -197,75 +182,75 @@ const MediaManager = () => {
             onAddFolder={() => setShowCreateFolder(true)}
             onDeleteFolder={(f) => setPendingFolderDelete(f)}
           />
-        )}
-
-        <div className="flex flex-1 flex-col overflow-hidden">
+        )
+      }
+    >
+      <div className="octo-media-manager__body">
+        <div className="octo-media-manager__content">
           <MediaUploadBar
             allowedFormats={config.mediaAllowedFormats}
             onFiles={openUploadQueue}
             disabled={pendingUpload !== null}
           />
 
-          {/* Search bar — same shape and tokens as /cms/content */}
-          <div className="px-6 pb-3 pt-3">
-            <div className="relative min-w-[220px] max-w-[420px] flex-[0_1_420px]">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          {/* Search bar */}
+          <div className="octo-media-manager__search-bar">
+            <div className="octo-media-manager__search-wrap">
+              <Icon.Search className="octo-media-manager__search-icon octo-icon-md" />
               <input
                 ref={searchRef}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Filter assets…"
-                className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+                className="octo-media-manager__search-input"
               />
-              <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-border bg-[var(--surface-2)] px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                /
-              </kbd>
+              <kbd className="octo-media-manager__search-kbd">/</kbd>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 pb-6">
-            {isLoadingFiles ? (
-              viewMode === 'grid' ? (
-                <MediaGridSkeleton />
-              ) : (
-                <MediaListTableSkeleton />
-              )
-            ) : filteredFiles.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
-                <ImageIcon className="h-12 w-12" />
-                <p className="text-sm">{searchQuery ? 'No assets match this search' : 'No files in this folder yet'}</p>
-              </div>
-            ) : viewMode === 'grid' ? (
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
-                {filteredFiles.map((file) => (
-                  <button
-                    key={file.id}
-                    type="button"
-                    onClick={() => router.push(`/cms/media/${file.id}`)}
-                    className="group relative cursor-pointer overflow-hidden rounded-xl border border-border bg-background text-left transition-all hover:border-foreground/40 hover:shadow-sm"
-                  >
-                    <div className="aspect-square bg-[var(--surface-2)]">
-                      <img
-                        src={file.publicUrl}
-                        alt={file.title || file.originalName}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="border-t border-border bg-background px-3 py-2">
-                      <p className="truncate text-sm font-medium text-foreground">{file.title || file.originalName}</p>
-                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                        {file.extension.toUpperCase()}
-                        {file.width != null && file.height != null ? ` · ${file.width}×${file.height}` : ''}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
+          {isLoadingFiles ? (
+            viewMode === 'grid' ? (
+              <MediaGridSkeleton />
             ) : (
-              <MediaListTable files={filteredFiles} />
-            )}
-          </div>
+              <MediaListTableSkeleton />
+            )
+          ) : filteredFiles.length === 0 ? (
+            <div className="octo-media-manager__empty">
+              <Icon.Image className="octo-icon-2xl" />
+              <p className="octo-u-text-base">
+                {searchQuery ? 'No assets match this search' : 'No files in this folder yet'}
+              </p>
+            </div>
+          ) : viewMode === 'grid' ? (
+            <div className="octo-media-grid">
+              {filteredFiles.map((file) => (
+                <button
+                  key={file.id}
+                  type="button"
+                  onClick={() => router.push(`/cms/media/${file.id}`)}
+                  className="octo-media-grid__card"
+                >
+                  <div className="octo-media-grid__img-wrap">
+                    <img
+                      src={file.publicUrl}
+                      alt={file.title || file.originalName}
+                      className="octo-media-grid__img"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="octo-media-grid__info">
+                    <p className="octo-media-grid__name">{file.title || file.originalName}</p>
+                    <p className="octo-media-grid__meta">
+                      {file.extension.toUpperCase()}
+                      {file.width != null && file.height != null ? ` · ${file.width}×${file.height}` : ''}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <MediaListTable files={filteredFiles} />
+          )}
         </div>
       </div>
 
@@ -275,7 +260,7 @@ const MediaManager = () => {
         type="file"
         accept={config.mediaAllowedFormats.map((f) => `.${f}`).join(',')}
         multiple
-        className="hidden"
+        className="octo-u-hidden"
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) openUploadQueue(e.target.files);
           e.target.value = '';
@@ -302,45 +287,8 @@ const MediaManager = () => {
         onComplete={handleUploadComplete}
         onCancel={() => setPendingUpload(null)}
       />
-    </div>
+    </Page>
   );
 };
-
-function ViewModeSwitcher({ value, onChange }: { value: ViewMode; onChange: (v: ViewMode) => void }) {
-  return (
-    <div
-      className="inline-flex items-center rounded-full border border-border bg-background p-0.5"
-      role="tablist"
-      aria-label="View mode"
-    >
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'grid'}
-        aria-label="Grid view"
-        onClick={() => onChange('grid')}
-        className={cn(
-          'flex h-7 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors',
-          value === 'grid' ? 'bg-[var(--surface-3)] text-foreground' : 'hover:text-foreground',
-        )}
-      >
-        <LayoutGrid className="h-3.5 w-3.5" />
-      </button>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={value === 'list'}
-        aria-label="List view"
-        onClick={() => onChange('list')}
-        className={cn(
-          'flex h-7 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors',
-          value === 'list' ? 'bg-[var(--surface-3)] text-foreground' : 'hover:text-foreground',
-        )}
-      >
-        <List className="h-3.5 w-3.5" />
-      </button>
-    </div>
-  );
-}
 
 export default MediaManager;

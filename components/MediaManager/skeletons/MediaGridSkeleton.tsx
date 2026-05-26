@@ -8,15 +8,11 @@ import { ShimmerBlock } from '../../skeletons/primitives';
  */
 export function MediaGridSkeleton({ tiles = 12 }: { tiles?: number }) {
   return (
-    <div
-      role="status"
-      aria-label="Loading media grid"
-      className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4"
-    >
+    <div role="status" aria-label="Loading media grid" className="octo-media-grid">
       {Array.from({ length: tiles }, (_, i) => (
-        <div key={i} className="flex flex-col gap-2">
-          <ShimmerBlock className="aspect-square w-full rounded-xl" />
-          <ShimmerBlock className="h-3 w-2/3" />
+        <div key={i} className="octo-media-grid__item-skel">
+          <ShimmerBlock className="octo-skel-aspect-square octo-skel-w-full octo-skel-rounded-xl" />
+          <ShimmerBlock className="octo-skel-h-3 octo-skel-w-2-3" />
         </div>
       ))}
     </div>

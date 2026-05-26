@@ -6,7 +6,7 @@
 import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { Bot, FileText, GitBranch, Plus, Search } from 'lucide-react';
+import { Dialog, DialogContent, Icon, Kbd } from '../ui';
 
 import { getEntryList } from '../../admin/actions/entries';
 import { getFile } from '../../admin/actions/files';
@@ -14,7 +14,6 @@ import { listCMSBranches, searchEntries, type CMSBranch, type SearchResult } fro
 import { queryKeys } from '../../admin/query/keys';
 import { useConfig } from '../../hooks/useConfig';
 import { entryAdminHref } from '../../lib/searchIndex';
-import { Kbd } from '../ui';
 import { RowItem, Section } from './parts';
 
 type CommandKProps = {
@@ -48,8 +47,8 @@ type Action = {
 };
 
 const ACTIONS: Action[] = [
-  { id: 'new-entry', label: 'New entry', icon: <Plus size={14} />, href: '/cms/content', kbd: ['⌘', 'N'] },
-  { id: 'agent', label: 'Ask the agent', icon: <Bot size={14} />, href: '/cms/chat', kbd: ['⌘', 'J'] },
+  { id: 'new-entry', label: 'New entry', icon: <Icon.Plus size={14} />, href: '/cms/content', kbd: ['⌘', 'N'] },
+  { id: 'agent', label: 'Ask the agent', icon: <Icon.Bot size={14} />, href: '/cms/chat', kbd: ['⌘', 'J'] },
 ];
 
 type Row =
@@ -177,40 +176,28 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
     }
   };
 
-  if (!open) return null;
-
   let runningIndex = -1;
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-start justify-center bg-black/40 px-4 pt-[12vh] backdrop-blur-sm"
-      role="dialog"
-      aria-modal="true"
-      onClick={() => onOpenChange(false)}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') onOpenChange(false);
-      }}
-    >
-      <div
-        className="w-full max-w-[720px] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-1)]"
-        style={{ boxShadow: 'var(--shadow-3)' }}
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className="octo-cmdk__dialog octo-dialog-content octo-dialog-content--3xl octo-dialog-content--no-padding octo-dialog-content--overflow-hidden"
+        aria-label="Command palette"
       >
-        <div className="flex items-center gap-3 border-b border-[var(--border)] px-4 py-3.5">
-          <Search size={18} className="text-[var(--muted)]" />
+        <div className="octo-cmdk__input-row">
+          <Icon.Search size={18} className="octo-cmdk__input-icon" />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="Search entries, branches…"
-            className="flex-1 border-0 bg-transparent text-base text-[var(--text)] outline-none"
+            className="octo-cmdk__input"
           />
           <Kbd>Esc</Kbd>
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto py-2">
+        <div className="octo-cmdk__results">
           {entries.length > 0 && (
             <Section label={`Entries · ${entries.length}`}>
               {entries.map((r) => {
@@ -220,7 +207,7 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
                 return (
                   <RowItem
                     key={`e-${r.id}`}
-                    icon={<FileText size={14} />}
+                    icon={<Icon.FileText size={14} />}
                     title={r.title}
                     sub={adminHref}
                     badge={r.typeLabel}
@@ -245,7 +232,7 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
                 return (
                   <RowItem
                     key={`b-${b.branch}`}
-                    icon={<GitBranch size={14} />}
+                    icon={<Icon.GitBranch size={14} />}
                     title={b.branch}
                     sub={b.isPublished ? 'Published · live' : b.prUrl ? 'Open PR' : 'Branch'}
                     mono
@@ -280,26 +267,24 @@ export function CommandK({ open, onOpenChange }: CommandKProps) {
           )}
 
           {rows.length === 0 && (
-            <div className="px-4 py-8 text-center text-sm text-[var(--muted)]">
-              {query.trim() ? 'No results' : 'Start typing to search…'}
-            </div>
+            <div className="octo-cmdk__empty">{query.trim() ? 'No results' : 'Start typing to search…'}</div>
           )}
         </div>
 
-        <div className="flex items-center gap-4 border-t border-[var(--border)] bg-[var(--surface-2)] px-4 py-2.5 text-xs text-[var(--muted)]">
-          <span className="inline-flex items-center gap-1">
+        <div className="octo-cmdk__footer">
+          <span className="octo-cmdk__footer-hint">
             <Kbd>↑</Kbd>
             <Kbd>↓</Kbd> navigate
           </span>
-          <span className="inline-flex items-center gap-1">
+          <span className="octo-cmdk__footer-hint">
             <Kbd>↵</Kbd> open
           </span>
-          <span className="inline-flex items-center gap-1">
+          <span className="octo-cmdk__footer-hint">
             <Kbd>⌘</Kbd>
             <Kbd>↵</Kbd> open in new tab
           </span>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

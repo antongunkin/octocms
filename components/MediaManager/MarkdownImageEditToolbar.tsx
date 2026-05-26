@@ -18,11 +18,8 @@ import { openEditImageDialog$, parseImageDimension } from '@mdxeditor/editor';
 import { usePublisher } from '@mdxeditor/gurx';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNodeByKey } from 'lexical';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Icon } from '../ui';
 import React, { useState } from 'react';
-
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 
 type Props = {
   nodeKey: string;
@@ -55,7 +52,7 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
   };
 
   return (
-    <div className="absolute right-2 top-2 z-10 flex gap-1 rounded-md border border-border bg-background/95 p-1 shadow-sm backdrop-blur">
+    <div className="octo-markdown-img-toolbar">
       <button
         type="button"
         title="Delete image"
@@ -64,9 +61,9 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
           e.preventDefault();
           setConfirmOpen(true);
         }}
-        className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-destructive"
+        className="octo-markdown-img-toolbar__btn octo-markdown-img-toolbar__btn--delete"
       >
-        <Trash2 className="h-3.5 w-3.5" />
+        <Icon.Trash2 className="octo-icon-sm" />
       </button>
       <button
         type="button"
@@ -84,13 +81,13 @@ export const MarkdownImageEditToolbar: React.FC<Props> = ({
             },
           });
         }}
-        className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+        className="octo-markdown-img-toolbar__btn octo-markdown-img-toolbar__btn--edit"
       >
-        <Pencil className="h-3.5 w-3.5" />
+        <Icon.Pencil className="octo-icon-sm" />
       </button>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="octo-dialog-content octo-dialog-content--md">
           <DialogHeader>
             <DialogTitle>Delete this image?</DialogTitle>
             <DialogDescription>

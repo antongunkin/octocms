@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
 
 import { useEntry } from '../../admin/query/hooks/useEntry';
 import { useEntryList } from '../../admin/query/hooks/useEntryList';
@@ -18,23 +17,33 @@ import {
   useSaveFile,
 } from '../../admin/query/hooks/useEntryMutations';
 import type { EntryStatus, SelectedFile } from '../../types';
-import { StatusBadge } from '../StatusBadge';
+import type { Config } from '../../admin/types';
 import { useFileState } from '../../hooks/useFileState';
 import { EntryStackProvider, useEntryStack } from '../../hooks/useEntryStack';
 import { validateEntryFields } from '../../lib/validateEntryFields';
 import { rebuildConditionalFields } from '../../lib/conditionalField';
-import type { Config } from '../../admin/types';
 import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 import { useConfig } from '../../hooks/useConfig';
-import FormFields from '../FormFields';
 import InlineEntryEditor from '../InlineEntryEditor/InlineEntryEditor';
 import LinkedBySection from '../LinkedBySection/LinkedBySection';
 import { DiffView } from '../DiffView';
-import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  FormFields,
+  StatusBadge,
+  Switcher,
+  SwitcherItem,
+} from '../ui';
 import { toast } from '../../hooks/useToast';
-import CreateBranchDialog from '../CreateBranchDialog';
+import CreateBranchDialog from '../Layout/CreateBranchDialog';
+
+import { Page } from '../Layout/Page';
 
 import { EntryFormSkeleton } from './skeletons/EntryFormSkeleton';
 import { EntrySidebarSkeleton } from './skeletons/EntrySidebarSkeleton';
@@ -229,161 +238,107 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
   const isNotFound = entryListResolved && !resolvedEntryItem;
 
   // Header chrome that's safe to render before the entry resolves.
-  const headerChrome = (
-    <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
-          <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
+  const headerProps = {
+    title: entryTitle || collectionLabel,
+    breadcrumbs: [
+      {
+        label: 'Content',
+        href: '/cms/content',
+      },
+      {
+        label: collectionLabel,
+        href: `/cms/content/${type}`,
+      },
+    ],
+    actions: (
+      <>
+        {diffToggleVisible && (
+          <Switcher aria-label="Edit or Diff view">
+            <SwitcherItem key="edit" active={viewMode === 'edit'} onClick={() => setViewMode('edit')}>
+              Edit
+            </SwitcherItem>
+            <SwitcherItem key="diff" active={viewMode === 'diff'} onClick={() => setViewMode('diff')}>
+              Diff
+            </SwitcherItem>
+          </Switcher>
+        )}
+        {currentStatus === 'archived' ? (
+          <>
+            <Button variant="outline" onClick={handleRestore} disabled={isSaving}>
+              Restore
+            </Button>
+            <Button variant="destructive" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
+              Delete permanently
+            </Button>
+          </>
+        ) : (
+          <Button variant="outline" onClick={handleArchive} disabled={isSaving}>
+            Archive
+          </Button>
+        )}
+        <Button
+          type="submit"
+          form="entry-form"
+          variant="default"
+          disabled={isSaving || Object.keys(fieldErrors).length > 0}
+        >
+          {isSaving ? 'Saving...' : 'Save'}
         </Button>
-        <div className="min-w-0 flex-1">
-          <div className="mb-px flex items-center gap-1.5 text-[12px]" style={{ color: 'var(--text-2)' }}>
-            <Link
-              href="/cms/content"
-              className="hover:text-foreground transition-colors"
-              style={{ color: 'var(--text-2)' }}
-            >
-              Content
-            </Link>
-            <ChevronRight className="h-3 w-3 opacity-60" />
-            <span>{collectionLabel}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <h1 className="m-0 text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-              {entryTitle || collectionLabel}
-            </h1>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+      </>
+    ),
+  };
 
   if (isLoadingEntry) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {headerChrome}
-        <div className="flex-1 min-h-0 overflow-hidden flex">
-          <div className="flex-1 min-w-0 overflow-y-auto bg-bg">
-            <div className="max-w-[960px] mx-auto px-6 py-6 pb-32">
-              <EntryFormSkeleton />
-            </div>
-          </div>
-          <EntrySidebarSkeleton />
-        </div>
-      </div>
+      <Page className="octo-edit-post" {...headerProps} rightBar={<EntrySidebarSkeleton />}>
+        <EntryFormSkeleton />
+      </Page>
     );
   }
 
   if (isNotFound || !post?.fields) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {headerChrome}
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-muted-foreground">
-          <p className="text-sm font-medium">Entry not found.</p>
-          <Button asChild variant="outline" size="sm">
+      <Page className="octo-edit-post" {...headerProps}>
+        <div className="octo-edit-post__not-found">
+          <p className="octo-u-text-base octo-u-font-medium">Entry not found.</p>
+          <Button asChild variant="outline">
             <Link href={`/cms/content/${type}`}>Back to {collectionLabel}</Link>
           </Button>
         </div>
-      </div>
+      </Page>
     );
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Page header — same chrome as MediaAsset / DashboardContent */}
-      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border bg-[var(--bg)] px-6 py-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="-ml-2 h-7 w-7 shrink-0 text-muted-foreground">
-            <Link href={`/cms/content/${type}`} aria-label="Back to collection">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div className="min-w-0 flex-1">
-            <div className="mb-px flex items-center gap-1.5 text-[12px]" style={{ color: 'var(--text-2)' }}>
-              <Link
-                href="/cms/content"
-                className="hover:text-foreground transition-colors"
-                style={{ color: 'var(--text-2)' }}
-              >
-                Content
-              </Link>
-              <ChevronRight className="h-3 w-3 opacity-60" />
-              <span>{collectionLabel}</span>
+    <Page
+      className="octo-edit-post"
+      {...headerProps}
+      rightBar={
+        <div className="octo-edit-post__sidebar">
+          <div className="octo-edit-post__sidebar-label">Entry details</div>
+          <div className="octo-u-stack octo-u-gap-3">
+            <div className="octo-edit-post__detail-row">
+              <span className="octo-edit-post__detail-key">ID</span>
+              <span className="octo-edit-post__detail-val octo-edit-post__detail-val--mono" title={post.sys?.id}>
+                {post.sys?.id}
+              </span>
             </div>
-            <div className="flex items-center gap-2">
-              <h1 className="m-0 text-ellipsis whitespace-nowrap text-[16px] font-semibold tracking-[-0.012em] text-foreground">
-                {entryTitle || collectionLabel}
-              </h1>
+            <div className="octo-edit-post__detail-row">
+              <span className="octo-edit-post__detail-key">Type</span>
+              <span className="octo-edit-post__detail-val">{collectionLabel}</span>
+            </div>
+            <div className="octo-edit-post__detail-row">
+              <span className="octo-edit-post__detail-key">Status</span>
+              <StatusBadge status={currentStatus} />
             </div>
           </div>
+          {selectedFile && <HistorySection entryPath={selectedFile.path} flat />}
+          {selectedFile && <LinkedBySection entryPath={selectedFile.path} />}
         </div>
-        <div className="flex flex-none items-center gap-2">
-          {diffToggleVisible && (
-            <div
-              role="tablist"
-              aria-label="Edit or Diff view"
-              className="inline-flex rounded-md border border-border bg-muted/40 p-0.5"
-            >
-              <button
-                type="button"
-                role="tab"
-                aria-selected={viewMode === 'edit'}
-                onClick={() => setViewMode('edit')}
-                className={cn(
-                  'px-3 py-1 text-[13px] font-medium rounded transition-colors',
-                  viewMode === 'edit'
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={viewMode === 'diff'}
-                onClick={() => setViewMode('diff')}
-                className={cn(
-                  'px-3 py-1 text-[13px] font-medium rounded transition-colors',
-                  viewMode === 'diff'
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                Diff
-              </button>
-            </div>
-          )}
-          {currentStatus === 'archived' ? (
-            <>
-              <Button variant="outline" size="sm" onClick={handleRestore} disabled={isSaving}>
-                Restore
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => setIsDialogOpen(true)} disabled={isSaving}>
-                Delete permanently
-              </Button>
-            </>
-          ) : (
-            <Button variant="outline" size="sm" onClick={handleArchive} disabled={isSaving}>
-              Archive
-            </Button>
-          )}
-          <Button
-            type="submit"
-            form="entry-form"
-            variant="default"
-            size="sm"
-            disabled={isSaving || Object.keys(fieldErrors).length > 0}
-          >
-            {isSaving ? 'Saving...' : 'Save'}
-          </Button>
-        </div>
-      </div>
-
+      }
+    >
       <form
         id="entry-form"
-        className="flex-1 min-h-0 overflow-hidden flex"
         onSubmit={handleSubmit}
         onInput={(e) => {
           const t = e.target;
@@ -399,53 +354,19 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
         }}
       >
         {/* Main content column — independently scrollable */}
-        <div className="flex-1 min-w-0 overflow-y-auto bg-bg">
-          <div className="max-w-[960px] mx-auto px-6 py-6 pb-32">
-            {viewMode === 'diff' && selectedFile ? (
-              <DiffView collectionType={type} entryPath={selectedFile.path} />
-            ) : (
-              <section className="rounded-2xl border border-border bg-bg px-7 py-7 shadow-1">
-                <FormFields
-                  key={`${filePath ?? ''}-${entryQuery.dataUpdatedAt}`}
-                  selectedFile={selectedFile}
-                  fields={post.fields}
-                  fieldErrors={fieldErrors}
-                  onClearFieldError={clearFieldError}
-                />
-              </section>
-            )}
-          </div>
-        </div>
-
-        {/* Sidebar — fixed width, independently scrollable, surface-2 panel */}
-        <aside className="w-[280px] shrink-0 overflow-y-auto border-l border-border bg-surface-2 px-4 py-5 flex flex-col gap-5">
-          {/* Entry details */}
-          <div>
-            <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-              Entry details
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-16 shrink-0 text-muted-foreground">ID</span>
-                <span className="flex-1 min-w-0 font-mono text-[11px] text-foreground truncate" title={post.sys?.id}>
-                  {post.sys?.id}
-                </span>
-              </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-16 shrink-0 text-muted-foreground">Type</span>
-                <span className="flex-1 text-foreground">{collectionLabel}</span>
-              </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="w-16 shrink-0 text-muted-foreground">Status</span>
-                <StatusBadge status={currentStatus} />
-              </div>
-            </div>
-          </div>
-
-          {selectedFile && <HistorySection entryPath={selectedFile.path} flat />}
-
-          {selectedFile && <LinkedBySection entryPath={selectedFile.path} />}
-        </aside>
+        {viewMode === 'diff' && selectedFile ? (
+          <DiffView collectionType={type} entryPath={selectedFile.path} />
+        ) : (
+          <section className="octo-edit-post__form-card">
+            <FormFields
+              key={`${filePath ?? ''}-${entryQuery.dataUpdatedAt}`}
+              selectedFile={selectedFile}
+              fields={post.fields}
+              fieldErrors={fieldErrors}
+              onClearFieldError={clearFieldError}
+            />
+          </section>
+        )}
       </form>
 
       {/* Inline entry editor overlays (rendered outside the form to avoid nested forms) */}
@@ -489,7 +410,7 @@ const EditPostInner = ({ type, id }: EditPostProps) => {
         onOpenChange={setCreateBranchOpen}
         onBranchCreated={handleBranchCreated}
       />
-    </div>
+    </Page>
   );
 };
 

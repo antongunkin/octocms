@@ -11,13 +11,10 @@
  */
 
 import React from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Button, Icon, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui';
 
 import type { SchemaOptionField } from '../../schema/types';
 import type { SelectOption } from '../../types';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { cn } from '../../lib/utils';
 
 interface Props {
@@ -40,13 +37,13 @@ export default function SchemaOptionFieldInput({
   disabled,
 }: Props) {
   return (
-    <div className="space-y-1.5">
-      <label className="block text-xs font-medium text-foreground">
+    <div className="octo-option-field-input">
+      <label className="octo-option-field-input__label">
         {spec.label}
-        {spec.required ? <span className="ml-0.5 text-destructive">*</span> : null}
+        {spec.required ? <span className="octo-option-field-input__required">*</span> : null}
       </label>
       {renderControl({ spec, value, onChange, availableCollections, selectOptions, disabled })}
-      {spec.description ? <p className="text-xs text-muted-foreground">{spec.description}</p> : null}
+      {spec.description ? <p className="octo-option-field-input__desc">{spec.description}</p> : null}
     </div>
   );
 }
@@ -71,7 +68,7 @@ function renderControl({
             onValueChange={(v) => onChange(v === '__none__' ? undefined : v)}
             disabled={disabled}
           >
-            <SelectTrigger className="h-9 text-sm">
+            <SelectTrigger className="octo-select__trigger octo-select__trigger--sm">
               <SelectValue placeholder="No default" />
             </SelectTrigger>
             <SelectContent>
@@ -90,7 +87,7 @@ function renderControl({
           value={typeof value === 'string' ? value : ''}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="h-9"
+          className=""
         />
       );
     }
@@ -106,7 +103,7 @@ function renderControl({
             onChange(Number.isFinite(n) ? n : undefined);
           }}
           disabled={disabled}
-          className="h-9"
+          className=""
         />
       );
     case 'boolean':
@@ -114,7 +111,7 @@ function renderControl({
     case 'enum':
       return (
         <Select value={typeof value === 'string' ? value : ''} onValueChange={(v) => onChange(v)} disabled={disabled}>
-          <SelectTrigger className="h-9 text-sm">
+          <SelectTrigger className="octo-select__trigger octo-select__trigger--sm">
             <SelectValue placeholder="Select…" />
           </SelectTrigger>
           <SelectContent>
@@ -163,7 +160,7 @@ function renderControl({
         />
       );
     default:
-      return <p className="text-xs text-muted-foreground">Unsupported option type: {spec.type}</p>;
+      return <p className="octo-option-field-input__desc">Unsupported option type: {spec.type}</p>;
   }
 }
 
@@ -188,27 +185,13 @@ function BooleanToggle({
       onClick={() => onChange(!value)}
       disabled={disabled}
       aria-pressed={value}
-      className={cn(
-        'inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs transition',
-        value ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-background hover:bg-muted/50',
-        disabled && 'cursor-not-allowed opacity-50',
-      )}
+      className={cn('octo-bool-toggle', value && 'octo-bool-toggle octo-bool-toggle--on')}
     >
-      <span
-        className={cn(
-          'inline-block h-3 w-6 shrink-0 rounded-full bg-muted-foreground/30 transition',
-          value && 'bg-primary',
-        )}
-      >
-        <span
-          className={cn(
-            'block h-3 w-3 rounded-full bg-background shadow transition',
-            value ? 'translate-x-3' : 'translate-x-0',
-          )}
-        />
+      <span className="octo-bool-toggle__track">
+        <span className="octo-bool-toggle__thumb" />
       </span>
       <span>{value ? 'On' : 'Off'}</span>
-      <span className="sr-only">{label}</span>
+      <span className="octo-sr-only">{label}</span>
     </button>
   );
 }
@@ -225,21 +208,17 @@ function CollectionsCheckboxList({
   disabled?: boolean;
 }) {
   if (available.length === 0) {
-    return (
-      <p className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
-        No collections in the schema yet.
-      </p>
-    );
+    return <p className="octo-checkbox-list__empty">No collections in the schema yet.</p>;
   }
   const selected = new Set(value);
   return (
-    <div className="space-y-1 rounded-md border border-border bg-background p-2 max-h-44 overflow-auto">
+    <div className="octo-checkbox-list">
       {available.map((c) => (
         <label
           key={c}
           className={cn(
-            'flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 text-xs hover:bg-muted/50',
-            disabled && 'cursor-not-allowed opacity-50',
+            'octo-checkbox-list__item',
+            disabled && 'octo-checkbox-list__item octo-checkbox-list__item--disabled',
           )}
         >
           <input
@@ -253,11 +232,11 @@ function CollectionsCheckboxList({
               onChange(available.filter((k) => next.has(k)));
             }}
           />
-          <code className="font-mono">{c}</code>
+          <code className="octo-u-mono">{c}</code>
         </label>
       ))}
       {value.length === 0 ? (
-        <p className="px-1.5 pt-1 text-[11px] italic text-muted-foreground">
+        <p style={{ padding: '4px 6px', fontSize: 11, fontStyle: 'italic', color: 'var(--muted)' }}>
           None selected — references can target any collection.
         </p>
       ) : null}
@@ -278,13 +257,13 @@ function DefaultOptionsCheckboxList({
 }) {
   const selected = new Set(value);
   return (
-    <div className="space-y-1 rounded-md border border-border bg-background p-2 max-h-44 overflow-auto">
+    <div className="octo-checkbox-list">
       {options.map((o) => (
         <label
           key={o.value}
           className={cn(
-            'flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 text-xs hover:bg-muted/50',
-            disabled && 'cursor-not-allowed opacity-50',
+            'octo-checkbox-list__item',
+            disabled && 'octo-checkbox-list__item octo-checkbox-list__item--disabled',
           )}
         >
           <input
@@ -299,7 +278,7 @@ function DefaultOptionsCheckboxList({
             }}
           />
           <span>{o.label}</span>
-          <code className="font-mono text-muted-foreground">({o.value})</code>
+          <code className="octo-u-mono octo-u-text-muted">({o.value})</code>
         </label>
       ))}
     </div>
@@ -330,21 +309,19 @@ function SelectOptionsEditor({
   }
 
   return (
-    <div className="space-y-1.5">
-      <div className="space-y-1">
+    <div className="octo-select-options">
+      <div>
         {value.length === 0 ? (
-          <p className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
-            No options yet — add at least one.
-          </p>
+          <p className="octo-select-options__empty">No options yet — add at least one.</p>
         ) : (
           value.map((o, i) => (
-            <div key={i} className="flex items-center gap-1.5">
+            <div key={i} className="octo-select-option-row">
               <Input
                 placeholder="Label"
                 value={o.label}
                 onChange={(e) => update(i, { label: e.target.value })}
                 disabled={disabled}
-                className="h-9 flex-1"
+                className="octo-u-flex-1"
               />
               <Input
                 placeholder="value"
@@ -352,29 +329,35 @@ function SelectOptionsEditor({
                 onChange={(e) => update(i, { value: e.target.value })}
                 disabled={disabled}
                 className={cn(
-                  'h-9 flex-1 font-mono text-xs',
-                  (o.value === '' || valueDuplicates.has(o.value)) && 'border-destructive/50',
+                  'octo-u-flex-1 octo-u-mono octo-select__trigger octo-select__trigger--xs',
+                  (o.value === '' || valueDuplicates.has(o.value)) && 'octo-input octo-input--invalid',
                 )}
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-muted-foreground hover:text-destructive"
+                className="octo-button octo-button--icon-sm octo-button--danger-ghost"
                 onClick={() => remove(i)}
                 disabled={disabled}
                 aria-label="Remove option"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Icon.Trash2 className="octo-icon-sm" />
               </Button>
             </div>
           ))
         )}
       </div>
-      <Button type="button" variant="outline" size="sm" onClick={add} disabled={disabled} className="h-7 text-xs">
-        <Plus className="mr-1 h-3 w-3" /> Add option
+      <Button
+        type="button"
+        variant="outline"
+        onClick={add}
+        disabled={disabled}
+        className="octo-button octo-button--icon-xs"
+      >
+        <Icon.Plus className="octo-icon-xs" /> Add option
       </Button>
-      {valueDuplicates.size > 0 ? <p className="text-xs text-destructive">Option values must be unique.</p> : null}
+      {valueDuplicates.size > 0 ? <p className="octo-dialog-field__error-xs">Option values must be unique.</p> : null}
     </div>
   );
 }
@@ -396,18 +379,15 @@ function StringListEditor({
     setDraft('');
   };
   return (
-    <div className="space-y-1.5">
-      <div className="flex flex-wrap gap-1">
+    <div className="octo-string-list">
+      <div className="octo-string-list__tags">
         {value.map((v) => (
-          <span
-            key={v}
-            className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-1.5 py-0.5 text-xs"
-          >
-            <code className="font-mono">{v}</code>
+          <span key={v} className="octo-string-list__tag">
+            <code className="octo-u-mono">{v}</code>
             <button
               type="button"
               onClick={() => onChange(value.filter((x) => x !== v))}
-              className="text-muted-foreground hover:text-destructive"
+              className="octo-string-list__tag-remove"
               disabled={disabled}
               aria-label={`Remove ${v}`}
             >
@@ -416,7 +396,7 @@ function StringListEditor({
           </span>
         ))}
       </div>
-      <div className="flex gap-1.5">
+      <div className="octo-string-list__input-row">
         <Input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -428,9 +408,9 @@ function StringListEditor({
           }}
           placeholder="Press Enter to add"
           disabled={disabled}
-          className="h-9 flex-1"
+          className="octo-u-flex-1"
         />
-        <Button type="button" variant="outline" size="sm" onClick={commit} disabled={disabled || !draft.trim()}>
+        <Button type="button" variant="outline" onClick={commit} disabled={disabled || !draft.trim()}>
           Add
         </Button>
       </div>
