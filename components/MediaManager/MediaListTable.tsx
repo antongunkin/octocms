@@ -1,6 +1,5 @@
 'use client';
 
-import { Icon } from '../ui';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -37,7 +36,6 @@ export function MediaListTable({ files, onPickFile, selectedId }: MediaListTable
               <th className="octo-content-card__th">Folder</th>
               <th className="octo-content-card__th">Format</th>
               <th className="octo-content-card__th">Dimensions</th>
-              <th className="octo-content-card__th">File name</th>
             </tr>
           </thead>
           <tbody>
@@ -77,12 +75,6 @@ export function MediaListTable({ files, onPickFile, selectedId }: MediaListTable
                   <td className="octo-content-row__td octo-content-row__meta">{file.extension.toUpperCase()}</td>
                   <td className="octo-content-row__td octo-content-row__meta">
                     {file.width != null && file.height != null ? `${file.width} × ${file.height}` : '—'}
-                  </td>
-                  <td className="octo-content-row__td octo-content-row__meta octo-u-mono octo-u-text-sm">
-                    <span className="octo-u-flex octo-u-gap-1-5">
-                      <Icon.Image className="octo-icon-sm octo-u-shrink-0 octo-u-opacity-60" />
-                      <span className="octo-u-truncate">{file.originalName}</span>
-                    </span>
                   </td>
                 </tr>
               ))

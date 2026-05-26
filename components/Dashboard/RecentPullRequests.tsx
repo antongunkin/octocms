@@ -17,29 +17,23 @@ export function RecentPullRequestsView() {
   const recentPRs = recentPRsQ.data ?? [];
 
   return (
-    <div className="octo-content-area">
-      <div className="octo-pr-list__wrap octo-scroll">
-        <div className="octo-pr-list__inner">
-          <div>
-            <h2 className="octo-pr-list__heading">Recent pull requests</h2>
-            <p className="octo-pr-list__sub">
-              Latest <code className="octo-u-mono">cms-update</code> PRs · open and merged
-            </p>
-          </div>
-          {recentPRsQ.isPending && !recentPRsQ.data ? (
-            <RecentPullRequestsSkeleton />
-          ) : recentPRs.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <div className="octo-pr-list__card">
-              {recentPRs.map((pr, i) => (
-                <PullRequestRow key={pr.prNumber} pr={pr} isLast={i === recentPRs.length - 1} />
-              ))}
-            </div>
-          )}
+    <>
+      <h2 className="octo-pr-list__heading">Recent pull requests</h2>
+      <p className="octo-pr-list__sub">
+        Latest <code className="octo-u-mono">cms-update</code> PRs · open and merged
+      </p>
+      {recentPRsQ.isPending && !recentPRsQ.data ? (
+        <RecentPullRequestsSkeleton />
+      ) : recentPRs.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="octo-pr-list__card">
+          {recentPRs.map((pr, i) => (
+            <PullRequestRow key={pr.prNumber} pr={pr} isLast={i === recentPRs.length - 1} />
+          ))}
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
 

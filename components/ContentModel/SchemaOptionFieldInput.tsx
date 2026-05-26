@@ -191,7 +191,7 @@ function BooleanToggle({
         <span className="octo-bool-toggle__thumb" />
       </span>
       <span>{value ? 'On' : 'Off'}</span>
-      <span className="sr-only">{label}</span>
+      <span className="octo-sr-only">{label}</span>
     </button>
   );
 }

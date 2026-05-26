@@ -931,6 +931,10 @@
     flex-direction: column;
   }
 
+  .octo-field + .octo-field {
+    margin-top: var(--v-gap);
+  }
+
   .octo-field__header {
     display: flex;
     align-items: baseline;
@@ -1312,6 +1316,7 @@
     user-select: none;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
     border-radius: 10px;
     padding: 8px 10px;
     font-size: 14px;
@@ -1406,6 +1411,8 @@
     margin: 4px -4px;
     height: 1px;
     background: var(--border);
+    overflow: hidden;
+    border: none;
   }
 
   .octo-dropdown__shortcut {
@@ -2393,8 +2400,7 @@
     padding: 12px var(--h-gap-lg);
     box-shadow:
       -400px 0 0 var(--bg),
-      400px 0 0 var(--bg),
-      0 2px 8px var(--bg);
+      400px 0 0 var(--bg);
     backdrop-filter: blur(4px);
 
     &[class*='--skel'] {
@@ -2517,12 +2523,7 @@
   .octo-page-sidebar__bar {
     position: sticky;
     top: 120px;
-    z-index: 41;
     height: calc(100vh - 120px - 6px);
-
-    /* max-height: calc(100vh - 120px - 40px); */
-
-    /* min-height: calc(100vh - 120px - 6px); */
     overflow-y: auto;
     padding: 10px 8px;
     background: var(--surface-2);
@@ -2877,8 +2878,6 @@
   /* ── octo-pr-list (RecentPullRequests) ── */
   .octo-pr-list__wrap {
     flex: 1;
-    overflow: auto;
-    padding: 20px 24px 48px;
   }
 
   .octo-pr-list__inner {
@@ -2890,12 +2889,13 @@
   .octo-pr-list__heading {
     font-size: 14px;
     font-weight: 600;
+    margin: 0 0 5px;
   }
 
   .octo-pr-list__sub {
-    margin-top: 2px;
     font-size: 12px;
     color: var(--muted);
+    margin: 0 0 var(--v-gap);
   }
 
   .octo-pr-list__card {
@@ -4254,6 +4254,7 @@
     border: 1px solid var(--border);
     background: var(--bg);
     text-align: left;
+    padding: 0;
     transition:
       border-color 120ms,
       box-shadow 120ms;
@@ -5565,6 +5566,7 @@
     padding: 6px 10px;
     font-size: 12px;
     cursor: pointer;
+    color: var(--text);
     transition:
       background-color 120ms,
       border-color 120ms;
@@ -5577,7 +5579,6 @@
     &[class*='--on'] {
       border-color: var(--primary);
       background: color-mix(in oklab, var(--primary) 10%, transparent);
-      color: var(--text);
 
       .octo-bool-toggle__track {
         background: var(--primary);

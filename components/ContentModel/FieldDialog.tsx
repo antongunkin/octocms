@@ -587,7 +587,7 @@ function ChangeTypeMenu({
         className="octo-button octo-button--icon-xs"
         onClick={() => setOpenPicker((v) => !v)}
       >
-        Change type
+        <Icon.Pencil className="octo-icon-xs" aria-label="Change type" />
       </Button>
       {openPicker ? (
         <div className="octo-change-type-popover">
