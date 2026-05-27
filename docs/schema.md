@@ -309,3 +309,29 @@ Write your bio content here in Markdown.
   }
 }
 ```
+
+## Recipe (`recipe`)
+
+- **Type:** hasMany (multiple entries)
+- **Path:** `cms/content/recipe/recipe-<uuid>.json`
+
+### Fields
+
+| Field | Label | Format | Required | Storage notes |
+| --- | --- | --- | --- | --- |
+| `title` | Title | `string` | yes | plain text |
+
+### Example entry JSON
+
+```json
+{
+  "sys": {
+    "id": "<uuid>",
+    "type": "recipe",
+    "status": "draft"
+  },
+  "fields": {
+    "title": "Example title"
+  }
+}
+```

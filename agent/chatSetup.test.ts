@@ -31,6 +31,7 @@ const localConfig: AgentConfig = {
 describe('isChatAgentReady', () => {
   it('returns false when agentConfig is missing', () => {
     expect(isChatAgentReady(undefined)).toBe(false);
+    expect(isChatAgentReady(null)).toBe(false);
   });
 
   it('returns false when the provider key is missing', () => {
@@ -44,7 +45,7 @@ describe('isChatAgentReady', () => {
 
 describe('buildChatSetupInfo', () => {
   it('describes missing agentConfig export', () => {
-    const setup = buildChatSetupInfo(undefined);
+    const setup = buildChatSetupInfo(null);
     expect(setup.reason).toBe('no-config');
     expect(setup.docsHref).toBe(CHAT_AGENT_DOCS_HREF);
     expect(setup.steps.some((s) => s.detail.includes('agentConfig'))).toBe(true);

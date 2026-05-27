@@ -4033,6 +4033,13 @@
   }
 
   /* ── octo-media-left-panel (MediaLeftPanel) ── */
+  .octo-media-left-panel__folder-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 20px;
+  }
+
   .octo-media-left-panel__folders-header {
     display: flex;
     align-items: center;
@@ -4135,12 +4142,34 @@
   .octo-media-select-dialog__body {
     display: flex;
     flex: 1;
+    min-height: 0;
     overflow: hidden;
+  }
+
+  .octo-media-select-dialog__sidebar {
+    display: flex;
+    width: 248px;
+    flex-shrink: 0;
+    flex-direction: column;
+    min-height: 0;
+    border-right: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .octo-media-select-dialog__sidebar-inner {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    padding: 12px 10px 16px;
   }
 
   .octo-media-select-dialog__content {
     display: flex;
     flex: 1;
+    min-width: 0;
     flex-direction: column;
     overflow: hidden;
   }
@@ -5737,7 +5766,15 @@
 
   /* ── octo-chat-composer ── */
   .octo-chat-composer {
-    background: var(--bg);
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    flex-shrink: 0;
+    background: color-mix(in srgb, var(--bg) 95%, transparent);
+    backdrop-filter: blur(4px);
+    box-shadow:
+      -400px 0 0 var(--bg),
+      400px 0 0 var(--bg);
   }
 
   .octo-chat-composer--dragover {
@@ -6003,6 +6040,17 @@
     }
   }
 
+  .octo-tool-call-card__toggle {
+    background: none;
+    border: none;
+    padding: 6px;
+    margin: 0;
+    font-size: 12px;
+    color: var(--text);
+    width: 100%;
+    text-align: left;
+  }
+
   .octo-tool-call-card__chevron {
     flex-shrink: 0;
     transition: transform 120ms;
@@ -6015,11 +6063,13 @@
   .octo-tool-call-card__icon {
     flex-shrink: 0;
     color: var(--muted);
+    margin-right: 10px;
   }
 
   .octo-tool-call-card__name {
     font-family: var(--ft-mono);
     font-weight: 600;
+    margin-right: 10px;
   }
 
   .octo-tool-call-card__preview {
@@ -6033,6 +6083,7 @@
 
   .octo-tool-call-card__status {
     flex-shrink: 0;
+    margin-left: 10px;
   }
 
   .octo-tool-call-card__body {
@@ -6333,11 +6384,19 @@
     min-height: 0;
     flex: 1;
     flex-direction: column;
+    height: calc(100dvh - var(--header-height));
+  }
+
+  .octo-chat-page .octo-page-row {
+    min-height: 0;
+    flex: 1;
+    overflow: hidden;
   }
 
   .octo-chat-page .octo-page-content {
     min-height: 0;
     overflow: hidden;
+    padding-top: 0;
     padding-bottom: 0;
   }
 
@@ -6462,6 +6521,7 @@
   }
 
   .octo-chat__scroller {
+    min-height: 0;
     flex: 1;
     overflow-y: auto;
   }

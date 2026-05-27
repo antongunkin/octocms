@@ -105,21 +105,25 @@ export function MediaSelectDialog({ open, onOpenChange, selectedId, onSelect }: 
         </DialogHeader>
 
         <div className="octo-media-select-dialog__body">
-          <MediaLeftPanel
-            folders={folders}
-            selectedFolder={selectedFolder}
-            countByFolder={countByFolder}
-            totalCount={files.length}
-            customFolders={[]}
-            onSelectAll={() => setSelectedFolder(null)}
-            onSelectFolder={(f) => setSelectedFolder(f)}
-            onAddFolder={() => {
-              /* folder management lives on /cms/media — not exposed here */
-            }}
-            onDeleteFolder={() => {
-              /* folder management lives on /cms/media — not exposed here */
-            }}
-          />
+          <aside className="octo-media-select-dialog__sidebar" aria-label="Folders">
+            <div className="octo-media-select-dialog__sidebar-inner">
+              <MediaLeftPanel
+                folders={folders}
+                selectedFolder={selectedFolder}
+                countByFolder={countByFolder}
+                totalCount={files.length}
+                customFolders={[]}
+                onSelectAll={() => setSelectedFolder(null)}
+                onSelectFolder={(f) => setSelectedFolder(f)}
+                onAddFolder={() => {
+                  /* folder management lives on /cms/media — not exposed here */
+                }}
+                onDeleteFolder={() => {
+                  /* folder management lives on /cms/media — not exposed here */
+                }}
+              />
+            </div>
+          </aside>
 
           <div className="octo-media-select-dialog__content">
             <div className="octo-media-select-dialog__toolbar">
