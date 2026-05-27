@@ -457,7 +457,7 @@ export default async function HelloPage() {
 export function readmeTemplate(projectName: string): string {
   return `# ${projectName}
 
-Built with [OctoCMS](https://octocms.com) — a file-based CMS on Next.js.
+Built with [OctoCMS](https://octocms.gunkin.dev) — a file-based CMS on Next.js.
 
 ## Setup
 
@@ -474,7 +474,7 @@ npm install octocms next-auth @tanstack/react-query @mdxeditor/editor \\
 
 ### 2. Create a GitHub App
 
-Follow the [OctoCMS GitHub App setup guide](https://octocms.com/docs/github-app) to create a GitHub App for authentication.
+Follow the [OctoCMS GitHub App setup guide](https://octocms.gunkin.dev/docs/github-app) to create a GitHub App for authentication.
 
 ### 3. Configure environment variables
 

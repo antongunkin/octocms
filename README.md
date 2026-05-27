@@ -2,7 +2,7 @@
 
 A file-based CMS for Next.js. Schema defined in TypeScript, content stored as JSON files, Git-backed, no database.
 
-**[octocms.com](https://octocms.com)** · [Docs](https://octocms.com/docs)
+**[octocms.gunkin.dev](https://octocms.gunkin.dev)** · [Docs](https://octocms.gunkin.dev/docs)
 
 ## Requirements
 

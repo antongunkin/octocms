@@ -18,7 +18,7 @@ describe('ChatAgentSetup', () => {
     expect(screen.getByTestId('chat-agent-setup')).toBeDefined();
     expect(screen.getByRole('heading', { name: setup.headline })).toBeDefined();
     expect(screen.getByRole('link', { name: /Open setup guide/i }).getAttribute('href')).toBe(
-      'https://octocms.com/docs/chat-agent',
+      'https://octocms.gunkin.dev/docs/chat-agent',
     );
     expect(
       screen.getByText('Add agent settings to your project', { selector: '.octo-chat-setup__step-title' }),

@@ -2,7 +2,7 @@ import { getAgentStatus } from './featureFlag';
 import type { AgentConfig, AgentProvider } from './types';
 
 /** OctoCMS product documentation — linked from the in-admin setup screen. */
-export const CHAT_AGENT_DOCS_HREF = 'https://octocms.com/docs/chat-agent';
+export const CHAT_AGENT_DOCS_HREF = 'https://octocms.gunkin.dev/docs/chat-agent';
 
 export type ChatSetupReason = 'no-config' | 'no-key' | 'budget-exceeded';
 
