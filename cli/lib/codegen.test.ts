@@ -218,7 +218,9 @@ describe('generateEnums', () => {
 
   it('generates COLLECTION_NAMES array', () => {
     const out = generateEnums(cfg, collections, fieldTypes);
-    expect(out).toContain("export const COLLECTION_NAMES = ['post'] as const;");
+    expect(out).toContain('export const COLLECTION_NAMES = [');
+    expect(out).toContain("  'post',");
+    expect(out).toContain('] as const;');
   });
 
   it('generates select option enums', () => {

@@ -76,7 +76,9 @@ describe('typesGen end-to-end output', () => {
     const out = generateEnums(config, collections, fieldTypes);
     expect(out).toContain("Post: 'post',");
     expect(out).toContain("Author: 'author',");
-    expect(out).toContain("COLLECTION_NAMES = ['post', 'author'] as const;");
+    expect(out).toContain('COLLECTION_NAMES = [');
+    expect(out).toContain("  'post',");
+    expect(out).toContain("  'author',");
   });
 
   it('generates content declarations with raw types', () => {

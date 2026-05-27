@@ -532,12 +532,19 @@ export function agentsMdSection(): string {
   return `${AGENT_DOCS_MARKER}
 ## OctoCMS — AI Content Management
 
-For tasks that involve creating, editing, or deleting CMS content directly (without the admin UI), read the auto-generated agent docs:
+For tasks that involve creating, editing, or deleting CMS content directly (without the admin UI), read these docs:
 
-- **\`octocms/docs/overview.md\`** — How to find, create, update, and delete content entries via file operations
-- **\`octocms/docs/schema.md\`** — Per-collection field definitions, example JSON, and file path conventions
+**Package docs (content-agnostic, stable):**
 
-These docs are generated from \`cms/octocms.config.ts\`. Regenerate after schema changes: \`npm run agent-docs:gen\`.`;
+- **\`octocms/docs/overview.md\`** — Generic content management (CRUD, entry shape, status values)
+- **\`octocms/docs/editing-schema.md\`** — How to edit \`cms/schema.json\` safely
+
+**Project docs (auto-generated from \`cms/schema.json\`):**
+
+- **\`cms/__generated__/agent-docs/schema.md\`** — Per-collection field definitions and example JSON
+- **\`cms/__generated__/agent-docs/collections.md\`** — Collection list and URL mapping
+
+Regenerate project docs after schema changes: \`npm run agent-docs:gen\` (or \`npm run types:gen\`).`;
 }
 
 export function agentsMdTemplate(): string {

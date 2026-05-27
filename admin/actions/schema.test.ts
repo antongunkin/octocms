@@ -623,7 +623,7 @@ describe('saveSchema', () => {
     const writtenPaths = mockedFs.writeFile.mock.calls.map((c) => String(c[0]));
     expect(writtenPaths.some((p) => p.endsWith('cms/schema.json'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('cms/__generated__/types.ts'))).toBe(true);
-    expect(writtenPaths.some((p) => p.endsWith('octocms/docs/schema.md'))).toBe(true);
+    expect(writtenPaths.some((p) => p.endsWith('cms/__generated__/agent-docs/schema.md'))).toBe(true);
 
     // No GitHub commit in dev
     expect(mockedGithub.commitMultipleFilesToGitHub).not.toHaveBeenCalled();
@@ -664,7 +664,7 @@ describe('saveSchema', () => {
     const paths = batch.map((c) => c.path);
     expect(paths).toContain('cms/schema.json');
     expect(paths).toContain('cms/__generated__/types.ts');
-    expect(paths).toContain('octocms/docs/schema.md');
+    expect(paths).toContain('cms/__generated__/agent-docs/schema.md');
     // Every change is an upsert-text since no entries were affected.
     expect(batch.every((c) => c.kind === 'upsert-text')).toBe(true);
 

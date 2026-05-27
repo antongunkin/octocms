@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CollectionField, Config } from '../../types';
-import { generateAgentIndex, generateAgentOverview, generateAgentSchema, placeholderValue } from './agentDocs';
+import { generateAgentCollections, generateAgentIndex, generateAgentSchema, placeholderValue } from './agentDocs';
 
 // ---------------------------------------------------------------------------
 // Shared fixtures
@@ -202,41 +202,32 @@ describe('placeholderValue', () => {
 });
 
 // ---------------------------------------------------------------------------
-// generateAgentOverview
+// generateAgentCollections
 // ---------------------------------------------------------------------------
 
-describe('generateAgentOverview', () => {
+describe('generateAgentCollections', () => {
   it('includes banner', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
+    const out = generateAgentCollections(minimalConfig, collections);
     expect(out).toContain('AUTO-GENERATED');
   });
 
   it('includes title', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
-    expect(out).toContain('# OctoCMS — Content Management for AI Agents');
+    const out = generateAgentCollections(minimalConfig, collections);
+    expect(out).toContain('# OctoCMS — Collections Reference for AI Agents');
   });
 
-  it('includes content folder path', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
-    expect(out).toContain('cms/content/');
-  });
-
-  it('includes entry JSON structure', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
-    expect(out).toContain('"sys"');
-    expect(out).toContain('"fields"');
-  });
-
-  it('includes status table', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
-    expect(out).toContain('`draft`');
-    expect(out).toContain('`published`');
-    expect(out).toContain('`archived`');
+  it('includes collections summary table', () => {
+    const out = generateAgentCollections(richConfig, richCollections);
+    expect(out).toContain('| `post` |');
+    expect(out).toContain('| `homePage` |');
+    expect(out).toContain('hasMany');
+    expect(out).toContain('singleton');
   });
 
   it('includes companion file section when markdown fields exist', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
-    expect(out).toContain('Companion files');
+    const out = generateAgentCollections(minimalConfig, collections);
+    expect(out).toContain('Companion files in this project');
+    expect(out).toContain('body');
     expect(out).toContain('.body.md');
   });
 
@@ -251,48 +242,25 @@ describe('generateAgentOverview', () => {
         },
       },
     };
-    const out = generateAgentOverview(noCompanionConfig, ['simple']);
-    expect(out).not.toContain('Companion files');
+    const out = generateAgentCollections(noCompanionConfig, ['simple']);
+    expect(out).not.toContain('Companion files in this project');
   });
 
   it('includes URL mapping table when search config exists', () => {
-    const out = generateAgentOverview(richConfig, richCollections);
+    const out = generateAgentCollections(richConfig, richCollections);
     expect(out).toContain('URL to collection mapping');
     expect(out).toContain('/blog/:slug');
     expect(out).toContain('`post`');
   });
 
   it('omits URL mapping when no search config', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
+    const out = generateAgentCollections(minimalConfig, collections);
     expect(out).not.toContain('URL to collection mapping');
   });
 
-  it('includes collections summary table', () => {
-    const out = generateAgentOverview(richConfig, richCollections);
-    expect(out).toContain('| `post` |');
-    expect(out).toContain('| `homePage` |');
-    expect(out).toContain('hasMany');
-    expect(out).toContain('singleton');
-  });
-
-  it('includes CRUD sections', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
-    expect(out).toContain('## Creating a new entry');
-    expect(out).toContain('## Updating an entry');
-    expect(out).toContain('## Deleting an entry');
-  });
-
-  it('includes add collection section', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
-    expect(out).toContain('## Adding a new collection');
-    expect(out).toContain('cms/schema.json');
-    expect(out).toContain("query('collectionName')");
-  });
-
-  it('points readers at editing-schema.md as the source of truth', () => {
-    const out = generateAgentOverview(minimalConfig, collections);
-    expect(out).toContain('## Where the schema lives');
-    expect(out).toContain('editing-schema.md');
+  it('points readers at package overview', () => {
+    const out = generateAgentCollections(minimalConfig, collections);
+    expect(out).toContain('octocms/docs/overview.md');
   });
 });
 
@@ -418,10 +386,16 @@ describe('generateAgentIndex', () => {
     expect(out).toContain('AUTO-GENERATED');
   });
 
-  it('includes links to overview and schema', () => {
+  it('includes links to project docs', () => {
     const out = generateAgentIndex();
-    expect(out).toContain('./overview.md');
     expect(out).toContain('./schema.md');
+    expect(out).toContain('./collections.md');
+  });
+
+  it('includes package doc references', () => {
+    const out = generateAgentIndex();
+    expect(out).toContain('octocms/docs/overview.md');
+    expect(out).toContain('octocms/docs/editing-schema.md');
   });
 
   it('includes AGENTS.md usage instructions', () => {

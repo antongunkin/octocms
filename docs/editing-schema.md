@@ -2,7 +2,7 @@
 
 This document is **hand-written** and stable across schema changes. It describes how to safely edit `cms/schema.json` directly — the source of truth for the OctoCMS data model.
 
-The auto-generated [`schema.md`](./schema.md) describes the *current* schema (collections and fields). This file describes *how to edit* the schema.
+The auto-generated `cms/__generated__/agent-docs/schema.md` describes the *current* schema (collections and fields). This file describes *how to edit* the schema.
 
 ## File location
 
@@ -118,7 +118,7 @@ Every field has at minimum a `label` and a `format`. Every format supports the c
 | `reference` | Reference key string `"type-id.json"` (or array when cardinality `many`) | `reference: { collections?, cardinality?, min?, max? }` |
 | `conditional` | JSON object (branch-dependent) | `conditional: { branches: [...] }` |
 
-For the *current* per-collection field shapes and example JSON, see the auto-generated [`schema.md`](./schema.md) — it is regenerated from `cms/schema.json` on every `npm run agent-docs:gen`.
+For the *current* per-collection field shapes and example JSON, see `cms/__generated__/agent-docs/schema.md` — it is regenerated from `cms/schema.json` on every `npm run agent-docs:gen`.
 
 ## Validation invariants
 
@@ -144,14 +144,14 @@ Workflow for hand-edits:
 2. Run **`npm run types:gen`**. This:
    - Validates the schema (`validateConfig`).
    - Regenerates `cms/__generated__/schema.ts`, `types.ts`, `enums.ts`, `content.d.ts`, `index.ts`, `query.ts`, `configInit.ts`.
+   - Regenerates `cms/__generated__/agent-docs/` when you run `npm run agent-docs:gen` (also included in `npm run types:gen`).
    - Fails fast with a clear error message if a rule is violated.
 3. Run **`npm run docs:gen`** to refresh `docs/generated/schema.md`.
-4. Run **`npm run agent-docs:gen`** to refresh `octocms/docs/overview.md` and `octocms/docs/schema.md`.
-5. Run **`npm run checks`** to verify everything is consistent (lint, typecheck, format, all generated files up-to-date, unit tests).
-6. Commit `cms/schema.json` plus every regenerated file in the same commit. Production CI enforces this — `npm run types:check`, `docs:check`, and `agent-docs:check` all fail if generated files drift.
+4. Run **`npm run checks`** to verify everything is consistent (lint, typecheck, format, all generated files up-to-date, unit tests).
+5. Commit `cms/schema.json` plus every regenerated file in the same commit. Production CI enforces this — `npm run types:check` and `docs:check` fail if generated files drift.
 
 > [!IMPORTANT]
-> Always commit `cms/schema.json` together with the regenerated files in `cms/__generated__/`, `docs/generated/`, and `octocms/docs/`. CI will reject a commit where they have drifted. The visual editor (`/cms/model`) commits all of these atomically; hand-edits must run the regenerators yourself.
+> Always commit `cms/schema.json` together with the regenerated files in `cms/__generated__/` and `docs/generated/`. CI will reject a commit where they have drifted. The visual editor (`/cms/model`) commits all of these atomically; hand-edits must run the regenerators yourself.
 
 ## Migrating existing content
 
@@ -177,12 +177,13 @@ The per-build pointer files under `cms/pointers/` (and optional `CMS_BRANCH`) co
 
 ## Field-format reference
 
-For the full per-format option set and current examples, see the auto-generated [`schema.md`](./schema.md). The static field-format catalogue and option types are encoded in [`octocms/schema/fieldFormats.ts`](../schema/fieldFormats.ts) (`FIELD_FORMAT_META`) — that registry drives both the visual editor's "Add Field" dialog and the auto-generated docs, so adding a new format means editing the registry.
+For the full per-format option set and current examples, see `cms/__generated__/agent-docs/schema.md`. The static field-format catalogue and option types are encoded in [`octocms/schema/fieldFormats.ts`](../schema/fieldFormats.ts) (`FIELD_FORMAT_META`) — that registry drives both the visual editor's "Add Field" dialog and the auto-generated docs, so adding a new format means editing the registry.
 
 ## Related docs
 
-- [`overview.md`](./overview.md) — How to manage **content entries** (auto-generated from the schema).
-- [`schema.md`](./schema.md) — Per-collection field definitions and example JSON for the **current** schema (auto-generated).
+- [`overview.md`](./overview.md) — Generic content entry management (package doc, stable).
+- `cms/__generated__/agent-docs/schema.md` — Per-collection field definitions and example JSON for the **current** project schema (auto-generated).
+- `cms/__generated__/agent-docs/collections.md` — Collection list and URL mapping for the **current** project (auto-generated).
 - [`docs/content-model.md`](../../docs/content-model.md) — Developer-facing description of entry storage.
 - [`docs/content-model-editor.md`](../../docs/content-model-editor.md) — How to use the visual editor at `/cms/model`.
 - [`docs/schema-editor.md`](../../docs/schema-editor.md) — Programmatic schema editing API (`diffSchema`, `migrateEntry`, `previewSchemaChange`, `saveSchema`).

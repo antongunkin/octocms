@@ -7,7 +7,7 @@
 
 import { FIELD_FORMATS } from '../../schema/fieldFormats';
 import type { CollectionField, Config, ConditionalBranchConfig } from '../../types';
-import { generateAgentIndex, generateAgentOverview, generateAgentSchema } from './agentDocs';
+import { generateAgentCollections, generateAgentIndex, generateAgentSchema } from './agentDocs';
 import { generateSchemaDocs } from './schemaDocs';
 import { validateConfig } from './validateConfig';
 
@@ -186,7 +186,11 @@ export function generateEnums(cfg: Config, collectionNames: readonly string[], f
   lines.push('');
 
   // COLLECTION_NAMES array
-  lines.push(`export const COLLECTION_NAMES = [${collectionNames.map((k) => `'${k}'`).join(', ')}] as const;`);
+  lines.push('export const COLLECTION_NAMES = [');
+  for (const key of collectionNames) {
+    lines.push(`  '${key}',`);
+  }
+  lines.push('] as const;');
   lines.push('');
 
   // Select option enums per collection
@@ -454,9 +458,9 @@ export function regenerateAll(cfg: Config): { files: Record<string, string> } {
       'cms/__generated__/query.ts': generateQuery(),
       'cms/__generated__/configInit.ts': generateConfigInit(),
       'docs/generated/schema.md': generateSchemaDocs(cfg, collectionNames, FIELD_FORMATS),
-      'octocms/docs/index.md': generateAgentIndex(),
-      'octocms/docs/overview.md': generateAgentOverview(cfg, collectionNames),
-      'octocms/docs/schema.md': generateAgentSchema(cfg, collectionNames),
+      'cms/__generated__/agent-docs/index.md': generateAgentIndex(),
+      'cms/__generated__/agent-docs/collections.md': generateAgentCollections(cfg, collectionNames),
+      'cms/__generated__/agent-docs/schema.md': generateAgentSchema(cfg, collectionNames),
     },
   };
 }

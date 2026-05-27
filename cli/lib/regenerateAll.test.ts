@@ -25,6 +25,9 @@ describe('regenerateAll', () => {
   it('produces the full set of schema-driven artifacts', () => {
     const { files } = regenerateAll(minimalConfig);
     expect(Object.keys(files).sort()).toEqual([
+      'cms/__generated__/agent-docs/collections.md',
+      'cms/__generated__/agent-docs/index.md',
+      'cms/__generated__/agent-docs/schema.md',
       'cms/__generated__/configInit.ts',
       'cms/__generated__/content.d.ts',
       'cms/__generated__/enums.ts',
@@ -34,9 +37,6 @@ describe('regenerateAll', () => {
       'cms/__generated__/types.ts',
       'cms/schema.json',
       'docs/generated/schema.md',
-      'octocms/docs/index.md',
-      'octocms/docs/overview.md',
-      'octocms/docs/schema.md',
     ]);
   });
 

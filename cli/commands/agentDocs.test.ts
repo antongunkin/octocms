@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { agentDocsCommand } from './agentDocs';
+import { agentDocsCommand, upsertAgentsMdSection } from './agentDocs';
 import { agentsMdSection, agentsMdTemplate } from '../lib/templates';
 
 const TMP_DIR = join(process.cwd(), '.tmp-agent-docs-test');
@@ -13,6 +13,24 @@ beforeEach(() => {
 
 afterEach(() => {
   rmSync(TMP_DIR, { recursive: true, force: true });
+});
+
+describe('upsertAgentsMdSection', () => {
+  it('appends when marker is absent', () => {
+    const out = upsertAgentsMdSection('# Existing\n', agentsMdSection());
+    expect(out).toContain('# Existing');
+    expect(out).toContain(MARKER);
+  });
+
+  it('replaces existing section when marker is present', () => {
+    const stale = `# Existing\n\n${agentsMdSection()}\n\n## Other\n\nKeep me.\n`;
+    const updated = upsertAgentsMdSection(stale, `${MARKER}\n## OctoCMS — Updated\n`);
+    expect(updated).toContain('# Existing');
+    expect(updated).toContain('## OctoCMS — Updated');
+    expect(updated).toContain('## Other');
+    expect(updated).toContain('Keep me.');
+    expect(updated.split(MARKER).length - 1).toBe(1);
+  });
 });
 
 describe('agentDocsCommand', () => {
@@ -29,7 +47,8 @@ describe('agentDocsCommand', () => {
     const content = readFileSync(join(TMP_DIR, 'AGENTS.md'), 'utf8');
     expect(content).toContain(MARKER);
     expect(content).toContain('octocms/docs/overview.md');
-    expect(content).toContain('octocms/docs/schema.md');
+    expect(content).toContain('cms/__generated__/agent-docs/schema.md');
+    expect(content).toContain('cms/__generated__/agent-docs/collections.md');
   });
 
   it('appends section to existing AGENTS.md without marker', async () => {
@@ -45,14 +64,16 @@ describe('agentDocsCommand', () => {
     expect(content).toContain('octocms/docs/overview.md');
   });
 
-  it('does not duplicate section when marker already present', async () => {
-    writeFileSync(join(TMP_DIR, 'AGENTS.md'), agentsMdTemplate(), 'utf8');
+  it('replaces section when marker already present', async () => {
+    const stale = `# Existing\n\n${MARKER}\n## OctoCMS — AI Content Management\n\n- \`octocms/docs/schema.md\`\n`;
+    writeFileSync(join(TMP_DIR, 'AGENTS.md'), stale, 'utf8');
 
     await agentDocsCommand(TMP_DIR);
 
     const content = readFileSync(join(TMP_DIR, 'AGENTS.md'), 'utf8');
-    const markerCount = content.split(MARKER).length - 1;
-    expect(markerCount).toBe(1);
+    expect(content.split(MARKER).length - 1).toBe(1);
+    expect(content).not.toContain('octocms/docs/schema.md');
+    expect(content).toContain('cms/__generated__/agent-docs/schema.md');
   });
 
   it('preserves existing content when appending', async () => {
