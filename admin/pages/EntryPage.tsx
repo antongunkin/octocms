@@ -1,12 +1,11 @@
 import { redirect } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { getServerSession } from 'next-auth';
 import React from 'react';
 
 import { EditPostPageSkeleton } from '../../components/EditPost/skeletons/EditPostPageSkeleton';
 import { FileContextProvider } from '../../hooks/useFileState';
 import { getConfig } from '../../lib/configStore';
-import { authOptions } from '../auth';
+import { getCmsSession } from '../auth/session';
 
 const EditPost = dynamic(() => import('../../components/EditPost/EditPost'), {
   loading: () => <EditPostPageSkeleton />,
@@ -33,7 +32,7 @@ export async function EntryPage({ params }: { params: Promise<{ type: string; id
     redirect(`/cms/media/${id}`);
   }
 
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
 
   if (!session) {
     return null;

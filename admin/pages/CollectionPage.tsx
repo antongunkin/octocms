@@ -1,18 +1,17 @@
 import { redirect } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { getServerSession } from 'next-auth';
 import React from 'react';
 
 import { DashboardCollectionPageSkeleton } from '../../components/Dashboard/skeletons/DashboardCollectionPageSkeleton';
 import { getConfig } from '../../lib/configStore';
-import { authOptions } from '../auth';
+import { getCmsSession } from '../auth/session';
 
 const DashboardContent = dynamic(() => import('../../components/Dashboard/DashboardContent'), {
   loading: () => <DashboardCollectionPageSkeleton />,
 });
 
 export async function CollectionPage({ params }: { params: Promise<{ type: string }> }) {
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
 
   if (!session) {
     return null;

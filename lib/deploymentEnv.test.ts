@@ -41,7 +41,7 @@ describe('deploymentEnv', () => {
     expect(getProductionEnvIssues()).toEqual([]);
   });
 
-  it('requires NextAuth and GitHub OAuth vars in production when GitHub content mode is off', () => {
+  it('requires auth env vars in production when GitHub content mode is off', () => {
     mockIsProductionMode.mockReturnValue(false);
     vi.stubEnv('NEXTAUTH_SECRET', undefined);
     vi.stubEnv('NEXTAUTH_URL', undefined);

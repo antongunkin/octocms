@@ -48,7 +48,7 @@ export function ChatAgentSetup({ setup }: Props) {
 
         <p className="octo-chat-setup__footer">
           Messages cannot be sent until credentials and config are in place. API routes at{' '}
-          <code className="octo-u-mono">/api/agent</code> also return 404 until then — that is expected.
+          <code className="octo-u-mono">/api/octocms/agent</code> also return 404 until then — that is expected.
         </p>
       </div>
     </Page>

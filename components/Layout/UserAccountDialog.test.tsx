@@ -4,8 +4,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const signOutMock = vi.fn();
 
-vi.mock('next-auth/react', () => ({
-  signOut: (...args: unknown[]) => signOutMock(...args),
+vi.mock('../../hooks/useCmsSession', () => ({
+  useCmsSession: () => ({
+    data: { user: { id: '1', name: 'Jane Doe' } },
+    status: 'authenticated',
+    signIn: vi.fn(),
+    signOut: (...args: unknown[]) => signOutMock(...args),
+  }),
 }));
 
 vi.mock('../../admin/theme', () => ({

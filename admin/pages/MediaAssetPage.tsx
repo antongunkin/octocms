@@ -1,10 +1,9 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { getServerSession } from 'next-auth';
 
 import { MediaAssetPageSkeleton } from '../../components/MediaAsset/skeletons/MediaAssetPageSkeleton';
 import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
-import { authOptions } from '../auth';
+import { getCmsSession } from '../auth/session';
 
 const MediaAsset = dynamic(() => import('../../components/MediaAsset/MediaAsset'), {
   loading: () => <MediaAssetPageSkeleton />,
@@ -18,7 +17,7 @@ const MediaAsset = dynamic(() => import('../../components/MediaAsset/MediaAsset'
  * instant from the warm cache.
  */
 export async function MediaAssetPage({ id }: { id: string }) {
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
   if (!session) return null;
 
   return (

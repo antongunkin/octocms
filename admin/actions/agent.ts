@@ -2,12 +2,10 @@
 
 import './registerConfig';
 
-import { getServerSession } from 'next-auth/next';
-
 import { getAgentConfig } from '../../agent/configStore';
 import { getAgentStatus, isAgentEnabled } from '../../agent/featureFlag';
 import { acceptProposal, isProposal, type AcceptResult } from '../../agent/proposals';
-import { authOptions } from '../auth';
+import { getCmsSession } from '../auth/session';
 
 export type AgentClientStatus =
   | { enabled: false }
@@ -59,7 +57,7 @@ export async function acceptProposalAction(proposal: unknown): Promise<AcceptPro
     throw new Error('Chat agent is disabled.');
   }
 
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
   if (!session) {
     throw new Error('Unauthorized.');
   }
@@ -95,7 +93,7 @@ export async function rejectProposalAction(_reason?: string | null): Promise<{ o
     throw new Error('Chat agent is disabled.');
   }
 
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
   if (!session) {
     throw new Error('Unauthorized.');
   }

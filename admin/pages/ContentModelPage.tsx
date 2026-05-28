@@ -1,9 +1,8 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { getServerSession } from 'next-auth';
 
 import { ContentModelListPageSkeleton } from '../../components/ContentModel/skeletons/ContentModelListPageSkeleton';
-import { authOptions } from '../auth';
+import { getCmsSession } from '../auth/session';
 
 const ContentModelList = dynamic(() => import('../../components/ContentModel/ContentModelList'), {
   loading: () => <ContentModelListPageSkeleton />,
@@ -15,7 +14,7 @@ const ContentModelList = dynamic(() => import('../../components/ContentModel/Con
  * pending. See `octocms/admin/query/hooks/useSchema.ts`.
  */
 export async function ContentModelPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
 
   if (!session) {
     return null;

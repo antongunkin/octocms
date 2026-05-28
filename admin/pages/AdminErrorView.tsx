@@ -10,7 +10,7 @@ import { isContentSourceError, parseContentSourceFromMessage } from '../../lib/c
  * standard `{ error, reset }` props and renders the shared `AdminErrorView`.
  *
  * Wired into the user app via a one-line re-export:
- *   `export { AdminError as default } from 'octocms/admin'`
+ *   `export { AdminError as default } from 'octocms/admin/error'`
  */
 export function AdminError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return <AdminErrorView error={error} reset={reset} />;

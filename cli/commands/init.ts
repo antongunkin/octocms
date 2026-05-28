@@ -19,6 +19,8 @@ import {
   buildAdminPageTemplate,
   agentChatRouteTemplate,
   mediaRouteTemplate,
+  searchRouteTemplate,
+  octocmsAuthRouteTemplate,
   demoHelloPageJson,
   envLocalTemplate,
   generatedConfigInitTemplate,
@@ -29,7 +31,6 @@ import {
   generatedQueryTemplate,
   generatedTypesTemplate,
   helloPageTemplate,
-  nextAuthRouteTemplate,
   nextConfigTemplate,
   octoConfigTemplate,
   schemaJsonTemplate,
@@ -49,9 +50,9 @@ import {
  */
 const REQUIRED_PEER_DEPS: readonly string[] = [
   '@mdxeditor/editor',
+  '@octokit/oauth-app',
   '@tanstack/react-query',
   'minisearch',
-  'next-auth',
   'octokit',
   'react-markdown',
   'rehype-sanitize',
@@ -192,20 +193,23 @@ export async function initCommand(projectRoot: string, options: InitOptions = {}
     }
   }
 
-  // NextAuth API route
-  const authRouteDir = join(projectRoot, 'app', 'api', 'auth', '[...nextauth]');
+  // OctoCMS auth API routes — GitHub OAuth via @octokit/oauth-app
+  const authRouteDir = join(projectRoot, 'app', 'api', 'octocms', 'auth', '[action]');
   mkdirSync(authRouteDir, { recursive: true });
-  writeFileSync(join(authRouteDir, 'route.ts'), nextAuthRouteTemplate, 'utf8');
-  log.success('app/api/auth/[...nextauth]/route.ts');
+  writeFileSync(join(authRouteDir, 'route.ts'), octocmsAuthRouteTemplate(), 'utf8');
+  log.success('app/api/octocms/auth/[action]/route.ts');
 
   // Chat-agent routes — thin re-exports of handlers in `octocms/agent`.
-  // The handlers are opt-in (the agent feature is gated by config + provider
-  // key at runtime); shipping the routes by default costs nothing when the
-  // agent is disabled — every endpoint 404s in that case.
-  const chatRouteDir = join(projectRoot, 'app', 'api', 'agent');
+  const chatRouteDir = join(projectRoot, 'app', 'api', 'octocms', 'agent');
   mkdirSync(chatRouteDir, { recursive: true });
   writeFileSync(join(chatRouteDir, 'route.ts'), agentChatRouteTemplate(), 'utf8');
-  log.success('app/api/agent/route.ts');
+  log.success('app/api/octocms/agent/route.ts');
+
+  // Public search route — consumed by `SearchBox` from `octocms/components/public`.
+  const searchRouteDir = join(projectRoot, 'app', 'api', 'octocms', 'search');
+  mkdirSync(searchRouteDir, { recursive: true });
+  writeFileSync(join(searchRouteDir, 'route.ts'), searchRouteTemplate(), 'utf8');
+  log.success('app/api/octocms/search/route.ts');
 
   // Note: chat-agent proposal accept/reject are server actions
   // (`acceptProposalAction` / `rejectProposalAction` in

@@ -39,10 +39,9 @@ beforeEach(async () => {
     getConfig: () => minimalConfig,
     setConfig: vi.fn(),
   }));
-  vi.doMock('next-auth/next', () => ({
-    getServerSession: vi.fn().mockResolvedValue({ user: { name: 'Test' } }),
+  vi.doMock('../auth/session', () => ({
+    getCmsSession: vi.fn().mockResolvedValue({ user: { id: '1', name: 'Test' } }),
   }));
-  vi.doMock('../auth', () => ({ authOptions: {} }));
   // Reset usage so spend caps don't leak between tests.
   const { resetUsage } = await import('../../agent/usage');
   resetUsage();
@@ -61,8 +60,7 @@ beforeEach(async () => {
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.doUnmock('../../lib/configStore');
-  vi.doUnmock('next-auth/next');
-  vi.doUnmock('../auth');
+  vi.doUnmock('../auth/session');
   vi.doUnmock('../../agent/proposals');
   vi.doUnmock('./registerConfig');
 });
@@ -88,7 +86,7 @@ describe('acceptProposalAction', () => {
 
   it('throws when no session', async () => {
     vi.doMock('../../agent/configStore', () => ({ getAgentConfig: () => enabledAgentConfig }));
-    vi.doMock('next-auth/next', () => ({ getServerSession: vi.fn().mockResolvedValue(null) }));
+    vi.doMock('../auth/session', () => ({ getCmsSession: vi.fn().mockResolvedValue(null) }));
     const { acceptProposalAction } = await import('./agent');
     await expect(acceptProposalAction(validEditProposal)).rejects.toThrow(/unauthorized/i);
   });
@@ -136,7 +134,7 @@ describe('rejectProposalAction', () => {
 
   it('throws when no session', async () => {
     vi.doMock('../../agent/configStore', () => ({ getAgentConfig: () => enabledAgentConfig }));
-    vi.doMock('next-auth/next', () => ({ getServerSession: vi.fn().mockResolvedValue(null) }));
+    vi.doMock('../auth/session', () => ({ getCmsSession: vi.fn().mockResolvedValue(null) }));
     const { rejectProposalAction } = await import('./agent');
     await expect(rejectProposalAction('not interested')).rejects.toThrow(/unauthorized/i);
   });

@@ -73,7 +73,7 @@ describe('initCommand', () => {
     expect(layout).toContain("from 'octocms/admin'");
     expect(page).toContain("from 'octocms/admin'");
     expect(page).toContain('configInit');
-    expect(error).toContain("from 'octocms/admin'");
+    expect(error).toContain("from 'octocms/admin/error'");
     expect(error).toContain("'use client'");
   });
 
@@ -151,6 +151,13 @@ describe('initCommand', () => {
     const configInit = readFileSync(gen('configInit.ts'), 'utf8');
     expect(configInit).toContain("from 'octocms/lib/configStore'");
     expect(configInit).toContain('setConfig(configOctoCMS)');
+  });
+
+  it('creates octocms API route re-exports', async () => {
+    await initCommand(TMP_DIR, { yes: true });
+    expect(existsSync(join(TMP_DIR, 'app', 'api', 'octocms', 'auth', '[action]', 'route.ts'))).toBe(true);
+    expect(existsSync(join(TMP_DIR, 'app', 'api', 'octocms', 'agent', 'route.ts'))).toBe(true);
+    expect(existsSync(join(TMP_DIR, 'app', 'api', 'octocms', 'search', 'route.ts'))).toBe(true);
   });
 
   it('creates .env.local stub', async () => {

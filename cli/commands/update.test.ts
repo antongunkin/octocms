@@ -8,7 +8,7 @@ import {
   buildAdminPageTemplate,
   LEGACY_ADMIN_CATCH_ALL_TEMPLATES,
   LEGACY_ADMIN_LAYOUT_TEMPLATES,
-  nextAuthRouteTemplate,
+  octocmsAuthRouteTemplate,
 } from '../lib/templates';
 
 const expectedAdminPage = buildAdminPageTemplate();
@@ -85,19 +85,19 @@ describe('updateCommand — legacy catch-all migration (deep import → barrel)'
   });
 });
 
-describe('updateCommand — nextauth route', () => {
-  it('creates app/api/auth/[...nextauth]/route.ts when missing', async () => {
+describe('updateCommand — octocms auth route', () => {
+  it('creates src/app/api/octocms/auth/[action]/route.ts when missing', async () => {
     mkdirSync(join(TMP_DIR, 'src', 'app'), { recursive: true });
     await updateCommand(TMP_DIR);
-    const authFile = join(TMP_DIR, 'src', 'app', 'api', 'auth', '[...nextauth]', 'route.ts');
+    const authFile = join(TMP_DIR, 'src', 'app', 'api', 'octocms', 'auth', '[action]', 'route.ts');
     expect(existsSync(authFile)).toBe(true);
-    expect(readFileSync(authFile, 'utf8')).toBe(nextAuthRouteTemplate);
+    expect(readFileSync(authFile, 'utf8')).toBe(octocmsAuthRouteTemplate());
   });
 
-  it('preserves a customised nextauth route instead of overwriting', async () => {
-    const authDir = join(TMP_DIR, 'src', 'app', 'api', 'auth', '[...nextauth]');
+  it('preserves a customised octocms auth route instead of overwriting', async () => {
+    const authDir = join(TMP_DIR, 'src', 'app', 'api', 'octocms', 'auth', '[action]');
     mkdirSync(authDir, { recursive: true });
-    const customised = '// custom auth setup with extra providers\nexport {};\n';
+    const customised = '// custom auth setup with authorizeUser hook\nexport {};\n';
     writeFileSync(join(authDir, 'route.ts'), customised, 'utf8');
     await updateCommand(TMP_DIR);
     expect(readFileSync(join(authDir, 'route.ts'), 'utf8')).toBe(customised);
