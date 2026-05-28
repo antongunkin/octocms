@@ -2,14 +2,6 @@ import { isProductionMode } from './githubContentMode';
 
 const trimOrEmpty = (value: string | undefined): string => (typeof value === 'string' ? value.trim() : '');
 
-function hasSessionSecret(): boolean {
-  return !!(trimOrEmpty(process.env.CMS_SESSION_SECRET) || trimOrEmpty(process.env.NEXTAUTH_SECRET));
-}
-
-function hasAppUrl(): boolean {
-  return !!(trimOrEmpty(process.env.CMS_APP_URL) || trimOrEmpty(process.env.NEXTAUTH_URL));
-}
-
 /**
  * Returns env var names that are missing or blank for the current process mode.
  * In non-production, returns an empty array.
@@ -21,10 +13,10 @@ export function getProductionEnvIssues(): string[] {
 
   const missing: string[] = [];
 
-  if (!hasSessionSecret()) missing.push('CMS_SESSION_SECRET');
+  if (!trimOrEmpty(process.env.NEXTAUTH_SECRET)) missing.push('NEXTAUTH_SECRET');
   if (!trimOrEmpty(process.env.GITHUB_ID)) missing.push('GITHUB_ID');
   if (!trimOrEmpty(process.env.GITHUB_SECRET)) missing.push('GITHUB_SECRET');
-  if (!hasAppUrl()) missing.push('CMS_APP_URL');
+  if (!trimOrEmpty(process.env.NEXTAUTH_URL)) missing.push('NEXTAUTH_URL');
 
   if (isProductionMode()) {
     if (!trimOrEmpty(process.env.GITHUB_REPO_OWNER)) missing.push('GITHUB_REPO_OWNER');

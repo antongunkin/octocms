@@ -513,8 +513,8 @@ GITHUB_ID=your_github_app_client_id
 GITHUB_SECRET=your_github_app_client_secret
 
 # Session secret — generate with: openssl rand -base64 32
-CMS_SESSION_SECRET=your_session_secret
-CMS_APP_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_session_secret
+NEXTAUTH_URL=http://localhost:3000
 
 # GitHub App callback URL (register in GitHub App settings):
 # http://localhost:3000/api/octocms/auth/callback
@@ -544,8 +544,8 @@ GITHUB_ID=
 GITHUB_SECRET=
 
 # Session secret — generate with: openssl rand -base64 32
-CMS_SESSION_SECRET=
-CMS_APP_URL=http://localhost:3000
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
 
 # GitHub App callback URL (register in GitHub App settings):
 # http://localhost:3000/api/octocms/auth/callback

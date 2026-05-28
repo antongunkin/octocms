@@ -166,7 +166,7 @@ describe('initCommand', () => {
     const env = readFileSync(join(TMP_DIR, '.env.local'), 'utf8');
     expect(env).toContain('GITHUB_ID=');
     expect(env).toContain('GITHUB_SECRET=');
-    expect(env).toContain('CMS_SESSION_SECRET=');
+    expect(env).toContain('NEXTAUTH_SECRET=');
   });
 
   it('does not overwrite existing .env.local', async () => {
@@ -181,7 +181,7 @@ describe('initCommand', () => {
     expect(existsSync(join(TMP_DIR, 'README.md'))).toBe(true);
     const readme = readFileSync(join(TMP_DIR, 'README.md'), 'utf8');
     expect(readme).toContain('GITHUB_ID');
-    expect(readme).toContain('CMS_SESSION_SECRET');
+    expect(readme).toContain('NEXTAUTH_SECRET');
   });
 
   it('does not overwrite existing README.md', async () => {
