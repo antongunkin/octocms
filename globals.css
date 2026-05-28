@@ -1598,6 +1598,11 @@
     flex-direction: column-reverse;
     padding: 16px;
     gap: 8px;
+    pointer-events: none;
+  }
+
+  .octo-toast__viewport:empty {
+    display: none;
   }
 
   @media (width >= 640px) {
@@ -1624,6 +1629,7 @@
     background: var(--surface-1);
     padding: 16px;
     box-shadow: var(--shadow-2);
+    pointer-events: auto;
     transition:
       transform 300ms,
       opacity 300ms;
