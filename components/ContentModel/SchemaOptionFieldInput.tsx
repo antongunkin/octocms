@@ -236,7 +236,7 @@ function CollectionsCheckboxList({
         </label>
       ))}
       {value.length === 0 ? (
-        <p style={{ padding: '4px 6px', fontSize: 11, fontStyle: 'italic', color: 'var(--muted)' }}>
+        <p style={{ padding: '4px 6px', fontSize: 11, fontStyle: 'italic', color: 'var(--octo-muted)' }}>
           None selected — references can target any collection.
         </p>
       ) : null}

@@ -228,8 +228,8 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                     fontSize: 14,
                     border: 0,
                     cursor: 'pointer',
-                    background: selectedFolder === null ? 'var(--brand)' : 'transparent',
-                    color: selectedFolder === null ? 'var(--bg)' : 'var(--text)',
+                    background: selectedFolder === null ? 'var(--octo-brand)' : 'transparent',
+                    color: selectedFolder === null ? 'var(--octo-bg)' : 'var(--octo-text)',
                   }}
                 >
                   All
@@ -248,8 +248,8 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                       fontSize: 14,
                       border: 0,
                       cursor: 'pointer',
-                      background: selectedFolder === folder ? 'var(--brand)' : 'transparent',
-                      color: selectedFolder === folder ? 'var(--bg)' : 'var(--text)',
+                      background: selectedFolder === folder ? 'var(--octo-brand)' : 'transparent',
+                      color: selectedFolder === folder ? 'var(--octo-bg)' : 'var(--octo-text)',
                     }}
                   >
                     {folder === '/' ? 'Root' : folder}
@@ -271,7 +271,7 @@ const ImageEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                         aspectRatio: '1',
                         borderRadius: 8,
                         overflow: 'hidden',
-                        border: isSelected ? '2px solid var(--brand)' : '2px solid var(--border)',
+                        border: isSelected ? '2px solid var(--octo-brand)' : '2px solid var(--octo-border)',
                         cursor: 'pointer',
                         padding: 0,
                         background: 'transparent',

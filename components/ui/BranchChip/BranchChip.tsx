@@ -26,7 +26,7 @@ export const BranchChip = React.forwardRef<HTMLButtonElement, BranchChipProps>(
         )}
         {...props}
       >
-        <Icon.GitBranch size={13} style={{ color: isFeature ? 'var(--brand-strong)' : undefined }} />
+        <Icon.GitBranch size={13} style={{ color: isFeature ? 'var(--octo-brand-strong)' : undefined }} />
         <span className="octo-button__branch-name">{name}</span>
         {ahead > 0 && <span className="octo-button__branch-ahead">+{ahead}</span>}
         {dirty > 0 && <span className="octo-button__branch-dirty">· {dirty}</span>}
