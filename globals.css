@@ -9720,7 +9720,8 @@
   7b. Unlayered CMS surface reset — override consumer globals, then
   @layer tokens/base/components rules above apply via revert-layer.
   Custom properties (--octo-*) are not affected by `all` and keep
-  inheriting from html#octocms. MDXEditor overrides follow in §8.
+  inheriting from html#octocms. Descendants of `.mdxeditor` / `.mdxeditor-popup-container`
+  are excluded so @mdxeditor/editor/style.css keeps working. §8 token overrides follow.
   ============================================================ */
 
 html#octocms {
@@ -9741,9 +9742,10 @@ html#octocms body {
   text-rendering: optimizelegibility;
 }
 
-html#octocms *,
-html#octocms *::before,
-html#octocms *::after {
+html#octocms
+  :where(*, *::before, *::after):not(
+    :is(.mdxeditor, .mdxeditor *, .mdxeditor-popup-container, .mdxeditor-popup-container *)
+  ) {
   all: revert-layer;
 }
 
