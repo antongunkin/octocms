@@ -1,10 +1,10 @@
 'use client';
 
-import { signIn, useSession } from 'next-auth/react';
 import React, { Suspense, useEffect } from 'react';
 import { Button, Icon } from '../ui';
 
 import { useConfig } from '../../hooks/useConfig';
+import { useCmsSession } from '../../hooks/useCmsSession';
 import type { Theme } from '../../admin/theme';
 import { cn } from '../../lib/utils';
 import { RouteMainSlotSkeleton } from '../Layout/skeletons/RouteMainSlotSkeleton';
@@ -18,7 +18,7 @@ type LayoutProps = {
 
 const Layout = ({ children, initialTheme }: LayoutProps) => {
   const config = useConfig();
-  const { data: session } = useSession();
+  const { status, signIn } = useCmsSession();
   const { open: cmdkOpen, setOpen: setCmdkOpen } = useCommandK();
 
   useEffect(() => {
@@ -30,19 +30,19 @@ const Layout = ({ children, initialTheme }: LayoutProps) => {
 
   return (
     <div id="cms-layout" className={cn('octo-layout', initialTheme === 'light' && 'light')}>
-      {session === null ? (
+      {status === 'unauthenticated' ? (
         <div className="octo-layout__sign-in">
           <div className="octo-layout__sign-in-inner">
             <div className="octo-layout__sign-in-icon">O</div>
             <h1 className="octo-layout__sign-in-title">{config.projectName} CMS</h1>
             <p className="octo-layout__sign-in-subtitle">Sign in to manage your content</p>
-            <Button onClick={() => signIn('github', { callbackUrl: '/cms' })} size="lg">
+            <Button onClick={signIn} size="lg">
               <Icon.LogIn className="octo-icon-md" />
               Sign in with GitHub
             </Button>
           </div>
         </div>
-      ) : (
+      ) : status === 'loading' ? null : (
         <>
           <TopHeader onCommandK={() => setCmdkOpen(true)} initialTheme={initialTheme} />
           <main className="octo-layout__main">

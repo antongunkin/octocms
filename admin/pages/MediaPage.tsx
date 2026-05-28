@@ -1,10 +1,9 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { getServerSession } from 'next-auth';
 
 import { MediaManagerPageSkeleton } from '../../components/MediaManager/skeletons/MediaManagerPageSkeleton';
 import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
-import { authOptions } from '../auth';
+import { getCmsSession } from '../auth/session';
 
 const MediaManager = dynamic(() => import('../../components/MediaManager/MediaManager'), {
   loading: () => <MediaManagerPageSkeleton />,
@@ -16,7 +15,7 @@ const MediaManager = dynamic(() => import('../../components/MediaManager/MediaMa
  * and grid/list slots. See `octocms/admin/query/hooks/useMediaList.ts`.
  */
 export async function MediaPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
 
   if (!session) {
     return null;

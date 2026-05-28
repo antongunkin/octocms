@@ -1,10 +1,9 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { getServerSession } from 'next-auth';
 
 import { ContentTypeDetailPageSkeleton } from '../../components/ContentModel/skeletons/ContentTypeDetailPageSkeleton';
 import { ErrorBoundary } from '../../components/ErrorBoundary/ErrorBoundary';
-import { authOptions } from '../auth';
+import { getCmsSession } from '../auth/session';
 
 const ContentTypeDetail = dynamic(() => import('../../components/ContentModel/ContentTypeDetail'), {
   loading: () => <ContentTypeDetailPageSkeleton />,
@@ -15,7 +14,7 @@ const ContentTypeDetail = dynamic(() => import('../../components/ContentModel/Co
  * `useSchema` + `useEntryList` and renders block skeletons while pending.
  */
 export async function ContentTypePage({ type }: { type: string }) {
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
 
   if (!session) {
     return null;

@@ -1,16 +1,15 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { getServerSession } from 'next-auth';
+import { getCmsSession } from '../auth/session';
 
 import { DashboardPageSkeleton } from '../../components/Dashboard/skeletons/DashboardPageSkeleton';
-import { authOptions } from '../auth';
 
 const DashboardContent = dynamic(() => import('../../components/Dashboard/DashboardContent'), {
   loading: () => <DashboardPageSkeleton />,
 });
 
 export async function ContentPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
 
   if (!session) {
     return null;

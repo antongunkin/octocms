@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { signOut } from 'next-auth/react';
 
 import type { Theme } from '../../admin/theme';
 import { ThemeToggle } from '../../admin/theme';
+import { useCmsSession } from '../../hooks/useCmsSession';
 import {
   Avatar,
   AvatarFallback,
@@ -34,9 +34,11 @@ export function UserAccountDialog({
   userInitials,
   initialTheme,
 }: UserAccountDialogProps) {
+  const { signOut } = useCmsSession();
+
   const handleSignOut = () => {
     onOpenChange(false);
-    signOut();
+    void signOut();
   };
 
   return (

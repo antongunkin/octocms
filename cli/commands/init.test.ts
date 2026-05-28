@@ -153,13 +153,20 @@ describe('initCommand', () => {
     expect(configInit).toContain('setConfig(configOctoCMS)');
   });
 
+  it('creates octocms API route re-exports', async () => {
+    await initCommand(TMP_DIR, { yes: true });
+    expect(existsSync(join(TMP_DIR, 'app', 'api', 'octocms', 'auth', '[action]', 'route.ts'))).toBe(true);
+    expect(existsSync(join(TMP_DIR, 'app', 'api', 'octocms', 'agent', 'route.ts'))).toBe(true);
+    expect(existsSync(join(TMP_DIR, 'app', 'api', 'octocms', 'search', 'route.ts'))).toBe(true);
+  });
+
   it('creates .env.local stub', async () => {
     await initCommand(TMP_DIR, { yes: true });
     expect(existsSync(join(TMP_DIR, '.env.local'))).toBe(true);
     const env = readFileSync(join(TMP_DIR, '.env.local'), 'utf8');
     expect(env).toContain('GITHUB_ID=');
     expect(env).toContain('GITHUB_SECRET=');
-    expect(env).toContain('NEXTAUTH_SECRET=');
+    expect(env).toContain('CMS_SESSION_SECRET=');
   });
 
   it('does not overwrite existing .env.local', async () => {
@@ -174,7 +181,7 @@ describe('initCommand', () => {
     expect(existsSync(join(TMP_DIR, 'README.md'))).toBe(true);
     const readme = readFileSync(join(TMP_DIR, 'README.md'), 'utf8');
     expect(readme).toContain('GITHUB_ID');
-    expect(readme).toContain('NEXTAUTH_SECRET');
+    expect(readme).toContain('CMS_SESSION_SECRET');
   });
 
   it('does not overwrite existing README.md', async () => {

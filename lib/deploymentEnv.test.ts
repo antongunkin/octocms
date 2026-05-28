@@ -21,10 +21,12 @@ describe('deploymentEnv', () => {
   beforeEach(() => {
     mockIsProductionMode.mockReturnValue(false);
     vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('NEXTAUTH_SECRET', 'secret');
+    vi.stubEnv('CMS_SESSION_SECRET', 'secret');
+    vi.stubEnv('NEXTAUTH_SECRET', undefined);
     vi.stubEnv('GITHUB_ID', 'id');
     vi.stubEnv('GITHUB_SECRET', 'ghsecret');
-    vi.stubEnv('NEXTAUTH_URL', 'https://app.example.com');
+    vi.stubEnv('CMS_APP_URL', 'https://app.example.com');
+    vi.stubEnv('NEXTAUTH_URL', undefined);
     vi.stubEnv('GITHUB_REPO_OWNER', undefined);
     vi.stubEnv('GITHUB_REPO_NAME', undefined);
     vi.stubEnv('CMS_FORCE_GITHUB_API', undefined);
@@ -37,15 +39,26 @@ describe('deploymentEnv', () => {
 
   it('returns no issues in non-production', () => {
     vi.stubEnv('NODE_ENV', 'development');
-    vi.stubEnv('NEXTAUTH_SECRET', undefined);
+    vi.stubEnv('CMS_SESSION_SECRET', undefined);
     expect(getProductionEnvIssues()).toEqual([]);
   });
 
-  it('requires NextAuth and GitHub OAuth vars in production when GitHub content mode is off', () => {
+  it('requires CMS auth env vars in production when GitHub content mode is off', () => {
     mockIsProductionMode.mockReturnValue(false);
+    vi.stubEnv('CMS_SESSION_SECRET', undefined);
     vi.stubEnv('NEXTAUTH_SECRET', undefined);
+    vi.stubEnv('CMS_APP_URL', undefined);
     vi.stubEnv('NEXTAUTH_URL', undefined);
-    expect(getProductionEnvIssues()).toEqual(expect.arrayContaining(['NEXTAUTH_SECRET', 'NEXTAUTH_URL']));
+    expect(getProductionEnvIssues()).toEqual(expect.arrayContaining(['CMS_SESSION_SECRET', 'CMS_APP_URL']));
+  });
+
+  it('accepts legacy NEXTAUTH_* vars during transition', () => {
+    mockIsProductionMode.mockReturnValue(false);
+    vi.stubEnv('CMS_SESSION_SECRET', undefined);
+    vi.stubEnv('NEXTAUTH_SECRET', 'legacy-secret');
+    vi.stubEnv('CMS_APP_URL', undefined);
+    vi.stubEnv('NEXTAUTH_URL', 'https://legacy.example.com');
+    expect(getProductionEnvIssues()).toEqual([]);
   });
 
   it('requires repository env vars when isProductionMode is true', () => {

@@ -121,11 +121,11 @@
     "@anthropic-ai/sdk": ">=0.91",
     "@huggingface/transformers": ">=4",
     "@mdxeditor/editor": ">=4",
+    "@octokit/oauth-app": ">=7",
     "@tanstack/react-query": ">=5",
     "mammoth": ">=1.12",
     "minisearch": ">=7",
     "next": ">=15",
-    "next-auth": ">=4",
     "octokit": ">=4",
     "openai": ">=4",
     "pdfjs-dist": ">=4",
@@ -156,7 +156,7 @@
     }
   },
   "devDependencies": {
-    "next-auth": "^4.24.14",
+    "@octokit/oauth-app": "^8.0.3",
     "@tanstack/react-query": "^5.100.9",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",

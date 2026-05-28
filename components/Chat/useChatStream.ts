@@ -5,6 +5,7 @@ import { useCallback, useEffect, useReducer, useRef } from 'react';
 
 import { acceptProposalAction, rejectProposalAction } from '../../admin/actions/agent';
 import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
+import { OCTOCMS_API } from '../../lib/octocmsApiRoutes';
 
 import type { AttachmentDiagnostic } from '../../agent/attachments';
 import type { ChatEvent } from '../../agent/chat';
@@ -299,7 +300,7 @@ export type UseChatStreamReturn = {
   getSnapshot(): PersistedChatState | null;
 };
 
-export function useChatStream(endpoint: string = '/api/agent'): UseChatStreamReturn {
+export function useChatStream(endpoint: string = OCTOCMS_API.agent): UseChatStreamReturn {
   const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initial);
   const stateRef = useRef(state);

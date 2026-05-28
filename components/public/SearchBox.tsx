@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Icon } from '../ui';
 
 import type { SearchResult } from '../../lib/searchIndex';
+import { OCTOCMS_API } from '../../lib/octocmsApiRoutes';
 
 /** Escape special regex characters in a string. */
 function escapeRegex(s: string): string {
@@ -58,7 +59,7 @@ export default function SearchBox({ placeholder = 'Search...', className = '' }:
 
     setIsSearching(true);
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=10`);
+      const response = await fetch(`${OCTOCMS_API.search}?q=${encodeURIComponent(q)}&limit=10`);
       if (response.ok) {
         const data = await response.json();
         setResults(data.results || []);

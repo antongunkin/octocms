@@ -1,10 +1,9 @@
 import { Octokit } from 'octokit';
-import { getServerSession } from 'next-auth';
 
 import { logCmsServerError } from '../lib/cmsServerLog';
 import { mapGitHubApiErrorToContentSource } from '../lib/contentSourceError';
 
-import { authOptions } from './auth';
+import { getCmsSession } from './auth/session';
 
 import {
   assertGitHubConfig,
@@ -85,8 +84,8 @@ const ensureBranchExists = async (octokit: Octokit, owner: string, repo: string,
 };
 
 const getOctokit = async () => {
-  const session = await getServerSession(authOptions);
-  const accessToken = (session as any)?.accessToken;
+  const session = await getCmsSession();
+  const accessToken = session?.accessToken;
 
   if (!accessToken) {
     throw new Error('No GitHub access token found. Please sign in again.');

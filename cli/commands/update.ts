@@ -21,7 +21,9 @@ import {
   buildAdminPageTemplate,
   agentChatRouteTemplate,
   mediaRouteTemplate,
-  nextAuthRouteTemplate,
+  searchRouteTemplate,
+  octocmsAuthRouteTemplate,
+  LEGACY_NEXT_AUTH_ROUTE_TEMPLATE,
   LEGACY_ADMIN_CATCH_ALL_TEMPLATES,
   LEGACY_ADMIN_LAYOUT_TEMPLATES,
   rootLayoutConfigInitImport,
@@ -146,51 +148,95 @@ export async function updateCommand(projectRoot: string): Promise<void> {
     }
   }
 
-  // 5. NextAuth route. Stable boilerplate; only created when missing — never
-  //    overwritten, since user apps may customise (e.g. dev-bypass provider).
-  const authRouteFile =
-    rel === 'src/app'
-      ? join(projectRoot, 'src', 'app', 'api', 'auth', '[...nextauth]', 'route.ts')
-      : join(projectRoot, 'app', 'api', 'auth', '[...nextauth]', 'route.ts');
-  const authRel = `${rel}/api/auth/[...nextauth]/route.ts`;
-  if (!existsSync(authRouteFile)) {
-    mkdirSync(dirname(authRouteFile), { recursive: true });
-    writeFileSync(authRouteFile, nextAuthRouteTemplate, 'utf8');
-    log.step(`${authRel} — created`);
-    allUpToDate = false;
-  } else {
-    log.success(`${authRel} — present`);
-  }
-
-  // 6. Chat-agent SSE route. Depth-agnostic — bare-specifier configInit
-  //    resolves via the `withOctoCMS()` bundler alias from any depth.
-  const chatRouteRoots: Array<{ file: string; rel: string }> = [
-    { file: join(projectRoot, 'src', 'app', 'api', 'agent', 'route.ts'), rel: 'src/app/api/agent/route.ts' },
-    { file: join(projectRoot, 'app', 'api', 'agent', 'route.ts'), rel: 'app/api/agent/route.ts' },
-  ];
-  const chatRoot = chatRouteRoots.find((r) => existsSync(join(r.file, '..', '..', '..', '..'))) ?? chatRouteRoots[1];
+  // 5. OctoCMS auth route at `/api/octocms/auth/[action]`.
+  const authRouteFile = join(absRoot, 'api', 'octocms', 'auth', '[action]', 'route.ts');
+  const authRel = `${rel}/api/octocms/auth/[action]/route.ts`;
   {
-    const expected = agentChatRouteTemplate();
-    if (!existsSync(chatRoot.file)) {
-      mkdirSync(join(chatRoot.file, '..'), { recursive: true });
-      writeFileSync(chatRoot.file, expected, 'utf8');
-      log.step(`${chatRoot.rel} — created`);
+    const expected = octocmsAuthRouteTemplate();
+    if (!existsSync(authRouteFile)) {
+      mkdirSync(dirname(authRouteFile), { recursive: true });
+      writeFileSync(authRouteFile, expected, 'utf8');
+      log.step(`${authRel} — created`);
       allUpToDate = false;
     } else {
-      const current = readFileSync(chatRoot.file, 'utf8');
+      const current = readFileSync(authRouteFile, 'utf8');
       if (current === expected) {
-        log.success(`${chatRoot.rel} — up to date`);
+        log.success(`${authRel} — up to date`);
       } else {
-        log.info(`${chatRoot.rel} — present (skipped, not auto-rewritten)`);
+        log.info(`${authRel} — present (skipped, not auto-rewritten)`);
       }
     }
   }
 
-  // 7. Chat-agent proposal accept/reject — now server actions
-  //    (`acceptProposalAction` / `rejectProposalAction` in
-  //    `octocms/admin/actions/agent.ts`), no route files to manage.
+  // Legacy NextAuth route — log migration hint when still present.
+  const legacyAuthRouteFile = join(absRoot, 'api', 'auth', '[...nextauth]', 'route.ts');
+  const legacyAuthRel = `${rel}/api/auth/[...nextauth]/route.ts`;
+  if (existsSync(legacyAuthRouteFile)) {
+    const legacyContent = readFileSync(legacyAuthRouteFile, 'utf8');
+    if (legacyContent === LEGACY_NEXT_AUTH_ROUTE_TEMPLATE) {
+      log.info(
+        `${legacyAuthRel} — legacy NextAuth route detected; delete after verifying ${authRel} works and update your GitHub App callback URL to /api/octocms/auth/callback`,
+      );
+    } else {
+      log.info(`${legacyAuthRel} — legacy NextAuth route present (customised — migrate manually)`);
+    }
+  }
 
-  // 8. Media proxy route — `app/media/[...slug]/route.ts`. Depth-agnostic.
+  // 6. Chat-agent SSE route at `/api/octocms/agent`.
+  const chatRouteFile = join(absRoot, 'api', 'octocms', 'agent', 'route.ts');
+  const chatRel = `${rel}/api/octocms/agent/route.ts`;
+  {
+    const expected = agentChatRouteTemplate();
+    if (!existsSync(chatRouteFile)) {
+      mkdirSync(dirname(chatRouteFile), { recursive: true });
+      writeFileSync(chatRouteFile, expected, 'utf8');
+      log.step(`${chatRel} — created`);
+      allUpToDate = false;
+    } else {
+      const current = readFileSync(chatRouteFile, 'utf8');
+      if (current === expected) {
+        log.success(`${chatRel} — up to date`);
+      } else {
+        log.info(`${chatRel} — present (skipped, not auto-rewritten)`);
+      }
+    }
+  }
+
+  const legacyChatRouteFile = join(absRoot, 'api', 'agent', 'route.ts');
+  if (existsSync(legacyChatRouteFile)) {
+    log.info(
+      `${rel}/api/agent/route.ts — legacy route detected; delete after verifying ${chatRel} works`,
+    );
+  }
+
+  // 7. Public search route at `/api/octocms/search`.
+  const searchRouteFile = join(absRoot, 'api', 'octocms', 'search', 'route.ts');
+  const searchRel = `${rel}/api/octocms/search/route.ts`;
+  {
+    const expected = searchRouteTemplate();
+    if (!existsSync(searchRouteFile)) {
+      mkdirSync(dirname(searchRouteFile), { recursive: true });
+      writeFileSync(searchRouteFile, expected, 'utf8');
+      log.step(`${searchRel} — created`);
+      allUpToDate = false;
+    } else {
+      const current = readFileSync(searchRouteFile, 'utf8');
+      if (current === expected) {
+        log.success(`${searchRel} — up to date`);
+      } else {
+        log.info(`${searchRel} — present (skipped, not auto-rewritten)`);
+      }
+    }
+  }
+
+  const legacySearchRouteFile = join(absRoot, 'api', 'search', 'route.ts');
+  if (existsSync(legacySearchRouteFile)) {
+    log.info(
+      `${rel}/api/search/route.ts — legacy route detected; delete after verifying ${searchRel} works`,
+    );
+  }
+
+  // 8. Chat-agent proposal accept/reject — server actions only.
   const mediaRouteRoots: Array<{ file: string; rel: string }> = [
     {
       file: join(projectRoot, 'src', 'app', 'media', '[...slug]', 'route.ts'),

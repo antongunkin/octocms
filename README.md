@@ -47,8 +47,8 @@ Visit `http://localhost:3000/cms` to open the editor.
 ```bash
 GITHUB_ID=              # GitHub App client ID
 GITHUB_SECRET=          # GitHub App client secret
-NEXTAUTH_SECRET=        # Random string: openssl rand -base64 32
-NEXTAUTH_URL=http://localhost:3000
+CMS_SESSION_SECRET=     # Random string: openssl rand -base64 32
+CMS_APP_URL=http://localhost:3000
 
 # Required in production
 GITHUB_REPO_OWNER=

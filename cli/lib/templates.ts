@@ -220,7 +220,30 @@ export { AdminApp as default } from 'octocms/admin';
 `,
 ];
 
-export const nextAuthRouteTemplate = `import NextAuth from 'next-auth';
+export function octocmsAuthRouteTemplate(): string {
+  return `// Side-effect import: registers \`configOctoCMS\` into the runtime store so
+// \`getConfig()\` resolves on cold start. Route Handlers don't run
+// \`app/layout.tsx\`, so this import has to live here.
+${CONFIG_INIT_IMPORT}
+
+import { authRoute } from 'octocms/admin/authRoutes';
+
+type RouteContext = { params: Promise<{ action: string }> };
+
+export async function GET(request: Request, context: RouteContext) {
+  const { action } = await context.params;
+  return authRoute(request, action);
+}
+
+export async function POST(request: Request, context: RouteContext) {
+  const { action } = await context.params;
+  return authRoute(request, action);
+}
+`;
+}
+
+/** @deprecated Legacy NextAuth scaffold — kept for update migration detection only. */
+export const LEGACY_NEXT_AUTH_ROUTE_TEMPLATE = `import NextAuth from 'next-auth';
 import { authOptions } from 'octocms/admin/auth';
 
 const handler = NextAuth(authOptions);
@@ -228,11 +251,15 @@ const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
 `;
 
+/** @deprecated Alias for migration detection. */
+export const nextAuthRouteTemplate = LEGACY_NEXT_AUTH_ROUTE_TEMPLATE;
+
 /**
  * Build a thin re-export Route Handler for the chat-agent SSE endpoint.
  *
  * The actual handler lives in `octocms/agent/chatApi.ts`
- * (`chatRoute` / `chatStatusRoute`). The user-app file just:
+ * (`chatRoute` / `chatStatusRoute`). The user-app file at
+ * `app/api/octocms/agent/route.ts` just:
  *   1. side-effect-imports `cms/__generated__/configInit` so
  *      `getAgentConfig()` resolves on cold start (Route Handlers don't run
  *      `app/layout.tsx`); and
@@ -275,7 +302,7 @@ export { mediaRoute as GET } from 'octocms/admin/mediaRoute';
 }
 
 /**
- * Build a thin re-export Route Handler for the public-site `/api/search`
+ * Build a thin re-export Route Handler for the public-site `/api/octocms/search`
  * endpoint consumed by the `SearchBox` component shipped at
  * `octocms/components/public`.
  *
@@ -464,7 +491,7 @@ Built with [OctoCMS](https://octocms.gunkin.dev) — a file-based CMS on Next.js
 ### 1. Install dependencies
 
 \`\`\`bash
-npm install octocms next-auth @tanstack/react-query @mdxeditor/editor \\
+npm install octocms @octokit/oauth-app @tanstack/react-query @mdxeditor/editor \\
   minisearch octokit \\
   react-markdown rehype-sanitize remark-gfm remark-mdx \\
   sharp zod
@@ -485,9 +512,12 @@ Copy the values from your GitHub App into \`.env.local\`:
 GITHUB_ID=your_github_app_client_id
 GITHUB_SECRET=your_github_app_client_secret
 
-# NextAuth (generate secret: openssl rand -base64 32)
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=http://localhost:3000
+# Session secret — generate with: openssl rand -base64 32
+CMS_SESSION_SECRET=your_session_secret
+CMS_APP_URL=http://localhost:3000
+
+# GitHub App callback URL (register in GitHub App settings):
+# http://localhost:3000/api/octocms/auth/callback
 
 # GitHub repo for content storage (required in production)
 GITHUB_REPO_OWNER=your_github_username_or_org
@@ -513,9 +543,12 @@ export function envLocalTemplate(): string {
 GITHUB_ID=
 GITHUB_SECRET=
 
-# NextAuth secret — generate with: openssl rand -base64 32
-NEXTAUTH_SECRET=
-NEXTAUTH_URL=http://localhost:3000
+# Session secret — generate with: openssl rand -base64 32
+CMS_SESSION_SECRET=
+CMS_APP_URL=http://localhost:3000
+
+# GitHub App callback URL (register in GitHub App settings):
+# http://localhost:3000/api/octocms/auth/callback
 
 # GitHub repo for content storage (required in production)
 GITHUB_REPO_OWNER=

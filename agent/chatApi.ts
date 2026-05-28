@@ -2,7 +2,7 @@
  * Packaged Route Handler for the chat-agent SSE endpoint.
  *
  * Lives inside `octocms/agent` so the user app keeps a thin re-export at
- * `app/api/agent/route.ts` (scaffolded by `octocms init` and `octocms update`,
+ * `app/api/octocms/agent/route.ts` (scaffolded by `octocms init` and `octocms update`,
  * see `octocms/cli/lib/templates.ts` → `agentChatRouteTemplate`). The user
  * file's only job is to side-effect-import `cms/__generated__/configInit` (so
  * `getAgentConfig()` resolves on cold start) and re-export {@link chatRoute}
@@ -15,10 +15,9 @@
  * `AbortController`. The agent loop checks it between turns; the SSE stream
  * also cancels naturally when the client disconnects.
  */
-import { getServerSession } from 'next-auth/next';
 import { cookies } from 'next/headers';
 
-import { authOptions } from '../admin/auth';
+import { getCmsSession } from '../admin/auth/session';
 import { getConfig } from '../lib/configStore';
 
 import {
@@ -61,7 +60,7 @@ function badRequest(message: string): Response {
 }
 
 /**
- * `POST /api/agent` — streams the chat response as SSE. Accepts both JSON
+ * `POST /api/octocms/agent` — streams the chat response as SSE. Accepts both JSON
  * (no attachments — Phase 3/4 behaviour) and `multipart/form-data` (Phase 5,
  * with files). Auth-gated; 404 when the agent feature is disabled for this
  * deploy.
@@ -70,7 +69,7 @@ export async function chatRoute(request: Request): Promise<Response> {
   const agentConfig = getAgentConfig();
   if (!agentConfig || !isAgentEnabled(agentConfig)) return notFound();
 
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
   if (!session) return unauthorized();
 
   // Two body formats: JSON (no attachments — Phase 3/4 behaviour) and
@@ -229,7 +228,7 @@ export async function chatRoute(request: Request): Promise<Response> {
 }
 
 /**
- * `GET /api/agent` — small health endpoint so the client can verify the
+ * `GET /api/octocms/agent` — small health endpoint so the client can verify the
  * agent is enabled and read the active provider/model without opening a
  * stream. Auth-gated; 404 when disabled.
  */
@@ -237,7 +236,7 @@ export async function chatStatusRoute(): Promise<Response> {
   const agentConfig = getAgentConfig();
   if (!agentConfig || !isAgentEnabled(agentConfig)) return notFound();
 
-  const session = await getServerSession(authOptions);
+  const session = await getCmsSession();
   if (!session) return unauthorized();
 
   const provider = agentConfig.provider;

@@ -8,13 +8,13 @@ import * as React from 'react';
 import { useIsFetching, useIsMutating, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { Icon, Avatar, AvatarFallback, AvatarImage, BranchChip, Kbd } from '../ui';
 
 import { invalidateAfterMutationAsync } from '../../admin/query/invalidate';
 import { useBranch } from '../../admin/query/hooks/useBranch';
 import { useHasActiveBranch } from '../../admin/query/hooks/useHasActiveBranch';
 import { useConfig } from '../../hooks/useConfig';
+import { useCmsSession } from '../../hooks/useCmsSession';
 import { toast } from '../../hooks/useToast';
 import { cn } from '../../lib/utils';
 import { BranchSelectorDialog } from './BranchSelectorDialog';
@@ -41,7 +41,7 @@ type TopHeaderProps = {
 };
 
 export function TopHeader({ onCommandK, initialTheme = 'dark' }: TopHeaderProps) {
-  const { data } = useSession();
+  const { data } = useCmsSession();
   const config = useConfig();
   const pathname = usePathname() ?? '/cms';
   const router = useRouter();

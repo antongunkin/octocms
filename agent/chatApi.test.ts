@@ -36,10 +36,9 @@ beforeEach(async () => {
     getConfig: () => minimalConfig,
     setConfig: vi.fn(),
   }));
-  vi.doMock('next-auth/next', () => ({
-    getServerSession: vi.fn().mockResolvedValue({ user: { name: 'Test' } }),
+  vi.doMock('../admin/auth/session', () => ({
+    getCmsSession: vi.fn().mockResolvedValue({ user: { id: '1', name: 'Test' } }),
   }));
-  vi.doMock('../admin/auth', () => ({ authOptions: {} }));
   vi.doMock('next/headers', () => ({
     cookies: () => ({ get: () => undefined }),
   }));
@@ -121,7 +120,7 @@ describe('chatRoute — auth + body parsing', () => {
 
   it('401s when the user is not signed in', async () => {
     vi.doMock('./configStore', () => ({ getAgentConfig: () => enabledAgentConfig, setAgentConfig: vi.fn() }));
-    vi.doMock('next-auth/next', () => ({ getServerSession: vi.fn().mockResolvedValue(null) }));
+    vi.doMock('../admin/auth/session', () => ({ getCmsSession: vi.fn().mockResolvedValue(null) }));
     const { chatRoute } = await import('./chatApi');
     const res = await chatRoute(jsonRequest('http://test/agent', { messages: [{ role: 'user', content: 'hi' }] }));
     expect(res.status).toBe(401);
@@ -255,7 +254,7 @@ describe('chatStatusRoute', () => {
 
   it('401s when the user is not signed in', async () => {
     vi.doMock('./configStore', () => ({ getAgentConfig: () => enabledAgentConfig, setAgentConfig: vi.fn() }));
-    vi.doMock('next-auth/next', () => ({ getServerSession: vi.fn().mockResolvedValue(null) }));
+    vi.doMock('../admin/auth/session', () => ({ getCmsSession: vi.fn().mockResolvedValue(null) }));
     const { chatStatusRoute } = await import('./chatApi');
     const res = await chatStatusRoute();
     expect(res.status).toBe(401);

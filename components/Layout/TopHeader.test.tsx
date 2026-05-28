@@ -26,9 +26,13 @@ vi.mock('../../hooks/useConfig', () => ({
 
 vi.mock('../../hooks/useToast', () => ({ toast: vi.fn() }));
 
-vi.mock('next-auth/react', () => ({
-  useSession: () => ({ data: { user: { name: 'Tester', image: '' } } }),
-  signOut: vi.fn(),
+vi.mock('../../hooks/useCmsSession', () => ({
+  useCmsSession: () => ({
+    data: { user: { id: '1', name: 'Tester', image: '' } },
+    status: 'authenticated',
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+  }),
 }));
 
 vi.mock('next/navigation', () => ({
