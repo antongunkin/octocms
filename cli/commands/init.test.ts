@@ -73,7 +73,7 @@ describe('initCommand', () => {
     expect(layout).toContain("from 'octocms/admin'");
     expect(page).toContain("from 'octocms/admin'");
     expect(page).toContain('configInit');
-    expect(error).toContain("from 'octocms/admin'");
+    expect(error).toContain("from 'octocms/admin/error'");
     expect(error).toContain("'use client'");
   });
 

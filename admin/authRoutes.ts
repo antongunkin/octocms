@@ -9,10 +9,7 @@ import {
   buildSessionSetCookieHeader,
   clearOAuthStateCookie,
   clearCmsSessionCookie,
-  DEV_BYPASS_USER,
-  isDevAuthBypassEnabled,
   readOAuthStateCookie,
-  setCmsSessionCookie,
   toPublicSession,
 } from './auth/session';
 import type { CmsUser } from './auth/types';
@@ -144,17 +141,6 @@ async function handleSession(): Promise<Response> {
   return jsonResponse(toPublicSession(session));
 }
 
-async function handleDevBypass(): Promise<Response> {
-  if (!isDevAuthBypassEnabled()) {
-    return new Response(null, { status: 404 });
-  }
-
-  const session = { user: DEV_BYPASS_USER };
-  await setCmsSessionCookie(session);
-  const sessionCookie = await buildSessionSetCookieHeader(session);
-  return appendCookies(jsonResponse({ ok: true, user: DEV_BYPASS_USER }), sessionCookie);
-}
-
 /**
  * Factory for auth Route Handlers with optional access-control hook.
  */
@@ -177,9 +163,6 @@ export function createAuthRouteHandlers(options?: { authorizeUser?: AuthorizeUse
       case 'session':
         if (method !== 'GET') return new Response(null, { status: 405 });
         return handleSession();
-      case 'dev-bypass':
-        if (method !== 'POST') return new Response(null, { status: 405 });
-        return handleDevBypass();
       default:
         return new Response(null, { status: 404 });
     }

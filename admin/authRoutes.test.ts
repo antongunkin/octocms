@@ -44,7 +44,6 @@ describe('authRoute', () => {
     mockExchange.mockReset();
     mockGetAuthUrl.mockClear();
     vi.stubEnv('NODE_ENV', 'development');
-    vi.stubEnv('NEXT_PUBLIC_CMS_DEV_AUTH_BYPASS', undefined);
   });
 
   afterEach(() => {
@@ -89,19 +88,6 @@ describe('authRoute', () => {
   it('session returns 401 when unauthenticated', async () => {
     const res = await authRoute(new Request('http://localhost/api/octocms/auth/session'), 'session');
     expect(res.status).toBe(401);
-  });
-
-  it('dev-bypass is 404 when bypass flag is off', async () => {
-    const res = await authRoute(new Request('http://localhost/api/octocms/auth/dev-bypass', { method: 'POST' }), 'dev-bypass');
-    expect(res.status).toBe(404);
-  });
-
-  it('dev-bypass sets session when enabled in development', async () => {
-    vi.stubEnv('NEXT_PUBLIC_CMS_DEV_AUTH_BYPASS', '1');
-    const res = await authRoute(new Request('http://localhost/api/octocms/auth/dev-bypass', { method: 'POST' }), 'dev-bypass');
-    expect(res.status).toBe(200);
-    const setCookies = parseSetCookies(res);
-    expect(setCookies.some((c) => c.startsWith(`${CMS_SESSION_COOKIE}=`))).toBe(true);
   });
 
   it('logout clears session cookie', async () => {

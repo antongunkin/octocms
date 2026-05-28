@@ -8,7 +8,6 @@ export const OCTOCMS_API = {
     callback: '/api/octocms/auth/callback',
     logout: '/api/octocms/auth/logout',
     session: '/api/octocms/auth/session',
-    devBypass: '/api/octocms/auth/dev-bypass',
   },
   agent: '/api/octocms/agent',
   search: '/api/octocms/search',

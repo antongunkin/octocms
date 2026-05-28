@@ -178,8 +178,16 @@ export { AdminApp as default } from 'octocms/admin';
  */
 export const adminErrorTemplate = `'use client';
 
-export { AdminError as default } from 'octocms/admin';
+export { AdminError as default } from 'octocms/admin/error';
 `;
+
+/** Prior `error.tsx` templates — imported from the server barrel (breaks client build). */
+export const LEGACY_ADMIN_ERROR_TEMPLATES: ReadonlyArray<string> = [
+  `'use client';
+
+export { AdminError as default } from 'octocms/admin';
+`,
+];
 
 /**
  * Historical template values used by \`octocms update\` to recognise an

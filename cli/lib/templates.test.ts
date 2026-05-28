@@ -122,9 +122,9 @@ describe('admin route templates (3-file model)', () => {
     expect(page).not.toMatch(/'\.\.\/.*cms\/__generated__/);
   });
 
-  it('error.tsx is a client component re-exporting AdminError from the barrel', () => {
+  it('error.tsx is a client component re-exporting AdminError from the client entry', () => {
     expect(adminErrorTemplate).toContain("'use client'");
-    expect(adminErrorTemplate).toContain("from 'octocms/admin'");
+    expect(adminErrorTemplate).toContain("from 'octocms/admin/error'");
     expect(adminErrorTemplate).toContain('export { AdminError as default }');
   });
 });

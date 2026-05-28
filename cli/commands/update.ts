@@ -25,6 +25,7 @@ import {
   octocmsAuthRouteTemplate,
   LEGACY_NEXT_AUTH_ROUTE_TEMPLATE,
   LEGACY_ADMIN_CATCH_ALL_TEMPLATES,
+  LEGACY_ADMIN_ERROR_TEMPLATES,
   LEGACY_ADMIN_LAYOUT_TEMPLATES,
   rootLayoutConfigInitImport,
 } from '../lib/templates';
@@ -115,10 +116,13 @@ export async function updateCommand(projectRoot: string): Promise<void> {
   // 3. error.tsx
   {
     const path = join(absRoot, 'cms', 'error.tsx');
-    const result = writeOrMigrate(path, adminErrorTemplate, []);
+    const result = writeOrMigrate(path, adminErrorTemplate, LEGACY_ADMIN_ERROR_TEMPLATES);
     const display = `${rel}/cms/error.tsx`;
     if (result === 'created') {
       log.step(`${display} — created`);
+      allUpToDate = false;
+    } else if (result === 'updated') {
+      log.step(`${display} — updated (legacy → octocms/admin/error import)`);
       allUpToDate = false;
     } else if (result === 'unchanged') {
       log.success(`${display} — up to date`);

@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 
 import { getSessionSecret } from './env';
 import { sealSession, unsealSession } from './seal';
-import type { CmsSession, CmsSessionPublic, CmsUser } from './types';
+import type { CmsSession, CmsSessionPublic } from './types';
 import {
   CMS_OAUTH_STATE_COOKIE,
   CMS_SESSION_COOKIE,
@@ -90,15 +90,4 @@ export function buildOAuthStateSetCookieHeader(payload: OAuthStatePayload): stri
 export function buildOAuthStateClearCookieHeader(): string {
   const opts = oauthStateCookieOptions();
   return formatClearCookie(CMS_OAUTH_STATE_COOKIE, opts);
-}
-
-export const DEV_BYPASS_USER: CmsUser = {
-  id: 'dev',
-  name: 'Dev User',
-  email: 'dev@local',
-  image: null,
-};
-
-export function isDevAuthBypassEnabled(): boolean {
-  return process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_CMS_DEV_AUTH_BYPASS === '1';
 }
