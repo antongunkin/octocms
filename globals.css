@@ -9717,8 +9717,20 @@
 }
 
 /* ============================================================
-  7b. Unlayered body override — beats consumer site globals (including !important)
+  7b. Unlayered CMS surface reset — override consumer globals, then
+  @layer tokens/base/components rules above apply via revert-layer.
+  Custom properties (--octo-*) are not affected by `all` and keep
+  inheriting from html#octocms. MDXEditor overrides follow in §8.
   ============================================================ */
+
+html#octocms {
+  font-family: var(--octo-ft-ui);
+  font-size: 16px;
+  font-weight: normal;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
+}
 
 html#octocms body {
   margin: 0 !important;
@@ -9727,6 +9739,12 @@ html#octocms body {
   background: var(--octo-background) !important;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizelegibility;
+}
+
+html#octocms *,
+html#octocms *::before,
+html#octocms *::after {
+  all: revert-layer;
 }
 
 /* ============================================================
