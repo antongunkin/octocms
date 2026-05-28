@@ -32,9 +32,9 @@ export function StatusBadge({ status, variant = 'badge', size = 'md', className 
   const info = STATUSES[status];
   if (!info) return null;
   const sz = sizeStyles[size];
-  const fg = `var(--st-${status})`;
-  const bg = `var(--st-${status}-bg)`;
-  const bd = `var(--st-${status}-bd)`;
+  const fg = `var(--octo-st-${status})`;
+  const bg = `var(--octo-st-${status}-bg)`;
+  const bd = `var(--octo-st-${status}-bd)`;
 
   if (variant === 'dot') {
     return (

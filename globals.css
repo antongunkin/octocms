@@ -3,7 +3,7 @@
 /* ============================================================
    OctoCMS global styles — plain modern CSS.
    Sections:
-     1. Design tokens (:root dark + .light overrides)
+     1. Design tokens (html#octocms dark + html#octocms.light overrides)
      2. Scoped container + scrollbars
      3. Field shell helpers
      4. BEM foundation utilities
@@ -16,212 +16,212 @@
 
 @layer tokens {
   /* ============================================================
-     1. Design tokens (:root dark + .light overrides)
+     1. Design tokens (html#octocms dark + html#octocms.light overrides)
      ============================================================ */
 
   /* ============================================================
      Dark theme (default — no class needed)
      ============================================================ */
-  :root {
+  html#octocms {
     /* Layout */
-    --header-height: 57px;
-    --page-top-height: 63px;
-    --footer-height: 40px;
-    --v-gap: 20px;
-    --h-gap: 12px;
-    --h-gap-lg: 24px;
+    --octo-header-height: 57px;
+    --octo-page-top-height: 63px;
+    --octo-footer-height: 40px;
+    --octo-v-gap: 20px;
+    --octo-h-gap: 12px;
+    --octo-h-gap-lg: 24px;
 
     /* Typography — system fonts only */
-    --ft-ui:
+    --octo-ft-ui:
       system-ui, -apple-system, 'Segoe UI', roboto, 'Helvetica Neue', arial, 'Noto Sans', 'Liberation Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    --ft-mono: ui-monospace, sfmono-regular, 'SF Mono', menlo, consolas, 'Liberation Mono', monospace;
+    --octo-ft-mono: ui-monospace, sfmono-regular, 'SF Mono', menlo, consolas, 'Liberation Mono', monospace;
 
     /* surfaces */
-    --bg: #1a1816;
-    --surface-1: #25221f;
-    --surface-2: #2e2b27;
-    --surface-3: #3a3631;
-    --border: #4a443d;
-    --border-strong: #5e5750;
+    --octo-bg: #1a1816;
+    --octo-surface-1: #25221f;
+    --octo-surface-2: #2e2b27;
+    --octo-surface-3: #3a3631;
+    --octo-border: #4a443d;
+    --octo-border-strong: #5e5750;
 
     /* text */
-    --text: #faf7f3;
-    --text-2: #ddd6cb;
-    --muted: #b8b0a2;
+    --octo-text: #faf7f3;
+    --octo-text-2: #ddd6cb;
+    --octo-muted: #b8b0a2;
 
     /* brand */
-    --brand: #19e0a0;
-    --brand-fg: #95f0c8;
-    --brand-bg: #0e3326;
-    --brand-strong: #2dec90;
+    --octo-brand: #19e0a0;
+    --octo-brand-fg: #95f0c8;
+    --octo-brand-bg: #0e3326;
+    --octo-brand-strong: #2dec90;
 
     /* primary */
-    --primary: #faf7f3;
-    --primary-fg: #1a1816;
+    --octo-primary: #faf7f3;
+    --octo-primary-fg: #1a1816;
 
     /* accent */
-    --accent: #c2c9fd;
-    --accent-bg: #2e2c46;
-    --accent-fg: #dee2fe;
+    --octo-accent: #c2c9fd;
+    --octo-accent-bg: #2e2c46;
+    --octo-accent-fg: #dee2fe;
 
     /* ring */
-    --ring: var(--accent);
+    --octo-ring: var(--octo-accent);
 
     /* tones */
-    --danger: #fc8a82;
-    --danger-bg: #421f1c;
-    --danger-bd: #8a3025;
-    --warn: #fdc85a;
-    --warn-bg: #3e2f15;
-    --warn-bd: #8a611a;
-    --ok: #95f0c8;
-    --ok-bg: #143a2a;
-    --ok-bd: #2a6b4d;
+    --octo-danger: #fc8a82;
+    --octo-danger-bg: #421f1c;
+    --octo-danger-bd: #8a3025;
+    --octo-warn: #fdc85a;
+    --octo-warn-bg: #3e2f15;
+    --octo-warn-bd: #8a611a;
+    --octo-ok: #95f0c8;
+    --octo-ok-bg: #143a2a;
+    --octo-ok-bd: #2a6b4d;
 
     /* status */
-    --st-draft: #d0c9bc;
-    --st-draft-bg: #2e2b27;
-    --st-draft-bd: #4a443d;
-    --st-changed: #fdc85a;
-    --st-changed-bg: #3e2f15;
-    --st-changed-bd: #8a611a;
-    --st-published: #95f0c8;
-    --st-published-bg: #143a2a;
-    --st-published-bd: #2a6b4d;
-    --st-merged: #d6c7fe;
-    --st-merged-bg: #2e264a;
-    --st-merged-bd: #6b51c4;
-    --st-archived: #b8b0a2;
-    --st-archived-bg: #2e2b27;
-    --st-archived-bd: #4a443d;
+    --octo-st-draft: #d0c9bc;
+    --octo-st-draft-bg: #2e2b27;
+    --octo-st-draft-bd: #4a443d;
+    --octo-st-changed: #fdc85a;
+    --octo-st-changed-bg: #3e2f15;
+    --octo-st-changed-bd: #8a611a;
+    --octo-st-published: #95f0c8;
+    --octo-st-published-bg: #143a2a;
+    --octo-st-published-bd: #2a6b4d;
+    --octo-st-merged: #d6c7fe;
+    --octo-st-merged-bg: #2e264a;
+    --octo-st-merged-bd: #6b51c4;
+    --octo-st-archived: #b8b0a2;
+    --octo-st-archived-bg: #2e2b27;
+    --octo-st-archived-bd: #4a443d;
 
     /* diff */
-    --add-bg: #143a2a;
-    --add-fg: #95f0c8;
-    --del-bg: #421f1c;
-    --del-fg: #fc8a82;
+    --octo-add-bg: #143a2a;
+    --octo-add-fg: #95f0c8;
+    --octo-del-bg: #421f1c;
+    --octo-del-fg: #fc8a82;
 
     /* shadows */
-    --shadow-1: 0 1px 4px rgb(0 0 0 / 45%);
-    --shadow-2: 0 4px 16px rgb(0 0 0 / 50%);
-    --shadow-3: 0 16px 40px rgb(0 0 0 / 65%);
-    --shadow-inner: inset 0 0 1px rgb(255 255 255 / 45%);
+    --octo-shadow-1: 0 1px 4px rgb(0 0 0 / 45%);
+    --octo-shadow-2: 0 4px 16px rgb(0 0 0 / 50%);
+    --octo-shadow-3: 0 16px 40px rgb(0 0 0 / 65%);
+    --octo-shadow-inner: inset 0 0 1px rgb(255 255 255 / 45%);
 
     /* ─── Legacy shadcn aliases ─── */
-    --background: var(--bg);
-    --foreground: var(--text);
-    --card: var(--surface-1);
-    --card-foreground: var(--text);
-    --popover: var(--surface-1);
-    --popover-foreground: var(--text);
-    --primary-foreground: var(--primary-fg);
-    --secondary: var(--surface-2);
-    --secondary-foreground: var(--text);
-    --destructive: var(--danger);
-    --destructive-foreground: #fff;
-    --muted-bg: var(--surface-2);
-    --input: var(--surface-1);
-    --radius: 0.5rem;
+    --octo-background: var(--octo-bg);
+    --octo-foreground: var(--octo-text);
+    --octo-card: var(--octo-surface-1);
+    --octo-card-foreground: var(--octo-text);
+    --octo-popover: var(--octo-surface-1);
+    --octo-popover-foreground: var(--octo-text);
+    --octo-primary-foreground: var(--octo-primary-fg);
+    --octo-secondary: var(--octo-surface-2);
+    --octo-secondary-foreground: var(--octo-text);
+    --octo-destructive: var(--octo-danger);
+    --octo-destructive-foreground: #fff;
+    --octo-muted-bg: var(--octo-surface-2);
+    --octo-input: var(--octo-surface-1);
+    --octo-radius: 0.5rem;
 
     /* CMS layout aliases (used by legacy CSS Module classes) */
-    --color-layout-bg: var(--bg);
-    --color-text: var(--text);
-    --color-header-bg: var(--surface-1);
-    --color-header-text: var(--text);
-    --color-sidebar-bg: var(--surface-2);
-    --color-border: var(--border);
+    --octo-color-layout-bg: var(--octo-bg);
+    --octo-color-text: var(--octo-text);
+    --octo-color-header-bg: var(--octo-surface-1);
+    --octo-color-header-text: var(--octo-text);
+    --octo-color-sidebar-bg: var(--octo-surface-2);
+    --octo-color-border: var(--octo-border);
   }
 
   /* ============================================================
-     Light theme — applied when an ancestor has class="light"
+     Light theme — applied on html#octocms.light
      ============================================================ */
-  .light {
+  html#octocms.light {
     /* surfaces */
-    --bg: #fafaf9;
-    --surface-1: #fff;
-    --surface-2: #f4f2ee;
-    --surface-3: #ebe8e2;
-    --border: #d8d4cc;
-    --border-strong: #b8b1a5;
+    --octo-bg: #fafaf9;
+    --octo-surface-1: #fff;
+    --octo-surface-2: #f4f2ee;
+    --octo-surface-3: #ebe8e2;
+    --octo-border: #d8d4cc;
+    --octo-border-strong: #b8b1a5;
 
     /* text */
-    --text: #110d06;
-    --text-2: #3a342b;
-    --muted: #5d564b;
+    --octo-text: #110d06;
+    --octo-text-2: #3a342b;
+    --octo-muted: #5d564b;
 
     /* brand */
-    --brand: #04cd8c;
-    --brand-fg: #002b1c;
-    --brand-bg: #d8f5e8;
-    --brand-strong: #006e4a;
+    --octo-brand: #04cd8c;
+    --octo-brand-fg: #002b1c;
+    --octo-brand-bg: #d8f5e8;
+    --octo-brand-strong: #006e4a;
 
     /* primary */
-    --primary: #110d06;
-    --primary-fg: #fafaf9;
+    --octo-primary: #110d06;
+    --octo-primary-fg: #fafaf9;
 
     /* accent */
-    --accent: #4f46e5;
-    --accent-bg: #e6e8fc;
-    --accent-fg: #2c2483;
+    --octo-accent: #4f46e5;
+    --octo-accent-bg: #e6e8fc;
+    --octo-accent-fg: #2c2483;
 
     /* ring */
-    --ring: var(--accent);
+    --octo-ring: var(--octo-accent);
 
     /* tones */
-    --danger: #8c1810;
-    --danger-bg: #fde9e7;
-    --danger-bd: #f5a8a2;
-    --warn: #8c3500;
-    --warn-bg: #fff3d6;
-    --warn-bd: #f0bf6a;
-    --ok: #0f6332;
-    --ok-bg: #def9e6;
-    --ok-bd: #8eddae;
+    --octo-danger: #8c1810;
+    --octo-danger-bg: #fde9e7;
+    --octo-danger-bd: #f5a8a2;
+    --octo-warn: #8c3500;
+    --octo-warn-bg: #fff3d6;
+    --octo-warn-bd: #f0bf6a;
+    --octo-ok: #0f6332;
+    --octo-ok-bg: #def9e6;
+    --octo-ok-bd: #8eddae;
 
     /* status */
-    --st-draft: #4a4339;
-    --st-draft-bg: #efece8;
-    --st-draft-bd: #c5bfb4;
-    --st-changed: #8c3500;
-    --st-changed-bg: #fff3d6;
-    --st-changed-bd: #f0bf6a;
-    --st-published: #044e30;
-    --st-published-bg: #def9e6;
-    --st-published-bd: #8eddae;
-    --st-merged: #432eaa;
-    --st-merged-bg: #e7defc;
-    --st-merged-bd: #b69dff;
-    --st-archived: #3f3a33;
-    --st-archived-bg: #e3dfd7;
-    --st-archived-bd: #b8b1a5;
+    --octo-st-draft: #4a4339;
+    --octo-st-draft-bg: #efece8;
+    --octo-st-draft-bd: #c5bfb4;
+    --octo-st-changed: #8c3500;
+    --octo-st-changed-bg: #fff3d6;
+    --octo-st-changed-bd: #f0bf6a;
+    --octo-st-published: #044e30;
+    --octo-st-published-bg: #def9e6;
+    --octo-st-published-bd: #8eddae;
+    --octo-st-merged: #432eaa;
+    --octo-st-merged-bg: #e7defc;
+    --octo-st-merged-bd: #b69dff;
+    --octo-st-archived: #3f3a33;
+    --octo-st-archived-bg: #e3dfd7;
+    --octo-st-archived-bd: #b8b1a5;
 
     /* diff */
-    --add-bg: #def9e6;
-    --add-fg: #033f23;
-    --del-bg: #fde9e7;
-    --del-fg: #5e1810;
+    --octo-add-bg: #def9e6;
+    --octo-add-fg: #033f23;
+    --octo-del-bg: #fde9e7;
+    --octo-del-fg: #5e1810;
 
     /* shadows */
-    --shadow-1: 0 1px 2px rgb(20 15 5 / 35%);
-    --shadow-2: 0 4px 12px rgb(20 15 5 / 6%), 0 1px 3px rgb(20 15 5 / 4%);
-    --shadow-3: 0 16px 40px rgb(20 15 5 / 10%), 0 4px 10px rgb(20 15 5 / 5%);
+    --octo-shadow-1: 0 1px 2px rgb(20 15 5 / 35%);
+    --octo-shadow-2: 0 4px 12px rgb(20 15 5 / 6%), 0 1px 3px rgb(20 15 5 / 4%);
+    --octo-shadow-3: 0 16px 40px rgb(20 15 5 / 10%), 0 4px 10px rgb(20 15 5 / 5%);
 
     /* ui aliases — must re-declare here so var() refs resolve in .light context
        (CSS custom props inherit the :root-resolved value, not the token string) */
-    --background: var(--bg);
-    --foreground: var(--text);
-    --card: var(--surface-1);
-    --card-foreground: var(--text);
-    --popover: var(--surface-1);
-    --popover-foreground: var(--text);
-    --primary-foreground: var(--primary-fg);
-    --secondary: var(--surface-2);
-    --secondary-foreground: var(--text);
-    --destructive: var(--danger);
-    --muted-bg: var(--surface-2);
-    --input: var(--surface-1);
-    --color-layout-bg: var(--bg);
+    --octo-background: var(--octo-bg);
+    --octo-foreground: var(--octo-text);
+    --octo-card: var(--octo-surface-1);
+    --octo-card-foreground: var(--octo-text);
+    --octo-popover: var(--octo-surface-1);
+    --octo-popover-foreground: var(--octo-text);
+    --octo-primary-foreground: var(--octo-primary-fg);
+    --octo-secondary: var(--octo-surface-2);
+    --octo-secondary-foreground: var(--octo-text);
+    --octo-destructive: var(--octo-danger);
+    --octo-muted-bg: var(--octo-surface-2);
+    --octo-input: var(--octo-surface-1);
+    --octo-color-layout-bg: var(--octo-bg);
   }
 }
 
@@ -230,9 +230,9 @@
      2. Scoped container + scrollbars
      ============================================================ */
   .scoped {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--ft-ui);
+    background: var(--octo-bg);
+    color: var(--octo-text);
+    font-family: var(--octo-ft-ui);
   }
 
   /* .scroll — legacy alias; new code should use .octo-scroll instead */
@@ -242,7 +242,7 @@
   }
 
   .scroll::-webkit-scrollbar-thumb {
-    background: var(--border-strong);
+    background: var(--octo-border-strong);
     border-radius: 10px;
     border: 2px solid transparent;
     background-clip: padding-box;
@@ -252,7 +252,7 @@
     background: transparent;
   }
 
-  html {
+  html#octocms {
     scrollbar-color: hsl(0deg 0% 67%) transparent;
   }
 
@@ -267,27 +267,27 @@
   }
 
   .field-shell:hover {
-    border-color: var(--border-strong) !important;
+    border-color: var(--octo-border-strong) !important;
   }
 
   .field-shell:has(input:focus),
   .field-shell:has(input:focus-visible) {
-    border-color: var(--ring) !important;
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent) !important;
+    border-color: var(--octo-ring) !important;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--octo-ring) 22%, transparent) !important;
   }
 
   .field-textarea:focus,
   .field-textarea:focus-visible,
   .field-select:focus,
   .field-select:focus-visible {
-    border-color: var(--ring) !important;
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent) !important;
+    border-color: var(--octo-ring) !important;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--octo-ring) 22%, transparent) !important;
     outline: none;
   }
 
   .field-shell input::placeholder,
   .field-textarea::placeholder {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* Native date/time inputs: sync color-scheme so the browser renders the
@@ -301,11 +301,11 @@
     color-scheme: dark;
   }
 
-  .light .field-shell input[type='date'],
-  .light .field-shell input[type='datetime-local'],
-  .light .field-shell input[type='time'],
-  .light .field-shell input[type='month'],
-  .light .field-shell input[type='week'] {
+  html#octocms.light .field-shell input[type='date'],
+  html#octocms.light .field-shell input[type='datetime-local'],
+  html#octocms.light .field-shell input[type='time'],
+  html#octocms.light .field-shell input[type='month'],
+  html#octocms.light .field-shell input[type='week'] {
     color-scheme: light;
   }
 
@@ -333,7 +333,7 @@
   }
 
   .octo-scroll::-webkit-scrollbar-thumb {
-    background: var(--border-strong);
+    background: var(--octo-border-strong);
     border-radius: 10px;
     border: 2px solid transparent;
     background-clip: padding-box;
@@ -386,7 +386,7 @@
     list-style: none;
   }
 
-  html:focus-within {
+  html#octocms:focus-within {
     scroll-behavior: smooth;
   }
 
@@ -408,7 +408,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    html:focus-within {
+    html#octocms:focus-within {
       scroll-behavior: auto;
     }
 
@@ -422,8 +422,8 @@
     }
   }
 
-  body,
-  html {
+  html#octocms,
+  html#octocms body {
     height: 100%;
     scroll-behavior: smooth;
   }
@@ -444,26 +444,26 @@
     outline: none;
   }
 
-  html {
+  html#octocms {
     font-size: 16px;
-    font-family: var(--ft-ui);
+    font-family: var(--octo-ft-ui);
     font-weight: normal;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
     scrollbar-gutter: stable;
   }
 
-  body {
+  html#octocms body {
     margin: 0;
     padding: 0;
-    color: var(--foreground);
-    background: var(--background);
+    color: var(--octo-foreground);
+    background: var(--octo-background);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizelegibility;
   }
 
-  body:has(dialog[open]),
-  body:has(.octo-inline-editor) {
+  html#octocms body:has(dialog[open]),
+  html#octocms body:has(.octo-inline-editor) {
     overflow: hidden;
   }
 }
@@ -499,7 +499,7 @@
     line-height: 1;
 
     &:focus-visible {
-      outline: 2px solid var(--ring);
+      outline: 2px solid var(--octo-ring);
       outline-offset: 2px;
     }
 
@@ -515,8 +515,8 @@
 
     &[class*='--default'],
     &[class*='--primary'] {
-      background: var(--primary);
-      color: var(--primary-fg);
+      background: var(--octo-primary);
+      color: var(--octo-primary-fg);
 
       &:hover {
         opacity: 0.9;
@@ -524,8 +524,8 @@
     }
 
     &[class*='--destructive'] {
-      background: var(--destructive);
-      color: var(--destructive-foreground);
+      background: var(--octo-destructive);
+      color: var(--octo-destructive-foreground);
 
       &:hover {
         opacity: 0.9;
@@ -533,38 +533,38 @@
     }
 
     &[class*='--outline'] {
-      border-color: var(--border-strong);
+      border-color: var(--octo-border-strong);
       background: transparent;
-      color: var(--text);
+      color: var(--octo-text);
 
       &:hover {
-        background: var(--surface-3);
+        background: var(--octo-surface-3);
       }
     }
 
     &[class*='--secondary'] {
-      border-color: var(--border);
-      background: var(--surface-1);
-      color: var(--text);
+      border-color: var(--octo-border);
+      background: var(--octo-surface-1);
+      color: var(--octo-text);
 
       &:hover {
-        background: var(--surface-3);
+        background: var(--octo-surface-3);
       }
     }
 
     &[class*='--ghost'] {
       background: transparent;
-      color: var(--text);
+      color: var(--octo-text);
       border-color: transparent;
 
       &:hover {
-        background: var(--surface-3);
+        background: var(--octo-surface-3);
       }
     }
 
     &[class*='--link'] {
       background: transparent;
-      color: var(--primary);
+      color: var(--octo-primary);
       border-color: transparent;
       text-underline-offset: 4px;
 
@@ -574,8 +574,8 @@
     }
 
     &[class*='--brand'] {
-      background: var(--brand);
-      color: var(--brand-fg);
+      background: var(--octo-brand);
+      color: var(--octo-brand-fg);
 
       &:hover {
         opacity: 0.9;
@@ -597,7 +597,7 @@
     }
 
     &[class*='--publish'] {
-      background: var(--brand);
+      background: var(--octo-brand);
       color: #003d29;
       border-color: transparent;
       box-shadow:
@@ -617,18 +617,18 @@
       height: 32px;
       padding: 0 12px;
       gap: 8px;
-      font-family: var(--ft-mono);
+      font-family: var(--octo-ft-mono);
       font-size: 12px;
       font-weight: 500;
-      border-color: var(--border);
-      background: var(--surface-1);
-      color: var(--text);
+      border-color: var(--octo-border);
+      background: var(--octo-surface-1);
+      color: var(--octo-text);
       border-radius: 9999px;
     }
 
     &[class*='--branch-disabled'] {
       cursor: default;
-      color: var(--muted);
+      color: var(--octo-muted);
       opacity: 0.6;
     }
   }
@@ -651,25 +651,25 @@
 
   .octo-button__branch-ahead {
     border-radius: 4px;
-    border: 1px solid var(--st-changed-bd);
+    border: 1px solid var(--octo-st-changed-bd);
     padding: 0 6px;
     font-size: 10px;
     font-weight: 600;
     line-height: 16px;
-    color: var(--st-changed);
-    background: var(--st-changed-bg);
+    color: var(--octo-st-changed);
+    background: var(--octo-st-changed-bg);
   }
 
   .octo-button__branch-dirty {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-card ── */
   .octo-card {
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
-    color: var(--text);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
+    color: var(--octo-text);
     overflow: hidden;
 
     &[class*='--banner'] {
@@ -680,33 +680,33 @@
     }
 
     &[class*='--banner-info'] {
-      border-color: var(--border-strong);
-      background: var(--surface-2);
-      color: var(--text);
+      border-color: var(--octo-border-strong);
+      background: var(--octo-surface-2);
+      color: var(--octo-text);
     }
 
     &[class*='--banner-warn'] {
-      border-color: var(--st-changed-bd);
-      background: var(--st-changed-bg);
-      color: var(--st-changed);
+      border-color: var(--octo-st-changed-bd);
+      background: var(--octo-st-changed-bg);
+      color: var(--octo-st-changed);
     }
 
     &[class*='--banner-success'] {
-      border-color: var(--ok-bd);
-      background: var(--ok-bg);
-      color: var(--ok);
+      border-color: var(--octo-ok-bd);
+      background: var(--octo-ok-bg);
+      color: var(--octo-ok);
     }
 
     &[class*='--banner-danger'] {
-      border-color: var(--danger-bd);
-      background: var(--danger-bg);
-      color: var(--danger);
+      border-color: var(--octo-danger-bd);
+      background: var(--octo-danger-bg);
+      color: var(--octo-danger);
     }
 
     &[class*='--banner-brand'] {
-      border-color: var(--brand);
-      background: var(--brand-bg);
-      color: var(--brand-fg);
+      border-color: var(--octo-brand);
+      background: var(--octo-brand-bg);
+      color: var(--octo-brand-fg);
     }
 
     &[class*='--empty'] {
@@ -722,8 +722,8 @@
     align-items: center;
     gap: 8px;
     padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    border-bottom: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
   }
 
   .octo-card__title {
@@ -745,14 +745,14 @@
     align-items: center;
     gap: 6px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
     padding: 4px 10px;
     font-size: 12px;
-    color: var(--text-2);
+    color: var(--octo-text-2);
 
     &[class*='--mono'] {
-      font-family: var(--ft-mono);
+      font-family: var(--octo-ft-mono);
     }
 
     &[class*='--kbd'] {
@@ -760,11 +760,11 @@
       justify-content: center;
       border-radius: 4px;
       padding: 0 6px;
-      font-family: var(--ft-mono);
+      font-family: var(--octo-ft-mono);
       font-size: 10px;
       font-weight: 500;
-      color: var(--muted);
-      background: var(--surface-2);
+      color: var(--octo-muted);
+      background: var(--octo-surface-2);
     }
 
     &[class*='--status'] {
@@ -789,7 +789,7 @@
     &[class*='--status-dot'] {
       background: transparent;
       border: none;
-      color: var(--text-2);
+      color: var(--octo-text-2);
       padding: 0;
     }
 
@@ -843,7 +843,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     font-size: 12px;
     font-weight: 500;
   }
@@ -855,7 +855,7 @@
   }
 
   .octo-field + .octo-field {
-    margin-top: var(--v-gap);
+    margin-top: var(--octo-v-gap);
   }
 
   .octo-field__header {
@@ -868,34 +868,34 @@
   .octo-field__label {
     font-size: 12px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-field__required {
     margin-left: 2px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-field__schema {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-field__lock {
     display: inline-flex;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-field__dirty {
     border-radius: 4px;
-    border: 1px solid var(--st-changed-bd);
+    border: 1px solid var(--octo-st-changed-bd);
     padding: 0 8px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
     font-weight: 500;
-    color: var(--st-changed);
-    background: var(--st-changed-bg);
+    color: var(--octo-st-changed);
+    background: var(--octo-st-changed-bg);
   }
 
   .octo-field__spacer {
@@ -904,14 +904,14 @@
 
   .octo-field__hint {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-field__helper {
     margin-bottom: 8px;
     font-size: 12px;
     line-height: 1.5;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-field__error {
@@ -920,7 +920,7 @@
     gap: 6px;
     margin-top: 8px;
     font-size: 12px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   /* ── octo-input ── */
@@ -929,27 +929,27 @@
     height: 40px;
     width: 100%;
     border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 0 12px;
     font-size: 14px;
-    color: var(--text);
-    box-shadow: var(--shadow-1);
+    color: var(--octo-text);
+    box-shadow: var(--octo-shadow-1);
     transition:
       border-color 120ms,
       box-shadow 120ms;
 
     &::placeholder {
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &:hover {
-      border-color: var(--border-strong);
+      border-color: var(--octo-border-strong);
     }
 
     &:focus-visible {
-      border-color: var(--ring);
-      box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
+      border-color: var(--octo-ring);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--octo-ring) 22%, transparent);
       outline: none;
     }
 
@@ -965,24 +965,24 @@
       align-items: center;
       gap: 8px;
       border-radius: 9999px;
-      border: 1px solid var(--border);
-      background: var(--surface-1);
+      border: 1px solid var(--octo-border);
+      background: var(--octo-surface-1);
       padding: 0 12px;
       font-size: 14px;
-      color: var(--text);
-      box-shadow: var(--shadow-1);
+      color: var(--octo-text);
+      box-shadow: var(--octo-shadow-1);
       transition:
         border-color 120ms,
         box-shadow 120ms;
 
       &:hover {
-        border-color: var(--border-strong);
+        border-color: var(--octo-border-strong);
       }
 
       &:has(input:focus),
       &:has(input:focus-visible) {
-        border-color: var(--ring);
-        box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
+        border-color: var(--octo-ring);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--octo-ring) 22%, transparent);
       }
 
       &:has(input:disabled) {
@@ -992,7 +992,7 @@
     }
 
     &[class*='--shell--error'] {
-      border-color: var(--danger);
+      border-color: var(--octo-danger);
     }
   }
 
@@ -1000,7 +1000,7 @@
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-input__inner {
@@ -1012,12 +1012,12 @@
     background: transparent;
     padding: 0;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
     outline: none;
   }
 
   .octo-input__inner::placeholder {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-textarea ── */
@@ -1026,25 +1026,25 @@
     min-height: 108px;
     width: 100%;
     border-radius: 16px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 8px 12px;
     font-size: 14px;
-    color: var(--text);
-    box-shadow: var(--shadow-1);
+    color: var(--octo-text);
+    box-shadow: var(--octo-shadow-1);
 
     &::placeholder {
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &:hover {
-      border-color: var(--border-strong);
+      border-color: var(--octo-border-strong);
     }
 
     &:focus,
     &:focus-visible {
-      border-color: var(--ring);
-      box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
+      border-color: var(--octo-ring);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--octo-ring) 22%, transparent);
       outline: none;
     }
 
@@ -1054,7 +1054,7 @@
     }
 
     &[class*='--error'] {
-      border-color: var(--danger);
+      border-color: var(--octo-danger);
     }
   }
 
@@ -1098,12 +1098,12 @@
     width: 100%;
     max-width: 512px;
     gap: 16px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 24px;
-    box-shadow: var(--shadow-2);
+    box-shadow: var(--octo-shadow-2);
     border-radius: 12px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-dialog__content[data-state='open'] {
@@ -1118,7 +1118,7 @@
     position: fixed;
     inset: 0;
     z-index: 49;
-    background: var(--bg);
+    background: var(--octo-bg);
     opacity: 0.8;
   }
 
@@ -1136,7 +1136,7 @@
     align-items: center;
     justify-content: center;
     padding: 2px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-dialog__close:hover {
@@ -1144,7 +1144,7 @@
   }
 
   .octo-dialog__close:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--octo-ring);
     outline-offset: 2px;
   }
 
@@ -1177,12 +1177,12 @@
     font-size: 18px;
     font-weight: 600;
     line-height: 1;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-dialog__description {
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   @keyframes octo-popup-in {
@@ -1216,11 +1216,11 @@
     max-height: 24rem;
     overflow: hidden auto;
     border-radius: 16px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 6px;
-    color: var(--text);
-    box-shadow: var(--shadow-2);
+    color: var(--octo-text);
+    box-shadow: var(--octo-shadow-2);
   }
 
   .octo-dropdown__content[data-state='open'] {
@@ -1243,7 +1243,7 @@
     border-radius: 10px;
     padding: 8px 10px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
     background: none;
     border: none;
     text-align: left;
@@ -1252,12 +1252,12 @@
   }
 
   .octo-dropdown__item:focus {
-    background: var(--surface-3);
+    background: var(--octo-surface-3);
   }
 
   .octo-dropdown__item[data-disabled] {
     pointer-events: none;
-    color: var(--muted);
+    color: var(--octo-muted);
     opacity: 0.7;
   }
 
@@ -1268,7 +1268,7 @@
     }
 
     &[class*='--checkable'][data-state='checked'] {
-      background: var(--accent-bg);
+      background: var(--octo-accent-bg);
     }
 
     &[class*='--inset'] {
@@ -1292,17 +1292,17 @@
     border-radius: 10px;
     padding: 8px 10px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
     outline: none;
     transition: background-color 80ms;
   }
 
   .octo-dropdown__sub-trigger:focus {
-    background: var(--surface-3);
+    background: var(--octo-surface-3);
   }
 
   .octo-dropdown__sub-trigger[data-state='open'] {
-    background: var(--surface-3);
+    background: var(--octo-surface-3);
   }
 
   .octo-dropdown__sub-trigger svg {
@@ -1323,7 +1323,7 @@
     padding: 6px 10px;
     font-size: 14px;
     font-weight: 600;
-    color: var(--muted);
+    color: var(--octo-muted);
 
     &[class*='--inset'] {
       padding-left: 32px;
@@ -1333,7 +1333,7 @@
   .octo-dropdown__separator {
     margin: 4px -4px;
     height: 1px;
-    background: var(--border);
+    background: var(--octo-border);
     overflow: hidden;
     border: none;
   }
@@ -1374,11 +1374,11 @@
     align-items: center;
     justify-content: space-between;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 8px 14px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
     outline: none;
     transition:
       border-color 120ms,
@@ -1386,16 +1386,16 @@
   }
 
   .octo-select__trigger:hover {
-    border-color: var(--border-strong);
+    border-color: var(--octo-border-strong);
   }
 
   .octo-select__trigger:focus {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
+    border-color: var(--octo-ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--octo-ring) 22%, transparent);
   }
 
   .octo-select__trigger[data-placeholder] {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-select__trigger:disabled {
@@ -1437,10 +1437,10 @@
     min-width: 8rem;
     overflow: hidden auto;
     border-radius: 16px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
-    color: var(--text);
-    box-shadow: var(--shadow-2);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
+    color: var(--octo-text);
+    box-shadow: var(--octo-shadow-2);
     transform-origin: var(--radix-select-content-transform-origin);
   }
 
@@ -1478,26 +1478,26 @@
     border-radius: 10px;
     padding: 8px 10px 8px 32px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
     outline: none;
     transition: background-color 80ms;
   }
 
   .octo-select__item:focus {
-    background: var(--surface-3);
+    background: var(--octo-surface-3);
   }
 
   .octo-select__item[data-state='checked'] {
-    background: var(--accent-bg);
+    background: var(--octo-accent-bg);
   }
 
   .octo-select__item[data-state='checked']:focus {
-    background: var(--accent-bg);
+    background: var(--octo-accent-bg);
   }
 
   .octo-select__item[data-disabled] {
     pointer-events: none;
-    color: var(--muted);
+    color: var(--octo-muted);
     opacity: 0.7;
   }
 
@@ -1519,7 +1519,7 @@
   .octo-select__separator {
     margin: 4px -4px;
     height: 1px;
-    background: var(--surface-3);
+    background: var(--octo-surface-3);
   }
 
   /* ── octo-switcher ── */
@@ -1527,8 +1527,8 @@
     display: inline-flex;
     align-items: center;
     border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 2px;
   }
 
@@ -1543,7 +1543,7 @@
     border-radius: 9999px;
     border: 0;
     background: transparent;
-    color: var(--muted);
+    color: var(--octo-muted);
     cursor: pointer;
     transition:
       background-color 120ms,
@@ -1552,21 +1552,21 @@
     outline: none;
 
     &:not(:is([aria-selected='true'], [data-state='active'])):hover {
-      color: var(--text);
+      color: var(--octo-text);
     }
 
     &:is([aria-selected='true'], [data-state='active']) {
-      background: var(--surface-3);
-      color: var(--text);
+      background: var(--octo-surface-3);
+      color: var(--octo-text);
     }
 
     &:focus-visible {
-      box-shadow: 0 0 0 2px var(--ring);
+      box-shadow: 0 0 0 2px var(--octo-ring);
     }
 
     &[data-disabled] {
       pointer-events: none;
-      color: var(--muted);
+      color: var(--octo-muted);
       opacity: 0.5;
       cursor: not-allowed;
     }
@@ -1583,7 +1583,7 @@
   }
 
   .octo-tabs__content:focus-visible {
-    box-shadow: 0 0 0 2px var(--ring);
+    box-shadow: 0 0 0 2px var(--octo-ring);
   }
 
   /* ── octo-toast ── */
@@ -1625,10 +1625,10 @@
     gap: 8px;
     overflow: hidden;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 16px;
-    box-shadow: var(--shadow-2);
+    box-shadow: var(--octo-shadow-2);
     pointer-events: auto;
     transition:
       transform 300ms,
@@ -1655,8 +1655,8 @@
     }
 
     &[class*='--destructive'] {
-      border-color: var(--danger);
-      background: var(--danger-bg, var(--surface-1));
+      border-color: var(--octo-danger);
+      background: var(--danger-bg, var(--octo-surface-1));
     }
 
     &[class*='--success'] {
@@ -1665,7 +1665,7 @@
 
     &[class*='--destructive'] {
       .octo-toast__action {
-        border-color: var(--danger);
+        border-color: var(--octo-danger);
       }
     }
   }
@@ -1673,12 +1673,12 @@
   .octo-toast__title {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-toast__description {
     font-size: 13px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-toast__close {
@@ -1702,7 +1702,7 @@
   }
 
   .octo-toast__close:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--octo-ring);
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -1720,7 +1720,7 @@
     padding: 4px 12px;
     font-size: 13px;
     font-weight: 500;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     background: transparent;
     cursor: pointer;
     white-space: nowrap;
@@ -1728,11 +1728,11 @@
   }
 
   .octo-toast__action:hover {
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
   }
 
   .octo-toast__action:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--octo-ring);
     outline-offset: 2px;
   }
 
@@ -1790,21 +1790,21 @@
   }
 
   .octo-table__head {
-    border-bottom: 2px solid var(--border);
+    border-bottom: 2px solid var(--octo-border);
   }
 
   .octo-table__row {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--octo-border);
     transition: background-color 80ms;
   }
 
   .octo-table__row[aria-selected='true'] {
-    background: var(--accent-bg);
+    background: var(--octo-accent-bg);
   }
 
   .octo-table__head .octo-table__row:hover,
   .octo-table__body .octo-table__row:hover {
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
   }
 
   .octo-table__header {
@@ -1814,7 +1814,7 @@
     vertical-align: middle;
     font-size: 12px;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--octo-muted);
     white-space: nowrap;
   }
 
@@ -1825,7 +1825,7 @@
   .octo-table__cell {
     padding: 10px 12px;
     vertical-align: middle;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-table__cell[data-align='right'] {
@@ -1835,7 +1835,7 @@
   .octo-table__caption {
     margin-top: 8px;
     font-size: 13px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ============================================================
@@ -1844,8 +1844,8 @@
 
   /* ── octo-layout ── */
   .octo-layout {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--octo-bg);
+    color: var(--octo-text);
     max-width: 1440px;
     margin: 0 auto;
   }
@@ -1855,7 +1855,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 30%, transparent);
   }
 
   .octo-layout__sign-in-inner {
@@ -1885,7 +1885,7 @@
   .octo-layout__sign-in-subtitle {
     margin: 0 0 32px;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-layout__main {
@@ -1899,27 +1899,27 @@
     top: 0;
     z-index: 42;
     display: flex;
-    height: var(--header-height);
+    height: var(--octo-header-height);
     flex: none;
     align-items: center;
     gap: 10px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-1);
+    border-bottom: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     box-shadow:
-      -400px -1px 0 var(--surface-1),
-      400px -1px 0 var(--surface-1),
-      -800px -1px 0 var(--surface-1),
-      800px -1px 0 var(--surface-1),
-      -1200px -1px 0 var(--surface-1),
-      1200px -1px 0 var(--surface-1),
-      -400px 0 0 var(--border),
-      400px 0 0 var(--border),
-      -800px 0 0 var(--border),
-      800px 0 0 var(--border),
-      -1200px 0 0 var(--border),
-      1200px 0 0 var(--border);
+      -400px -1px 0 var(--octo-surface-1),
+      400px -1px 0 var(--octo-surface-1),
+      -800px -1px 0 var(--octo-surface-1),
+      800px -1px 0 var(--octo-surface-1),
+      -1200px -1px 0 var(--octo-surface-1),
+      1200px -1px 0 var(--octo-surface-1),
+      -400px 0 0 var(--octo-border),
+      400px 0 0 var(--octo-border),
+      -800px 0 0 var(--octo-border),
+      800px 0 0 var(--octo-border),
+      -1200px 0 0 var(--octo-border),
+      1200px 0 0 var(--octo-border);
     padding: 0 24px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-top-header__logo {
@@ -1931,12 +1931,12 @@
     overflow: hidden;
     white-space: nowrap;
     border-radius: 9999px;
-    box-shadow: inset 0 0 0 1px var(--border);
+    box-shadow: inset 0 0 0 1px var(--octo-border);
     background: transparent;
     padding: 0 14px;
     font-size: 14px;
     font-weight: 700;
-    color: var(--text);
+    color: var(--octo-text);
     text-decoration: none;
   }
 
@@ -1949,7 +1949,7 @@
     flex-shrink: 0;
     height: 22px;
     width: 1px;
-    background: var(--border);
+    background: var(--octo-border);
     margin: 0 4px;
   }
 
@@ -1972,16 +1972,16 @@
     text-decoration: none;
     background: transparent;
     font-weight: 600;
-    color: var(--text-2);
+    color: var(--octo-text-2);
     transition: color 80ms;
 
     &:hover {
-      color: var(--text);
+      color: var(--octo-text);
     }
 
     &:is([aria-current='page'], [class*='--active']) {
-      background: var(--surface-2);
-      color: var(--text);
+      background: var(--octo-surface-2);
+      color: var(--octo-text);
     }
   }
 
@@ -2000,11 +2000,11 @@
     overflow: hidden;
     white-space: nowrap;
     border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
     padding: 0 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     flex: 0 1 150px;
   }
 
@@ -2035,7 +2035,7 @@
     border: 0;
     background: transparent;
     padding: 0 4px;
-    color: var(--text-2);
+    color: var(--octo-text-2);
   }
 
   :is(
@@ -2044,7 +2044,7 @@
     .octo-top-header__search,
     .octo-top-header__user-btn
   ):focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--octo-ring);
     outline-offset: 2px;
   }
 
@@ -2084,17 +2084,17 @@
   }
 
   .octo-branch-selector-dialog__dot--active {
-    background: var(--ok);
+    background: var(--octo-ok);
   }
 
   .octo-branch-selector-dialog__name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 13px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-branch-selector-dialog__live {
@@ -2102,7 +2102,7 @@
     padding: 0 8px 0 4px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--ok);
+    color: var(--octo-ok);
   }
 
   .octo-branch-selector-dialog__publish {
@@ -2111,10 +2111,10 @@
     padding: 0 8px;
     font-size: 12px;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--octo-muted);
 
     &:hover {
-      color: var(--ok);
+      color: var(--octo-ok);
     }
   }
 
@@ -2122,10 +2122,10 @@
     flex-shrink: 0;
     height: 32px;
     width: 32px;
-    color: var(--muted);
+    color: var(--octo-muted);
 
     &:hover {
-      color: var(--text);
+      color: var(--octo-text);
     }
   }
 
@@ -2135,7 +2135,7 @@
     gap: 8px;
     padding: 8px 12px;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-branch-selector-dialog__spinner {
@@ -2150,7 +2150,7 @@
 
   .octo-top-header__logo-spinner {
     flex-shrink: 0;
-    color: var(--st-changed);
+    color: var(--octo-st-changed);
     animation: octo-spin 1s linear infinite;
   }
 
@@ -2177,7 +2177,7 @@
     width: 120px;
     flex-shrink: 0;
     border-radius: 9999px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
   }
 
   .octo-top-header__nav-link-skel {
@@ -2192,8 +2192,8 @@
     width: 150px;
     flex-shrink: 0;
     border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
   }
 
   .octo-top-header__user-skel {
@@ -2201,8 +2201,8 @@
     width: 88px;
     flex-shrink: 0;
     border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
   }
 
   .octo-top-header__avatar-skel {
@@ -2235,40 +2235,40 @@
     background: transparent;
     border: 0;
     cursor: pointer;
-    color: var(--text-2);
+    color: var(--octo-text-2);
 
     &:hover {
-      background: var(--surface-1);
+      background: var(--octo-surface-1);
     }
 
     &:focus-visible {
-      outline: 2px solid var(--ring);
+      outline: 2px solid var(--octo-ring);
       outline-offset: 2px;
       border-radius: 8px;
     }
 
     &:is([aria-current='page'], [class*='--active']) {
-      background: var(--surface-3);
+      background: var(--octo-surface-3);
       font-weight: 600;
-      color: var(--text);
+      color: var(--octo-text);
 
       &:hover {
-        background: var(--surface-3);
+        background: var(--octo-surface-3);
       }
 
       .octo-left-nav-item__icon {
-        color: var(--text);
+        color: var(--octo-text);
       }
 
       .octo-left-nav-item__count {
-        color: var(--text-2);
+        color: var(--octo-text-2);
       }
     }
   }
 
   .octo-left-nav-item__icon {
     flex-shrink: 0;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-left-nav-item__label {
@@ -2281,7 +2281,7 @@
   .octo-left-nav-item__count {
     font-size: 12px;
     font-variant-numeric: tabular-nums;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-page-shell ── */
@@ -2298,13 +2298,13 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    padding: var(--v-gap) var(--h-gap-lg) var(--footer-height);
+    padding: var(--octo-v-gap) var(--octo-h-gap-lg) var(--octo-footer-height);
   }
 
   /* ── octo-shimmer-block / octo-shimmer-row ── */
   .octo-shimmer-block {
     border-radius: 6px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     animation: octo-shimmer 2s ease-in-out infinite;
   }
 
@@ -2317,19 +2317,19 @@
   /* ── octo-page-top (shared page header bar pattern) ── */
   .octo-page-top {
     position: sticky;
-    top: var(--header-height);
+    top: var(--octo-header-height);
     z-index: 40;
     display: flex;
-    height: var(--page-top-height);
+    height: var(--octo-page-top-height);
     flex: none;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    background: color-mix(in srgb, var(--bg) 95%, transparent);
-    padding: 12px var(--h-gap-lg);
+    background: color-mix(in srgb, var(--octo-bg) 95%, transparent);
+    padding: 12px var(--octo-h-gap-lg);
     box-shadow:
-      -400px 0 0 var(--bg),
-      400px 0 0 var(--bg);
+      -400px 0 0 var(--octo-bg),
+      400px 0 0 var(--octo-bg);
     backdrop-filter: blur(4px);
 
     &[class*='--skel'] {
@@ -2351,11 +2351,11 @@
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin-bottom: 4px;
 
     a {
-      color: var(--muted);
+      color: var(--octo-muted);
     }
   }
 
@@ -2373,7 +2373,7 @@
     white-space: nowrap;
     font-size: 16px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-page-top__right {
@@ -2419,10 +2419,10 @@
     height: calc(100vh - 120px - 6px);
     overflow-y: auto;
     padding: 10px 8px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     box-shadow:
-      inset 0 0 0 1px var(--border),
-      var(--shadow-1);
+      inset 0 0 0 1px var(--octo-border),
+      var(--octo-shadow-1);
     border-radius: 12px;
   }
 
@@ -2438,7 +2438,7 @@
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-page-sidebar__nav {
@@ -2475,8 +2475,8 @@
 
   /* ─── Content table skeleton ─────────────────────────── */
   .octo-content-table__skel-header {
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-2);
+    border-bottom: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
     padding: 10px 16px;
   }
 
@@ -2525,31 +2525,31 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-content-search__input {
     height: 36px;
     width: 100%;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 0 48px 0 36px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-content-search__input::placeholder {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-content-search__input:hover {
-    border-color: var(--border-strong);
+    border-color: var(--octo-border-strong);
   }
 
   .octo-content-search__input:focus {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
+    border-color: var(--octo-ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--octo-ring) 22%, transparent);
     outline: none;
   }
 
@@ -2560,12 +2560,12 @@
     top: 50%;
     transform: translateY(-50%);
     border-radius: 4px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
     padding: 2px 6px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-content-sort {
@@ -2576,9 +2576,9 @@
   .octo-content-card {
     overflow: hidden;
     border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
-    box-shadow: var(--shadow-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
+    box-shadow: var(--octo-shadow-1);
   }
 
   .octo-content-card__scroll {
@@ -2594,8 +2594,8 @@
   }
 
   .octo-content-card__th-row {
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-2);
+    border-bottom: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
   }
 
   .octo-content-card__th {
@@ -2605,7 +2605,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-content-card__footer {
@@ -2613,12 +2613,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
   }
 
   .octo-content-card__footer-count {
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-content-card__footer-pages {
@@ -2629,11 +2629,11 @@
 
   .octo-content-row {
     cursor: pointer;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--octo-border);
     transition: background-color 80ms;
 
     &:hover {
-      background: var(--surface-2);
+      background: var(--octo-surface-2);
     }
 
     &[class*='--archived'] {
@@ -2641,7 +2641,7 @@
     }
 
     &[class*='--selected'] {
-      background: var(--surface-2);
+      background: var(--octo-surface-2);
     }
   }
 
@@ -2666,9 +2666,9 @@
     justify-content: center;
     overflow: hidden;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
-    color: var(--muted);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
+    color: var(--octo-muted);
   }
 
   .octo-content-row__thumb img {
@@ -2689,11 +2689,11 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-content-row__meta {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-content-row__branch {
@@ -2704,7 +2704,7 @@
   }
 
   .octo-content-row__branch-label {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 12px;
   }
 
@@ -2712,7 +2712,7 @@
     height: 128px;
     text-align: center;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-branched-empty (BranchedView no-branch / no-entries state) ── */
@@ -2739,20 +2739,20 @@
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background: var(--surface-2);
-    color: var(--muted);
+    background: var(--octo-surface-2);
+    color: var(--octo-muted);
   }
 
   .octo-branched-empty__title {
     font-size: 14px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-branched-empty__text {
     max-width: 300px;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-pr-list (RecentPullRequests) ── */
@@ -2765,16 +2765,16 @@
 
   .octo-pr-list__sub {
     font-size: 12px;
-    color: var(--muted);
-    margin: 0 0 var(--v-gap);
+    color: var(--octo-muted);
+    margin: 0 0 var(--octo-v-gap);
   }
 
   .octo-pr-list__card {
     overflow: hidden;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
-    box-shadow: var(--shadow-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
+    box-shadow: var(--octo-shadow-1);
   }
 
   .octo-pr-row {
@@ -2784,7 +2784,7 @@
     padding: 14px 16px;
 
     &:not(:last-child) {
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--octo-border);
     }
   }
 
@@ -2798,21 +2798,21 @@
     border: 1px solid;
 
     &[class*='--open'] {
-      border-color: var(--brand);
-      background: var(--brand-bg);
-      color: var(--brand-strong);
+      border-color: var(--octo-brand);
+      background: var(--octo-brand-bg);
+      color: var(--octo-brand-strong);
     }
 
     &[class*='--merged'] {
-      border-color: var(--st-merged-bd);
-      background: var(--st-merged-bg);
-      color: var(--st-merged);
+      border-color: var(--octo-st-merged-bd);
+      background: var(--octo-st-merged-bg);
+      color: var(--octo-st-merged);
     }
 
     &[class*='--closed'] {
-      border-color: var(--border);
-      background: var(--surface-2);
-      color: var(--muted);
+      border-color: var(--octo-border);
+      background: var(--octo-surface-2);
+      color: var(--octo-muted);
     }
   }
 
@@ -2834,9 +2834,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-pr-row__branch {
@@ -2851,27 +2851,27 @@
     border-radius: 9999px;
     border: 1px solid;
     padding: 0 6px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
     font-weight: 600;
     line-height: 16px;
 
     &[class*='--open'] {
-      background: var(--brand-bg);
-      color: var(--brand-strong);
-      border-color: var(--brand);
+      background: var(--octo-brand-bg);
+      color: var(--octo-brand-strong);
+      border-color: var(--octo-brand);
     }
 
     &[class*='--merged'] {
-      background: var(--st-merged-bg);
-      color: var(--st-merged);
-      border-color: var(--st-merged-bd);
+      background: var(--octo-st-merged-bg);
+      color: var(--octo-st-merged);
+      border-color: var(--octo-st-merged-bd);
     }
 
     &[class*='--closed'] {
-      background: var(--surface-2);
-      color: var(--muted);
-      border-color: var(--border);
+      background: var(--octo-surface-2);
+      color: var(--octo-muted);
+      border-color: var(--octo-border);
     }
   }
 
@@ -2881,8 +2881,8 @@
     align-items: center;
     gap: 12px;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 40px 16px;
     text-align: center;
   }
@@ -2894,20 +2894,20 @@
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background: var(--surface-2);
-    color: var(--muted);
+    background: var(--octo-surface-2);
+    color: var(--octo-muted);
   }
 
   .octo-pr-empty__title {
     font-size: 14px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-pr-empty__text {
     max-width: 300px;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-pr-skel__row {
@@ -2915,7 +2915,7 @@
     align-items: center;
     gap: 14px;
     padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--octo-border);
   }
 
   .octo-pr-skel__row:last-child {
@@ -2927,7 +2927,7 @@
     width: 28px;
     flex: none;
     border-radius: 6px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     animation: octo-shimmer 2s ease-in-out infinite;
   }
 
@@ -2941,7 +2941,7 @@
   .octo-pr-skel__line {
     height: 12px;
     border-radius: 4px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     animation: octo-shimmer 2s ease-in-out infinite;
   }
 
@@ -2949,7 +2949,7 @@
     height: 28px;
     width: 64px;
     border-radius: 9999px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     animation: octo-shimmer 2s ease-in-out infinite;
   }
 
@@ -2969,8 +2969,8 @@
   /* ── octo-error-boundary ── */
   .octo-error-boundary {
     border-radius: 8px;
-    border: 1px solid color-mix(in oklab, var(--danger) 30%, transparent);
-    background: color-mix(in oklab, var(--danger) 5%, transparent);
+    border: 1px solid color-mix(in oklab, var(--octo-danger) 30%, transparent);
+    background: color-mix(in oklab, var(--octo-danger) 5%, transparent);
     padding: 16px;
     font-size: 14px;
     display: flex;
@@ -2980,12 +2980,12 @@
 
   .octo-error-boundary__title {
     font-weight: 500;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-error-boundary__msg {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-create-branch-dialog (form fields inside CreateBranchDialog) ── */
@@ -3003,7 +3003,7 @@
   }
 
   .octo-create-branch__opt {
-    color: var(--muted);
+    color: var(--octo-muted);
     font-weight: 400;
   }
 
@@ -3012,7 +3012,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: var(--v-gap);
+    margin-bottom: var(--octo-v-gap);
   }
 
   .octo-user-account-dialog__avatar {
@@ -3044,7 +3044,7 @@
 
   .octo-field-hint-error__hint {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-ff-markdown ── */
@@ -3058,8 +3058,8 @@
     align-items: center;
     gap: 4px;
     border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 4px;
   }
 
@@ -3075,23 +3075,23 @@
     cursor: pointer;
     border: 0;
     background: transparent;
-    color: var(--text);
+    color: var(--octo-text);
 
     &:focus-visible {
-      outline: 2px solid var(--ring);
+      outline: 2px solid var(--octo-ring);
       outline-offset: 2px;
     }
 
     &:is([aria-pressed='true'], [class*='--active']) {
-      background: var(--text);
-      color: var(--bg);
+      background: var(--octo-text);
+      color: var(--octo-bg);
     }
 
     &:is([aria-pressed='false'], [class*='--inactive']) {
-      color: var(--text);
+      color: var(--octo-text);
 
       &:hover {
-        background: color-mix(in oklab, var(--muted) 40%, transparent);
+        background: color-mix(in oklab, var(--octo-muted) 40%, transparent);
       }
     }
   }
@@ -3116,7 +3116,7 @@
 
   .octo-ff-select__multi-checkbox {
     border-radius: 4px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
   }
 
   .octo-ff-image__body {
@@ -3130,9 +3130,9 @@
     width: 160px;
     height: 112px;
     border-radius: 8px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     overflow: hidden;
-    background: color-mix(in oklab, var(--muted) 20%, transparent);
+    background: color-mix(in oklab, var(--octo-muted) 20%, transparent);
     flex-shrink: 0;
   }
 
@@ -3147,13 +3147,13 @@
     width: 160px;
     height: 112px;
     border-radius: 8px;
-    border: 2px dashed var(--border);
+    border: 2px dashed var(--octo-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: color-mix(in oklab, var(--muted) 10%, transparent);
+    background: color-mix(in oklab, var(--octo-muted) 10%, transparent);
     flex-shrink: 0;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ff-image__clear {
@@ -3184,7 +3184,7 @@
 
   .octo-ff-image__meta {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     word-break: break-all;
   }
 
@@ -3194,23 +3194,23 @@
 
     &[class*='--empty'] {
       font-size: 14px;
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &[class*='--valid'] {
       font-size: 14px;
-      color: var(--ok);
+      color: var(--octo-ok);
     }
 
     &[class*='--invalid'] {
       font-size: 14px;
-      color: var(--danger);
+      color: var(--octo-danger);
     }
   }
 
   .octo-ff-json__textarea {
     min-height: 160px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     line-height: 1.625;
   }
 
@@ -3250,8 +3250,8 @@
     width: 48px;
     cursor: pointer;
     border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 4px;
   }
 
@@ -3262,7 +3262,7 @@
 
   /* ── octo-ff-color (color picker) ── additional */
   .octo-ff-color__hex-input {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
   }
 
   /* ── octo-ff-conditional (tab-based conditional field) ── */
@@ -3279,7 +3279,7 @@
     gap: 2px;
     height: auto;
     background: transparent;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--octo-border);
     border-radius: 0;
     padding: 0;
   }
@@ -3291,18 +3291,18 @@
     font-weight: 500;
     transition: color 120ms;
     border-radius: 0;
-    color: var(--muted);
+    color: var(--octo-muted);
     background: transparent;
     border: 0;
     cursor: pointer;
   }
 
   .octo-ff-conditional__tab:hover {
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-ff-conditional__tab[data-state='active'] {
-    color: var(--text);
+    color: var(--octo-text);
     background: transparent;
     box-shadow: none;
   }
@@ -3314,23 +3314,23 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: var(--brand);
+    background: var(--octo-brand);
   }
 
   .octo-ff-conditional__tab {
     &[class*='--error'] {
-      color: var(--danger);
+      color: var(--octo-danger);
     }
   }
 
   .octo-ff-conditional__tab-key {
     margin-left: 6px;
     border-radius: 4px;
-    background: color-mix(in oklab, var(--muted) 20%, transparent);
+    background: color-mix(in oklab, var(--octo-muted) 20%, transparent);
     padding: 1px 4px;
     font-size: 10px;
     font-weight: 400;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ff-conditional__content {
@@ -3355,11 +3355,11 @@
   .octo-ff-list__add-input {
     width: 100%;
     font-size: 14px;
-    background: var(--bg);
-    color: var(--text);
+    background: var(--octo-bg);
+    color: var(--octo-text);
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     outline: none;
     transition:
       border-color 120ms,
@@ -3368,22 +3368,22 @@
   }
 
   .octo-ff-list__add-input:focus {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--ring) 30%, transparent);
+    border-color: var(--octo-ring);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--octo-ring) 30%, transparent);
   }
 
   .octo-ff-list__add-input {
     &[class*='--error'] {
-      border-color: var(--danger);
+      border-color: var(--octo-danger);
     }
 
     &[class*='--error']:focus {
-      box-shadow: 0 0 0 2px color-mix(in oklab, var(--danger) 30%, transparent);
+      box-shadow: 0 0 0 2px color-mix(in oklab, var(--octo-danger) 30%, transparent);
     }
   }
 
   .octo-ff-list__add-input::placeholder {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ff-list__items {
@@ -3398,8 +3398,8 @@
     align-items: center;
     gap: 0;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--muted) 10%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-muted) 10%, transparent);
     font-size: 14px;
     cursor: grab;
   }
@@ -3411,7 +3411,7 @@
   .octo-ff-list__item-grip {
     flex-shrink: 0;
     padding-left: 8px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ff-list__item-value {
@@ -3427,14 +3427,14 @@
     height: 24px;
     width: 1px;
     flex-shrink: 0;
-    background: var(--border);
+    background: var(--octo-border);
   }
 
   .octo-ff-list__item-remove {
     flex-shrink: 0;
     border-radius: 0 8px 8px 0;
     padding: 8px;
-    color: var(--muted);
+    color: var(--octo-muted);
     border: 0;
     background: transparent;
     cursor: pointer;
@@ -3443,8 +3443,8 @@
   }
 
   .octo-ff-list__item-remove:hover {
-    background: color-mix(in oklab, var(--danger) 10%, transparent);
-    color: var(--danger);
+    background: color-mix(in oklab, var(--octo-danger) 10%, transparent);
+    color: var(--octo-danger);
   }
 
   /* ── octo-ff-reference (reference field with drag-and-drop) ── */
@@ -3454,13 +3454,13 @@
 
   .octo-ff-reference__badge {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin-left: 8px;
   }
 
   .octo-ff-reference__loading {
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
     padding: 16px 0;
   }
 
@@ -3476,8 +3476,8 @@
     align-items: center;
     gap: 8px;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 8px 12px;
     transition: background-color 120ms;
     cursor: grab;
@@ -3488,13 +3488,13 @@
   }
 
   .octo-ff-reference__item:hover {
-    background: color-mix(in oklab, var(--muted) 20%, transparent);
+    background: color-mix(in oklab, var(--octo-muted) 20%, transparent);
   }
 
   .octo-ff-reference__item-grip {
     width: 16px;
     height: 16px;
-    color: var(--muted);
+    color: var(--octo-muted);
     flex-shrink: 0;
   }
 
@@ -3518,14 +3518,14 @@
 
   .octo-ff-reference__item-type {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ff-reference__item-edit {
     flex-shrink: 0;
     padding: 4px;
     border-radius: 4px;
-    color: var(--muted);
+    color: var(--octo-muted);
     border: 0;
     background: transparent;
     cursor: pointer;
@@ -3535,15 +3535,15 @@
   }
 
   .octo-ff-reference__item-edit:hover {
-    background: color-mix(in oklab, var(--brand) 10%, transparent);
-    color: var(--brand);
+    background: color-mix(in oklab, var(--octo-brand) 10%, transparent);
+    color: var(--octo-brand);
   }
 
   .octo-ff-reference__item-remove {
     flex-shrink: 0;
     padding: 4px;
     border-radius: 4px;
-    color: var(--muted);
+    color: var(--octo-muted);
     border: 0;
     background: transparent;
     cursor: pointer;
@@ -3553,15 +3553,15 @@
   }
 
   .octo-ff-reference__item-remove:hover {
-    background: color-mix(in oklab, var(--danger) 10%, transparent);
-    color: var(--danger);
+    background: color-mix(in oklab, var(--octo-danger) 10%, transparent);
+    color: var(--octo-danger);
   }
 
   .octo-ff-reference__empty {
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
     padding: 16px;
-    border: 1px dashed var(--border);
+    border: 1px dashed var(--octo-border);
     border-radius: 8px;
     text-align: center;
   }
@@ -3584,7 +3584,7 @@
     transform: translateY(-50%);
     width: 16px;
     height: 16px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ff-reference__modal-input {
@@ -3592,23 +3592,23 @@
     padding: 8px 12px 8px 36px;
     font-size: 14px;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
+    color: var(--octo-text);
     outline: none;
   }
 
   .octo-ff-reference__modal-input:focus {
-    border-color: var(--ring);
+    border-color: var(--octo-ring);
   }
 
   .octo-ff-reference__modal-type-select {
     padding: 8px 12px;
     font-size: 14px;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
+    color: var(--octo-text);
     outline: none;
   }
 
@@ -3616,21 +3616,21 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     border-radius: 8px;
   }
 
   .octo-ff-reference__modal-empty {
     padding: 32px;
     text-align: center;
-    color: var(--muted);
+    color: var(--octo-muted);
     font-size: 14px;
   }
 
   .octo-ff-reference__modal-loading {
     padding: 32px;
     text-align: center;
-    color: var(--muted);
+    color: var(--octo-muted);
     font-size: 14px;
   }
 
@@ -3644,7 +3644,7 @@
     padding: 8px 12px;
     cursor: pointer;
     transition: background-color 120ms;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--octo-border);
   }
 
   .octo-ff-reference__modal-row:last-child {
@@ -3652,7 +3652,7 @@
   }
 
   .octo-ff-reference__modal-row:hover {
-    background: color-mix(in oklab, var(--muted) 20%, transparent);
+    background: color-mix(in oklab, var(--octo-muted) 20%, transparent);
   }
 
   .octo-ff-reference__modal-row {
@@ -3662,7 +3662,7 @@
     }
 
     &[class*='--checked'] {
-      background: color-mix(in oklab, var(--brand) 5%, transparent);
+      background: color-mix(in oklab, var(--octo-brand) 5%, transparent);
     }
   }
 
@@ -3681,12 +3681,12 @@
 
   .octo-ff-reference__modal-row-type {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ff-reference__modal-row-added {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     flex-shrink: 0;
   }
 
@@ -3702,15 +3702,15 @@
     padding: 8px 12px;
     font-size: 14px;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
+    color: var(--octo-text);
     outline: none;
   }
 
   .octo-ff-reference__create-desc {
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ff-reference__filter-row {
@@ -3727,10 +3727,10 @@
 
   .octo-edit-post__form-card {
     border-radius: 16px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 28px;
-    box-shadow: var(--shadow-1);
+    box-shadow: var(--octo-shadow-1);
   }
 
   .octo-edit-post__sidebar {
@@ -3746,7 +3746,7 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-edit-post__detail-row {
@@ -3759,19 +3759,19 @@
   .octo-edit-post__detail-key {
     width: 64px;
     flex-shrink: 0;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-edit-post__detail-val {
     flex: 1;
     min-width: 0;
-    color: var(--text);
+    color: var(--octo-text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 
     &[class*='--mono'] {
-      font-family: var(--ft-mono);
+      font-family: var(--octo-ft-mono);
       font-size: 11px;
     }
   }
@@ -3784,7 +3784,7 @@
     justify-content: center;
     gap: 12px;
     padding: 32px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ─── EditPost skeleton ──────────────────────────────── */
@@ -3821,7 +3821,7 @@
   }
 
   .octo-media-manager__search-bar {
-    margin-bottom: var(--v-gap);
+    margin-bottom: var(--octo-v-gap);
   }
 
   .octo-media-manager__search-wrap {
@@ -3837,31 +3837,31 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-manager__search-input {
     height: 36px;
     width: 100%;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 0 48px 0 36px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-media-manager__search-input::placeholder {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-manager__search-input:hover {
-    border-color: var(--border-strong);
+    border-color: var(--octo-border-strong);
   }
 
   .octo-media-manager__search-input:focus {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
+    border-color: var(--octo-ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--octo-ring) 22%, transparent);
     outline: none;
   }
 
@@ -3872,12 +3872,12 @@
     top: 50%;
     transform: translateY(-50%);
     border-radius: 4px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
     padding: 2px 6px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-manager__empty {
@@ -3887,7 +3887,7 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-media-grid ── */
@@ -3910,8 +3910,8 @@
     cursor: pointer;
     overflow: hidden;
     border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     text-align: left;
     padding: 0;
     transition:
@@ -3920,20 +3920,20 @@
   }
 
   .octo-media-grid__card:hover {
-    border-color: color-mix(in srgb, var(--text) 40%, transparent);
-    box-shadow: var(--shadow-1);
+    border-color: color-mix(in srgb, var(--octo-text) 40%, transparent);
+    box-shadow: var(--octo-shadow-1);
   }
 
   .octo-media-grid__card {
     &[class*='--selected'] {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 30%, transparent);
+      border-color: var(--octo-primary);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--octo-primary) 30%, transparent);
     }
   }
 
   .octo-media-grid__img-wrap {
     aspect-ratio: 1;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
   }
 
   .octo-media-grid__img {
@@ -3943,8 +3943,8 @@
   }
 
   .octo-media-grid__info {
-    border-top: 1px solid var(--border);
-    background: var(--bg);
+    border-top: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 8px 12px;
   }
 
@@ -3954,7 +3954,7 @@
     white-space: nowrap;
     font-size: 14px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-media-grid__meta {
@@ -3963,7 +3963,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ─── MediaManager skeleton ──────────────────────────── */
@@ -3983,7 +3983,7 @@
 
   /* ── octo-media-upload-bar ── */
   .octo-media-upload-bar {
-    margin-bottom: var(--v-gap);
+    margin-bottom: var(--octo-v-gap);
   }
 
   .octo-media-upload-bar__btn {
@@ -3993,11 +3993,11 @@
     justify-content: center;
     gap: 12px;
     border-radius: 12px;
-    border: 1px dashed var(--border);
-    background: var(--surface-1);
+    border: 1px dashed var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 20px 16px;
     font-size: 14px;
-    color: var(--text-2);
+    color: var(--octo-text-2);
     cursor: pointer;
     transition:
       border-color 120ms,
@@ -4006,15 +4006,15 @@
   }
 
   .octo-media-upload-bar__btn:hover {
-    border-color: color-mix(in srgb, var(--text) 40%, transparent);
-    color: var(--text);
+    border-color: color-mix(in srgb, var(--octo-text) 40%, transparent);
+    color: var(--octo-text);
   }
 
   .octo-media-upload-bar__btn {
     &[class*='--dragging'] {
-      border-color: var(--primary);
-      background: var(--surface-3);
-      color: var(--text);
+      border-color: var(--octo-primary);
+      background: var(--octo-surface-3);
+      color: var(--octo-text);
     }
   }
 
@@ -4029,13 +4029,13 @@
 
   .octo-media-upload-bar__label {
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-media-upload-bar__hint {
     margin-left: 8px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-media-left-panel (MediaLeftPanel) ── */
@@ -4058,7 +4058,7 @@
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-left-panel__add-folder {
@@ -4071,14 +4071,14 @@
     border-radius: 4px;
     border: 0;
     background: transparent;
-    color: var(--muted);
+    color: var(--octo-muted);
     cursor: pointer;
     transition: background-color 120ms;
   }
 
   .octo-media-left-panel__add-folder:hover {
-    background: var(--surface-1);
-    color: var(--text);
+    background: var(--octo-surface-1);
+    color: var(--octo-text);
   }
 
   .octo-media-left-panel__folder-row {
@@ -4097,11 +4097,11 @@
     font-variant-numeric: tabular-nums;
 
     &[class*='--normal'] {
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &[class*='--active'] {
-      color: color-mix(in srgb, var(--text) 60%, transparent);
+      color: color-mix(in srgb, var(--octo-text) 60%, transparent);
     }
   }
 
@@ -4120,7 +4120,7 @@
     border-radius: 4px;
     border: 0;
     background: transparent;
-    color: var(--muted);
+    color: var(--octo-muted);
     cursor: pointer;
     transition:
       background-color 120ms,
@@ -4136,8 +4136,8 @@
   }
 
   .octo-media-left-panel__folder-del:hover {
-    background: var(--surface-1);
-    color: var(--danger);
+    background: var(--octo-surface-1);
+    color: var(--octo-danger);
   }
 
   .octo-media-left-panel__skel-inner {
@@ -4158,8 +4158,8 @@
     flex-shrink: 0;
     flex-direction: column;
     min-height: 0;
-    border-right: 1px solid var(--border);
-    background: var(--surface-2);
+    border-right: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
   }
 
   .octo-media-select-dialog__sidebar-inner {
@@ -4201,27 +4201,27 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-select-dialog__search-input {
     height: 36px;
     width: 100%;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 0 12px 0 36px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-media-select-dialog__search-input::placeholder {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-select-dialog__search-input:focus {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
+    border-color: var(--octo-ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--octo-ring) 22%, transparent);
     outline: none;
   }
 
@@ -4237,7 +4237,7 @@
     align-items: center;
     justify-content: center;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-select-dialog__empty {
@@ -4247,7 +4247,7 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-markdown-image-toolbar (floating toolbar over inserted images) ── */
@@ -4259,10 +4259,10 @@
     display: flex;
     gap: 4px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--bg) 95%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in srgb, var(--octo-bg) 95%, transparent);
     padding: 4px;
-    box-shadow: var(--shadow-1);
+    box-shadow: var(--octo-shadow-1);
     backdrop-filter: blur(4px);
   }
 
@@ -4275,20 +4275,20 @@
     border-radius: 4px;
     border: 0;
     background: transparent;
-    color: var(--muted);
+    color: var(--octo-muted);
     cursor: pointer;
     transition:
       background-color 120ms,
       color 120ms;
 
     &[class*='--delete']:hover {
-      background: var(--surface-2);
-      color: var(--danger);
+      background: var(--octo-surface-2);
+      color: var(--octo-danger);
     }
 
     &[class*='--edit']:hover {
-      background: var(--surface-2);
-      color: var(--text);
+      background: var(--octo-surface-2);
+      color: var(--octo-text);
     }
   }
 
@@ -4320,7 +4320,7 @@
       position: absolute;
       inset: 0;
       z-index: 2;
-      background: radial-gradient(transparent 50%, var(--bg) 100%);
+      background: radial-gradient(transparent 50%, var(--octo-bg) 100%);
     }
   }
 
@@ -4348,14 +4348,14 @@
     max-height: 100%;
     max-width: 640px;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     object-fit: contain;
-    box-shadow: var(--shadow-1);
+    box-shadow: var(--octo-shadow-1);
   }
 
   .octo-media-asset__preview-buttons {
-    padding-top: var(--v-gap);
+    padding-top: var(--octo-v-gap);
     text-align: center;
   }
 
@@ -4363,7 +4363,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding: var(--v-gap) var(--h-gap);
+    padding: var(--octo-v-gap) var(--octo-h-gap);
   }
 
   .octo-media-asset__sidebar-section {
@@ -4377,7 +4377,7 @@
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-asset__details {
@@ -4396,16 +4396,16 @@
     width: 96px;
     flex-shrink: 0;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-asset__detail-value {
     font-size: 12px;
-    color: var(--text);
+    color: var(--octo-text);
     word-break: break-all;
 
     &[class*='--mono'] {
-      font-family: var(--ft-mono);
+      font-family: var(--octo-ft-mono);
     }
   }
 
@@ -4417,14 +4417,14 @@
     justify-content: center;
     gap: 12px;
     padding: 32px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-media-asset__details-section {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--octo-border);
     padding-top: 20px;
   }
 
@@ -4447,18 +4447,18 @@
 
   .octo-upload-dialog__filename {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     word-break: break-all;
   }
 
   .octo-upload-dialog__input {
     width: 100%;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 6px 8px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-upload-dialog__input:disabled {
@@ -4473,7 +4473,7 @@
     gap: 8px;
     padding-top: 4px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-upload-check {
@@ -4493,34 +4493,34 @@
   .octo-folder-dialog__input {
     width: 100%;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 6px 8px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-folder-dialog__input:focus {
     outline: none;
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 30%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--octo-primary) 30%, transparent);
   }
 
   .octo-folder-dialog__error {
     font-size: 12px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-folder-dialog__hint {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-markdown-dialog (MarkdownInsertImageDialog alt-text form) ── */
   .octo-markdown-dialog__preview {
     overflow: hidden;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
   }
 
   .octo-markdown-dialog__preview-img {
@@ -4539,22 +4539,22 @@
     display: block;
     width: 100%;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 8px 12px;
     font-size: 14px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-markdown-dialog__alt-input:focus {
-    border-color: var(--ring);
+    border-color: var(--octo-ring);
     outline: none;
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--ring) 22%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--octo-ring) 22%, transparent);
   }
 
   .octo-markdown-dialog__alt-hint {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-content-model ── */
@@ -4562,16 +4562,16 @@
     display: flex;
     min-width: 0;
     align-items: center;
-    margin-bottom: var(--v-gap);
+    margin-bottom: var(--octo-v-gap);
   }
 
   /* ── octo-schema-list (content type table) ── */
   .octo-schema-list {
     overflow: hidden;
     border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
-    box-shadow: var(--shadow-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
+    box-shadow: var(--octo-shadow-1);
   }
 
   .octo-schema-list__scroll {
@@ -4587,8 +4587,8 @@
   }
 
   .octo-schema-list__th-row {
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-2);
+    border-bottom: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
   }
 
   .octo-schema-list__th {
@@ -4598,7 +4598,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--muted);
+    color: var(--octo-muted);
 
     &[class*='--icon'] {
       width: 40px;
@@ -4607,7 +4607,7 @@
 
   .octo-schema-list__item {
     cursor: pointer;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--octo-border);
     transition: background-color 80ms;
   }
 
@@ -4616,7 +4616,7 @@
   }
 
   .octo-schema-list__item:hover {
-    background: color-mix(in oklab, var(--surface-2) 60%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 60%, transparent);
   }
 
   .octo-schema-list__td {
@@ -4630,29 +4630,29 @@
     align-items: center;
     gap: 8px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-schema-list__name-icon {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-schema-list__key {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-schema-list__count {
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-schema-list__empty {
     height: 128px;
     text-align: center;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-schema-list__chevron {
@@ -4661,7 +4661,7 @@
   }
 
   .octo-schema-list__chevron svg {
-    color: var(--muted);
+    color: var(--octo-muted);
     opacity: 0.6;
     transition: opacity 80ms;
   }
@@ -4672,7 +4672,7 @@
 
   /* ── octo-schema-detail ── */
   .octo-schema-detail__aside {
-    padding: var(--v-gap) var(--h-gap);
+    padding: var(--octo-v-gap) var(--octo-h-gap);
   }
 
   .octo-schema-detail__aside-label {
@@ -4681,7 +4681,7 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-schema-detail__detail-row {
@@ -4694,19 +4694,19 @@
   .octo-schema-detail__detail-key {
     width: 64px;
     flex-shrink: 0;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-schema-detail__detail-val {
     flex: 1;
     min-width: 0;
-    color: var(--text);
+    color: var(--octo-text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 
     &[class*='--mono'] {
-      font-family: var(--ft-mono);
+      font-family: var(--octo-ft-mono);
       font-size: 11px;
     }
   }
@@ -4716,12 +4716,12 @@
     display: inline-flex;
     align-items: center;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
     padding: 2px 8px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-field-table__flags {
@@ -4734,11 +4734,11 @@
     display: inline-flex;
     align-items: center;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 2px 6px;
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
 
     &[class*='--required'] {
       border-color: color-mix(in oklab, #60a5fa 30%, transparent);
@@ -4764,17 +4764,17 @@
     }
 
     &[class*='--allowed']:not([class*='--active']) {
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &[class*='--allowed']:not([class*='--active']):hover {
-      background: var(--surface-2);
+      background: var(--octo-surface-2);
       color: #f59e0b;
     }
 
     &[class*='--disabled'] {
       cursor: not-allowed;
-      color: color-mix(in oklab, var(--muted) 30%, transparent);
+      color: color-mix(in oklab, var(--octo-muted) 30%, transparent);
     }
   }
 
@@ -4795,25 +4795,25 @@
 
   .octo-field-table__label-name {
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-field-table__label-hint {
     margin-top: 2px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-field-table__json-pre {
     margin: 0;
     max-height: 70vh;
     overflow: auto;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     padding: 16px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 12px;
     line-height: 1.5;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   /* ── octo-schema-impact ── */
@@ -4830,15 +4830,15 @@
     }
 
     &[class*='--destructive'] {
-      border-color: color-mix(in oklab, var(--danger) 30%, transparent);
-      background: color-mix(in oklab, var(--danger) 5%, transparent);
-      color: var(--danger);
+      border-color: color-mix(in oklab, var(--octo-danger) 30%, transparent);
+      background: color-mix(in oklab, var(--octo-danger) 5%, transparent);
+      color: var(--octo-danger);
     }
 
     &[class*='--muted'] {
-      border-color: var(--border);
-      background: color-mix(in oklab, var(--surface-2) 30%, transparent);
-      color: var(--text);
+      border-color: var(--octo-border);
+      background: color-mix(in oklab, var(--octo-surface-2) 30%, transparent);
+      color: var(--octo-text);
     }
   }
 
@@ -4878,7 +4878,7 @@
   }
 
   .octo-schema-impact__item-link:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--octo-ring);
     outline-offset: 2px;
   }
 
@@ -4937,9 +4937,9 @@
     letter-spacing: 0.04em;
 
     &[class*='--loss'] {
-      border-color: color-mix(in oklab, var(--danger) 30%, transparent);
-      background: color-mix(in oklab, var(--danger) 10%, transparent);
-      color: var(--danger);
+      border-color: color-mix(in oklab, var(--octo-danger) 30%, transparent);
+      background: color-mix(in oklab, var(--octo-danger) 10%, transparent);
+      color: var(--octo-danger);
     }
 
     &[class*='--ok'] {
@@ -4956,8 +4956,8 @@
     align-items: flex-start;
     gap: 4px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 12px;
     text-align: left;
     cursor: pointer;
@@ -4966,7 +4966,7 @@
       border-color 120ms;
 
     &:hover {
-      background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+      background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
     }
 
     &:disabled {
@@ -4975,9 +4975,9 @@
     }
 
     &[class*='--active'] {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+      border-color: var(--octo-primary);
+      background: color-mix(in oklab, var(--octo-primary) 10%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in oklab, var(--octo-primary) 40%, transparent);
     }
   }
 
@@ -4987,12 +4987,12 @@
     gap: 8px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-cardinality-option__desc {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-field-dialog (FieldDialog misc) ── */
@@ -5003,8 +5003,8 @@
     justify-content: space-between;
     gap: 8px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 20%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 20%, transparent);
     padding: 8px 12px;
   }
 
@@ -5016,25 +5016,25 @@
   }
 
   .octo-field-dialog__format-key {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-field-dialog__format-badge {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 2px 6px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-field-dialog__options {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 12px;
     display: flex;
     flex-direction: column;
@@ -5044,7 +5044,7 @@
   .octo-field-dialog__options-heading {
     font-size: 12px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-field-dialog__toggle-grid {
@@ -5059,8 +5059,8 @@
     align-items: flex-start;
     gap: 8px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 10px;
     font-size: 12px;
     transition: background-color 120ms;
@@ -5084,14 +5084,14 @@
 
   .octo-field-toggle__label {
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
     display: block;
   }
 
   .octo-field-toggle__desc {
     display: block;
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-format-picker {
@@ -5107,40 +5107,40 @@
     align-items: flex-start;
     gap: 4px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 10px;
     text-align: left;
     cursor: pointer;
     transition: background-color 120ms;
 
     &:hover {
-      background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+      background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
     }
 
     &[class*='--active'] {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+      border-color: var(--octo-primary);
+      background: color-mix(in oklab, var(--octo-primary) 10%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in oklab, var(--octo-primary) 40%, transparent);
     }
   }
 
   .octo-format-card__label {
     font-size: 13px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-format-card__code {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-format-card__desc {
     font-size: 11px;
     line-height: 1.4;
-    color: var(--muted);
+    color: var(--octo-muted);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -5154,10 +5154,10 @@
     margin-top: 4px;
     width: 288px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 4px;
-    box-shadow: var(--shadow-2);
+    box-shadow: var(--octo-shadow-2);
   }
 
   .octo-change-type-grid {
@@ -5180,24 +5180,24 @@
     transition: background-color 80ms;
 
     &:hover {
-      background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+      background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
     }
 
     &[class*='--active'] {
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+      background: color-mix(in oklab, var(--octo-primary) 10%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--octo-primary) 40%, transparent);
     }
   }
 
   .octo-change-type-item__label {
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-change-type-item__code {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-bool-toggle (BooleanToggle in SchemaOptionFieldInput) ── */
@@ -5206,12 +5206,12 @@
     align-items: center;
     gap: 8px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 6px 10px;
     font-size: 12px;
     cursor: pointer;
-    color: var(--text);
+    color: var(--octo-text);
     transition:
       background-color 120ms,
       border-color 120ms;
@@ -5222,11 +5222,11 @@
     }
 
     &[class*='--on'] {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
+      border-color: var(--octo-primary);
+      background: color-mix(in oklab, var(--octo-primary) 10%, transparent);
 
       .octo-bool-toggle__track {
-        background: var(--primary);
+        background: var(--octo-primary);
       }
 
       .octo-bool-toggle__thumb {
@@ -5241,7 +5241,7 @@
     width: 24px;
     flex-shrink: 0;
     border-radius: 9999px;
-    background: color-mix(in oklab, var(--muted) 30%, transparent);
+    background: color-mix(in oklab, var(--octo-muted) 30%, transparent);
     transition: background-color 120ms;
   }
 
@@ -5250,7 +5250,7 @@
     height: 12px;
     width: 12px;
     border-radius: 9999px;
-    background: var(--bg);
+    background: var(--octo-bg);
     box-shadow: 0 1px 2px rgb(0 0 0 / 30%);
     transition: transform 120ms;
   }
@@ -5258,15 +5258,15 @@
   /* ── octo-branch-kind-pill (ConditionalBranchesEditor) ── */
   .octo-branch-kind-pill {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 4px 10px;
     font-size: 12px;
     cursor: pointer;
     transition: background-color 120ms;
 
     &:hover {
-      background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+      background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
     }
 
     &:disabled {
@@ -5275,17 +5275,17 @@
     }
 
     &[class*='--active'] {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      color: var(--text);
+      border-color: var(--octo-primary);
+      background: color-mix(in oklab, var(--octo-primary) 10%, transparent);
+      color: var(--octo-text);
     }
   }
 
   /* ── octo-checkbox-list (CollectionsCheckboxList, DefaultOptionsCheckboxList) ── */
   .octo-checkbox-list {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 8px;
     max-height: 176px;
     overflow: auto;
@@ -5305,7 +5305,7 @@
   }
 
   .octo-checkbox-list__item:hover {
-    background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
   }
 
   .octo-checkbox-list__item {
@@ -5317,10 +5317,10 @@
 
   .octo-checkbox-list__empty {
     border-radius: 6px;
-    border: 1px dashed var(--border);
+    border: 1px dashed var(--octo-border);
     padding: 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-string-list-editor (StringListEditor / VariablesEditor) ── */
@@ -5335,14 +5335,14 @@
     align-items: center;
     gap: 4px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
     padding: 2px 6px;
     font-size: 11px;
   }
 
   .octo-string-list__tag code {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
   }
 
   .octo-string-list__tag-remove {
@@ -5350,11 +5350,11 @@
     background: transparent;
     padding: 0;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-string-list__tag-remove:hover {
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-string-list__input-row {
@@ -5377,10 +5377,10 @@
 
   .octo-select-options__empty {
     border-radius: 6px;
-    border: 1px dashed var(--border);
+    border: 1px dashed var(--octo-border);
     padding: 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     text-align: center;
   }
 
@@ -5395,24 +5395,24 @@
     display: block;
     font-size: 12px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-option-field-input__required {
     margin-left: 2px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-option-field-input__desc {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-nested-field-list ── */
   .octo-nested-field-list {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 20%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 20%, transparent);
     padding: 8px;
     display: flex;
     flex-direction: column;
@@ -5422,7 +5422,7 @@
   .octo-nested-field-list__empty {
     padding: 4px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-nested-field-row {
@@ -5430,7 +5430,7 @@
     align-items: center;
     gap: 6px;
     border-radius: 4px;
-    background: var(--bg);
+    background: var(--octo-bg);
     padding: 6px 8px;
   }
 
@@ -5445,32 +5445,32 @@
 
   .octo-nested-field-row__name {
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-nested-field-row__key {
     margin-left: 6px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-nested-field-row__format {
     margin-left: 8px;
     border-radius: 4px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
     padding: 1px 4px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ── octo-branch-list (ConditionalBranchesEditor branch cards) ── */
   .octo-branch-card {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 10px;
   }
 
@@ -5484,7 +5484,7 @@
     margin-top: 8px;
     flex-shrink: 0;
     cursor: grab;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-branch-card__body {
@@ -5510,7 +5510,7 @@
     display: block;
     font-size: 11px;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-branch-card__kind-row {
@@ -5520,7 +5520,7 @@
 
   .octo-branch-card__error {
     font-size: 12px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   /* ── octo-richtext-section ── */
@@ -5533,12 +5533,12 @@
   .octo-richtext-section__title {
     font-size: 12px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-richtext-section__desc {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-richtext-toolbar-grid {
@@ -5557,7 +5557,7 @@
     font-size: 12px;
 
     &:hover {
-      background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+      background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
     }
 
     &[class*='--disabled'] {
@@ -5568,8 +5568,8 @@
 
   .octo-richtext-embed-options {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 20%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 20%, transparent);
     padding: 8px;
     display: flex;
     flex-direction: column;
@@ -5578,18 +5578,18 @@
 
   .octo-richtext-collection-pill {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 2px 8px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
     cursor: pointer;
     transition: background-color 120ms;
 
     &[class*='--selected'] {
-      border-color: var(--primary);
-      background: color-mix(in oklab, var(--primary) 10%, transparent);
-      color: var(--text);
+      border-color: var(--octo-primary);
+      background: color-mix(in oklab, var(--octo-primary) 10%, transparent);
+      color: var(--octo-text);
     }
   }
 
@@ -5636,7 +5636,7 @@
     display: block;
     font-size: 11px;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--octo-muted);
 
     &[class*='--mb'] {
       margin-bottom: 4px;
@@ -5652,11 +5652,11 @@
   .octo-rt-opts__empty-text {
     font-size: 11px;
     font-style: italic;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-rt-opts__mono-tag {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
   }
 
@@ -5688,7 +5688,7 @@
     margin-top: 48px;
     text-align: center;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat__empty-icon {
@@ -5722,9 +5722,9 @@
       flex-direction: row;
 
       .octo-chat-msg__bubble {
-        background: var(--surface-2);
-        color: var(--text);
-        border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+        background: var(--octo-surface-2);
+        color: var(--octo-text);
+        border: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
       }
     }
   }
@@ -5738,7 +5738,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
   }
 
   .octo-chat-msg__body {
@@ -5757,7 +5757,7 @@
   }
 
   .octo-chat-msg__thinking {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat-msg__cursor {
@@ -5776,15 +5776,15 @@
     bottom: 0;
     z-index: 30;
     flex-shrink: 0;
-    background: color-mix(in srgb, var(--bg) 95%, transparent);
+    background: color-mix(in srgb, var(--octo-bg) 95%, transparent);
     backdrop-filter: blur(4px);
     box-shadow:
-      -400px 0 0 var(--bg),
-      400px 0 0 var(--bg);
+      -400px 0 0 var(--octo-bg),
+      400px 0 0 var(--octo-bg);
   }
 
   .octo-chat-composer--dragover {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--octo-ring);
     outline-offset: -2px;
   }
 
@@ -5801,8 +5801,8 @@
     align-items: center;
     gap: 8px;
     border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
     padding: 4px 12px;
     font-size: 12px;
   }
@@ -5815,7 +5815,7 @@
   }
 
   .octo-chat-composer__chip-size {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat-composer__chip-remove {
@@ -5824,25 +5824,25 @@
     border: 0;
     padding: 0;
     background: none;
-    color: var(--muted);
+    color: var(--octo-muted);
     cursor: pointer;
     line-height: 1;
 
     &:hover {
-      color: var(--text);
+      color: var(--octo-text);
     }
   }
 
   .octo-chat-composer__attach-error {
     font-size: 12px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-chat-composer__row {
     display: flex;
     align-items: flex-end;
     gap: 8px;
-    padding: var(--v-gap) 0;
+    padding: var(--octo-v-gap) 0;
   }
 
   .octo-chat-composer__file-input {
@@ -5853,23 +5853,23 @@
     flex: 1;
     resize: none;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 8px 12px;
     font-size: 14px;
-    color: var(--text);
-    box-shadow: var(--shadow-1);
+    color: var(--octo-text);
+    box-shadow: var(--octo-shadow-1);
     max-height: 160px;
     transition: border-color 120ms;
 
     &::placeholder {
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &:focus {
-      border-color: var(--ring);
+      border-color: var(--octo-ring);
       outline: none;
-      box-shadow: 0 0 0 1px var(--ring);
+      box-shadow: 0 0 0 1px var(--octo-ring);
     }
 
     &:disabled {
@@ -5881,12 +5881,12 @@
   .octo-proposal-card {
     margin: 12px 0;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
-    color: var(--text);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
+    color: var(--octo-text);
 
     &[class*='--error'] {
-      border-color: color-mix(in oklab, var(--danger) 50%, transparent);
+      border-color: color-mix(in oklab, var(--octo-danger) 50%, transparent);
     }
 
     &[class*='--accepted'] {
@@ -5902,7 +5902,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    border-bottom: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
     padding: 8px 12px;
   }
 
@@ -5910,7 +5910,7 @@
     flex: 1;
     min-width: 0;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -5919,9 +5919,9 @@
   .octo-proposal-card__reasoning {
     padding: 8px 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     font-style: italic;
-    border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    border-bottom: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
   }
 
   .octo-proposal-card__body {
@@ -5945,39 +5945,39 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
     padding: 8px 12px;
   }
 
   .octo-proposal-card__reject-input {
     flex: 1;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 4px 8px;
     font-size: 12px;
-    color: var(--text);
+    color: var(--octo-text);
     outline: none;
   }
 
   .octo-proposal-card__reject-input:focus-visible {
-    box-shadow: 0 0 0 1px var(--ring);
+    box-shadow: 0 0 0 1px var(--octo-ring);
   }
 
   .octo-proposal-card__busy {
     display: flex;
     align-items: center;
     gap: 8px;
-    border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
     padding: 8px 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-proposal-card__entry-path {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-proposal-card__field-label {
@@ -5988,23 +5988,23 @@
   }
 
   .octo-proposal-card__field-key {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
-    color: color-mix(in oklab, var(--muted) 70%, transparent);
+    color: color-mix(in oklab, var(--octo-muted) 70%, transparent);
     text-transform: none;
     letter-spacing: normal;
   }
 
   .octo-proposal-card__field-format {
     font-size: 10px;
-    color: color-mix(in oklab, var(--muted) 60%, transparent);
+    color: color-mix(in oklab, var(--octo-muted) 60%, transparent);
     text-transform: none;
     letter-spacing: normal;
   }
 
   .octo-proposal-card__create-meta {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-proposal-card__create-table {
@@ -6014,7 +6014,7 @@
   }
 
   .octo-proposal-card__create-row {
-    border-top: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--octo-border) 40%, transparent);
   }
 
   .octo-proposal-card__create-row:first-child {
@@ -6029,7 +6029,7 @@
   .octo-proposal-card__create-val pre {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
   }
 
@@ -6037,12 +6037,12 @@
   .octo-tool-call-card {
     margin: 8px 0;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
     font-size: 12px;
 
     &[class*='--error'] {
-      border-color: color-mix(in oklab, var(--danger) 40%, transparent);
+      border-color: color-mix(in oklab, var(--octo-danger) 40%, transparent);
     }
   }
 
@@ -6052,7 +6052,7 @@
     padding: 6px;
     margin: 0;
     font-size: 12px;
-    color: var(--text);
+    color: var(--octo-text);
     width: 100%;
     text-align: left;
   }
@@ -6068,12 +6068,12 @@
 
   .octo-tool-call-card__icon {
     flex-shrink: 0;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin-right: 10px;
   }
 
   .octo-tool-call-card__name {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-weight: 600;
     margin-right: 10px;
   }
@@ -6084,7 +6084,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-tool-call-card__status {
@@ -6093,7 +6093,7 @@
   }
 
   .octo-tool-call-card__body {
-    border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
     padding: 8px 12px;
     display: flex;
     flex-direction: column;
@@ -6104,16 +6104,16 @@
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin-bottom: 4px;
   }
 
   .octo-tool-call-card__pre {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
-    color: color-mix(in oklab, var(--text) 80%, transparent);
+    color: color-mix(in oklab, var(--octo-text) 80%, transparent);
   }
 
   /* ============================================================
@@ -6135,7 +6135,7 @@
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-search-wrap__input {
@@ -6148,11 +6148,11 @@
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
-    color: var(--muted);
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    color: var(--octo-muted);
+    background: var(--octo-surface-2);
+    border: 1px solid var(--octo-border);
     border-radius: 4px;
     padding: 1px 5px;
     pointer-events: none;
@@ -6161,8 +6161,8 @@
   /* ------ Shimmer skeleton table ------ */
   .octo-skeleton-table {
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 16px;
 
     &[class*='--schema'] {
@@ -6172,8 +6172,8 @@
   }
 
   .octo-skeleton-table__header {
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-2);
+    border-bottom: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
     padding: 10px 16px;
   }
 
@@ -6192,7 +6192,7 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background: var(--bg);
+    background: var(--octo-bg);
     padding: 24px;
     text-align: center;
   }
@@ -6205,14 +6205,14 @@
   .octo-not-found__desc {
     max-width: 384px;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-not-found__code {
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     border-radius: 4px;
     padding: 2px 4px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 12px;
   }
 
@@ -6242,45 +6242,45 @@
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
     margin-bottom: 6px;
   }
 
   .octo-dialog-field__optional {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-dialog-field__hint-row {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin-top: 4px;
   }
 
   .octo-dialog-field__hint {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
 
     &[class*='--error'] {
-      color: var(--danger);
+      color: var(--octo-danger);
     }
   }
 
   .octo-dialog-field__error {
     margin-top: 4px;
     font-size: 12px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-dialog-field__error-xs {
     font-size: 11px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-dialog-field__hint-xs {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin-top: 4px;
   }
 
@@ -6288,7 +6288,7 @@
     display: block;
     font-size: 12px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
     margin-bottom: 4px;
   }
 
@@ -6316,7 +6316,7 @@
     flex-shrink: 0;
   }
 
-  .light .octo-inline-warn {
+  html#octocms.light .octo-inline-warn {
     border-color: #fef3c7;
     background: #fffbeb;
     color: #92400e;
@@ -6325,11 +6325,11 @@
   /* ------ Error box ------ */
   .octo-error-box {
     border-radius: 6px;
-    border: 1px solid color-mix(in oklab, var(--danger) 30%, transparent);
-    background: color-mix(in oklab, var(--danger) 5%, transparent);
+    border: 1px solid color-mix(in oklab, var(--octo-danger) 30%, transparent);
+    background: color-mix(in oklab, var(--octo-danger) 5%, transparent);
     padding: 12px;
     font-size: 13px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-error-box__title {
@@ -6357,8 +6357,8 @@
   /* ------ Confirm box ------ */
   .octo-confirm-box {
     border-radius: 6px;
-    border: 1px solid color-mix(in oklab, var(--danger) 30%, transparent);
-    background: color-mix(in oklab, var(--danger) 5%, transparent);
+    border: 1px solid color-mix(in oklab, var(--octo-danger) 30%, transparent);
+    background: color-mix(in oklab, var(--octo-danger) 5%, transparent);
     padding: 12px;
     font-size: 14px;
   }
@@ -6366,7 +6366,7 @@
   .octo-confirm-box__label {
     display: block;
     font-weight: 500;
-    color: var(--danger);
+    color: var(--octo-danger);
     margin-bottom: 6px;
   }
 
@@ -6390,7 +6390,7 @@
     min-height: 0;
     flex: 1;
     flex-direction: column;
-    height: calc(100dvh - var(--header-height));
+    height: calc(100dvh - var(--octo-header-height));
   }
 
   .octo-chat-page .octo-page-row {
@@ -6412,7 +6412,7 @@
     padding: 8px 12px;
     font-size: 12px;
     line-height: 1.45;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat-session {
@@ -6425,18 +6425,18 @@
     }
 
     &:has(.octo-chat-session__button[aria-current='true']) {
-      background: var(--surface-3);
+      background: var(--octo-surface-3);
 
       .octo-chat-session__button {
         font-weight: 600;
-        color: var(--text);
+        color: var(--octo-text);
 
         &:hover {
           background: transparent;
         }
 
         .octo-chat-session__time {
-          color: var(--text-2);
+          color: var(--octo-text-2);
         }
       }
 
@@ -6460,17 +6460,17 @@
     font-size: 14px;
     text-align: left;
     cursor: pointer;
-    color: var(--text-2);
+    color: var(--octo-text-2);
     transition:
       background-color 80ms,
       color 80ms;
 
     &:hover {
-      background: var(--surface-1);
+      background: var(--octo-surface-1);
     }
 
     &:focus-visible {
-      outline: 2px solid var(--ring);
+      outline: 2px solid var(--octo-ring);
       outline-offset: 2px;
     }
   }
@@ -6485,7 +6485,7 @@
 
   .octo-chat-session__time {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat-session__delete {
@@ -6502,28 +6502,28 @@
     padding: 0;
     opacity: 0;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--octo-muted);
     transition:
       opacity 80ms,
       background-color 80ms,
       color 80ms;
 
     &:hover {
-      background: var(--surface-1);
-      color: var(--danger);
+      background: var(--octo-surface-1);
+      color: var(--octo-danger);
     }
 
     &:focus-visible {
       opacity: 1;
-      outline: 2px solid var(--ring);
+      outline: 2px solid var(--octo-ring);
       outline-offset: 0;
     }
   }
 
   .octo-chat__usage-badge {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat__scroller {
@@ -6542,7 +6542,7 @@
     margin-top: 48px;
     text-align: center;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat__empty-icon {
@@ -6553,7 +6553,7 @@
 
   .octo-chat__empty-title {
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-chat__empty-hint {
@@ -6581,14 +6581,14 @@
     margin: 0 0 8px;
     font-size: 18px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-chat-setup__summary {
     margin: 0 0 16px;
     font-size: 14px;
     line-height: 1.5;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat-setup__steps {
@@ -6604,9 +6604,9 @@
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     border-radius: 8px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     padding: 14px 16px;
   }
 
@@ -6615,8 +6615,8 @@
     width: 24px;
     height: 24px;
     border-radius: 999px;
-    background: var(--surface-3);
-    color: var(--text);
+    background: var(--octo-surface-3);
+    color: var(--octo-text);
     font-size: 12px;
     font-weight: 600;
     line-height: 24px;
@@ -6626,22 +6626,22 @@
   .octo-chat-setup__step-title {
     font-size: 14px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-chat-setup__step-detail {
     margin: 4px 0 0;
     font-size: 13px;
     line-height: 1.5;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat-setup__code {
     margin: 10px 0 0;
     overflow-x: auto;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 10px 12px;
     font-size: 12px;
     line-height: 1.45;
@@ -6652,7 +6652,7 @@
     margin-top: 24px;
     font-size: 12px;
     line-height: 1.5;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat__accept-all-bar {
@@ -6661,8 +6661,8 @@
     justify-content: space-between;
     margin: 12px 0;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
     padding: 8px 12px;
     font-size: 12px;
   }
@@ -6670,8 +6670,8 @@
   .octo-chat__attachment-diag {
     margin: 12px 0;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
     padding: 8px 12px;
     font-size: 12px;
   }
@@ -6691,27 +6691,27 @@
   }
 
   .octo-chat__attachment-diag-error {
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-chat__status-bar {
     margin: 12px 0;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
     padding: 8px 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat__error-bar {
     margin: 12px 0;
     border-radius: 6px;
-    border: 1px solid color-mix(in oklab, var(--danger) 40%, transparent);
-    background: color-mix(in oklab, var(--danger) 10%, transparent);
+    border: 1px solid color-mix(in oklab, var(--octo-danger) 40%, transparent);
+    background: color-mix(in oklab, var(--octo-danger) 10%, transparent);
     padding: 8px 12px;
     font-size: 12px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-chat__budget-bar {
@@ -6724,7 +6724,7 @@
     color: #78350f;
   }
 
-  .light .octo-chat__budget-bar {
+  html#octocms.light .octo-chat__budget-bar {
     color: #92400e;
   }
 
@@ -6748,11 +6748,11 @@
       gap: 8px;
       margin: 12px 0;
       border-radius: 6px;
-      border: 1px solid var(--border);
-      background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+      border: 1px solid var(--octo-border);
+      background: color-mix(in oklab, var(--octo-surface-2) 30%, transparent);
       padding: 8px 12px;
       font-size: 12px;
-      color: var(--muted);
+      color: var(--octo-muted);
     }
   }
 
@@ -6770,7 +6770,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
   }
 
   .octo-chat-msg__body {
@@ -6798,9 +6798,9 @@
     }
 
     &[class*='--assistant'] {
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+      background: var(--octo-surface-2);
+      color: var(--octo-text);
+      border: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
     }
   }
 
@@ -6840,7 +6840,7 @@
   }
 
   .octo-chat-msg__thinking {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-chat-msg__cursor {
@@ -6855,7 +6855,7 @@
 
   /* ------ Proposal card (extra classes beyond existing octo-proposal-card) ------ */
   .octo-proposal-card__header-icon {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-proposal-card__kind {
@@ -6865,7 +6865,7 @@
 
   .octo-proposal-card__summary {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     flex: 1;
     min-width: 0;
     overflow: hidden;
@@ -6876,17 +6876,17 @@
   .octo-proposal-card__reasoning {
     padding: 8px 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     font-style: italic;
-    border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    border-bottom: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
   }
 
   .octo-proposal-card__error-box {
-    border-top: 1px solid color-mix(in oklab, var(--danger) 40%, transparent);
-    background: color-mix(in oklab, var(--danger) 10%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--octo-danger) 40%, transparent);
+    background: color-mix(in oklab, var(--octo-danger) 10%, transparent);
     padding: 8px 12px;
     font-size: 12px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-proposal-card__error-title {
@@ -6903,38 +6903,38 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
     padding: 8px 12px;
   }
 
   .octo-proposal-card__reject-input {
     flex: 1;
     border-radius: 4px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 4px 8px;
     font-size: 12px;
-    color: var(--text);
+    color: var(--octo-text);
     outline: none;
   }
 
   .octo-proposal-card__reject-input:focus {
-    outline: 1px solid var(--ring);
+    outline: 1px solid var(--octo-ring);
   }
 
   .octo-proposal-card__busy {
     display: flex;
     align-items: center;
     gap: 8px;
-    border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--octo-border) 50%, transparent);
     padding: 8px 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-proposal-card__status {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
 
     &[class*='--accepted'] {
       display: inline-flex;
@@ -6944,7 +6944,7 @@
       color: #34d399;
     }
 
-    .light &[class*='--accepted'] {
+    html#octocms.light &[class*='--accepted'] {
       color: #059669;
     }
 
@@ -6953,18 +6953,18 @@
       align-items: center;
       gap: 4px;
       font-size: 11px;
-      color: var(--danger);
+      color: var(--octo-danger);
     }
   }
 
   .octo-proposal-card__loading {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-proposal-card__load-error {
     font-size: 12px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-proposal-card__changes {
@@ -6975,7 +6975,7 @@
 
   .octo-proposal-card__entry-path {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-proposal-card__field-label {
@@ -6985,18 +6985,18 @@
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin-bottom: 4px;
   }
 
   .octo-proposal-card__field-key {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     text-transform: none;
-    color: color-mix(in oklab, var(--muted) 70%, transparent);
+    color: color-mix(in oklab, var(--octo-muted) 70%, transparent);
   }
 
   .octo-proposal-card__field-format {
-    color: color-mix(in oklab, var(--muted) 60%, transparent);
+    color: color-mix(in oklab, var(--octo-muted) 60%, transparent);
   }
 
   .octo-proposal-card__inline-diff {
@@ -7011,7 +7011,7 @@
     border: 1px solid rgb(127 29 29 / 40%);
     background: rgb(127 29 29 / 40%);
     padding: 4px 8px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     color: #fca5a5;
   }
 
@@ -7020,17 +7020,17 @@
     border: 1px solid rgb(6 78 59 / 40%);
     background: rgb(6 78 59 / 40%);
     padding: 4px 8px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     color: #6ee7b7;
   }
 
-  .light .octo-proposal-card__inline-before {
+  html#octocms.light .octo-proposal-card__inline-before {
     border-color: #fecaca;
     background: #fef2f2;
     color: #991b1b;
   }
 
-  .light .octo-proposal-card__inline-after {
+  html#octocms.light .octo-proposal-card__inline-after {
     border-color: #bbf7d0;
     background: #f0fdf4;
     color: #166534;
@@ -7038,7 +7038,7 @@
 
   .octo-proposal-card__empty-val {
     font-style: italic;
-    color: color-mix(in oklab, var(--muted) 70%, transparent);
+    color: color-mix(in oklab, var(--octo-muted) 70%, transparent);
   }
 
   .octo-proposal-card__create {
@@ -7049,7 +7049,7 @@
 
   .octo-proposal-card__create-meta {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-proposal-card__create-table {
@@ -7058,7 +7058,7 @@
   }
 
   .octo-proposal-card__create-row {
-    border-top: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--octo-border) 40%, transparent);
   }
 
   .octo-proposal-card__create-row:first-child {
@@ -7073,9 +7073,9 @@
 
   .octo-proposal-card__create-format {
     margin-left: 8px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
-    color: color-mix(in oklab, var(--muted) 70%, transparent);
+    color: color-mix(in oklab, var(--octo-muted) 70%, transparent);
   }
 
   .octo-proposal-card__create-val {
@@ -7086,7 +7086,7 @@
   .octo-proposal-card__create-pre {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
   }
 
@@ -7102,21 +7102,21 @@
     align-items: center;
     gap: 8px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-diff-view__branch-code {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     border-radius: 4px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     padding: 2px 6px;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-diff-view__empty {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     padding: 32px;
     text-align: center;
   }
@@ -7124,24 +7124,24 @@
   .octo-diff-view__empty-title {
     font-size: 13.5px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
     margin: 0 0 4px;
   }
 
   .octo-diff-view__empty-sub {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin: 0;
   }
 
   .octo-diff-view__skeleton-line {
     border-radius: 4px;
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
   }
 
   .octo-diff-view__error {
     font-size: 13.5px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-diff-view__skeleton-line {
@@ -7158,8 +7158,8 @@
   /* DiffHunk */
   .octo-diff-hunk {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     overflow: hidden;
   }
 
@@ -7167,21 +7167,21 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    border-bottom: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
     padding: 8px 16px;
   }
 
   .octo-diff-hunk__header-label {
     font-size: 13.5px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-diff-hunk__header-format {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-diff-hunk__header-dot {
@@ -7198,7 +7198,7 @@
 
   .octo-diff-hunk__header-key {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-diff-hunk__body {
@@ -7207,25 +7207,25 @@
 
   .octo-diff-hunk__unchanged {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-diff-hunk__lines {
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     overflow: hidden;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 12.5px;
     line-height: 1.55;
 
     &[class*='--empty'] {
       border-radius: 6px;
-      border: 1px solid var(--border);
-      background: color-mix(in oklab, var(--surface-2) 20%, transparent);
+      border: 1px solid var(--octo-border);
+      background: color-mix(in oklab, var(--octo-surface-2) 20%, transparent);
       padding: 8px 12px;
       font-size: 12px;
-      color: var(--muted);
+      color: var(--octo-muted);
     }
   }
 
@@ -7234,17 +7234,17 @@
     white-space: pre-wrap;
 
     &[class*='--add'] {
-      background: var(--add-bg);
-      color: var(--add-fg);
+      background: var(--octo-add-bg);
+      color: var(--octo-add-fg);
     }
 
     &[class*='--del'] {
-      background: var(--del-bg);
-      color: var(--del-fg);
+      background: var(--octo-del-bg);
+      color: var(--octo-del-fg);
     }
 
     &[class*='--ctx'] {
-      color: var(--muted);
+      color: var(--octo-muted);
     }
   }
 
@@ -7255,8 +7255,8 @@
     padding: 2px 4px;
     text-align: right;
     font-size: 11px;
-    color: color-mix(in oklab, var(--muted) 70%, transparent);
-    border-right: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+    color: color-mix(in oklab, var(--octo-muted) 70%, transparent);
+    border-right: 1px solid color-mix(in oklab, var(--octo-border) 60%, transparent);
   }
 
   .octo-diff-hunk__line-sign {
@@ -7288,7 +7288,7 @@
 
   .octo-diff-hunk__image-side {
     border-radius: 6px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     padding: 8px;
 
     &[class*='--add'] {
@@ -7301,12 +7301,12 @@
       background: color-mix(in oklab, #450a0a 30%, transparent);
     }
 
-    .light &[class*='--add'] {
+    html#octocms.light &[class*='--add'] {
       border-color: #bbf7d0;
       background: #f0fdf4;
     }
 
-    .light &[class*='--del'] {
+    html#octocms.light &[class*='--del'] {
       border-color: #fecaca;
       background: #fef2f2;
     }
@@ -7337,21 +7337,21 @@
       color: #fecaca;
     }
 
-    .light &[class*='--add'] {
+    html#octocms.light &[class*='--add'] {
       background: #dcfce7;
       color: #14532d;
     }
 
-    .light &[class*='--del'] {
+    html#octocms.light &[class*='--del'] {
       background: #fee2e2;
       color: #7f1d1d;
     }
   }
 
   .octo-diff-hunk__image-uuid {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -7361,8 +7361,8 @@
     width: 100%;
     height: auto;
     border-radius: 4px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
   }
 
   .octo-diff-hunk__image-empty {
@@ -7371,10 +7371,10 @@
     align-items: center;
     justify-content: center;
     border-radius: 4px;
-    border: 1px dashed var(--border);
-    background: var(--bg);
+    border: 1px dashed var(--octo-border);
+    background: var(--octo-bg);
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ------ HistorySection ------ */
@@ -7387,7 +7387,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-history__skeleton {
@@ -7399,12 +7399,12 @@
   .octo-history__skeleton-row {
     height: 32px;
     border-radius: 4px;
-    background: color-mix(in oklab, var(--surface-2) 40%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 40%, transparent);
   }
 
   .octo-history__empty {
     font-size: 13.5px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-history__list {
@@ -7426,13 +7426,13 @@
   }
 
   .octo-history__item:hover {
-    background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
   }
 
   .octo-history__msg {
     font-size: 13.5px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -7440,14 +7440,14 @@
 
   .octo-history__meta {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .octo-history__sha {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 11px;
   }
 
@@ -7457,13 +7457,13 @@
     gap: 4px;
     margin-top: 12px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     text-decoration: none;
     transition: color 0.15s;
   }
 
   .octo-history__see-all:hover {
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   /* ------ LinkedBySection ------ */
@@ -7476,18 +7476,18 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-linked-by__summary {
     font-size: 13.5px;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin: 0 0 8px;
   }
 
   .octo-linked-by__loading {
     font-size: 13.5px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-linked-by__list {
@@ -7514,13 +7514,13 @@
   }
 
   .octo-linked-by__item:hover {
-    background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
   }
 
   .octo-linked-by__item-icon {
     width: 14px;
     height: 14px;
-    color: var(--muted);
+    color: var(--octo-muted);
     flex-shrink: 0;
   }
 
@@ -7535,23 +7535,23 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-linked-by__item:hover .octo-linked-by__item-title {
-    color: var(--brand);
+    color: var(--octo-brand);
   }
 
   .octo-linked-by__item-type {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ------ InlineEntryEditor ------ */
   .octo-inline-editor {
     position: fixed;
     inset: 0;
-    top: var(--header-height);
+    top: var(--octo-header-height);
   }
 
   .octo-inline-editor__container {
@@ -7571,7 +7571,7 @@
       position: absolute;
       z-index: 0;
       inset: 0;
-      background: var(--bg);
+      background: var(--octo-bg);
       opacity: 0.8;
     }
 
@@ -7582,18 +7582,18 @@
       inset: 0;
       left: 100%;
       width: 100px;
-      box-shadow: var(--shadow-2);
+      box-shadow: var(--octo-shadow-2);
     }
   }
 
   .octo-inline-editor__backdrop-top {
     position: relative;
     z-index: 1;
-    height: var(--page-top-height);
+    height: var(--octo-page-top-height);
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding-right: var(--h-gap-lg);
+    padding-right: var(--octo-h-gap-lg);
   }
 
   .octo-inline-editor__backdrop-button {
@@ -7606,7 +7606,7 @@
     z-index: 2;
     display: flex;
     flex-direction: column;
-    background: var(--bg);
+    background: var(--octo-bg);
     animation: octo-slide-in-right 0.2s ease;
     flex: 1 1 auto;
   }
@@ -7624,7 +7624,7 @@
   }
 
   .octo-inline-editor__top {
-    box-shadow: 0 2px 8px var(--bg);
+    box-shadow: 0 2px 8px var(--octo-bg);
   }
 
   .octo-inline-editor__loading {
@@ -7632,7 +7632,7 @@
     flex: 1;
     align-items: center;
     justify-content: center;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-inline-editor__body {
@@ -7645,7 +7645,7 @@
   .octo-inline-editor__fields {
     flex: 1;
     overflow-y: auto;
-    padding: var(--v-gap) var(--h-gap-lg) var(--footer-height);
+    padding: var(--octo-v-gap) var(--octo-h-gap-lg) var(--octo-footer-height);
     height: calc(100vh - 120px);
   }
 
@@ -7667,11 +7667,11 @@
     z-index: 42;
     height: calc(100vh - 120px - 6px);
     overflow-y: auto;
-    padding: var(--v-gap) var(--h-gap-lg);
-    background: var(--surface-2);
+    padding: var(--octo-v-gap) var(--octo-h-gap-lg);
+    background: var(--octo-surface-2);
     box-shadow:
-      inset 0 0 0 1px var(--border),
-      var(--shadow-1);
+      inset 0 0 0 1px var(--octo-border),
+      var(--octo-shadow-1);
     border-radius: 12px;
   }
 
@@ -7681,8 +7681,8 @@
     width: 360px;
     flex-shrink: 0;
     overflow-y: auto;
-    border-left: 1px solid var(--border);
-    background: var(--bg);
+    border-left: 1px solid var(--octo-border);
+    background: var(--octo-bg);
   }
 
   .octo-inline-editor__sidebar-inner {
@@ -7703,17 +7703,17 @@
 
   .octo-inline-editor__meta-key {
     font-weight: 500;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-inline-editor__meta-val {
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-inline-editor__delete-warning {
     border-radius: 6px;
-    border: 1px solid color-mix(in oklab, var(--danger) 30%, transparent);
-    background: color-mix(in oklab, var(--danger) 5%, transparent);
+    border: 1px solid color-mix(in oklab, var(--octo-danger) 30%, transparent);
+    background: color-mix(in oklab, var(--octo-danger) 5%, transparent);
     padding: 12px;
   }
 
@@ -7721,7 +7721,7 @@
     margin-bottom: 4px;
     font-size: 13.5px;
     font-weight: 500;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-inline-editor__delete-warning-list {
@@ -7732,7 +7732,7 @@
     flex-direction: column;
     gap: 2px;
     font-size: 13.5px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-inline-editor__delete-warning-item {
@@ -7744,7 +7744,7 @@
   .octo-inline-editor__delete-warning-foot {
     margin-top: 8px;
     font-size: 13.5px;
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   /* ------ CommandK ------ */
@@ -7758,12 +7758,12 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--octo-border);
     padding: 14px 16px;
   }
 
   .octo-cmdk__input-icon {
-    color: var(--muted);
+    color: var(--octo-muted);
     flex-shrink: 0;
   }
 
@@ -7772,7 +7772,7 @@
     border: 0;
     background: transparent;
     font-size: 16px;
-    color: var(--text);
+    color: var(--octo-text);
     outline: none;
   }
 
@@ -7786,18 +7786,18 @@
     padding: 32px 16px;
     text-align: center;
     font-size: 13.5px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-cmdk__footer {
     display: flex;
     align-items: center;
     gap: 16px;
-    border-top: 1px solid var(--border);
-    background: var(--surface-2);
+    border-top: 1px solid var(--octo-border);
+    background: var(--octo-surface-2);
     padding: 10px 16px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-cmdk__footer-hint {
@@ -7816,7 +7816,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-cmdk__item {
@@ -7833,13 +7833,13 @@
     color: inherit;
 
     &[class*='--active'] {
-      background: var(--surface-2);
+      background: var(--octo-surface-2);
     }
   }
 
   .octo-cmdk__item-icon {
     flex-shrink: 0;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-cmdk__item-body {
@@ -7853,10 +7853,10 @@
     white-space: nowrap;
     font-size: 13.5px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
 
     &[class*='--mono'] {
-      font-family: var(--ft-mono);
+      font-family: var(--octo-ft-mono);
     }
   }
 
@@ -7865,20 +7865,20 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-cmdk__item-badge {
     border-radius: 4px;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     padding: 2px 8px;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--muted);
+    color: var(--octo-muted);
     flex-shrink: 0;
   }
 
@@ -7892,8 +7892,8 @@
   .octo-embed-editor {
     margin: 8px 0;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 30%, transparent);
     padding: 12px;
   }
 
@@ -7908,7 +7908,7 @@
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7922,11 +7922,11 @@
       background: #134e4a;
     }
 
-    .light &[class*='--component'] {
+    html#octocms.light &[class*='--component'] {
       background: #fef3c7;
     }
 
-    .light &[class*='--condition'] {
+    html#octocms.light &[class*='--condition'] {
       background: #ccfbf1;
     }
   }
@@ -7939,7 +7939,7 @@
   .octo-embed-editor__subtitle {
     font-size: 12px;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-embed-editor__title {
@@ -7971,11 +7971,11 @@
   .octo-embed-editor__field-label {
     font-size: 12px;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-embed-editor__field-required {
-    color: var(--danger);
+    color: var(--octo-danger);
     margin-left: 2px;
   }
 
@@ -7983,21 +7983,21 @@
     width: 100%;
     font-size: 13.5px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 6px 8px;
     outline: none;
   }
 
   .octo-embed-editor__input:focus {
-    box-shadow: 0 0 0 2px var(--ring);
+    box-shadow: 0 0 0 2px var(--octo-ring);
   }
 
   .octo-embed-editor__tabs {
     display: flex;
     align-items: center;
     gap: 4px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--octo-border);
     margin-bottom: 8px;
     flex-wrap: wrap;
   }
@@ -8011,25 +8011,25 @@
     background: transparent;
     cursor: pointer;
     transition: color 0.15s;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-embed-editor__tab:hover {
-    color: var(--text);
-    border-bottom-color: var(--border);
+    color: var(--octo-text);
+    border-bottom-color: var(--octo-border);
   }
 
   .octo-embed-editor__tab {
     &[class*='--active'] {
-      border-bottom-color: var(--brand);
-      color: var(--brand);
+      border-bottom-color: var(--octo-brand);
+      color: var(--octo-brand);
     }
   }
 
   .octo-embed-editor__tab-add {
     padding: 6px 8px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -8037,7 +8037,7 @@
   }
 
   .octo-embed-editor__tab-add:hover {
-    color: var(--text);
+    color: var(--octo-text);
   }
 
   .octo-embed-editor__branch-key-row {
@@ -8051,8 +8051,8 @@
     min-height: 80px;
     font-size: 13.5px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 8px 12px;
     resize: vertical;
     outline: none;
@@ -8062,11 +8062,11 @@
     text-align: center;
     padding: 16px;
     font-size: 13.5px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-embed-editor__empty-link {
-    color: var(--brand);
+    color: var(--octo-brand);
     background: none;
     border: none;
     cursor: pointer;
@@ -8088,8 +8088,8 @@
   .octo-image-embed {
     margin: 8px 0;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 30%, transparent);
     padding: 12px;
   }
 
@@ -8104,9 +8104,9 @@
     width: 192px;
     height: 128px;
     border-radius: 8px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     overflow: hidden;
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
     flex-shrink: 0;
   }
 
@@ -8145,7 +8145,7 @@
   .octo-image-embed__info-label {
     font-size: 12px;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-image-embed__info-name {
@@ -8163,21 +8163,21 @@
     width: 64px;
     height: 64px;
     border-radius: 8px;
-    border: 2px dashed var(--border);
+    border: 2px dashed var(--octo-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
     flex-shrink: 0;
   }
 
   .octo-image-embed__placeholder-icon {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-image-embed__no-label {
     font-size: 13.5px;
-    color: var(--muted);
+    color: var(--octo-muted);
     display: block;
     margin-bottom: 4px;
   }
@@ -8186,8 +8186,8 @@
   .octo-ref-embed {
     margin: 8px 0;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--surface-2) 30%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-surface-2) 30%, transparent);
     padding: 12px;
   }
 
@@ -8201,8 +8201,8 @@
     width: 48px;
     height: 48px;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--brand) 10%, transparent);
+    border: 1px solid var(--octo-border);
+    background: color-mix(in oklab, var(--octo-brand) 10%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -8221,7 +8221,7 @@
   .octo-ref-embed__info-label {
     font-size: 12px;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ref-embed__info-title {
@@ -8234,7 +8234,7 @@
 
   .octo-ref-embed__info-type {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ref-embed__actions {
@@ -8249,21 +8249,21 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--octo-muted);
     transition:
       background 0.15s,
       color 0.15s;
   }
 
   .octo-ref-embed__action-btn:hover {
-    background: var(--surface-2);
-    color: var(--text);
+    background: var(--octo-surface-2);
+    color: var(--octo-text);
   }
 
   .octo-ref-embed__action-btn {
     &[class*='--danger']:hover {
-      background: color-mix(in oklab, var(--danger) 10%, transparent);
-      color: var(--danger);
+      background: color-mix(in oklab, var(--octo-danger) 10%, transparent);
+      color: var(--octo-danger);
     }
   }
 
@@ -8277,24 +8277,24 @@
     width: 48px;
     height: 48px;
     border-radius: 8px;
-    border: 2px dashed var(--border);
+    border: 2px dashed var(--octo-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: color-mix(in oklab, var(--surface-2) 50%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 50%, transparent);
     flex-shrink: 0;
   }
 
   .octo-ref-embed__loading-text {
     font-size: 13.5px;
-    color: var(--muted);
+    color: var(--octo-muted);
     display: block;
     margin-bottom: 2px;
   }
 
   .octo-ref-embed__loading-id {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ref-embed__empty-state {
@@ -8305,7 +8305,7 @@
 
   /* ─── Image Embed Editor ────────────────────────── */
   .octo-image-embed__dropzone {
-    border: 2px dashed var(--border);
+    border: 2px dashed var(--octo-border);
     border-radius: 8px;
     padding: 16px;
     display: flex;
@@ -8339,7 +8339,7 @@
     width: 144px;
     flex-shrink: 0;
     overflow-y: auto;
-    border-right: 1px solid var(--border);
+    border-right: 1px solid var(--octo-border);
     padding-right: 8px;
   }
 
@@ -8380,7 +8380,7 @@
     grid-column: 1 / -1;
     text-align: center;
     padding: 48px 0;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ─── Reference Embed Editor ─────────────────────── */
@@ -8405,19 +8405,19 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     border-radius: 8px;
   }
 
   .octo-ref-embed__empty {
     text-align: center;
     padding: 48px 0;
-    color: var(--muted);
+    color: var(--octo-muted);
     font-size: 14px;
   }
 
   .octo-ref-embed__divider {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--octo-border);
   }
 
   .octo-ref-embed__entry-info {
@@ -8435,13 +8435,13 @@
 
   .octo-ref-embed__entry-meta {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-ref-embed__selected-badge {
     font-size: 11px;
     font-weight: 500;
-    color: var(--brand);
+    color: var(--octo-brand);
     flex-shrink: 0;
   }
 
@@ -8453,14 +8453,14 @@
     max-height: 288px;
     overflow-y: auto;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface-1);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-surface-1);
     box-shadow: var(--shadow-3, 0 4px 16px rgb(0 0 0 / 30%));
 
     &[class*='--empty'] {
       padding: 8px 12px;
       font-size: 13.5px;
-      color: var(--muted);
+      color: var(--octo-muted);
     }
   }
 
@@ -8478,18 +8478,18 @@
   }
 
   .octo-slash-menu__item:hover {
-    background: var(--surface-2);
+    background: var(--octo-surface-2);
   }
 
   .octo-slash-menu__item {
     &[class*='--active'] {
-      background: var(--surface-2);
+      background: var(--octo-surface-2);
     }
   }
 
   .octo-slash-menu__item-icon {
     flex-shrink: 0;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-slash-menu__item-label {
@@ -8500,7 +8500,7 @@
   .octo-slash-menu__item-desc {
     display: block;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* Variable embed editor */
@@ -8526,12 +8526,12 @@
       color: #a78bfa;
     }
 
-    .light &[class*='--set'] {
+    html#octocms.light &[class*='--set'] {
       background: #ede9fe;
       color: #4c1d95;
     }
 
-    .light &[class*='--unset'] {
+    html#octocms.light &[class*='--unset'] {
       background: #f5f3ff;
       color: #7c3aed;
       border-color: #a78bfa;
@@ -8562,7 +8562,7 @@
     box-shadow: 0 0 0 2px rgb(139 92 246 / 50%);
   }
 
-  .light .octo-var-embed__select {
+  html#octocms.light .octo-var-embed__select {
     background: #fff;
     color: #4c1d95;
     border-color: #c4b5fd;
@@ -8574,7 +8574,7 @@
     font-style: italic;
   }
 
-  .light .octo-var-embed__none {
+  html#octocms.light .octo-var-embed__none {
     color: #7c3aed;
   }
 
@@ -8905,11 +8905,11 @@
   }
 
   .octo-u-text-muted {
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-u-text-danger {
-    color: var(--danger);
+    color: var(--octo-danger);
   }
 
   .octo-u-font-medium {
@@ -8963,7 +8963,7 @@
   }
 
   .octo-u-mono {
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
   }
 
   .octo-u-mt-0-5 {
@@ -8983,7 +8983,7 @@
   }
 
   .octo-u-text-brand {
-    color: var(--brand);
+    color: var(--octo-brand);
   }
 
   .octo-u-self-start {
@@ -9000,7 +9000,7 @@
   }
 
   .octo-u-text-ok {
-    color: var(--ok);
+    color: var(--octo-ok);
   }
 
   /* ----- Admin error view ----- */
@@ -9009,7 +9009,7 @@
     flex: 1;
     align-items: center;
     justify-content: center;
-    background: color-mix(in oklab, var(--surface-2) 20%, transparent);
+    background: color-mix(in oklab, var(--octo-surface-2) 20%, transparent);
     padding: 24px;
   }
 
@@ -9017,8 +9017,8 @@
     width: 100%;
     max-width: 32rem;
     border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--octo-border);
+    background: var(--octo-bg);
     padding: 24px;
     box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
   }
@@ -9027,7 +9027,7 @@
     font-size: 1rem;
     font-weight: 600;
     letter-spacing: -0.025em;
-    color: var(--text);
+    color: var(--octo-text);
     margin: 0;
   }
 
@@ -9035,13 +9035,13 @@
     margin-top: 8px;
     font-size: 14px;
     line-height: 1.5rem;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-admin-error__hint {
     margin-top: 4px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   .octo-admin-error__actions {
@@ -9056,16 +9056,16 @@
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.025em;
-    color: var(--muted);
+    color: var(--octo-muted);
   }
 
   /* ----- Primary-emphasis button override (replaces Tailwind bg-foreground text-background hover:bg-foreground/90) ----- */
   .octo-btn-primary-fg {
-    background: var(--text);
-    color: var(--bg);
+    background: var(--octo-text);
+    color: var(--octo-bg);
 
     &:hover {
-      background: color-mix(in oklab, var(--text) 90%, transparent);
+      background: color-mix(in oklab, var(--octo-text) 90%, transparent);
     }
   }
 
@@ -9279,8 +9279,8 @@
   .octo-button {
     /* Action button: dark bg / light text (for "Add field", "Create", primary CTAs) */
     &[class*='--action'] {
-      background: var(--text);
-      color: var(--bg);
+      background: var(--octo-text);
+      color: var(--octo-bg);
       gap: 6px;
     }
 
@@ -9290,13 +9290,13 @@
 
     /* Danger ghost button */
     &[class*='--danger-ghost'] {
-      color: var(--danger);
+      color: var(--octo-danger);
       gap: 6px;
     }
 
     &[class*='--danger-ghost']:hover {
-      background: color-mix(in oklab, var(--danger) 10%, transparent);
-      color: var(--danger);
+      background: color-mix(in oklab, var(--octo-danger) 10%, transparent);
+      color: var(--octo-danger);
     }
 
     /* Icon button size overrides */
@@ -9323,11 +9323,11 @@
   /* Danger menu item */
   .octo-menu-item {
     &[class*='--danger'] {
-      color: var(--danger);
+      color: var(--octo-danger);
     }
 
     &[class*='--danger']:focus {
-      color: var(--danger);
+      color: var(--octo-danger);
     }
   }
 
@@ -9343,17 +9343,17 @@
   .octo-table-cell {
     &[class*='--drag'] {
       cursor: grab;
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &[class*='--mono'] {
-      font-family: var(--ft-mono);
+      font-family: var(--octo-ft-mono);
       font-size: 12px;
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &[class*='--muted'] {
-      color: var(--muted);
+      color: var(--octo-muted);
       font-size: 14px;
     }
 
@@ -9361,7 +9361,7 @@
       height: 128px;
       text-align: center;
       font-size: 14px;
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &[class*='--right'] {
@@ -9380,7 +9380,7 @@
   .octo-table-head {
     &[class*='--muted'] {
       font-weight: 500;
-      color: var(--muted);
+      color: var(--octo-muted);
     }
 
     &[class*='--right'] {
@@ -9442,7 +9442,7 @@
   /* ----- Dialog header with border ----- */
   .octo-dialog-header {
     &[class*='--bordered'] {
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--octo-border);
       padding: 16px 24px;
     }
   }
@@ -9452,17 +9452,17 @@
     width: 100%;
     padding: 6px 10px;
     font-size: 14px;
-    color: var(--text);
-    background: var(--bg);
-    border: 1px solid var(--border);
+    color: var(--octo-text);
+    background: var(--octo-bg);
+    border: 1px solid var(--octo-border);
     border-radius: 8px;
     line-height: 1.4;
   }
 
   .octo-media-asset__input:focus {
     outline: none;
-    border-color: var(--ring);
-    box-shadow: 0 0 0 1px var(--ring);
+    border-color: var(--octo-ring);
+    box-shadow: 0 0 0 1px var(--octo-ring);
   }
 
   .octo-media-asset__input:disabled {
@@ -9473,7 +9473,7 @@
   .octo-field-label-hint {
     display: block;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--octo-muted);
     margin-bottom: 4px;
   }
 
@@ -9481,7 +9481,7 @@
     display: block;
     font-size: 12px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--octo-text);
     margin-bottom: 4px;
   }
 
@@ -9510,13 +9510,13 @@
   /* Input / select error state */
   .octo-input {
     &[class*='--invalid'] {
-      border-color: color-mix(in oklab, var(--danger) 50%, transparent);
+      border-color: color-mix(in oklab, var(--octo-danger) 50%, transparent);
     }
   }
 
   .octo-select__trigger {
     &[class*='--invalid'] {
-      border-color: color-mix(in oklab, var(--danger) 50%, transparent);
+      border-color: color-mix(in oklab, var(--octo-danger) 50%, transparent);
     }
   }
 
@@ -9546,25 +9546,25 @@
   .octo-slab__title {
     font-size: 12px;
     font-weight: 600;
-    color: var(--muted);
+    color: var(--octo-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-family: var(--ft-mono);
+    font-family: var(--octo-ft-mono);
   }
 
   .octo-slab__sub {
     font-size: 12px;
-    color: var(--text-2);
+    color: var(--octo-text-2);
     margin-top: 4px;
     line-height: 1.55;
   }
 
   .octo-slab__body {
-    border: 1px solid var(--border);
+    border: 1px solid var(--octo-border);
     border-radius: 12px;
     padding: 20px;
-    background: var(--surface-1);
-    box-shadow: var(--shadow-1);
+    background: var(--octo-surface-1);
+    box-shadow: var(--octo-shadow-1);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -9581,18 +9581,18 @@
   .octo-design-panel {
     padding: 28px;
     border-radius: 12px;
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-1);
+    background: var(--octo-surface-1);
+    border: 1px solid var(--octo-border);
+    box-shadow: var(--octo-shadow-1);
     display: grid;
     gap: 24px;
 
     &[class*='--form'] {
       padding: 28px;
       border-radius: 12px;
-      background: var(--surface-1);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-1);
+      background: var(--octo-surface-1);
+      border: 1px solid var(--octo-border);
+      box-shadow: var(--octo-shadow-1);
     }
 
     &[class*='--banners'] {
@@ -9601,9 +9601,9 @@
       gap: 14px;
       padding: 28px;
       border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--surface-1);
-      box-shadow: var(--shadow-1);
+      border: 1px solid var(--octo-border);
+      background: var(--octo-surface-1);
+      box-shadow: var(--octo-shadow-1);
     }
 
     &[class*='--commandk'] {
@@ -9611,9 +9611,9 @@
       min-height: 480px;
       border-radius: 12px;
       overflow: hidden;
-      background: var(--surface-0);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-1);
+      background: var(--octo-surface-0);
+      border: 1px solid var(--octo-border);
+      box-shadow: var(--octo-shadow-1);
       transform: translateZ(0);
     }
   }
@@ -9633,8 +9633,8 @@
 
   .octo-field-demo__label {
     font-size: 11px;
-    font-family: var(--ft-mono);
-    color: var(--muted);
+    font-family: var(--octo-ft-mono);
+    color: var(--octo-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 8px;
@@ -9644,7 +9644,7 @@
   .octo-design-subtitle {
     font-size: 12px;
     font-weight: 600;
-    color: var(--muted);
+    color: var(--octo-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 14px;
@@ -9658,7 +9658,7 @@
     border-radius: 50%;
     color: #fff;
     font-weight: 600;
-    box-shadow: 0 0 0 2px var(--surface-1);
+    box-shadow: 0 0 0 2px var(--octo-surface-1);
   }
 
   /* Responsive two-column card grid */
@@ -9717,6 +9717,39 @@
 }
 
 /* ============================================================
+  7b. Unlayered CMS surface reset — override consumer globals, then
+  @layer tokens/base/components rules above apply via revert-layer.
+  Custom properties (--octo-*) are not affected by `all` and keep
+  inheriting from html#octocms. Descendants of `.mdxeditor` / `.mdxeditor-popup-container`
+  are excluded so @mdxeditor/editor/style.css keeps working. §8 token overrides follow.
+  ============================================================ */
+
+html#octocms {
+  font-family: var(--octo-ft-ui);
+  font-size: 16px;
+  font-weight: normal;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
+}
+
+html#octocms body {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--octo-foreground) !important;
+  background: var(--octo-background) !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizelegibility;
+}
+
+html#octocms
+  :where(*, *::before, *::after):not(
+    :is(.mdxeditor, .mdxeditor *, .mdxeditor-popup-container, .mdxeditor-popup-container *)
+  ) {
+  all: revert-layer;
+}
+
+/* ============================================================
   8. MDXEditor overrides
   ============================================================ */
 
@@ -9727,39 +9760,39 @@
   /* Map MDXEditor's proprietary CSS vars to our design tokens.
     Both selectors use .editor-markdown for specificity (0,2,0) — needed because
     MDXEditor's own ._editorRoot_* rule loads later and would otherwise win. */
-  --baseBase: var(--bg);
-  --baseBgSubtle: var(--surface-1);
-  --baseBg: var(--surface-1);
-  --baseBgHover: var(--surface-2);
-  --baseBgActive: var(--surface-2);
-  --baseBorder: var(--border);
-  --baseBorderHover: var(--border-strong);
-  --baseText: var(--muted);
-  --baseTextContrast: var(--text-2);
-  --basePageBg: var(--surface-1);
+  --baseBase: var(--octo-bg);
+  --baseBgSubtle: var(--octo-surface-1);
+  --baseBg: var(--octo-surface-1);
+  --baseBgHover: var(--octo-surface-2);
+  --baseBgActive: var(--octo-surface-2);
+  --baseBorder: var(--octo-border);
+  --baseBorderHover: var(--octo-border-strong);
+  --baseText: var(--octo-muted);
+  --baseTextContrast: var(--octo-text-2);
+  --basePageBg: var(--octo-surface-1);
 }
 
 .editor-markdown.mdxeditor {
-  background-color: var(--surface-1);
+  background-color: var(--octo-surface-1);
   padding: 0;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  font-family: var(--ft-ui);
-  color: var(--text-2);
+  border: 1px solid var(--octo-border);
+  font-family: var(--octo-ft-ui);
+  color: var(--octo-text-2);
 }
 
 /* BlockTypeSelect trigger inside the toolbar */
 .editor-markdown.mdxeditor [class*='selectTrigger'] {
-  color: var(--text-2);
-  border: 1px solid var(--border);
+  color: var(--octo-text-2);
+  border: 1px solid var(--octo-border);
 }
 
 /* Highlighted item in the (portaled) dropdown menu — needs to stand out from
    the panel which uses --basePageBg = --surface-1 */
 .editor-markdown.mdxeditor-popup-container [class*='selectItem'][data-highlighted],
 .editor-markdown.mdxeditor-popup-container [class*='selectItem'][data-state='checked'] {
-  background-color: var(--surface-2);
-  color: var(--text);
+  background-color: var(--octo-surface-2);
+  color: var(--octo-text);
 }
 
 .editor-markdown.mdxeditor .mdxeditor-toolbar {
@@ -9770,7 +9803,7 @@
 
 .editor-markdown.mdxeditor [contenteditable] {
   padding: 12px;
-  font-family: var(--ft-ui);
+  font-family: var(--octo-ft-ui);
 }
 
 .editor-markdown.mdxeditor [contenteditable] h1,
@@ -9779,7 +9812,7 @@
 .editor-markdown.mdxeditor [contenteditable] h4,
 .editor-markdown.mdxeditor [contenteditable] h5,
 .editor-markdown.mdxeditor [contenteditable] h6 {
-  color: var(--text);
+  color: var(--octo-text);
 }
 
 .editor-markdown.mdxeditor [contenteditable] h1 {
@@ -9818,7 +9851,7 @@
 .editor-markdown.mdxeditor [contenteditable] h6 {
   font-size: 0.85em;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--octo-muted);
   margin: 2em 0;
 }
 
@@ -9851,7 +9884,7 @@
 }
 
 .editor-markdown.mdxeditor [contenteditable] a {
-  color: var(--brand);
+  color: var(--octo-brand);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -9877,24 +9910,24 @@
 .editor-markdown.mdxeditor [contenteditable] blockquote {
   margin: 0 0 0.75em;
   padding: 0.25em 0 0.25em 1em;
-  border-left: 3px solid var(--border);
-  color: var(--muted);
+  border-left: 3px solid var(--octo-border);
+  color: var(--octo-muted);
   font-style: italic;
 }
 
 .editor-markdown.mdxeditor [contenteditable] :not(pre) > code {
-  font-family: var(--ft-mono);
+  font-family: var(--octo-ft-mono);
   font-size: 0.9em;
-  background: var(--surface-2);
+  background: var(--octo-surface-2);
   padding: 0.15em 0.35em;
   border-radius: 4px;
 }
 
 .editor-markdown.mdxeditor [contenteditable] pre {
-  font-family: var(--ft-mono);
+  font-family: var(--octo-ft-mono);
   font-size: 0.9em;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--octo-surface-2);
+  border: 1px solid var(--octo-border);
   padding: 0.75em 1em;
   border-radius: 6px;
   overflow-x: auto;
@@ -9909,7 +9942,7 @@
 
 .editor-markdown.mdxeditor [contenteditable] hr {
   border: 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--octo-border);
   margin: 1.5em 0;
 }
 
@@ -9923,6 +9956,6 @@
 
 .editor-markdown {
   &[class*='--invalid'].mdxeditor {
-    border-color: var(--danger);
+    border-color: var(--octo-danger);
   }
 }

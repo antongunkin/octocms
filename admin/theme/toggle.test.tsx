@@ -2,6 +2,8 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { OCTOCMS_HTML_ID } from '../../lib/cmsSurface';
+
 vi.mock('../../components/ui', () => ({
   Switcher: ({ children, ...props }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) => (
     <div role="tablist" {...props}>
@@ -22,11 +24,13 @@ vi.mock('../../components/ui', () => ({
 const { ThemeToggle } = await import('./toggle');
 
 beforeEach(() => {
-  document.getElementById('cms-layout')?.classList.remove('light');
-  document.body.classList.remove('light');
+  document.documentElement.id = OCTOCMS_HTML_ID;
+  document.documentElement.classList.remove('light');
 });
 
 afterEach(() => {
+  document.documentElement.removeAttribute('id');
+  document.documentElement.classList.remove('light');
   cleanup();
 });
 
@@ -58,13 +62,13 @@ describe('ThemeToggle', () => {
     render(<ThemeToggle initialTheme="dark" />);
     fireEvent.click(screen.getByRole('tab', { name: 'Light' }));
     expect(screen.getByRole('tab', { name: 'Light' }).getAttribute('aria-selected')).toBe('true');
-    expect(document.body.classList.contains('light')).toBe(true);
+    expect(document.documentElement.classList.contains('light')).toBe(true);
   });
 
   it('switches to Dark when Dark is clicked', () => {
     render(<ThemeToggle initialTheme="light" />);
     fireEvent.click(screen.getByRole('tab', { name: 'Dark' }));
     expect(screen.getByRole('tab', { name: 'Dark' }).getAttribute('aria-selected')).toBe('true');
-    expect(document.body.classList.contains('light')).toBe(false);
+    expect(document.documentElement.classList.contains('light')).toBe(false);
   });
 });

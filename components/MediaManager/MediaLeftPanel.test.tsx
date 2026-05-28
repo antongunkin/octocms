@@ -90,7 +90,7 @@ describe('MediaLeftPanel', () => {
     render(<MediaLeftPanel {...baseProps} selectedFolder="blog" />);
     const blogButton = screen.getByText('blog').closest('button');
     expect(blogButton?.className).toMatch(/font-semibold/);
-    expect(blogButton?.className).toMatch(/bg-\[var\(--surface-3\)\]/);
+    expect(blogButton?.className).toMatch(/bg-\[var\(--octo-surface-3\)\]/);
   });
 
   it('"All files" is active when selectedFolder is null', () => {

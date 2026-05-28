@@ -7,3 +7,4 @@
  */
 export { AdminApp } from './AdminApp';
 export { AdminLayout, metadata } from './pages/AdminLayout';
+export { OctoCmsSurfaceMarker } from '../components/OctoCmsSurfaceMarker';

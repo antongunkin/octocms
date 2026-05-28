@@ -23,8 +23,8 @@ export function LeftNavItem(props: LeftNavItemProps) {
   const className = cn(
     'octo-left-nav-item',
     props.active
-      ? 'octo-left-nav-item octo-left-nav-item--active bg-[var(--surface-3)] font-semibold'
-      : 'text-[var(--text-2)]',
+      ? 'octo-left-nav-item octo-left-nav-item--active bg-[var(--octo-surface-3)] font-semibold'
+      : 'text-[var(--octo-text-2)]',
   );
 
   const inner = (

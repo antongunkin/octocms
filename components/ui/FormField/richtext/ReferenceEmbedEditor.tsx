@@ -228,11 +228,13 @@ const ReferenceEmbedEditor: React.FC<JsxEditorProps> = ({ mdastNode }) => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
-                        background: isSelected ? 'color-mix(in oklab, var(--brand) 10%, transparent)' : 'transparent',
-                        color: isSelected ? 'var(--brand)' : 'var(--text)',
+                        background: isSelected
+                          ? 'color-mix(in oklab, var(--octo-brand) 10%, transparent)'
+                          : 'transparent',
+                        color: isSelected ? 'var(--octo-brand)' : 'var(--octo-text)',
                         border: 0,
                         cursor: 'pointer',
-                        borderBottom: '1px solid var(--border)',
+                        borderBottom: '1px solid var(--octo-border)',
                       }}
                     >
                       <Icon.FileText className="octo-icon-md octo-u-shrink-0 octo-u-text-muted" />

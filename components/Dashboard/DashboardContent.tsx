@@ -547,7 +547,7 @@ function EntryRow({
       <td className="octo-content-row__td">
         <span
           className="octo-content-row__branch"
-          style={{ color: `var(--st-${entry.status})` }}
+          style={{ color: `var(--octo-st-${entry.status})` }}
           title={entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
         >
           <Icon.GitBranch className="octo-icon-sm octo-u-shrink-0" />

@@ -262,15 +262,17 @@ function RenderReference({
   return (
     <div
       style={{
-        border: '1px solid var(--border)',
+        border: '1px solid var(--octo-border)',
         borderRadius: 6,
         padding: '12px',
         margin: '8px 0',
-        background: 'color-mix(in oklab, var(--surface-2) 30%, transparent)',
+        background: 'color-mix(in oklab, var(--octo-surface-2) 30%, transparent)',
       }}
     >
       {collectionType && (
-        <span style={{ fontSize: 12, color: 'var(--muted)', display: 'block', marginBottom: 2 }}>{collectionType}</span>
+        <span style={{ fontSize: 12, color: 'var(--octo-muted)', display: 'block', marginBottom: 2 }}>
+          {collectionType}
+        </span>
       )}
       <span style={{ fontSize: 13.5, fontWeight: 500 }}>{title ?? 'Untitled entry'}</span>
     </div>

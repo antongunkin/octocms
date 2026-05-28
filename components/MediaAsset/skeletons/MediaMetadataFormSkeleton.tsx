@@ -20,7 +20,7 @@ export function MediaMetadataFormSkeleton() {
           display: 'flex',
           flexDirection: 'column',
           gap: '10px',
-          borderTop: '1px solid var(--border)',
+          borderTop: '1px solid var(--octo-border)',
           paddingTop: '20px',
         }}
       >
