@@ -208,9 +208,7 @@ export async function updateCommand(projectRoot: string): Promise<void> {
 
   const legacyChatRouteFile = join(absRoot, 'api', 'agent', 'route.ts');
   if (existsSync(legacyChatRouteFile)) {
-    log.info(
-      `${rel}/api/agent/route.ts — legacy route detected; delete after verifying ${chatRel} works`,
-    );
+    log.info(`${rel}/api/agent/route.ts — legacy route detected; delete after verifying ${chatRel} works`);
   }
 
   // 7. Public search route at `/api/octocms/search`.
@@ -235,9 +233,7 @@ export async function updateCommand(projectRoot: string): Promise<void> {
 
   const legacySearchRouteFile = join(absRoot, 'api', 'search', 'route.ts');
   if (existsSync(legacySearchRouteFile)) {
-    log.info(
-      `${rel}/api/search/route.ts — legacy route detected; delete after verifying ${searchRel} works`,
-    );
+    log.info(`${rel}/api/search/route.ts — legacy route detected; delete after verifying ${searchRel} works`);
   }
 
   // 8. Chat-agent proposal accept/reject — server actions only.

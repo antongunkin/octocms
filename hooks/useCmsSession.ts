@@ -38,11 +38,7 @@ export function useCmsSession(): {
   });
 
   const status: CmsSessionStatus =
-    query.isPending && query.data === undefined
-      ? 'loading'
-      : query.data
-        ? 'authenticated'
-        : 'unauthenticated';
+    query.isPending && query.data === undefined ? 'loading' : query.data ? 'authenticated' : 'unauthenticated';
 
   const signIn = useCallback(() => {
     const returnTo = encodeURIComponent(pathname);
