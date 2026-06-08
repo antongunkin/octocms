@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as github from '../github';
-import * as files from './files';
 import { createBranch, listCMSBranches, publishBranch } from './git';
 
 const { mockCookieSet } = vi.hoisted(() => ({
@@ -30,10 +29,6 @@ vi.mock('../github', () => ({
   getGitHubFile: vi.fn(),
   resolveContentBranch: vi.fn(),
   listGitHubCMSPullRequests: vi.fn(),
-}));
-
-vi.mock('./files', () => ({
-  waitForPublicReadConsistency: vi.fn(),
 }));
 
 vi.mock('./build', () => ({
@@ -71,7 +66,6 @@ describe('publishBranch', () => {
   it('writes per-build pointer to base branch when pointer ref is unset', async () => {
     vi.mocked(github.getPublishedPointerRef).mockReturnValue(undefined);
     vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(files.waitForPublicReadConsistency).mockResolvedValue(undefined);
 
     await publishBranch('feature-a');
 
@@ -81,17 +75,11 @@ describe('publishBranch', () => {
       'Publish branch feature-a (cms/pointers/test-build.json)',
       'main',
     );
-    expect(files.waitForPublicReadConsistency).toHaveBeenCalledWith(
-      'cms/pointers/test-build.json',
-      `${JSON.stringify({ branch: 'feature-a', buildId: 'test-build' }, null, 2)}\n`,
-      'main',
-    );
   });
 
   it('writes per-build pointer to pointer branch when getPublishedPointerRef returns a branch', async () => {
     vi.mocked(github.getPublishedPointerRef).mockReturnValue('cms/publish-pointer');
     vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(files.waitForPublicReadConsistency).mockResolvedValue(undefined);
 
     await publishBranch('feature-b');
 
@@ -99,11 +87,6 @@ describe('publishBranch', () => {
       'cms/pointers/test-build.json',
       `${JSON.stringify({ branch: 'feature-b', buildId: 'test-build' }, null, 2)}\n`,
       'Publish branch feature-b (cms/pointers/test-build.json)',
-      'cms/publish-pointer',
-    );
-    expect(files.waitForPublicReadConsistency).toHaveBeenCalledWith(
-      'cms/pointers/test-build.json',
-      `${JSON.stringify({ branch: 'feature-b', buildId: 'test-build' }, null, 2)}\n`,
       'cms/publish-pointer',
     );
   });

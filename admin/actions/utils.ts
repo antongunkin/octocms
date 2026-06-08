@@ -9,24 +9,35 @@ export const getErrorMessage = (error: unknown): string => {
   return String(error);
 };
 
+export type ActionFailure = {
+  success: false;
+  error: string;
+  code?: string;
+  retryable?: boolean;
+};
+
 /** Standard result for CMS server actions — use for user-facing feedback (toast). */
-export type ActionResult = { success: true } | { success: false; error: string };
+export type ActionResult = { success: true } | ActionFailure;
 
 /** `saveFile` may attach per-field errors (e.g. duplicate slug). */
-export type SaveFileResult =
-  | { success: true }
-  | { success: false; error: string; fieldErrors?: Record<string, string> };
+export type SaveFileResult = { success: true } | (ActionFailure & { fieldErrors?: Record<string, string> });
 
 export const actionOk = (): { success: true } => ({ success: true });
 
-export const actionErr = (error: unknown): { success: false; error: string } => ({
-  success: false,
-  error: getErrorMessage(error),
-});
+export const actionErr = (error: unknown): ActionFailure => {
+  const metadata =
+    typeof error === 'object' && error !== null ? (error as { code?: unknown; retryable?: unknown }) : {};
+  return {
+    success: false,
+    error: getErrorMessage(error),
+    ...(typeof metadata.code === 'string' ? { code: metadata.code } : {}),
+    ...(metadata.retryable === true ? { retryable: true } : {}),
+  };
+};
 
-export type NewFileResult = { success: true; path: string } | { success: false; error: string };
+export type NewFileResult = { success: true; path: string } | ActionFailure;
 
-export type UploadMediaResult = { success: true; id: string } | { success: false; error: string };
+export type UploadMediaResult = { success: true; id: string } | ActionFailure;
 
 export type CreatePRResult = { success: true; url: string; number: number } | { success: false; error: string };
 

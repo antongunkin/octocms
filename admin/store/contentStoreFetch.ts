@@ -1,35 +1,72 @@
 /**
- * Bulk-fetch all CMS content for a branch using the Git Trees API.
+ * Git-backed snapshot primitives for the CMS admin UI.
  *
- * Replaces N+1 sequential `repos.getContent` calls with:
- *   1 × `git.getTree({ recursive: 1 })`  →  all paths + blob SHAs
- *   N × `git.getBlob(sha)`               →  parallel, chunked (PARALLEL_BLOB_LIMIT)
- *
- * Falls back to the existing per-file REST approach on failure.
+ * The manifest and blob-content layers are intentionally serializable so
+ * Next.js can cache them remotely without pulling a Vercel SDK into OctoCMS.
  */
 
-import { Octokit } from 'octokit';
+import type { Octokit } from 'octokit';
 
-import { getConfig } from '../../lib/configStore';
 import { companionMarkdownPathsForEntry, companionRichTextPathsForEntry } from '../../lib/companionMarkdown';
+import { getConfig } from '../../lib/configStore';
 import { logCmsServerError } from '../../lib/cmsServerLog';
 import { isMediaEntryPath, mediaContentFolder } from '../../lib/mediaPath';
 
 import type { BranchStoreData, StoredEntry } from './contentStoreTypes';
 
-/** Maximum concurrent blob fetches. GitHub allows bursts but we stay conservative. */
 const PARALLEL_BLOB_LIMIT = 20;
+
+/** Leaves headroom for cache serialization overhead below Next/Vercel's 2 MB item limit. */
+export const CONTENT_CHUNK_TARGET_BYTES = 900_000;
+
+export type BranchManifestItem = {
+  path: string;
+  sha: string;
+  size: number;
+};
+
+export type BranchManifest = {
+  branch: string;
+  headSha: string | null;
+  checkedAt: number;
+  treeSha: string;
+  items: BranchManifestItem[];
+};
+
+export type BranchHead = {
+  branch: string;
+  headSha: string;
+  checkedAt: number;
+};
+
+export type CommitTree = {
+  headSha: string;
+  treeSha: string;
+};
+
+export type TreeManifest = {
+  treeSha: string;
+  items: BranchManifestItem[];
+};
+
+export type BlobContent = {
+  sha: string;
+  content: string | null;
+};
+
+export type FetchedContentFile = {
+  path: string;
+  sha: string;
+  content: string | null;
+};
 
 type TreeItem = {
   path?: string;
-  mode?: string;
   type?: string;
   sha?: string;
   size?: number;
 };
 
-/** Returns true for CMS-managed files: editorial content under `contentFolder` (`.json`/`.md`/`.mdx`)
- *  or media-entry JSONs under `mediaContentFolder`. */
 function isCmsContentFile(filePath: string): boolean {
   const config = getConfig();
   if (
@@ -41,24 +78,47 @@ function isCmsContentFile(filePath: string): boolean {
   return filePath.startsWith(`${mediaContentFolder()}/`) && filePath.endsWith('.json');
 }
 
-/** Extract collection name from a content path like "cms/content/post/post-123.json".
- *  Returns null for media-entry paths (they have no collection). */
 function collectionFromPath(filePath: string): string | null {
   const config = getConfig();
   if (!filePath.startsWith(`${config.contentFolder}/`)) return null;
-  const relative = filePath.slice(config.contentFolder.length + 1); // "post/post-123.json"
+  const relative = filePath.slice(config.contentFolder.length + 1);
   const slashIdx = relative.indexOf('/');
   return slashIdx > 0 ? relative.slice(0, slashIdx) : null;
 }
 
-/** Fetch blob content from GitHub, returning the decoded UTF-8 string. */
-async function fetchBlobContent(octokit: Octokit, owner: string, repo: string, sha: string): Promise<string> {
-  const { data } = await octokit.rest.git.getBlob({ owner, repo, file_sha: sha });
-  return Buffer.from(data.content, 'base64').toString('utf-8');
+function manifestItemPriority(item: BranchManifestItem): number {
+  return item.path.endsWith('.json') ? 0 : 1;
 }
 
-/** Process fetched items in parallel with a concurrency limit. */
-async function parallelMap<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+function orderedManifestItems(items: readonly BranchManifestItem[]): BranchManifestItem[] {
+  return [...items].sort((a, b) => manifestItemPriority(a) - manifestItemPriority(b) || a.path.localeCompare(b.path));
+}
+
+/** Deterministically partition files into cache-safe chunks using Git-reported blob sizes. */
+export function chunkManifestItems(
+  items: readonly BranchManifestItem[],
+  targetBytes = CONTENT_CHUNK_TARGET_BYTES,
+): BranchManifestItem[][] {
+  const chunks: BranchManifestItem[][] = [];
+  let current: BranchManifestItem[] = [];
+  let currentBytes = 0;
+
+  for (const item of orderedManifestItems(items)) {
+    const itemBytes = Math.max(0, item.size);
+    if (current.length > 0 && currentBytes + itemBytes > targetBytes) {
+      chunks.push(current);
+      current = [];
+      currentBytes = 0;
+    }
+    current.push(item);
+    currentBytes += itemBytes;
+  }
+
+  if (current.length > 0) chunks.push(current);
+  return chunks;
+}
+
+async function parallelMap<T, R>(items: readonly T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
   const results: R[] = [];
   let index = 0;
 
@@ -74,119 +134,208 @@ async function parallelMap<T, R>(items: T[], limit: number, fn: (item: T) => Pro
   return results;
 }
 
-/**
- * Fetch all CMS content for a branch using the Git Trees API.
- *
- * @param octokit  Authenticated Octokit client (session or CMS_GITHUB_TOKEN)
- * @param owner    Repository owner
- * @param repo     Repository name
- * @param branch   Git ref (branch name)
- * @returns Fully populated BranchStoreData or null if the tree fetch fails
- */
-export async function fetchBranchContent(
+export async function fetchBranchHead(
   octokit: Octokit,
   owner: string,
   repo: string,
   branch: string,
-): Promise<BranchStoreData | null> {
-  const config = getConfig();
-  // Step 1: Get the full recursive tree in one API call
-  let treeSha: string;
-  let treeItems: TreeItem[];
-
+): Promise<BranchHead | null> {
   try {
-    const { data } = await octokit.rest.git.getTree({
+    const { data } = await octokit.rest.git.getRef({
       owner,
       repo,
-      tree_sha: branch,
-      recursive: '1',
+      ref: `heads/${branch}`,
     });
-    treeSha = data.sha;
-    treeItems = data.tree;
-
-    if (data.truncated) {
-      logCmsServerError({
-        operation: 'contentStore.fetchTree',
-        branch,
-        message: 'Git tree was truncated — repo may have too many files. Store may be incomplete.',
-      });
-    }
+    return { branch, headSha: data.object.sha, checkedAt: Date.now() };
   } catch (error) {
     logCmsServerError({
-      operation: 'contentStore.fetchTree',
+      operation: 'contentStore.fetchHead',
       branch,
       message: error instanceof Error ? error.message : String(error),
     });
     return null;
   }
+}
 
-  // Step 2: Filter to CMS content files (json + md under contentFolder)
-  const cmsItems = treeItems.filter(
-    (item): item is TreeItem & { path: string; sha: string } =>
-      item.type === 'blob' &&
-      typeof item.path === 'string' &&
-      typeof item.sha === 'string' &&
-      isCmsContentFile(item.path),
-  );
+export async function fetchCommitTree(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  headSha: string,
+): Promise<CommitTree | null> {
+  try {
+    const { data } = await octokit.rest.git.getCommit({
+      owner,
+      repo,
+      commit_sha: headSha,
+    });
+    return { headSha, treeSha: data.tree.sha };
+  } catch {
+    return null;
+  }
+}
 
-  if (cmsItems.length === 0) {
+export async function fetchTreeManifest(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  treeSha: string,
+  branchForLogging: string,
+): Promise<TreeManifest | null> {
+  try {
+    const { data } = await octokit.rest.git.getTree({
+      owner,
+      repo,
+      tree_sha: treeSha,
+      recursive: '1',
+    });
+
+    if (data.truncated) {
+      logCmsServerError({
+        operation: 'contentStore.fetchTree',
+        branch: branchForLogging,
+        message: 'Git tree was truncated; the admin snapshot may be incomplete.',
+      });
+    }
+
+    const items = (data.tree as TreeItem[])
+      .filter(
+        (item): item is TreeItem & { path: string; sha: string } =>
+          item.type === 'blob' &&
+          typeof item.path === 'string' &&
+          typeof item.sha === 'string' &&
+          isCmsContentFile(item.path),
+      )
+      .map((item) => ({
+        path: item.path,
+        sha: item.sha,
+        size: typeof item.size === 'number' ? item.size : 0,
+      }));
+
     return {
-      branch,
-      treeSha,
-      entries: new Map(),
-      byCollection: new Map(),
-      mediaEntries: new Map(),
-      populatedAt: Date.now(),
-      version: 0,
-      searchIndex: null,
-      searchIndexVersion: -1,
+      treeSha: data.sha,
+      items: orderedManifestItems(items),
     };
+  } catch (error) {
+    logCmsServerError({
+      operation: 'contentStore.fetchTree',
+      branch: branchForLogging,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
+/**
+ * Direct manifest load. Cached production paths call the three primitives
+ * separately so unchanged commit and tree SHAs remain immutable cache hits.
+ */
+export async function fetchBranchManifest(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  branch: string,
+): Promise<BranchManifest | null> {
+  if (!octokit.rest.git.getRef || !octokit.rest.git.getCommit) {
+    const tree = await fetchTreeManifest(octokit, owner, repo, branch, branch);
+    return tree ? { branch, headSha: null, checkedAt: Date.now(), ...tree } : null;
   }
 
-  // Build a SHA→path index for deduplication (same blob content shared across files is rare but possible)
-  const jsonItems = cmsItems.filter((item) => item.path.endsWith('.json'));
-  const mdItems = cmsItems.filter((item) => item.path.endsWith('.md') || item.path.endsWith('.mdx'));
+  const head = await fetchBranchHead(octokit, owner, repo, branch);
+  if (!head) return null;
+  const commit = await fetchCommitTree(octokit, owner, repo, head.headSha);
+  if (!commit) return null;
+  const tree = await fetchTreeManifest(octokit, owner, repo, commit.treeSha, branch);
+  return tree ? { branch, headSha: head.headSha, checkedAt: head.checkedAt, ...tree } : null;
+}
 
-  // Step 3: Fetch all blob contents in parallel chunks
-  const jsonContents = await parallelMap(jsonItems, PARALLEL_BLOB_LIMIT, async (item) => {
+/** Fetch immutable Git blobs with bounded concurrency and SHA deduplication. */
+export async function fetchBlobContents(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  shas: readonly string[],
+): Promise<BlobContent[]> {
+  const uniqueShas = Array.from(new Set(shas));
+  return parallelMap(uniqueShas, PARALLEL_BLOB_LIMIT, async (sha) => {
     try {
-      const content = await fetchBlobContent(octokit, owner, repo, item.sha);
-      return { path: item.path, sha: item.sha, content };
+      const { data } = await octokit.rest.git.getBlob({ owner, repo, file_sha: sha });
+      return {
+        sha,
+        content: Buffer.from(data.content, 'base64').toString('utf-8'),
+      };
     } catch {
-      return { path: item.path, sha: item.sha, content: null };
+      return { sha, content: null };
     }
   });
+}
 
-  const mdContents = await parallelMap(mdItems, PARALLEL_BLOB_LIMIT, async (item) => {
-    try {
-      const content = await fetchBlobContent(octokit, owner, repo, item.sha);
-      return { path: item.path, content };
-    } catch {
-      return { path: item.path, content: null };
+export function mapBlobContentsToFiles(
+  items: readonly BranchManifestItem[],
+  blobs: readonly BlobContent[],
+): FetchedContentFile[] {
+  const contentBySha = new Map(blobs.map((blob) => [blob.sha, blob.content]));
+  return items.map((item) => ({
+    path: item.path,
+    sha: item.sha,
+    content: contentBySha.get(item.sha) ?? null,
+  }));
+}
+
+function referenceKeys(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((key): key is string => typeof key === 'string' && key.length > 0);
+  }
+  if (typeof value !== 'string' || value.length === 0) return [];
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (Array.isArray(parsed)) {
+      return parsed.filter((key): key is string => typeof key === 'string' && key.length > 0);
     }
-  });
+  } catch {
+    // A single reference key is intentionally stored as a plain string.
+  }
+  return [value];
+}
 
-  // Index markdown contents by path for fast lookup
-  const mdByPath = new Map<string, string>();
-  for (const md of mdContents) {
-    if (md.content !== null) {
-      mdByPath.set(md.path, md.content);
+function addReverseIndex(index: Map<string, string[]>, key: string, sourcePath: string): void {
+  const paths = index.get(key);
+  if (!paths) {
+    index.set(key, [sourcePath]);
+  } else if (!paths.includes(sourcePath)) {
+    paths.push(sourcePath);
+  }
+}
+
+/** Build the parsed/indexed admin snapshot from manifest and fetched file data. */
+export function buildBranchStoreData(manifest: BranchManifest, files: readonly FetchedContentFile[]): BranchStoreData {
+  const config = getConfig();
+  const fileShas = new Map(manifest.items.map((item) => [item.path, item.sha]));
+  const fileSizes = new Map(manifest.items.map((item) => [item.path, item.size]));
+  const markdownByPath = new Map<string, string>();
+  const loadedCompanionPaths = new Set<string>();
+
+  for (const file of files) {
+    if (file.content !== null && (file.path.endsWith('.md') || file.path.endsWith('.mdx'))) {
+      markdownByPath.set(file.path, file.content);
+      loadedCompanionPaths.add(file.path);
     }
   }
 
-  // Step 4: Parse JSON, pair companion markdown, build indexed Maps
   const entries = new Map<string, StoredEntry>();
   const byCollection = new Map<string, string[]>();
   const mediaEntries = new Map<string, StoredEntry>();
+  const reverseEntryReferences = new Map<string, string[]>();
+  const reverseMediaReferences = new Map<string, string[]>();
 
-  for (const item of jsonContents) {
-    if (item.content === null) continue;
+  for (const item of files) {
+    if (!item.path.endsWith('.json') || item.content === null) continue;
 
     let parsed: Record<string, unknown>;
     try {
       parsed = JSON.parse(item.content) as Record<string, unknown>;
     } catch {
-      continue; // Skip malformed JSON
+      continue;
     }
 
     const collectionType =
@@ -194,16 +343,15 @@ export async function fetchBranchContent(
         ? (parsed as { sys: { type: string } }).sys.type
         : null;
 
-    // Merge companion markdown and richtext files
     const companions: Record<string, string> = {};
     if (collectionType) {
-      const mdPaths = companionMarkdownPathsForEntry(item.path, collectionType, config.collections);
-      for (const [fieldName, mdPath] of Object.entries(mdPaths)) {
-        companions[fieldName] = mdByPath.get(mdPath) ?? '';
+      const markdownPaths = companionMarkdownPathsForEntry(item.path, collectionType, config.collections);
+      for (const [fieldName, markdownPath] of Object.entries(markdownPaths)) {
+        companions[fieldName] = markdownByPath.get(markdownPath) ?? '';
       }
-      const rtPaths = companionRichTextPathsForEntry(item.path, collectionType, config.collections);
-      for (const [fieldName, rtPath] of Object.entries(rtPaths)) {
-        companions[fieldName] = mdByPath.get(rtPath) ?? '';
+      const richTextPaths = companionRichTextPathsForEntry(item.path, collectionType, config.collections);
+      for (const [fieldName, richTextPath] of Object.entries(richTextPaths)) {
+        companions[fieldName] = markdownByPath.get(richTextPath) ?? '';
       }
     }
 
@@ -220,28 +368,68 @@ export async function fetchBranchContent(
     }
 
     entries.set(item.path, stored);
-
-    // Index by collection
     const collection = collectionFromPath(item.path);
     if (collection) {
-      const list = byCollection.get(collection);
-      if (list) {
-        list.push(item.path);
-      } else {
-        byCollection.set(collection, [item.path]);
+      const paths = byCollection.get(collection);
+      if (paths) paths.push(item.path);
+      else byCollection.set(collection, [item.path]);
+    }
+
+    if (!collectionType) continue;
+    const collectionConfig = config.collections[collectionType as keyof typeof config.collections];
+    const fields = parsed.fields as Record<string, unknown> | undefined;
+    if (!collectionConfig || !fields) continue;
+
+    for (const [fieldName, fieldConfig] of Object.entries(collectionConfig.fields)) {
+      if (fieldConfig.format === 'reference') {
+        for (const key of referenceKeys(fields[fieldName])) {
+          addReverseIndex(reverseEntryReferences, key, item.path);
+        }
+      } else if (fieldConfig.format === 'image') {
+        for (const mediaId of referenceKeys(fields[fieldName])) {
+          addReverseIndex(reverseMediaReferences, mediaId, item.path);
+        }
       }
     }
   }
 
   return {
-    branch,
-    treeSha,
+    branch: manifest.branch,
+    headSha: manifest.headSha,
+    treeSha: manifest.treeSha,
+    fileShas,
+    fileSizes,
     entries,
     byCollection,
     mediaEntries,
-    populatedAt: Date.now(),
+    reverseEntryReferences,
+    reverseMediaReferences,
+    loadedCompanionPaths,
+    cacheStatus: 'fresh',
+    cacheError: null,
+    populatedAt: manifest.checkedAt,
     version: 0,
     searchIndex: null,
     searchIndexVersion: -1,
   };
+}
+
+/** Direct, uncached snapshot load used by local Node and cold-start recovery. */
+export async function fetchBranchContent(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  branch: string,
+): Promise<BranchStoreData | null> {
+  const manifest = await fetchBranchManifest(octokit, owner, repo, branch);
+  if (!manifest) return null;
+  if (manifest.items.length === 0) return buildBranchStoreData(manifest, []);
+
+  const blobs = await fetchBlobContents(
+    octokit,
+    owner,
+    repo,
+    manifest.items.map((item) => item.sha),
+  );
+  return buildBranchStoreData(manifest, mapBlobContentsToFiles(manifest.items, blobs));
 }

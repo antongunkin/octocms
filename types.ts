@@ -250,6 +250,20 @@ export type SearchConfig = {
   publicCollections?: Record<string, PublicCollectionSearchConfig>;
 };
 
+export type AdminCacheConfig = {
+  /** Disable the shared production admin cache and use the process-local store only. Defaults to true. */
+  enabled?: boolean;
+  /** How often production checks whether the active Git branch HEAD changed. Defaults to 30 seconds. */
+  branchRevalidateSeconds?: number;
+  /** Maximum age of cached admin content served while GitHub is unavailable. Defaults to 24 hours. */
+  staleIfErrorSeconds?: number;
+};
+
+export type AdminConfig = {
+  /** Production admin content-cache settings. */
+  cache?: AdminCacheConfig;
+};
+
 export type Config = {
   projectName: string;
   contentFolder: string;
@@ -262,6 +276,8 @@ export type Config = {
   collections: Record<string, Collection>;
   /** Full-text search configuration. */
   search?: SearchConfig;
+  /** Admin-only runtime settings. */
+  admin?: AdminConfig;
 };
 
 /** Narrowed field types for parsers that only apply to one format. */

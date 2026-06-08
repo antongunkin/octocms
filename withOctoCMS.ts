@@ -18,6 +18,9 @@ export function withOctoCMS(nextConfig: NextConfig = {}, _octoConfig: Config): N
   if (process.env.NODE_ENV === 'production') {
     assertProductionEnvOrThrow();
   }
+  if (nextConfig.cacheComponents === false) {
+    throw new Error('OctoCMS requires Next.js cacheComponents. Remove `cacheComponents: false` from next.config.');
+  }
 
   const projectRoot = process.cwd();
   // Turbopack rejects absolute paths in `resolveAlias` (it treats a leading `/`
@@ -43,6 +46,7 @@ export function withOctoCMS(nextConfig: NextConfig = {}, _octoConfig: Config): N
 
   return {
     ...nextConfig,
+    cacheComponents: true,
     turbopack: {
       ...nextConfig.turbopack,
       resolveAlias: {

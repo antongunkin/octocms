@@ -44,7 +44,6 @@ import {
 import { getPointerFilePath, serializePointerPayload } from '../../lib/contentBranch';
 import { warmBranch } from '../store/contentStore';
 import { buildJsons } from './build';
-import { waitForPublicReadConsistency } from './files';
 
 const CMS_BRANCH_COOKIE = 'cms-active-branch';
 
@@ -298,7 +297,6 @@ export const publishBranch = async (branchName: string): Promise<ActionResult> =
     const content = serializePointerPayload(branchName);
 
     await saveGitHubFile(pointerPath, content, `Publish branch ${branchName} (${pointerPath})`, targetBranch);
-    await waitForPublicReadConsistency(pointerPath, content, targetBranch);
     await buildJsons('');
 
     if (branchName !== baseBranch) {

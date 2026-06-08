@@ -20,15 +20,22 @@ import { validateEntryFields } from '../../lib/validateEntryFields';
 import type { Config } from '../types';
 
 import {
-  deleteGitHubFile,
+  commitMultipleFilesToGitHub,
+  GitHubBranchConflictError,
   getGitHubFile,
   isProductionMode,
   listGitHubFiles,
   listGitHubFilesRecursive,
   readGitHubFilePublic,
-  saveGitHubFile,
+  type GitHubBatchChange,
 } from '../github';
-import { applyMutation, getStoredContentFiles, getStoredFile, getStoredFileSha } from '../store/contentStore';
+import {
+  applyCommittedMutations,
+  getContentStoreStatus,
+  getStoredContentFiles,
+  getStoredFile,
+  getStoredFileSha,
+} from '../store/contentStore';
 import { mediaContentFolder, mediaEntryPath } from '../../lib/mediaPath';
 import { buildJsons } from './build';
 import {
@@ -72,29 +79,30 @@ async function syncEmbeddingsForRemoveIfEnabled(
   await syncEmbeddingsAfterRemove({ agentConfig, entryPath, branch, isProduction });
 }
 
-/** Records the entry path under the active branch in `cms/branch-history.json` (GitHub or local). Best-effort. */
-async function persistBranchHistoryEntryIfNeeded(activeBranch: string | undefined, entryPath: string): Promise<void> {
+async function getBranchHistoryBatchChange(activeBranch: string, entryPath: string): Promise<GitHubBatchChange | null> {
+  try {
+    const historyFile = await getGitHubFile(BRANCH_HISTORY_FILE_PATH, activeBranch);
+    const next = mergeHistoryContentWithAppendedEntry(
+      historyFile?.content ?? '',
+      activeBranch,
+      normalizeContentPath(entryPath),
+    );
+    return next === null ? null : { kind: 'upsert-text', path: BRANCH_HISTORY_FILE_PATH, content: next };
+  } catch {
+    return null;
+  }
+}
+
+/** Records the entry path under the active branch in local development. Best-effort. */
+async function persistLocalBranchHistoryEntryIfNeeded(
+  activeBranch: string | undefined,
+  entryPath: string,
+): Promise<void> {
   if (!activeBranch) {
     return;
   }
 
   const normalized = normalizeContentPath(entryPath);
-
-  if (isProductionMode()) {
-    try {
-      const historyFile = await getGitHubFile(BRANCH_HISTORY_FILE_PATH, activeBranch);
-      const next = mergeHistoryContentWithAppendedEntry(historyFile?.content ?? '', activeBranch, normalized);
-      if (next == null) {
-        return;
-      }
-
-      await saveGitHubFile(BRANCH_HISTORY_FILE_PATH, next, 'CMS: track entry in branch history', activeBranch);
-    } catch {
-      /* best-effort sidecar — primary save must still succeed */
-    }
-
-    return;
-  }
 
   try {
     const abs = path.join(/*turbopackIgnore: true*/ process.cwd(), BRANCH_HISTORY_FILE_PATH);
@@ -240,35 +248,21 @@ export const assertFeatureBranchForWritesIfRequired = async (): Promise<void> =>
     return;
   }
 
-  if (!(await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value) {
+  const activeBranch = (await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
+  if (!activeBranch) {
     throw new Error('Create or select a branch before editing.');
   }
-};
 
-export const waitForPublicReadConsistency = async (fileName: string, expectedContent: string, readRef?: string) => {
-  if (!isProductionMode()) {
-    return;
-  }
-
-  const parsedAttempts = Number.parseInt(process.env.CMS_GITHUB_CONSISTENCY_ATTEMPTS || '8', 10);
-  const parsedDelayMs = Number.parseInt(process.env.CMS_GITHUB_CONSISTENCY_DELAY_MS || '250', 10);
-  const maxAttempts = Number.isFinite(parsedAttempts) && parsedAttempts > 0 ? parsedAttempts : 1;
-  const delayMs = Number.isFinite(parsedDelayMs) && parsedDelayMs >= 0 ? parsedDelayMs : 250;
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      const visibleContent = await readGitHubFilePublic(fileName, readRef);
-
-      if (visibleContent === expectedContent) {
-        return;
-      }
-    } catch (_e) {
-      // Ignore transient read failures and retry within the same save request.
+  try {
+    const cache = await getContentStoreStatus(activeBranch);
+    if (cache.status === 'stale') {
+      throw new Error('Editing is temporarily disabled because GitHub could not confirm the current branch HEAD.');
     }
-
-    if (attempt < maxAttempts && delayMs > 0) {
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('temporarily disabled')) {
+      throw error;
     }
+    // A cold cache should not block writes; the atomic commit still detects conflicts.
   }
 };
 
@@ -590,37 +584,37 @@ export const saveFile = async (
       const entryId = payload?.sys?.id || '';
       const message = `Update ${entryTypeLabel} ${entryId}`;
       const activeBranch = (await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
+      if (!activeBranch) throw new Error('Create or select a branch before editing.');
 
-      // Use cached SHA from the store to skip the pre-read API call
-      const cachedSha = (await getStoredFileSha(fileName, activeBranch)) || undefined;
-      await saveGitHubFile(fileName, normalizedData, message, activeBranch, cachedSha);
-      // Write companion markdown and richtext files
+      const changes: GitHubBatchChange[] = [{ kind: 'upsert-text', path: fileName, content: normalizedData }];
       const mdPaths =
         typeof entryType === 'string' ? companionMarkdownPathsForEntry(fileName, entryType, config.collections) : {};
       for (const [fieldName, mdPath] of Object.entries(mdPaths)) {
         const mdContent = markdownContents[fieldName] ?? '';
-        await saveGitHubFile(mdPath, mdContent, `Update ${fieldName} for ${entryType} ${entryId}`, activeBranch);
+        changes.push({ kind: 'upsert-text', path: mdPath, content: mdContent });
       }
       const rtPaths =
         typeof entryType === 'string' ? companionRichTextPathsForEntry(fileName, entryType, config.collections) : {};
       for (const [fieldName, rtPath] of Object.entries(rtPaths)) {
         const rtContent = markdownContents[fieldName] ?? '';
-        await saveGitHubFile(rtPath, rtContent, `Update ${fieldName} for ${entryType} ${entryId}`, activeBranch);
+        changes.push({ kind: 'upsert-text', path: rtPath, content: rtContent });
       }
-      await waitForPublicReadConsistency(fileName, normalizedData);
+      const historyChange = await getBranchHistoryBatchChange(activeBranch, fileName);
+      if (historyChange) changes.push(historyChange);
+
+      const commit = await commitMultipleFilesToGitHub(changes, message, activeBranch);
 
       // Write-through: update in-memory store so subsequent reads are instant
-      if (activeBranch) {
-        applyMutation(activeBranch, {
+      applyCommittedMutations(activeBranch, commit.sha, [
+        {
           type: 'upsert',
           path: fileName,
           content: payload,
-          sha: '', // SHA unknown after single-file commit; next tree fetch will correct it
+          sha: '', // Blob SHA is corrected by the next manifest refresh.
           companions: markdownContents,
-        });
-      }
+        },
+      ]);
 
-      await persistBranchHistoryEntryIfNeeded(activeBranch, fileName);
       await syncEmbeddingsForUpsertIfEnabled(fileName, payload, markdownContents, activeBranch, true);
       const built = await buildJsons(fileName);
 
@@ -644,12 +638,13 @@ export const saveFile = async (
       const rtContent = markdownContents[fieldName] ?? '';
       await fsPromises.writeFile(path.join(/*turbopackIgnore: true*/ process.cwd(), rtPath), rtContent, 'utf8');
     }
-    await persistBranchHistoryEntryIfNeeded(activeBranchDev, fileName);
+    await persistLocalBranchHistoryEntryIfNeeded(activeBranchDev, fileName);
     await syncEmbeddingsForUpsertIfEnabled(fileName, payload, markdownContents, activeBranchDev, false);
     const built = await buildJsons(fileName);
 
     return built.success ? actionOk() : built;
   } catch (e) {
+    if (e instanceof GitHubBranchConflictError) return actionErr(e);
     return actionErr(new Error(`Failed to save file: ${getErrorMessage(e)}`));
   }
 };
@@ -673,20 +668,22 @@ export const newFile = async (type: string): Promise<NewFileResult> => {
     if (isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
-      await saveGitHubFile(file, normalizedData, `Create new ${type} ${id}`, activeBranch);
-      await waitForPublicReadConsistency(file, normalizedData);
+      if (!activeBranch) throw new Error('Create or select a branch before editing.');
+      const changes: GitHubBatchChange[] = [{ kind: 'upsert-text', path: file, content: normalizedData }];
+      const historyChange = await getBranchHistoryBatchChange(activeBranch, file);
+      if (historyChange) changes.push(historyChange);
+      const commit = await commitMultipleFilesToGitHub(changes, `Create new ${type} ${id}`, activeBranch);
 
       // Write-through: add new entry to in-memory store
-      if (activeBranch) {
-        applyMutation(activeBranch, {
+      applyCommittedMutations(activeBranch, commit.sha, [
+        {
           type: 'upsert',
           path: file,
           content: values,
           sha: '',
-        });
-      }
+        },
+      ]);
 
-      await persistBranchHistoryEntryIfNeeded(activeBranch, file);
       await syncEmbeddingsForUpsertIfEnabled(file, values, {}, activeBranch, true);
       const built = await buildJsons(file);
 
@@ -698,13 +695,15 @@ export const newFile = async (type: string): Promise<NewFileResult> => {
     const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), file);
     await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
     await fsPromises.writeFile(filePath, normalizedData, 'utf8');
-    await persistBranchHistoryEntryIfNeeded(activeBranchDev, file);
+    await persistLocalBranchHistoryEntryIfNeeded(activeBranchDev, file);
     await syncEmbeddingsForUpsertIfEnabled(file, values, {}, activeBranchDev, false);
     const built = await buildJsons(file);
 
     return built.success ? { success: true, path: file } : { success: false, error: built.error };
   } catch (e) {
-    return { success: false, error: getErrorMessage(e) } satisfies NewFileResult;
+    return e instanceof GitHubBranchConflictError
+      ? actionErr(e)
+      : ({ success: false, error: getErrorMessage(e) } satisfies NewFileResult);
   }
 };
 
@@ -731,19 +730,18 @@ export const removeFile = async (fileName: string): Promise<ActionResult> => {
     if (isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get(CMS_ACTIVE_BRANCH_COOKIE)?.value;
-      await deleteGitHubFile(fileName, `Remove ${fileName}`, activeBranch);
+      if (!activeBranch) throw new Error('Create or select a branch before editing.');
+      const changes: GitHubBatchChange[] = [{ kind: 'delete', path: fileName }];
       for (const mdPath of companionPaths) {
-        try {
-          await deleteGitHubFile(mdPath, `Remove companion ${mdPath}`, activeBranch);
-        } catch {
-          /* best-effort — companion may not exist */
+        const cachedSha = await getStoredFileSha(mdPath, activeBranch);
+        if (cachedSha !== null || (await getGitHubFile(mdPath, activeBranch))) {
+          changes.push({ kind: 'delete', path: mdPath });
         }
       }
+      const commit = await commitMultipleFilesToGitHub(changes, `Remove ${fileName}`, activeBranch);
 
       // Write-through: remove entry from in-memory store
-      if (activeBranch) {
-        applyMutation(activeBranch, { type: 'delete', path: fileName });
-      }
+      applyCommittedMutations(activeBranch, commit.sha, [{ type: 'delete', path: fileName }]);
 
       await syncEmbeddingsForRemoveIfEnabled(fileName, activeBranch, true);
       const built = await buildJsons(fileName);

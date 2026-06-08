@@ -19,6 +19,8 @@ const VALID_IDENTIFIER = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
  * codegen script applies the same checks before emitting output.
  */
 export function validateConfig(config: Config, collectionNames: readonly string[]): void {
+  validateAdminCache(config);
+
   for (const key of collectionNames) {
     const col = config.collections[key as keyof typeof config.collections];
     if (!col) {
@@ -38,6 +40,30 @@ export function validateConfig(config: Config, collectionNames: readonly string[
 
       validateField(collectionNames, key, fieldName, field, col.fields);
     }
+  }
+}
+
+function validateAdminCache(config: Config): void {
+  const cache = config.admin?.cache;
+  if (!cache) return;
+
+  if (cache.enabled !== undefined && typeof cache.enabled !== 'boolean') {
+    throw new Error('validate — admin.cache.enabled must be a boolean');
+  }
+
+  const branchRevalidateSeconds = cache.branchRevalidateSeconds ?? 30;
+  const staleIfErrorSeconds = cache.staleIfErrorSeconds ?? 86_400;
+
+  if (!Number.isInteger(branchRevalidateSeconds) || branchRevalidateSeconds <= 0) {
+    throw new Error('validate — admin.cache.branchRevalidateSeconds must be a positive integer');
+  }
+  if (!Number.isInteger(staleIfErrorSeconds) || staleIfErrorSeconds <= 0) {
+    throw new Error('validate — admin.cache.staleIfErrorSeconds must be a positive integer');
+  }
+  if (staleIfErrorSeconds < branchRevalidateSeconds) {
+    throw new Error(
+      'validate — admin.cache.staleIfErrorSeconds must be greater than or equal to branchRevalidateSeconds',
+    );
   }
 }
 

@@ -80,6 +80,20 @@ export function generateSchemaDocs(
   fieldFormats: readonly string[],
 ): string {
   const pointer = cfg.git.publishedPointerBranch?.trim();
+  const adminCache = cfg.admin?.cache;
+  const adminCacheEnabled = adminCache?.enabled ?? true;
+  const branchRevalidateSeconds = adminCache?.branchRevalidateSeconds ?? 30;
+  const staleIfErrorSeconds = adminCache?.staleIfErrorSeconds ?? 86_400;
+  const adminCacheLines = adminCache
+    ? [
+        '## Admin cache (from cms/schema.json)',
+        '',
+        `- **enabled:** \`${adminCacheEnabled}\` — use the shared production admin content cache.`,
+        `- **branchRevalidateSeconds:** \`${branchRevalidateSeconds}\` — interval between active-branch HEAD checks.`,
+        `- **staleIfErrorSeconds:** \`${staleIfErrorSeconds}\` — maximum cached-content age served while GitHub is unavailable.`,
+        '',
+      ]
+    : [];
   const lines: string[] = [
     SCHEMA_DOCS_BANNER + '# Schema reference',
     '',
@@ -92,6 +106,7 @@ export function generateSchemaDocs(
       ? `- **publishedPointerBranch:** \`${pointer}\` — branch that holds per-build pointer files under \`cms/pointers/\` so **Publish** does not commit to a protected base branch.`
       : '- **publishedPointerBranch:** _omitted_ — per-build pointer files under `cms/pointers/` are read and written on `baseBranch`.',
     '',
+    ...adminCacheLines,
     '## Field formats (global)',
     '',
     fieldFormats.map((t) => `- \`${t}\``).join('\n'),

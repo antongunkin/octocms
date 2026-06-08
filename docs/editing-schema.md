@@ -4,6 +4,8 @@ This document is **hand-written** and stable across schema changes. It describes
 
 The auto-generated `cms/__generated__/agent-docs/schema.md` describes the *current* schema (collections and fields). This file describes *how to edit* the schema.
 
+Admin cache settings are documented in [admin-cache.md](./admin-cache.md).
+
 ## File location
 
 The schema lives in **`cms/schema.json`** at the repo root. It is plain JSON, hand-editable, and the visual Content Model editor at `/cms/model` writes to the same file. Both flows go through the same validator and the same codegen.

@@ -10,8 +10,6 @@ import {
   getPublicOctokits,
   getPublishedPointerRef,
   readGitHubFilePublic,
-  listGitHubFiles,
-  listGitHubFilesRecursive,
   listGitHubBranchRefsByPrefix,
   resolveContentBranch,
   isProductionMode,
@@ -22,12 +20,131 @@ export {
   getPublicOctokits,
   getPublishedPointerRef,
   readGitHubFilePublic,
-  listGitHubFiles,
-  listGitHubFilesRecursive,
   listGitHubBranchRefsByPrefix,
   resolveContentBranch,
   isProductionMode,
 };
+
+/**
+ * Octokit clients for authenticated CMS admin reads.
+ *
+ * Order: `CMS_GITHUB_TOKEN` (shared cache / private repos), signed-in user OAuth
+ * token (private repos when no static token is configured), then unauthenticated
+ * (public repos only).
+ */
+export async function getAdminReadOctokits(): Promise<Octokit[]> {
+  const clients: Octokit[] = [];
+  const staticToken = process.env.CMS_GITHUB_TOKEN?.trim();
+  if (staticToken) {
+    clients.push(new Octokit({ auth: staticToken }));
+  }
+
+  const session = await getCmsSession();
+  if (session?.accessToken) {
+    clients.push(new Octokit({ auth: session.accessToken }));
+  }
+
+  clients.push(new Octokit());
+  return clients;
+}
+
+/** Admin list — tries every {@link getAdminReadOctokits} client before failing. */
+export async function listGitHubFiles(dirPath: string, extension?: string, branch?: string): Promise<string[]> {
+  const { owner, repo, branch: configBranch } = assertGitHubConfig();
+  const ref = branch ?? configBranch;
+  const clients = await getAdminReadOctokits();
+
+  let sawAuthError = false;
+  for (const octokit of clients) {
+    try {
+      const { data } = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path: dirPath,
+        ref,
+      });
+
+      if (!Array.isArray(data)) {
+        return [];
+      }
+
+      let files = data.filter((item) => item.type === 'file').map((item) => item.path);
+      if (extension) {
+        files = files.filter((f) => f.endsWith(extension));
+      }
+      return files;
+    } catch (error: any) {
+      if (error.status === 429) {
+        throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref });
+      }
+      if (error.status === 401 || error.status === 403) {
+        sawAuthError = true;
+        continue;
+      }
+      if (error.status === 404) {
+        if (sawAuthError) continue;
+        return [];
+      }
+      throw mapGitHubApiErrorToContentSource(error, { owner, repo, ref });
+    }
+  }
+
+  return [];
+}
+
+/** Admin recursive list — uses {@link getAdminReadOctokits}. */
+export async function listGitHubFilesRecursive(
+  dirPath: string,
+  extension?: string,
+  branch?: string,
+): Promise<string[]> {
+  const clients = await getAdminReadOctokits();
+  for (const octokit of clients) {
+    try {
+      const files = await listGitHubFilesRecursiveWithOctokit(octokit, dirPath, extension, branch);
+      return files;
+    } catch (error: any) {
+      if (error.status === 401 || error.status === 403) continue;
+      if (error.status === 404) return [];
+      throw error;
+    }
+  }
+  return [];
+}
+
+async function listGitHubFilesRecursiveWithOctokit(
+  octokit: Octokit,
+  dirPath: string,
+  extension: string | undefined,
+  branch: string | undefined,
+): Promise<string[]> {
+  const { owner, repo, branch: configBranch } = assertGitHubConfig();
+  const ref = branch ?? configBranch;
+
+  const { data } = await octokit.rest.repos.getContent({
+    owner,
+    repo,
+    path: dirPath,
+    ref,
+  });
+
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  const results: string[] = [];
+  for (const item of data) {
+    if (item.type === 'file') {
+      if (!extension || item.path.endsWith(extension)) {
+        results.push(item.path);
+      }
+    } else if (item.type === 'dir') {
+      const subFiles = await listGitHubFilesRecursiveWithOctokit(octokit, item.path, extension, branch);
+      results.push(...subFiles);
+    }
+  }
+  return results;
+}
 
 const getErrorMessage = (error: unknown): string => {
   if (error instanceof Error) {
@@ -47,6 +164,16 @@ const formatGitHubApiError = (error: any): string => {
 
   return message;
 };
+
+export class GitHubBranchConflictError extends Error {
+  readonly code = 'branch_conflict';
+  readonly retryable = true;
+
+  constructor(branch: string, detail: string) {
+    super(`Branch "${branch}" changed while saving. Retry the operation: ${detail}`);
+    this.name = 'GitHubBranchConflictError';
+  }
+}
 
 const getDefaultBranchRef = async (octokit: Octokit, owner: string, repo: string): Promise<string> => {
   const { data: repoData } = await octokit.rest.repos.get({ owner, repo });
@@ -160,30 +287,40 @@ export const getGitHubFile = async (
   filePath: string,
   branch?: string,
 ): Promise<{ content: string; sha: string } | null> => {
-  const [octokit] = getPublicOctokits();
   const { owner, repo, branch: configBranch } = assertGitHubConfig();
   const ref = branch || configBranch;
+  const clients = await getAdminReadOctokits();
 
-  try {
-    const { data } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
-      path: filePath,
-      ref,
-    });
+  let sawAuthError = false;
+  for (const octokit of clients) {
+    try {
+      const { data } = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path: filePath,
+        ref,
+      });
 
-    if ('content' in data && data.type === 'file') {
-      const content = Buffer.from(data.content, 'base64').toString('utf-8');
-      return { content, sha: data.sha };
-    }
+      if ('content' in data && data.type === 'file') {
+        const content = Buffer.from(data.content, 'base64').toString('utf-8');
+        return { content, sha: data.sha };
+      }
 
-    return null;
-  } catch (error: any) {
-    if (error.status === 404) {
       return null;
+    } catch (error: any) {
+      if (error.status === 401 || error.status === 403) {
+        sawAuthError = true;
+        continue;
+      }
+      if (error.status === 404) {
+        if (sawAuthError) continue;
+        return null;
+      }
+      throw error;
     }
-    throw error;
   }
+
+  return null;
 };
 
 /**
@@ -394,10 +531,8 @@ export const commitMultipleFilesToGitHub = async (
       sha: newCommit.sha,
     });
   } catch (error: any) {
-    if (error.status === 422) {
-      throw new Error(
-        `Branch "${targetBranch}" moved while committing. Retry the schema save: ${formatGitHubApiError(error)}`,
-      );
+    if (error.status === 409 || error.status === 422) {
+      throw new GitHubBranchConflictError(targetBranch, formatGitHubApiError(error));
     }
     throw new Error(`GitHub updateRef failed: ${formatGitHubApiError(error)}`);
   }

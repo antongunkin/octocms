@@ -16,8 +16,13 @@ import { mediaContentFolder, mediaEntryPath } from '../../lib/mediaPath';
 import { getAgentConfig } from '../../agent/configStore';
 import { syncEmbeddingsAfterRemove, syncEmbeddingsAfterUpsert } from '../../agent/embeddingsHook';
 
-import { deleteGitHubFile, isProductionMode, saveGitHubBinaryFile, saveGitHubFile } from '../github';
-import { applyMutation, getStoredMediaEntries } from '../store/contentStore';
+import {
+  commitMultipleFilesToGitHub,
+  GitHubBranchConflictError,
+  isProductionMode,
+  type GitHubBatchChange,
+} from '../github';
+import { applyCommittedMutations, getStoredMediaEntries, getStoredMediaReferencePaths } from '../store/contentStore';
 import { assertFeatureBranchForWritesIfRequired, getContentFiles, getFile, getMediaContentFiles } from './files';
 import { actionErr, actionOk, getErrorMessage, type ActionResult, type UploadMediaResult } from './utils';
 
@@ -221,13 +226,15 @@ export const uploadMedia = async (formData: FormData): Promise<UploadMediaResult
     if (process.env.NODE_ENV === 'production' || isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get('cms-active-branch')?.value;
-      await saveGitHubBinaryFile(physicalPath, buffer, `Upload media ${file.name}`, activeBranch);
-      await saveGitHubFile(entryPath, `${JSON.stringify(entry, null, 2)}\n`, `Add media entry ${id}`, activeBranch);
+      if (!activeBranch) throw new Error('Create or select a branch before editing.');
+      const changes: GitHubBatchChange[] = [
+        { kind: 'upsert-binary', path: physicalPath, content: buffer },
+        { kind: 'upsert-text', path: entryPath, content: `${JSON.stringify(entry, null, 2)}\n` },
+      ];
+      const commit = await commitMultipleFilesToGitHub(changes, `Upload media ${file.name}`, activeBranch);
 
       // Write-through: add media entry to in-memory store
-      if (activeBranch) {
-        applyMutation(activeBranch, { type: 'upsert', path: entryPath, content: entry, sha: '' });
-      }
+      applyCommittedMutations(activeBranch, commit.sha, [{ type: 'upsert', path: entryPath, content: entry, sha: '' }]);
     } else {
       await fsPromises.mkdir(path.join(process.cwd(), config.mediaFolder), { recursive: true });
       await fsPromises.writeFile(path.join(process.cwd(), physicalPath), buffer);
@@ -241,6 +248,7 @@ export const uploadMedia = async (formData: FormData): Promise<UploadMediaResult
 
     return { success: true, id };
   } catch (e) {
+    if (e instanceof GitHubBranchConflictError) return actionErr(e);
     return { success: false, error: `Failed to upload file: ${getErrorMessage(e)}` };
   }
 };
@@ -276,13 +284,18 @@ export const deleteMedia = async (mediaId: string): Promise<ActionResult> => {
     if (process.env.NODE_ENV === 'production' || isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get('cms-active-branch')?.value;
-      await deleteGitHubFile(physicalPath, `Delete media file ${mediaId}`, activeBranch);
-      await deleteGitHubFile(entryPath, `Delete media entry ${mediaId}`, activeBranch);
+      if (!activeBranch) throw new Error('Create or select a branch before editing.');
+      const commit = await commitMultipleFilesToGitHub(
+        [
+          { kind: 'delete', path: physicalPath },
+          { kind: 'delete', path: entryPath },
+        ],
+        `Delete media ${mediaId}`,
+        activeBranch,
+      );
 
       // Write-through: remove media entry from in-memory store
-      if (activeBranch) {
-        applyMutation(activeBranch, { type: 'delete', path: entryPath });
-      }
+      applyCommittedMutations(activeBranch, commit.sha, [{ type: 'delete', path: entryPath }]);
     } else {
       await fsPromises.unlink(path.join(process.cwd(), physicalPath));
       await fsPromises.unlink(path.join(process.cwd(), entryPath));
@@ -293,6 +306,7 @@ export const deleteMedia = async (mediaId: string): Promise<ActionResult> => {
 
     return actionOk();
   } catch (e) {
+    if (e instanceof GitHubBranchConflictError) return actionErr(e);
     return actionErr(new Error(`Failed to delete media: ${getErrorMessage(e)}`));
   }
 };
@@ -312,11 +326,13 @@ export const moveMedia = async (mediaId: string, newFolder: string): Promise<Act
     if (process.env.NODE_ENV === 'production' || isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get('cms-active-branch')?.value;
-      await saveGitHubFile(entryPath, data, `Move media ${mediaId} to ${newFolder}`, activeBranch);
-
-      if (activeBranch) {
-        applyMutation(activeBranch, { type: 'upsert', path: entryPath, content: entry, sha: '' });
-      }
+      if (!activeBranch) throw new Error('Create or select a branch before editing.');
+      const commit = await commitMultipleFilesToGitHub(
+        [{ kind: 'upsert-text', path: entryPath, content: data }],
+        `Move media ${mediaId} to ${newFolder}`,
+        activeBranch,
+      );
+      applyCommittedMutations(activeBranch, commit.sha, [{ type: 'upsert', path: entryPath, content: entry, sha: '' }]);
     } else {
       await fsPromises.writeFile(path.join(process.cwd(), entryPath), data, 'utf8');
     }
@@ -325,6 +341,7 @@ export const moveMedia = async (mediaId: string, newFolder: string): Promise<Act
 
     return actionOk();
   } catch (e) {
+    if (e instanceof GitHubBranchConflictError) return actionErr(e);
     return actionErr(new Error(`Failed to move media: ${getErrorMessage(e)}`));
   }
 };
@@ -352,11 +369,13 @@ export const updateMediaMetadata = async (mediaId: string, title: string): Promi
     if (process.env.NODE_ENV === 'production' || isProductionMode()) {
       await assertFeatureBranchForWritesIfRequired();
       const activeBranch = (await cookies()).get('cms-active-branch')?.value;
-      await saveGitHubFile(entryPath, data, `Update media title ${mediaId}`, activeBranch);
-
-      if (activeBranch) {
-        applyMutation(activeBranch, { type: 'upsert', path: entryPath, content: entry, sha: '' });
-      }
+      if (!activeBranch) throw new Error('Create or select a branch before editing.');
+      const commit = await commitMultipleFilesToGitHub(
+        [{ kind: 'upsert-text', path: entryPath, content: data }],
+        `Update media title ${mediaId}`,
+        activeBranch,
+      );
+      applyCommittedMutations(activeBranch, commit.sha, [{ type: 'upsert', path: entryPath, content: entry, sha: '' }]);
     } else {
       await fsPromises.writeFile(path.join(process.cwd(), entryPath), data, 'utf8');
     }
@@ -365,6 +384,7 @@ export const updateMediaMetadata = async (mediaId: string, title: string): Promi
 
     return actionOk();
   } catch (e) {
+    if (e instanceof GitHubBranchConflictError) return actionErr(e);
     return actionErr(new Error(`Failed to update media: ${getErrorMessage(e)}`));
   }
 };
@@ -374,6 +394,16 @@ export const updateMediaMetadata = async (mediaId: string, title: string): Promi
  * Returns an array of file paths that reference the given media ID.
  */
 export const checkMediaReferences = async (mediaId: string): Promise<string[]> => {
+  if (isProductionMode()) {
+    try {
+      const activeBranch = (await cookies()).get('cms-active-branch')?.value;
+      const indexed = await getStoredMediaReferencePaths(mediaId, activeBranch);
+      if (indexed) return indexed;
+    } catch {
+      // Store unavailable; retain the direct-read recovery path below.
+    }
+  }
+
   const config = getConfig();
   const allFiles = await getContentFiles('**');
   const references: string[] = [];

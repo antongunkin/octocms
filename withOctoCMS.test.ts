@@ -33,6 +33,15 @@ describe('withOctoCMS', () => {
     expect(out.reactStrictMode).toBe(true);
   });
 
+  it('enables cacheComponents for the admin remote cache', () => {
+    const out = withOctoCMS({}, stubConfig);
+    expect(out.cacheComponents).toBe(true);
+  });
+
+  it('rejects explicitly disabled cacheComponents', () => {
+    expect(() => withOctoCMS({ cacheComponents: false }, stubConfig)).toThrow('requires Next.js cacheComponents');
+  });
+
   it('registers a Turbopack resolveAlias for cms/__generated__/configInit (project-relative)', () => {
     const out = withOctoCMS({}, stubConfig);
     const alias = (out.turbopack?.resolveAlias as Record<string, string> | undefined) ?? {};

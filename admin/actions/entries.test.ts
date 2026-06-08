@@ -3,11 +3,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as filesModule from './files';
 import { getEntryBacklinks, getEntryList } from './entries';
 import { getEntryTitleField } from './utils';
+import { isProductionMode } from '../github';
+import * as contentStoreModule from '../store/contentStore';
 
 vi.mock('./files', () => ({
   getContentFiles: vi.fn(),
   getFile: vi.fn(),
   getFileJson: vi.fn(),
+}));
+
+vi.mock('next/headers', () => ({
+  cookies: vi.fn(async () => ({ get: vi.fn(() => undefined) })),
+}));
+
+vi.mock('../github', () => ({
+  isProductionMode: vi.fn(() => false),
+}));
+
+vi.mock('../store/contentStore', () => ({
+  getStoredEntryListSnapshot: vi.fn(),
+  getStoredEntryReferencePaths: vi.fn(),
 }));
 
 const mockConfig = {
@@ -19,6 +34,7 @@ const mockConfig = {
         body: { format: 'markdown' },
         authors: { format: 'reference' },
         heroPost: { format: 'reference' },
+        image: { format: 'image' },
       },
     },
     homePage: {
@@ -64,6 +80,8 @@ describe('getEntryTitleField', () => {
 describe('getEntryList', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.mocked(isProductionMode).mockReturnValue(false);
+    vi.mocked(contentStoreModule.getStoredEntryListSnapshot).mockResolvedValue(null);
   });
 
   it('returns an empty array when there are no content files', async () => {
@@ -158,6 +176,48 @@ describe('getEntryList', () => {
     expect(filesModule.getFile).not.toHaveBeenCalled();
   });
 
+  it('uses one metadata-only store snapshot for a production list', async () => {
+    vi.mocked(isProductionMode).mockReturnValue(true);
+    vi.mocked(contentStoreModule.getStoredEntryListSnapshot).mockResolvedValue({
+      entries: [
+        {
+          path: 'cms/content/post/a.json',
+          content: {
+            sys: { id: 'a', type: 'post', status: 'changed' },
+            fields: { title: 'Alpha', image: 'media-1' },
+          },
+          sha: 'entry-sha',
+          companionMarkdown: {},
+        },
+      ],
+      mediaEntries: [
+        {
+          path: 'cms/media/media-1.json',
+          content: {
+            sys: { id: 'media-1', type: 'media' },
+            fields: { extension: 'jpg' },
+          },
+          sha: 'media-sha',
+          companionMarkdown: {},
+        },
+      ],
+    });
+
+    const result = await getEntryList();
+
+    expect(contentStoreModule.getStoredEntryListSnapshot).toHaveBeenCalledWith('**', undefined);
+    expect(filesModule.getContentFiles).not.toHaveBeenCalled();
+    expect(filesModule.getFileJson).not.toHaveBeenCalled();
+    expect(result).toEqual([
+      expect.objectContaining({
+        id: 'a',
+        title: 'Alpha',
+        status: 'changed',
+        thumbnailUrl: '/media/media-1.jpg',
+      }),
+    ]);
+  });
+
   it('filters to the given collection when specified', async () => {
     vi.mocked(filesModule.getContentFiles).mockResolvedValue(['cms/content/post/1.json']);
     vi.mocked(filesModule.getFileJson).mockResolvedValue({ fields: {} });
@@ -188,6 +248,8 @@ describe('getEntryList', () => {
 describe('getEntryBacklinks', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.mocked(isProductionMode).mockReturnValue(false);
+    vi.mocked(contentStoreModule.getStoredEntryReferencePaths).mockResolvedValue(null);
   });
 
   it('returns an empty array when no entry references the target key', async () => {

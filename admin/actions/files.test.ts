@@ -1,21 +1,13 @@
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as localReader from '../../lib/localReader';
 import * as github from '../github';
+import * as contentStore from '../store/contentStore';
 import * as build from './build';
-import {
-  getContentFiles,
-  getFile,
-  getMediaContentFiles,
-  getMediaFiles,
-  newFile,
-  removeFile,
-  saveFile,
-  waitForPublicReadConsistency,
-} from './files';
+import { getContentFiles, getFile, getMediaContentFiles, getMediaFiles, newFile, removeFile, saveFile } from './files';
 import { getErrorMessage } from './utils';
 
 const { mockCookiesGet } = vi.hoisted(() => ({
@@ -24,6 +16,7 @@ const { mockCookiesGet } = vi.hoisted(() => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(github.commitMultipleFilesToGitHub).mockResolvedValue({ sha: 'commit-sha' });
   mockCookiesGet.mockImplementation(() => undefined);
 });
 
@@ -51,6 +44,10 @@ vi.mock('../../lib/localReader', () => ({
 }));
 
 vi.mock('../github', () => ({
+  GitHubBranchConflictError: class GitHubBranchConflictError extends Error {
+    readonly code = 'branch_conflict';
+    readonly retryable = true;
+  },
   isProductionMode: vi.fn(() => false),
   assertGitHubConfig: vi.fn(() => ({
     owner: 'test-owner',
@@ -60,10 +57,24 @@ vi.mock('../github', () => ({
   getPublicOctokits: vi.fn(() => [undefined, undefined]),
   getGitHubFile: vi.fn(),
   readGitHubFilePublic: vi.fn(),
+  commitMultipleFilesToGitHub: vi.fn(async () => ({ sha: 'commit-sha' })),
   saveGitHubFile: vi.fn(),
   deleteGitHubFile: vi.fn(),
   listGitHubFiles: vi.fn(),
   listGitHubFilesRecursive: vi.fn(),
+}));
+
+vi.mock('../store/contentStore', () => ({
+  applyCommittedMutations: vi.fn(),
+  getContentStoreStatus: vi.fn(async () => ({
+    status: 'fresh',
+    error: null,
+    branch: 'main',
+    headSha: 'head-sha',
+  })),
+  getStoredContentFiles: vi.fn(async () => null),
+  getStoredFile: vi.fn(async () => null),
+  getStoredFileSha: vi.fn(async () => null),
 }));
 
 vi.mock('./build', () => ({
@@ -418,57 +429,58 @@ describe('saveFile', () => {
     expect(github.readGitHubFilePublic).not.toHaveBeenCalled();
   });
 
-  it('calls saveGitHubFile with commit message in production', async () => {
+  it('commits the entry and branch history atomically in production', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
-    vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(github.readGitHubFilePublic).mockResolvedValue(`${JSON.stringify(formData, null, 2)}\n`);
+    vi.mocked(github.getGitHubFile).mockResolvedValue({
+      sha: 'history-sha',
+      content: JSON.stringify({
+        'save-feat': {
+          title: 'Save feature',
+          createdAt: '2026-06-08T00:00:00.000Z',
+          entries: [],
+        },
+      }),
+    });
 
     const out = await saveFile(formData, 'cms/content/post/abc.json');
     expect(out).toEqual({ success: true });
 
     const persisted = { sys: { id: 'abc', type: 'post' }, fields: { title: 'Test', slug: 'test' } };
-    expect(github.saveGitHubFile).toHaveBeenCalledWith(
-      'cms/content/post/abc.json',
-      `${JSON.stringify(persisted, null, 2)}\n`,
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        {
+          kind: 'upsert-text',
+          path: 'cms/content/post/abc.json',
+          content: `${JSON.stringify(persisted, null, 2)}\n`,
+        },
+        expect.objectContaining({ kind: 'upsert-text', path: 'cms/branch-history.json' }),
+      ]),
       'Update post abc',
       'save-feat',
-      undefined,
     );
-    expect(github.readGitHubFilePublic).toHaveBeenCalledWith('cms/content/post/abc.json', undefined);
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalledOnce();
+    expect(github.readGitHubFilePublic).not.toHaveBeenCalled();
     expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json');
   });
 
-  it('runs revalidation in the same save request after write consistency checks', async () => {
+  it('runs revalidation after the atomic commit', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
-    vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(github.readGitHubFilePublic).mockResolvedValue(`${JSON.stringify(formData, null, 2)}\n`);
 
     await saveFile(formData, 'cms/content/post/abc.json');
 
-    const writeOrder = vi.mocked(github.saveGitHubFile).mock.invocationCallOrder[0];
-    const publicReadOrder = vi.mocked(github.readGitHubFilePublic).mock.invocationCallOrder[0];
+    const writeOrder = vi.mocked(github.commitMultipleFilesToGitHub).mock.invocationCallOrder[0];
     const revalidateOrder = vi.mocked(build.buildJsons).mock.invocationCallOrder[0];
 
-    expect(writeOrder).toBeLessThan(publicReadOrder);
-    expect(publicReadOrder).toBeLessThan(revalidateOrder);
+    expect(writeOrder).toBeLessThan(revalidateOrder);
   });
 
   it('falls back to "content" and empty id when sys fields are missing', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
-    vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(github.readGitHubFilePublic).mockResolvedValue(`${JSON.stringify({}, null, 2)}\n`);
 
     const out = await saveFile({}, 'cms/content/post/abc.json');
     expect(out).toEqual({ success: true });
 
-    expect(github.saveGitHubFile).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(String),
-      'Update content ',
-      'save-feat',
-      undefined,
-    );
-    expect(github.readGitHubFilePublic).toHaveBeenCalledWith('cms/content/post/abc.json', undefined);
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalledWith(expect.any(Array), 'Update content ', 'save-feat');
     expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json');
   });
 
@@ -486,14 +498,27 @@ describe('saveFile', () => {
 
   it('returns build failure in production when buildJsons fails after GitHub write', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
-    vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(github.readGitHubFilePublic).mockResolvedValue(`${JSON.stringify(formData, null, 2)}\n`);
     vi.mocked(build.buildJsons).mockResolvedValue({ success: false, error: 'revalidate failed' } as any);
 
     const out = await saveFile(formData, 'cms/content/post/abc.json');
 
     expect(out).toEqual({ success: false, error: 'revalidate failed' });
-    expect(github.saveGitHubFile).toHaveBeenCalled();
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalled();
+  });
+
+  it('returns retryable conflict errors without mutating the content store', async () => {
+    vi.mocked(github.isProductionMode).mockReturnValue(true);
+    const Conflict = github.GitHubBranchConflictError as new (branch: string, detail: string) => Error;
+    vi.mocked(github.commitMultipleFilesToGitHub).mockRejectedValue(new Conflict('save-feat', 'moved'));
+
+    const out = await saveFile(formData, 'cms/content/post/abc.json');
+
+    expect(out).toMatchObject({
+      success: false,
+      code: 'branch_conflict',
+      retryable: true,
+    });
+    expect(contentStore.applyCommittedMutations).not.toHaveBeenCalled();
   });
 
   it('rejects save in production when cms-active-branch cookie is absent', async () => {
@@ -506,7 +531,7 @@ describe('saveFile', () => {
       success: false,
       error: 'Failed to save file: Create or select a branch before editing.',
     });
-    expect(github.saveGitHubFile).not.toHaveBeenCalled();
+    expect(github.commitMultipleFilesToGitHub).not.toHaveBeenCalled();
   });
 
   it('allows save in production when cms-active-branch cookie is present', async () => {
@@ -514,19 +539,20 @@ describe('saveFile', () => {
     mockCookiesGet.mockImplementation((name: string) =>
       name === 'cms-active-branch' ? { value: 'feature/x' } : undefined,
     );
-    vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(github.readGitHubFilePublic).mockResolvedValue(`${JSON.stringify(formData, null, 2)}\n`);
-
     const out = await saveFile(formData, 'cms/content/post/abc.json');
 
     expect(out).toEqual({ success: true });
     const persisted = { sys: { id: 'abc', type: 'post' }, fields: { title: 'Test', slug: 'test' } };
-    expect(github.saveGitHubFile).toHaveBeenCalledWith(
-      'cms/content/post/abc.json',
-      `${JSON.stringify(persisted, null, 2)}\n`,
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        {
+          kind: 'upsert-text',
+          path: 'cms/content/post/abc.json',
+          content: `${JSON.stringify(persisted, null, 2)}\n`,
+        },
+      ]),
       'Update post abc',
       'feature/x',
-      undefined,
     );
   });
 
@@ -749,50 +775,35 @@ describe('newFile', () => {
     });
   });
 
-  it('calls saveGitHubFile in production and returns the file path', async () => {
+  it('creates the entry with one atomic commit in production', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
     mockCookiesGet.mockImplementation((name: string) =>
       name === 'cms-active-branch' ? { value: 'new-feat' } : undefined,
     );
-    vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(github.readGitHubFilePublic).mockImplementation(async (pathArg: string) => {
-      const call = vi.mocked(github.saveGitHubFile).mock.calls[0];
-      const writtenPath = call?.[0] as string | undefined;
-      const writtenBody = call?.[1] as string | undefined;
-      if (pathArg === writtenPath && writtenBody != null) {
-        return writtenBody;
-      }
-      return null;
-    });
     const result = await newFile('item');
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.path).toMatch(/^cms\/content\/item\/item-[0-9a-f-]{36}\.json$/);
     }
-    expect(github.saveGitHubFile).toHaveBeenCalledOnce();
-    expect(github.readGitHubFilePublic).toHaveBeenCalled();
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalledOnce();
+    expect(github.readGitHubFilePublic).not.toHaveBeenCalled();
     expect(build.buildJsons).toHaveBeenCalledOnce();
     if (result.success) {
       expect(build.buildJsons).toHaveBeenCalledWith(result.path);
     }
   });
 
-  it('runs buildJsons after public read consistency in production', async () => {
+  it('runs buildJsons after the atomic create commit in production', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
     mockCookiesGet.mockImplementation((name: string) =>
       name === 'cms-active-branch' ? { value: 'new-feat' } : undefined,
     );
-    vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(github.readGitHubFilePublic).mockResolvedValue('{\n  "sys": {}\n}\n');
-
     await newFile('post');
 
-    const writeOrder = vi.mocked(github.saveGitHubFile).mock.invocationCallOrder[0];
-    const publicReadOrder = vi.mocked(github.readGitHubFilePublic).mock.invocationCallOrder[0];
+    const writeOrder = vi.mocked(github.commitMultipleFilesToGitHub).mock.invocationCallOrder[0];
     const revalidateOrder = vi.mocked(build.buildJsons).mock.invocationCallOrder[0];
 
-    expect(writeOrder).toBeLessThan(publicReadOrder);
-    expect(publicReadOrder).toBeLessThan(revalidateOrder);
+    expect(writeOrder).toBeLessThan(revalidateOrder);
   });
 
   it('returns build failure when buildJsons fails after create in dev', async () => {
@@ -806,10 +817,6 @@ describe('newFile', () => {
     mockCookiesGet.mockImplementation((name: string) =>
       name === 'cms-active-branch' ? { value: 'new-feat' } : undefined,
     );
-    vi.mocked(github.saveGitHubFile).mockResolvedValue(undefined as any);
-    vi.mocked(github.readGitHubFilePublic).mockResolvedValue(
-      '{\n  "sys": { "id": "x", "type": "post" }, "fields": {}\n}\n',
-    );
     vi.mocked(build.buildJsons).mockResolvedValue({ success: false, error: 'build down' } as any);
 
     const result = await newFile('post');
@@ -822,7 +829,7 @@ describe('newFile', () => {
     mockCookiesGet.mockImplementation(() => undefined);
     const result = await newFile('post');
     expect(result).toEqual({ success: false, error: 'Create or select a branch before editing.' });
-    expect(github.saveGitHubFile).not.toHaveBeenCalled();
+    expect(github.commitMultipleFilesToGitHub).not.toHaveBeenCalled();
   });
 
   it('returns failure on error', async () => {
@@ -881,13 +888,12 @@ describe('removeFile', () => {
     expect(build.buildJsons).toHaveBeenCalledWith('cms/content/post/abc.json');
   });
 
-  it('calls deleteGitHubFile in production', async () => {
+  it('deletes the entry with one atomic commit in production', async () => {
     vi.mocked(github.isProductionMode).mockReturnValue(true);
-    vi.mocked(github.deleteGitHubFile).mockResolvedValue(undefined as any);
     const out = await removeFile('cms/content/post/abc.json');
     expect(out).toEqual({ success: true });
-    expect(github.deleteGitHubFile).toHaveBeenCalledWith(
-      'cms/content/post/abc.json',
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalledWith(
+      [{ kind: 'delete', path: 'cms/content/post/abc.json' }],
       'Remove cms/content/post/abc.json',
       'del-feat',
     );
@@ -912,25 +918,5 @@ describe('removeFile', () => {
     vi.mocked(fsPromises.unlink).mockRejectedValue(new Error('permission denied'));
     const out = await removeFile('cms/content/post/abc.json');
     expect(out).toEqual({ success: false, error: 'permission denied' });
-  });
-});
-
-// ─── waitForPublicReadConsistency ─────────────────────────────────────────────
-
-describe('waitForPublicReadConsistency', () => {
-  afterEach(() => {
-    vi.mocked(github.isProductionMode).mockReturnValue(false);
-  });
-
-  it('passes readRef to readGitHubFilePublic when provided', async () => {
-    vi.mocked(github.isProductionMode).mockReturnValue(true);
-    vi.mocked(github.readGitHubFilePublic).mockResolvedValue('expected\n');
-
-    await waitForPublicReadConsistency('cms/pointers/consistency-test.json', 'expected\n', 'cms/publish-pointer');
-
-    expect(github.readGitHubFilePublic).toHaveBeenCalledWith(
-      'cms/pointers/consistency-test.json',
-      'cms/publish-pointer',
-    );
   });
 });

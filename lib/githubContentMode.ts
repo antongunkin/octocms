@@ -27,3 +27,11 @@ export function isProductionMode(): boolean {
   if (process.env.NODE_ENV === 'production') return true;
   return process.env.CMS_FORCE_GITHUB_API === 'true';
 }
+
+/**
+ * True during Vercel's `next build` step. `VERCEL_REGION` is only set in serverless
+ * runtime, so the cloned git checkout (with `cms/content/` on disk) is available here.
+ */
+export function isVercelBuildStep(): boolean {
+  return process.env.VERCEL === '1' && !process.env.VERCEL_REGION;
+}

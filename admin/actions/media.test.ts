@@ -14,9 +14,17 @@ import {
   uploadMedia,
 } from './media';
 
+const { mockCookiesGet } = vi.hoisted(() => ({
+  mockCookiesGet: vi.fn(),
+}));
+
 beforeEach(() => {
   vi.resetAllMocks();
+  mockCookiesGet.mockImplementation((name: string) =>
+    name === 'cms-active-branch' ? { value: 'media-feat' } : undefined,
+  );
   vi.mocked(github.isProductionMode).mockReturnValue(false);
+  vi.mocked(github.commitMultipleFilesToGitHub).mockResolvedValue({ sha: 'commit-sha' });
   vi.mocked(fsPromises.writeFile).mockResolvedValue(undefined);
   vi.mocked(fsPromises.unlink).mockResolvedValue(undefined);
   vi.mocked(fsPromises.mkdir).mockResolvedValue(undefined as any);
@@ -32,17 +40,25 @@ vi.mock('fs/promises', () => ({
 
 vi.mock('next/headers', () => ({
   cookies: async () => ({
-    get: () => undefined,
+    get: (name: string) => mockCookiesGet(name),
     set: () => {},
     delete: () => {},
   }),
 }));
 
 vi.mock('../github', () => ({
+  GitHubBranchConflictError: class GitHubBranchConflictError extends Error {},
   isProductionMode: vi.fn(() => false),
+  commitMultipleFilesToGitHub: vi.fn(async () => ({ sha: 'commit-sha' })),
   saveGitHubBinaryFile: vi.fn(),
   saveGitHubFile: vi.fn(),
   deleteGitHubFile: vi.fn(),
+}));
+
+vi.mock('../store/contentStore', () => ({
+  applyCommittedMutations: vi.fn(),
+  getStoredMediaEntries: vi.fn(async () => null),
+  getStoredMediaReferencePaths: vi.fn(async () => null),
 }));
 
 vi.mock('./files', () => ({
@@ -246,17 +262,21 @@ describe('uploadMedia', () => {
     if (result.success) {
       expect(result.id).toMatch(/^[0-9a-f-]{36}$/);
     }
-    expect(github.saveGitHubBinaryFile).toHaveBeenCalledWith(
-      expect.stringMatching(/^public\/media\/[0-9a-f-]+\.webp$/),
-      expect.any(Buffer),
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({
+          kind: 'upsert-binary',
+          path: expect.stringMatching(/^public\/media\/[0-9a-f-]+\.webp$/),
+          content: expect.any(Buffer),
+        }),
+        expect.objectContaining({
+          kind: 'upsert-text',
+          path: expect.stringMatching(/^cms\/media\/media-[0-9a-f-]+\.json$/),
+          content: expect.any(String),
+        }),
+      ],
       'Upload media cover.webp',
-      undefined,
-    );
-    expect(github.saveGitHubFile).toHaveBeenCalledWith(
-      expect.stringMatching(/^cms\/media\/media-[0-9a-f-]+\.json$/),
-      expect.any(String),
-      expect.stringContaining('Add media entry'),
-      undefined,
+      'media-feat',
     );
     expect(fsPromises.writeFile).not.toHaveBeenCalled();
   });
@@ -421,11 +441,13 @@ describe('deleteMedia', () => {
     const out = await deleteMedia('abc');
     expect(out).toEqual({ success: true });
 
-    expect(github.deleteGitHubFile).toHaveBeenCalledWith('public/media/abc.jpg', 'Delete media file abc', undefined);
-    expect(github.deleteGitHubFile).toHaveBeenCalledWith(
-      'cms/media/media-abc.json',
-      'Delete media entry abc',
-      undefined,
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalledWith(
+      [
+        { kind: 'delete', path: 'public/media/abc.jpg' },
+        { kind: 'delete', path: 'cms/media/media-abc.json' },
+      ],
+      'Delete media abc',
+      'media-feat',
     );
   });
 
@@ -482,11 +504,10 @@ describe('moveMedia', () => {
     const out = await moveMedia('abc', 'news');
     expect(out).toEqual({ success: true });
 
-    expect(github.saveGitHubFile).toHaveBeenCalledWith(
-      'cms/media/media-abc.json',
-      expect.any(String),
+    expect(github.commitMultipleFilesToGitHub).toHaveBeenCalledWith(
+      [{ kind: 'upsert-text', path: 'cms/media/media-abc.json', content: expect.any(String) }],
       'Move media abc to news',
-      undefined,
+      'media-feat',
     );
   });
 

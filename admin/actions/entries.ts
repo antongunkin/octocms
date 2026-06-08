@@ -5,6 +5,8 @@ import './registerConfig';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
+import { cookies } from 'next/headers';
+
 import { getConfig } from '../../lib/configStore';
 import type { Config } from '../types';
 import type { EntryListItem, EntryStatus } from '../../types';
@@ -13,16 +15,43 @@ import { getContentFiles, getFile, getFileJson } from './files';
 import { isProductionMode } from '../github';
 import { getMediaEntries } from './media';
 import { getEntryTitleField } from './utils';
+import { getStoredEntryListSnapshot, getStoredEntryReferencePaths } from '../store/contentStore';
 
 export const getEntryList = async (collection: string = '**'): Promise<EntryListItem[]> => {
   const config = getConfig();
-  const files = await getContentFiles(collection);
-  // Build a media lookup so we can resolve thumbnail URLs for any entry that
-  // has an `image` field. One batched call regardless of entry count.
-  const mediaList = await getMediaEntries().catch(() => []);
-  const mediaById = new Map<string, { ext: string; publicUrl: string }>();
-  for (const m of mediaList) {
-    mediaById.set(m.id, { ext: m.extension, publicUrl: m.publicUrl });
+  const isProd = isProductionMode();
+  let storedSnapshot: Awaited<ReturnType<typeof getStoredEntryListSnapshot>> = null;
+
+  if (isProd) {
+    try {
+      const activeBranch = (await cookies()).get('cms-active-branch')?.value;
+      storedSnapshot = await getStoredEntryListSnapshot(collection, activeBranch);
+    } catch {
+      // Store unavailable; retain the direct-read recovery path below.
+    }
+  }
+
+  const files = storedSnapshot ? storedSnapshot.entries.map((entry) => entry.path) : await getContentFiles(collection);
+  const storedContentByPath = storedSnapshot
+    ? new Map(storedSnapshot.entries.map((entry) => [entry.path, entry.content]))
+    : null;
+
+  const mediaById = new Map<string, { publicUrl: string }>();
+  if (storedSnapshot) {
+    for (const entry of storedSnapshot.mediaEntries) {
+      const sys = entry.content.sys as { id?: unknown } | undefined;
+      const fields = entry.content.fields as { extension?: unknown } | undefined;
+      if (typeof sys?.id === 'string' && typeof fields?.extension === 'string') {
+        mediaById.set(sys.id, { publicUrl: `/media/${sys.id}.${fields.extension}` });
+      }
+    }
+  } else {
+    // Direct-read recovery and local development still use the existing media
+    // action, with one batched call regardless of entry count.
+    const mediaList = await getMediaEntries().catch(() => []);
+    for (const media of mediaList) {
+      mediaById.set(media.id, { publicUrl: media.publicUrl });
+    }
   }
 
   const imageFieldKeyByType = new Map<string, string | null>();
@@ -38,8 +67,6 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
     return key;
   }
 
-  const isProd = isProductionMode();
-
   const items = await Promise.all(
     files.map(async (file) => {
       const nameWithoutFolder = file.replace(`${config.contentFolder}/`, '').replace('.json', '');
@@ -54,7 +81,7 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
       let thumbnailUrl: string | undefined;
 
       const [contentResult, statResult] = await Promise.allSettled([
-        getFileJson(file),
+        storedContentByPath ? Promise.resolve(storedContentByPath.get(file) ?? null) : getFileJson(file),
         isProd ? Promise.resolve(null) : fsPromises.stat(path.join(/*turbopackIgnore: true*/ process.cwd(), file)),
       ]);
 
@@ -95,7 +122,17 @@ export const getEntryList = async (collection: string = '**'): Promise<EntryList
  */
 export const getEntryBacklinks = async (targetReferenceKey: string): Promise<EntryListItem[]> => {
   const config = getConfig();
-  const allFiles = await getContentFiles('**');
+  let indexedFiles: string[] | null = null;
+  if (isProductionMode()) {
+    try {
+      const activeBranch = (await cookies()).get('cms-active-branch')?.value;
+      indexedFiles = await getStoredEntryReferencePaths(targetReferenceKey, activeBranch);
+    } catch {
+      // Store unavailable; retain the direct-read recovery path below.
+    }
+  }
+
+  const allFiles = indexedFiles ?? (await getContentFiles('**'));
   const backlinks: EntryListItem[] = [];
 
   for (const file of allFiles) {
@@ -107,47 +144,47 @@ export const getEntryBacklinks = async (targetReferenceKey: string): Promise<Ent
       const collection = config.collections[type as keyof Config['collections']];
       if (!collection) continue;
 
-      const referenceFieldKeys = Object.keys(collection.fields).filter(
-        (k) => collection.fields[k].format === 'reference',
-      );
-      if (referenceFieldKeys.length === 0) continue;
+      if (indexedFiles === null) {
+        const referenceFieldKeys = Object.keys(collection.fields).filter(
+          (k) => collection.fields[k].format === 'reference',
+        );
+        if (referenceFieldKeys.length === 0) continue;
 
-      let found = false;
-      for (const fieldKey of referenceFieldKeys) {
-        const fieldValue = content?.fields?.[fieldKey];
-        if (!fieldValue) continue;
+        let found = false;
+        for (const fieldKey of referenceFieldKeys) {
+          const fieldValue = content?.fields?.[fieldKey];
+          if (!fieldValue) continue;
 
-        // Reference values can be a single string (cardinality 'one') or a JSON array string (cardinality 'many')
-        let keys: string[] = [];
-        if (typeof fieldValue === 'string') {
-          try {
-            const parsed = JSON.parse(fieldValue);
-            keys = Array.isArray(parsed) ? parsed : [fieldValue];
-          } catch {
-            keys = [fieldValue];
+          let keys: string[] = [];
+          if (typeof fieldValue === 'string') {
+            try {
+              const parsed = JSON.parse(fieldValue);
+              keys = Array.isArray(parsed) ? parsed : [fieldValue];
+            } catch {
+              keys = [fieldValue];
+            }
+          } else if (Array.isArray(fieldValue)) {
+            keys = fieldValue;
           }
-        } else if (Array.isArray(fieldValue)) {
-          keys = fieldValue;
-        }
 
-        if (keys.includes(targetReferenceKey)) {
-          found = true;
-          break;
+          if (keys.includes(targetReferenceKey)) {
+            found = true;
+            break;
+          }
         }
+        if (!found) continue;
       }
 
-      if (found) {
-        const nameWithoutFolder = file.replace(`${config.contentFolder}/`, '').replace('.json', '');
-        const parts = nameWithoutFolder.split('/');
-        const id = parts[parts.length - 1];
-        const titleField = getEntryTitleField(type);
-        let title = id;
-        if (titleField && content?.fields?.[titleField]) {
-          title = content.fields[titleField];
-        }
-        const status: EntryStatus = content?.sys?.status || 'merged';
-        backlinks.push({ type, id, path: file, title, status });
+      const nameWithoutFolder = file.replace(`${config.contentFolder}/`, '').replace('.json', '');
+      const parts = nameWithoutFolder.split('/');
+      const id = parts[parts.length - 1];
+      const titleField = getEntryTitleField(type);
+      let title = id;
+      if (titleField && content?.fields?.[titleField]) {
+        title = content.fields[titleField];
       }
+      const status: EntryStatus = content?.sys?.status || 'merged';
+      backlinks.push({ type, id, path: file, title, status });
     } catch (_e) {
       // Skip files that can't be read
     }

@@ -28,6 +28,51 @@ describe('validateConfig', () => {
     expect(() => validateConfig(makeConfig(), ['post'])).not.toThrow();
   });
 
+  it('passes for valid admin cache settings', () => {
+    const cfg = makeConfig({
+      admin: {
+        cache: {
+          enabled: true,
+          branchRevalidateSeconds: 60,
+          staleIfErrorSeconds: 3_600,
+        },
+      },
+    });
+    expect(() => validateConfig(cfg, ['post'])).not.toThrow();
+  });
+
+  it('rejects non-positive admin cache durations', () => {
+    const cfg = makeConfig({
+      admin: { cache: { branchRevalidateSeconds: 0 } },
+    });
+    expect(() => validateConfig(cfg, ['post'])).toThrow('branchRevalidateSeconds must be a positive integer');
+  });
+
+  it('requires staleIfErrorSeconds to cover the branch reconciliation interval', () => {
+    const cfg = makeConfig({
+      admin: {
+        cache: {
+          branchRevalidateSeconds: 60,
+          staleIfErrorSeconds: 30,
+        },
+      },
+    });
+    expect(() => validateConfig(cfg, ['post'])).toThrow(
+      'staleIfErrorSeconds must be greater than or equal to branchRevalidateSeconds',
+    );
+  });
+
+  it('rejects a non-boolean admin cache enabled value', () => {
+    const cfg = makeConfig({
+      admin: {
+        cache: {
+          enabled: 'yes',
+        },
+      },
+    } as any);
+    expect(() => validateConfig(cfg, ['post'])).toThrow('admin.cache.enabled must be a boolean');
+  });
+
   it('throws for missing collection', () => {
     expect(() => validateConfig(makeConfig(), ['post', 'nonexistent'])).toThrow(
       'collection "nonexistent" is listed but not defined',

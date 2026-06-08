@@ -4,7 +4,7 @@ import { getCmsBranchEnv, getPointerFilePath } from './lib/contentBranch';
 import { getConfig } from './lib/configStore';
 import { ContentSourceError, isContentSourceError, mapGitHubApiErrorToContentSource } from './lib/contentSourceError';
 
-export { isProductionMode } from './lib/githubContentMode';
+export { isProductionMode, isVercelBuildStep } from './lib/githubContentMode';
 
 const getGitHubConfig = () => ({
   owner: process.env.GITHUB_REPO_OWNER || '',

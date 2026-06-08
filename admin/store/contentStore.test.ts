@@ -4,6 +4,7 @@ import {
   applyMutation,
   clearAllStores,
   getStoredContentFiles,
+  getStoredEntryListSnapshot,
   getStoredFile,
   getStoredFileSha,
   getStoredMediaEntries,
@@ -22,6 +23,15 @@ const mockConfig = {
   mediaContentFolder: 'cms/media',
   mediaFolder: 'public/media',
   git: { baseBranch: 'main' },
+  collections: {
+    post: {
+      label: 'Post',
+      fields: {
+        body: { label: 'Body', format: 'markdown' },
+        title: { label: 'Title', format: 'string' },
+      },
+    },
+  },
 } as any;
 
 vi.mock('../../lib/configStore', () => ({ getConfig: () => mockConfig }));
@@ -31,14 +41,23 @@ vi.mock('octocms/lib/cmsServerLog', () => ({
 }));
 
 const mockFetchBranchContent = vi.fn<() => Promise<BranchStoreData | null>>();
+const mockFetchNextCachedContentFiles = vi.fn();
 
 vi.mock('./contentStoreFetch', () => ({
   fetchBranchContent: (...args: unknown[]) => mockFetchBranchContent(...(args as [])),
+  fetchBlobContents: vi.fn(),
+  mapBlobContentsToFiles: vi.fn(),
+}));
+
+vi.mock('./contentStoreNextCache', () => ({
+  fetchNextCachedBranchContent: vi.fn(async () => null),
+  fetchNextCachedContentFiles: (...args: unknown[]) => mockFetchNextCachedContentFiles(...args),
+  invalidateNextBranchCache: vi.fn(),
 }));
 
 vi.mock('../github', () => ({
   assertGitHubConfig: () => ({ owner: 'test', repo: 'repo', branch: 'main' }),
-  getPublicOctokits: () => [{}],
+  getAdminReadOctokits: async () => [{}],
 }));
 
 // ---------------------------------------------------------------------------
@@ -65,12 +84,23 @@ function makeBranchStore(branch: string, overrides?: Partial<BranchStoreData>): 
 
   return {
     branch,
+    headSha: 'commit-sha-000',
     treeSha: 'tree-sha-000',
+    fileShas: new Map([
+      [entry.path, entry.sha],
+      [mediaEntry.path, mediaEntry.sha],
+    ]),
+    fileSizes: new Map(),
     // After the media-folder split: editorial entries live in `entries`,
     // media entries live in `mediaEntries`. They never share a map.
     entries: new Map([[entry.path, entry]]),
     byCollection: new Map([['post', [entry.path]]]),
     mediaEntries: new Map([[mediaEntry.path, mediaEntry]]),
+    reverseEntryReferences: new Map(),
+    reverseMediaReferences: new Map(),
+    loadedCompanionPaths: new Set(),
+    cacheStatus: 'fresh',
+    cacheError: null,
     populatedAt: Date.now(),
     version: 0,
     searchIndex: null,
@@ -85,6 +115,8 @@ function makeBranchStore(branch: string, overrides?: Partial<BranchStoreData>): 
 
 afterEach(() => {
   clearAllStores();
+  mockFetchBranchContent.mockReset();
+  mockFetchNextCachedContentFiles.mockReset();
   vi.restoreAllMocks();
 });
 
@@ -121,6 +153,27 @@ describe('getStoredFile', () => {
     mockFetchBranchContent.mockResolvedValueOnce(null);
     const result = await getStoredFile('cms/content/post/post-1.json', 'broken');
     expect(result).toBeNull();
+  });
+
+  it('loads companion content lazily for entry detail', async () => {
+    const store = makeBranchStore('feat');
+    const entry = store.entries.get('cms/content/post/post-1.json')!;
+    entry.companionMarkdown = {};
+    store.fileShas.set('cms/content/post/post-1.body.md', 'body-sha');
+    store.fileSizes.set('cms/content/post/post-1.body.md', 12);
+    mockFetchBranchContent.mockResolvedValueOnce(store);
+    mockFetchNextCachedContentFiles.mockResolvedValueOnce([
+      {
+        path: 'cms/content/post/post-1.body.md',
+        sha: 'body-sha',
+        content: '# Lazy body',
+      },
+    ]);
+
+    const result = await getStoredFile('cms/content/post/post-1.json', 'feat');
+
+    expect(result?.companionMarkdown.body).toBe('# Lazy body');
+    expect(mockFetchNextCachedContentFiles).toHaveBeenCalledOnce();
   });
 });
 
@@ -167,6 +220,23 @@ describe('getStoredMediaEntries', () => {
     expect(media).not.toBeNull();
     expect(media!.size).toBe(1);
     expect(media!.has('cms/media/media-uuid.json')).toBe(true);
+  });
+});
+
+describe('getStoredEntryListSnapshot', () => {
+  it('returns entry and media metadata without hydrating companions', async () => {
+    const store = makeBranchStore('feat');
+    const entry = store.entries.get('cms/content/post/post-1.json')!;
+    entry.companionMarkdown = {};
+    store.fileShas.set('cms/content/post/post-1.body.md', 'body-sha');
+    store.fileSizes.set('cms/content/post/post-1.body.md', 12);
+    mockFetchBranchContent.mockResolvedValueOnce(store);
+
+    const snapshot = await getStoredEntryListSnapshot('post', 'feat');
+
+    expect(snapshot?.entries.map((item) => item.path)).toEqual(['cms/content/post/post-1.json']);
+    expect(snapshot?.mediaEntries.map((item) => item.path)).toEqual(['cms/media/media-uuid.json']);
+    expect(mockFetchNextCachedContentFiles).not.toHaveBeenCalled();
   });
 });
 

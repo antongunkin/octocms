@@ -6,7 +6,13 @@ import {
   getMarkdownFieldNames,
   getRichTextFieldNames,
 } from './lib/companionMarkdown';
-import { isProductionMode, listGitHubFiles, readGitHubFilePublic, resolveContentBranch } from './github-public';
+import {
+  isProductionMode,
+  isVercelBuildStep,
+  listGitHubFiles,
+  readGitHubFilePublic,
+  resolveContentBranch,
+} from './github-public';
 import { parseRichText } from './lib/richtext/parseRichText';
 
 // ---------------------------------------------------------------------------
@@ -16,14 +22,14 @@ import { parseRichText } from './lib/richtext/parseRichText';
 const readContentFile = async (filePath: string, branch?: string): Promise<any | null> => {
   const hasGitHubRepoConfig = !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
 
-  if (isProductionMode() && hasGitHubRepoConfig) {
+  if (isProductionMode() && hasGitHubRepoConfig && !isVercelBuildStep()) {
     const content = await readGitHubFilePublic(filePath, branch);
     return content ? JSON.parse(content) : null;
   }
 
-  // Dev-only: guarded so Turbopack dead-code-eliminates this block (and the dynamic import)
-  // in production builds, preventing NFT from tracing the local filesystem helpers.
-  if (process.env.NODE_ENV !== 'production') {
+  // Dev and Vercel build: cloned repo content is on disk. Guard with NODE_ENV so Turbopack
+  // dead-code-eliminates this block in production serverless bundles (runtime uses GitHub).
+  if (process.env.NODE_ENV !== 'production' || isVercelBuildStep()) {
     const { readLocalContentFile } = await import('./lib/localReader');
     return readLocalContentFile(filePath);
   }
@@ -34,12 +40,12 @@ const readContentFile = async (filePath: string, branch?: string): Promise<any |
 const readRawFile = async (filePath: string, branch?: string): Promise<string> => {
   const hasGitHubRepoConfig = !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
 
-  if (isProductionMode() && hasGitHubRepoConfig) {
+  if (isProductionMode() && hasGitHubRepoConfig && !isVercelBuildStep()) {
     const content = await readGitHubFilePublic(filePath, branch);
     return content ?? '';
   }
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || isVercelBuildStep()) {
     const { readLocalRawFile } = await import('./lib/localReader');
     return readLocalRawFile(filePath);
   }
@@ -53,7 +59,7 @@ function pathImageField(src: string): ResolvedImageField {
 /** Resolve the published branch once for a query execution. Undefined in dev (uses local FS). */
 const resolvePublishedBranch = async (): Promise<string | undefined> => {
   const hasGitHubRepoConfig = !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
-  if (!isProductionMode() || !hasGitHubRepoConfig) return undefined;
+  if (!isProductionMode() || !hasGitHubRepoConfig || isVercelBuildStep()) return undefined;
   return resolveContentBranch();
 };
 
@@ -407,11 +413,11 @@ const listCollectionFiles = async (
   const dirPath = `${contentFolder}/${collectionName}`;
   const hasGitHubRepoConfig = !!process.env.GITHUB_REPO_OWNER && !!process.env.GITHUB_REPO_NAME;
 
-  if (isProductionMode() && hasGitHubRepoConfig) {
+  if (isProductionMode() && hasGitHubRepoConfig && !isVercelBuildStep()) {
     return listGitHubFiles(dirPath, '.json', branch);
   }
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || isVercelBuildStep()) {
     const { listLocalCollectionFiles } = await import('./lib/localReader');
     return listLocalCollectionFiles(dirPath);
   }

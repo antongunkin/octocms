@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { fetchBranchContent } from './contentStoreFetch';
+import { chunkManifestItems, fetchBranchContent } from './contentStoreFetch';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -15,6 +15,8 @@ const mockConfig = {
       label: 'Post',
       fields: {
         body: { label: 'Body', format: 'markdown' },
+        authors: { label: 'Authors', format: 'reference' },
+        hero: { label: 'Hero', format: 'image' },
         title: { label: 'Title', format: 'string' },
       },
     },
@@ -214,5 +216,39 @@ describe('fetchBranchContent', () => {
     expect(result!.entries.size).toBe(1);
     // Only the json blob should have been fetched
     expect(octokit.rest.git.getBlob).toHaveBeenCalledTimes(1);
+  });
+
+  it('builds reverse entry and media reference indexes', async () => {
+    const octokit = makeOctokit([{ path: 'cms/content/post/post-1.json', type: 'blob', sha: 'sha-1', size: 100 }], {
+      'sha-1': JSON.stringify({
+        sys: { id: '1', type: 'post' },
+        fields: {
+          authors: JSON.stringify(['author-a.json', 'author-b.json']),
+          hero: 'media-hero',
+        },
+      }),
+    });
+
+    const result = await fetchBranchContent(octokit, 'owner', 'repo', 'main');
+    expect(result!.reverseEntryReferences.get('author-a.json')).toEqual(['cms/content/post/post-1.json']);
+    expect(result!.reverseMediaReferences.get('media-hero')).toEqual(['cms/content/post/post-1.json']);
+  });
+});
+
+describe('chunkManifestItems', () => {
+  it('groups deterministically by Git-reported size and puts JSON metadata first', () => {
+    const items = [
+      { path: 'cms/content/post/a.body.md', sha: 'md-a', size: 6 },
+      { path: 'cms/content/post/b.json', sha: 'json-b', size: 6 },
+      { path: 'cms/content/post/a.json', sha: 'json-a', size: 4 },
+    ];
+
+    expect(chunkManifestItems(items, 10)).toEqual([
+      [
+        { path: 'cms/content/post/a.json', sha: 'json-a', size: 4 },
+        { path: 'cms/content/post/b.json', sha: 'json-b', size: 6 },
+      ],
+      [{ path: 'cms/content/post/a.body.md', sha: 'md-a', size: 6 }],
+    ]);
   });
 });
